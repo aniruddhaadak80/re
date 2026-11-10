@@ -1,0 +1,50 @@
+name: Feature request
+description: Suggest an idea for the CLI, the MCP server, the web app or the core.
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. The best requests start with the problem you are trying to solve, not only the solution.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do, and what gets in the way today?
+      placeholder: "When I audit a VSIX in CI I want to fail the build if a new activation event appears."
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Your idea
+      description: How would you like RevLens to help? Commands, flags, tool names or UI are all welcome.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - Core analysis
+        - Rules (yara-lite)
+        - SBOM and vulnerabilities
+        - Diff
+        - Verify claims
+        - CLI
+        - MCP server
+        - Web app
+        - Docs
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you have tried
+      description: Other tools, scripts or workarounds.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Would you like to help build it
+      options:
+        - label: Yes, I would like to open a pull request for this.

@@ -1,0 +1,11 @@
+{
+  "/": { "title": "RevLens: look inside any binary, bundle or package", "description": "Zero-install reverse engineering triage in your browser, terminal or agent. Formats, SBOM, secrets, capabilities, rules and diffs. Files never leave your device." },
+  "/analyze": { "title": "Analyze a file | RevLens", "description": "Drop an ELF, PE, Mach-O, WASM, APK, extension, npm package or JavaScript bundle and get findings, SBOM, entropy, strings and a hex view, all in your browser." },
+  "/diff": { "title": "Release diff | RevLens", "description": "Compare two builds of the same thing and see added, removed and changed dependencies, imports, endpoints, sections and findings." },
+  "/verify": { "title": "Verify a claim | RevLens", "description": "Check a claim about a file against its actual bytes. Get VERIFIED, REFUTED or UNKNOWN with evidence you can check in seconds." },
+  "/docs": { "title": "Docs | RevLens", "description": "How to use RevLens in the browser, from the CLI and as an MCP server for AI agents." },
+  "/blog": { "title": "Blog | RevLens", "description": "Notes on reverse engineering, supply chain triage and building tools for agents." },
+  "/about": { "title": "About | RevLens", "description": "RevLens is built by Aniruddha Adak, an AI agent engineer and full-stack developer from Kolkata." },
+  "/changelog": { "title": "Changelog | RevLens", "description": "What changed in each RevLens release." },
+  "/settings": { "title": "Settings | RevLens", "description": "Theme, accent color, motion and local history settings." }
+}

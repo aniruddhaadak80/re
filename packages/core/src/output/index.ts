@@ -1,0 +1,83 @@
+import type { Report, Severity, Finding } from '../types.js';
+
+const SARIF_LEVEL: Record<Severity, string> = { critical: 'error', high: 'error', medium: 'warning', low: 'note', info: 'note' };
+const SCORE: Record<Severity, string> = { critical: '9.5', high: '8.0', medium: '5.5', low: '3.0', info: '0.0' };
+
+function allFindings(r: Report): Finding[] { return r.findings; }
+
+/** SARIF 2.1.0, ready for GitHub code scanning upload. */
+export function toSARIF(r: Report): object {
+  const findings = allFindings(r);
+  const rules = [...new Map(findings.map((f) => [f.id.replace(/[.@].*$/, '') + '.' + f.analyzer, f])).values()];
+  return {
+    $schema: 'https://json.schemastore.org/sarif-2.1.0.json',
+    version: '2.1.0',
+    runs: [{
+      tool: { driver: { name: 'RevLens', version: r.tool.version, informationUri: 'https://github.com/aniruddhaadak80/re',
+        rules: rules.map((f) => ({ id: ruleId(f), name: f.title, shortDescription: { text: f.title }, fullDescription: { text: f.detail },
+          properties: { tags: [...(f.tags ?? []), ...(f.attack ?? [])], 'security-severity': SCORE[f.severity] } })) } },
+      results: findings.map((f) => ({
+        ruleId: ruleId(f), level: SARIF_LEVEL[f.severity], message: { text: `${f.title}. ${f.detail}` },
+        locations: [{ physicalLocation: { artifactLocation: { uri: f.evidence[0]?.path ?? r.file.name },
+          region: f.evidence[0]?.offset !== undefined ? { byteOffset: f.evidence[0].offset, byteLength: f.evidence[0].length ?? 1 } : undefined } }],
+        properties: { analyzer: f.analyzer, severity: f.severity },
+      })),
+      artifacts: [{ location: { uri: r.file.name }, length: r.file.size, hashes: { sha256: r.file.hashes.sha256 } }],
+    }],
+  };
+}
+function ruleId(f: Finding): string { return `${f.analyzer}/${f.id.split('@')[0]!.replace(/\.\d+$/, '')}`; }
+
+/** CycloneDX 1.5 SBOM from detected components. */
+export function toCycloneDX(r: Report): object {
+  const comps = [...new Map([r, ...(r.children ?? [])].flatMap((x) => x.components).map((c) => [`${c.name}@${c.version ?? ''}`, c])).values()];
+  return {
+    bomFormat: 'CycloneDX', specVersion: '1.5', version: 1,
+    serialNumber: `urn:uuid:${uuidFrom(r.file.hashes.sha256)}`,
+    metadata: { timestamp: r.generatedAt, tools: { components: [{ type: 'application', name: 'RevLens', version: r.tool.version }] },
+      component: { type: 'file', name: r.file.name, hashes: [{ alg: 'SHA-256', content: r.file.hashes.sha256 }] } },
+    components: comps.map((c) => ({ type: 'library', name: c.name, version: c.version, purl: c.purl,
+      properties: [{ name: 'revlens:confidence', value: String(c.confidence) }, { name: 'revlens:ecosystem', value: c.ecosystem }] })),
+  };
+}
+function uuidFrom(h: string): string { return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-a${h.slice(17, 20)}-${h.slice(20, 32)}`; }
+
+/** Markdown report, good for pull requests, issues and agent context windows. */
+export function toMarkdown(r: Report): string {
+  const f = r.file;
+  const L: string[] = [];
+  L.push(`# RevLens report: ${f.name}`, '');
+  L.push(`| Field | Value |`, `| --- | --- |`);
+  L.push(`| Format | ${f.format}${f.arch ? `, ${f.arch}` : ''}${f.bits ? `, ${f.bits} bit` : ''} |`);
+  L.push(`| Size | ${f.size.toLocaleString('en-US')} bytes |`, `| SHA-256 | \`${f.hashes.sha256}\` |`, `| Entropy | ${f.entropy.toFixed(2)} bits per byte |`, '');
+  const counts = (['critical', 'high', 'medium', 'low', 'info'] as Severity[]).map((s) => `${s} ${r.findings.filter((x) => x.severity === s).length}`);
+  L.push(`## Findings`, '', `Totals: ${counts.join(', ')}.`, '');
+  for (const x of r.findings.slice(0, 200)) {
+    L.push(`- **${x.severity.toUpperCase()}** ${x.title}. ${x.detail}${x.evidence[0]?.offset !== undefined ? ` (offset ${x.evidence[0].offset}${x.evidence[0].path ? ` in ${x.evidence[0].path}` : ''})` : x.evidence[0]?.path ? ` (in ${x.evidence[0].path})` : ''}`);
+  }
+  if (r.capabilities.length) { L.push('', '## Capabilities', ''); for (const c of r.capabilities) L.push(`- ${c.name}${c.attack ? ` (${c.attack})` : ''}: ${c.evidence.map((e) => e.snippet).join(', ')}`); }
+  const comps = r.components;
+  if (comps.length) { L.push('', `## Components (${comps.length})`, '', '| Name | Version | Confidence |', '| --- | --- | --- |'); for (const c of comps.slice(0, 150)) L.push(`| ${c.name} | ${c.version ?? 'unknown'} | ${Math.round(c.confidence * 100)}% |`); }
+  if (r.sections.length) { L.push('', '## Sections', '', '| Name | Offset | Size | Entropy |', '| --- | --- | --- | --- |'); for (const s of r.sections.slice(0, 60)) L.push(`| ${s.name} | ${s.offset} | ${s.size} | ${s.entropy.toFixed(2)} |`); }
+  if (r.imports.length) { L.push('', '## Imports', ''); for (const i of r.imports.slice(0, 40)) L.push(`- ${i.library}: ${i.symbols.slice(0, 30).join(', ')}${i.symbols.length > 30 ? ` and ${i.symbols.length - 30} more` : ''}`); }
+  L.push('', `Generated by RevLens ${r.tool.version} at ${r.generatedAt}.`);
+  return L.join('\n');
+}
+
+const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+const SEV_COLOR: Record<Severity, string> = { critical: '#ef4444', high: '#f97316', medium: '#f5b301', low: '#14b8a6', info: '#94a3b8' };
+
+/** Self contained HTML report with an entropy strip. No external assets. */
+export function toHTML(r: Report): string {
+  const em = (r.meta.entropyMap as { values: number[] } | undefined)?.values ?? [];
+  const bars = em.map((v) => `<i style="height:${Math.max(4, (v / 8) * 60)}px;background:${v > 7.2 ? '#f97316' : v > 6 ? '#f5b301' : '#14b8a6'}" title="${v.toFixed(2)}"></i>`).join('');
+  const rows = r.findings.map((f) => `<tr><td><b style="color:${SEV_COLOR[f.severity]}">${f.severity}</b></td><td>${esc(f.title)}</td><td>${esc(f.detail)}</td><td>${f.evidence[0]?.offset ?? ''}</td></tr>`).join('');
+  const comps = r.components.map((c) => `<tr><td>${esc(c.name)}</td><td>${esc(c.version ?? 'unknown')}</td><td>${Math.round(c.confidence * 100)}%</td></tr>`).join('');
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RevLens report: ${esc(r.file.name)}</title>
+<style>body{margin:0;font:15px/1.55 system-ui,sans-serif;background:#0a0a0b;color:#e7e5e4}main{max-width:1000px;margin:auto;padding:32px 20px}h1{color:#ffd166;margin:0 0 4px}h2{color:#f5b301;margin-top:32px}code{color:#ffd166;word-break:break-all}table{width:100%;border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid #27272a;text-align:left;vertical-align:top}th{color:#a8a29e;font-weight:600}.strip{display:flex;align-items:flex-end;gap:2px;height:64px;background:#141416;padding:6px;border-radius:10px}.strip i{flex:1;border-radius:2px}.k{color:#a8a29e}</style></head>
+<body><main><h1>${esc(r.file.name)}</h1><div class="k">${esc(r.file.format)}${r.file.arch ? ` · ${esc(r.file.arch)}` : ''} · ${r.file.size.toLocaleString('en-US')} bytes · entropy ${r.file.entropy.toFixed(2)}</div>
+<p class="k">SHA-256 <code>${r.file.hashes.sha256}</code></p><h2>Entropy map</h2><div class="strip">${bars}</div>
+<h2>Findings (${r.findings.length})</h2><table><tr><th>Severity</th><th>Title</th><th>Detail</th><th>Offset</th></tr>${rows}</table>
+${comps ? `<h2>Components (${r.components.length})</h2><table><tr><th>Name</th><th>Version</th><th>Confidence</th></tr>${comps}</table>` : ''}
+<p class="k">Generated by RevLens ${r.tool.version} at ${r.generatedAt}.</p></main></body></html>`;
+}

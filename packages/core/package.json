@@ -1,0 +1,14 @@
+{
+  "name": "@revlens/core",
+  "version": "0.1.0",
+  "description": "Pure TypeScript reverse engineering analysis core. Zero native dependencies. Runs in the browser, Node and workers.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "files": ["dist"],
+  "scripts": { "build": "tsc -p tsconfig.json" },
+  "keywords": ["reverse-engineering", "sbom", "elf", "pe", "macho", "wasm", "yara", "sarif", "security", "mcp"],
+  "repository": { "type": "git", "url": "https://github.com/aniruddhaadak80/re.git", "directory": "packages/core" }
+}

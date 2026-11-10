@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-theme="black" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>RevLens: look inside any binary, bundle or package</title>
+    <meta name="description" content="Zero-install reverse engineering triage in your browser, terminal or agent. Formats, SBOM, secrets, capabilities, rules and diffs. Files never leave your device." />
+    <meta name="theme-color" content="#0A0A0B" />
+    <meta name="author" content="Aniruddha Adak" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <link rel="apple-touch-icon" href="%BASE_URL%icons/apple-touch-icon.png" />
+    <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
+    <link rel="canonical" href="https://aniruddhaadak80.github.io/re/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="RevLens" />
+    <meta property="og:title" content="RevLens: look inside any binary, bundle or package" />
+    <meta property="og:description" content="Zero-install reverse engineering triage in your browser, terminal or agent. Files never leave your device." />
+    <meta property="og:url" content="https://aniruddhaadak80.github.io/re/" />
+    <meta property="og:image" content="https://aniruddhaadak80.github.io/re/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@asi369_" />
+    <meta name="twitter:title" content="RevLens: look inside any binary, bundle or package" />
+    <meta name="twitter:description" content="Zero-install reverse engineering triage in your browser, terminal or agent. Files never leave your device." />
+    <meta name="twitter:image" content="https://aniruddhaadak80.github.io/re/og.png" />
+    <script>
+      (function () {
+        try {
+          var s = JSON.parse(localStorage.getItem('revlens.settings') || '{}');
+          var t = s.theme || 'black';
+          if (t === 'system') t = matchMedia('(prefers-color-scheme: light)').matches ? 'sun' : 'black';
+          var d = document.documentElement;
+          d.dataset.theme = t;
+          d.dataset.accent = s.accent || 'gold';
+          d.classList.toggle('dark', t !== 'sun');
+          if (s.motion === 'reduced') d.dataset.motion = 'reduced';
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-bg text-fg antialiased">
+    <div id="root"></div>
+    <noscript>RevLens needs JavaScript to analyze files in your browser.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

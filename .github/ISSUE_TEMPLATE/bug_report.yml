@@ -1,0 +1,86 @@
+name: Bug report
+description: Something went wrong, a finding is wrong, or a finding is missing.
+title: "bug: "
+labels: [bug, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Please do not attach private files, live malware or real secrets. For security problems in RevLens itself, follow SECURITY.md instead of opening an issue.
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where did it happen
+      options:
+        - Web app
+        - CLI (revlens)
+        - MCP server (@revlens/mcp)
+        - Library (@revlens/core)
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem is it
+      options:
+        - Crash, hang or error
+        - False positive (a finding that should not be there)
+        - Missed finding (something RevLens should have found)
+        - Wrong value (hash, format, version, offset)
+        - Docs or wording
+        - Something else
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: RevLens version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: Browser and version, or Node version and operating system.
+      placeholder: "Node 22.11 on Ubuntu 24.04"
+  - type: textarea
+    id: file
+    attributes:
+      label: The file
+      description: Where can we get the same file? A public npm package, store listing or release URL is ideal. Include the SHA-256 if you can.
+      placeholder: "npm pack @esbuild/win32-x64@0.24.0, sha256 26c4c83a..."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. npx revlens analyze esbuild.exe --json
+        2. Look at findings[0]
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+      description: Paste the relevant part of the output. Finding ids such as surface.http help a lot.
+      render: text
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: I did not include private files, live malware or real secrets.
+          required: true

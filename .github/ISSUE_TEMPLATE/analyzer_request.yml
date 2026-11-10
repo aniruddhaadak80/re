@@ -1,0 +1,50 @@
+name: Analyzer or format request
+description: Ask RevLens to understand a new file format, or to learn something new from a format it already reads.
+title: "analyzer: "
+labels: [analyzer, enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        RevLens analyzers are pure TypeScript and run in the browser, so we can only parse what we can read without native tools. Tell us what you want to learn from the file and we will see how far we can go.
+  - type: input
+    id: format
+    attributes:
+      label: Format or target
+      placeholder: "Android DEX, Python .pyc, PE rich header, Electron ASAR integrity, ..."
+    validations:
+      required: true
+  - type: textarea
+    id: questions
+    attributes:
+      label: What should RevLens tell you about it
+      description: The questions you ask when you first open a file like this.
+      placeholder: |
+        - Which classes call the network
+        - Which permissions it uses
+        - The compiler version
+    validations:
+      required: true
+  - type: textarea
+    id: samples
+    attributes:
+      label: Public samples
+      description: Links to public, license friendly files we can use in tests. Please no live malware.
+    validations:
+      required: true
+  - type: textarea
+    id: spec
+    attributes:
+      label: Specs and references
+      description: Format documentation, source code of other parsers, blog posts.
+  - type: textarea
+    id: existing
+    attributes:
+      label: How you do this today
+      description: Which tools you use now, and what they output.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Would you like to help build it
+      options:
+        - label: Yes, I would like to write or review the analyzer.

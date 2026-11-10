@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" width="1200" height="620" role="img" aria-labelledby="t d">
+<title id="t">RevLens architecture</title><desc id="d">Bytes come in from the browser, the CLI or the MCP server, pass through format detection and fifteen analyzers in @revlens/core, and come out as one report that renders to JSON, Markdown, HTML, SARIF and CycloneDX.</desc>
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#F5B301"/></marker></defs>
+<style>text{font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif}.m{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.flow{stroke-dasharray:6 8;animation:dash 1.4s linear infinite}@keyframes dash{to{stroke-dashoffset:-28}}</style>
+<rect width="1200" height="620" rx="24" fill="#0A0A0B"/>
+<text x="40" y="52" font-size="26" font-weight="800" fill="#FFD166">How RevLens works</text>
+<text x="40" y="80" font-size="15" fill="#A8A29E">One pure TypeScript core. Three ways in. One report out.</text>
+<rect x="40" y="130" width="200" height="74" rx="12" fill="#141416" stroke="#38BDF8" stroke-width="1.6"/>
+<text x="140.0" y="168.0" text-anchor="middle" font-size="15" font-weight="700" fill="#38BDF8">Browser</text>
+<text x="140.0" y="183.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">Web Worker</text>
+<path class="flow" d="M240 167 C 290 167, 290 330, 330 330" fill="none" stroke="#38BDF8" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="40" y="280" width="200" height="74" rx="12" fill="#141416" stroke="#14B8A6" stroke-width="1.6"/>
+<text x="140.0" y="318.0" text-anchor="middle" font-size="15" font-weight="700" fill="#14B8A6">CLI</text>
+<text x="140.0" y="333.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">npx revlens</text>
+<path class="flow" d="M240 317 C 290 317, 290 330, 330 330" fill="none" stroke="#14B8A6" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="40" y="430" width="200" height="74" rx="12" fill="#141416" stroke="#10B981" stroke-width="1.6"/>
+<text x="140.0" y="468.0" text-anchor="middle" font-size="15" font-weight="700" fill="#10B981">MCP server</text>
+<text x="140.0" y="483.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">npx @revlens/mcp</text>
+<path class="flow" d="M240 467 C 290 467, 290 330, 330 330" fill="none" stroke="#10B981" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="330" y="110" width="520" height="440" rx="18" fill="#101012" stroke="#F5B301" stroke-width="2"/>
+<text x="350" y="142" font-size="17" font-weight="800" fill="#F5B301">@revlens/core</text>
+<text x="830" y="142" text-anchor="end" font-size="12" fill="#A8A29E" class="m">Uint8Array in, Report out</text>
+<rect x="350" y="160" width="480" height="46" rx="12" fill="#141416" stroke="#FFD166" stroke-width="1.6"/>
+<text x="590.0" y="184.0" text-anchor="middle" font-size="15" font-weight="700" fill="#FFD166">detectFormat + hashes</text>
+<text x="590.0" y="199.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">magic bytes, md5, sha1, sha256, TLSH-like, CTPH</text>
+<rect x="350" y="230" width="89" height="44" rx="9" fill="#141416" stroke="#38BDF8" stroke-width="1.4"/>
+<text x="394.5" y="257" text-anchor="middle" font-size="13" font-weight="700" fill="#38BDF8" class="m">elf</text>
+<rect x="447" y="230" width="89" height="44" rx="9" fill="#141416" stroke="#38BDF8" stroke-width="1.4"/>
+<text x="491.5" y="257" text-anchor="middle" font-size="13" font-weight="700" fill="#38BDF8" class="m">pe</text>
+<rect x="544" y="230" width="89" height="44" rx="9" fill="#141416" stroke="#38BDF8" stroke-width="1.4"/>
+<text x="588.5" y="257" text-anchor="middle" font-size="13" font-weight="700" fill="#38BDF8" class="m">macho</text>
+<rect x="641" y="230" width="89" height="44" rx="9" fill="#141416" stroke="#38BDF8" stroke-width="1.4"/>
+<text x="685.5" y="257" text-anchor="middle" font-size="13" font-weight="700" fill="#38BDF8" class="m">wasm</text>
+<rect x="738" y="230" width="89" height="44" rx="9" fill="#141416" stroke="#38BDF8" stroke-width="1.4"/>
+<text x="782.5" y="257" text-anchor="middle" font-size="13" font-weight="700" fill="#38BDF8" class="m">buildinfo</text>
+<rect x="350" y="288" width="89" height="44" rx="9" fill="#141416" stroke="#F59E0B" stroke-width="1.4"/>
+<text x="394.5" y="315" text-anchor="middle" font-size="13" font-weight="700" fill="#F59E0B" class="m">entropy</text>
+<rect x="447" y="288" width="89" height="44" rx="9" fill="#141416" stroke="#F59E0B" stroke-width="1.4"/>
+<text x="491.5" y="315" text-anchor="middle" font-size="13" font-weight="700" fill="#F59E0B" class="m">strings</text>
+<rect x="544" y="288" width="89" height="44" rx="9" fill="#141416" stroke="#14B8A6" stroke-width="1.4"/>
+<text x="588.5" y="315" text-anchor="middle" font-size="13" font-weight="700" fill="#14B8A6" class="m">archive</text>
+<rect x="641" y="288" width="89" height="44" rx="9" fill="#141416" stroke="#14B8A6" stroke-width="1.4"/>
+<text x="685.5" y="315" text-anchor="middle" font-size="13" font-weight="700" fill="#14B8A6" class="m">extaudit</text>
+<rect x="738" y="288" width="89" height="44" rx="9" fill="#141416" stroke="#10B981" stroke-width="1.4"/>
+<text x="782.5" y="315" text-anchor="middle" font-size="13" font-weight="700" fill="#10B981" class="m">sbom</text>
+<rect x="350" y="346" width="89" height="44" rx="9" fill="#141416" stroke="#10B981" stroke-width="1.4"/>
+<text x="394.5" y="373" text-anchor="middle" font-size="13" font-weight="700" fill="#10B981" class="m">sourcemap</text>
+<rect x="447" y="346" width="89" height="44" rx="9" fill="#141416" stroke="#10B981" stroke-width="1.4"/>
+<text x="491.5" y="373" text-anchor="middle" font-size="13" font-weight="700" fill="#10B981" class="m">secrets</text>
+<rect x="544" y="346" width="89" height="44" rx="9" fill="#141416" stroke="#10B981" stroke-width="1.4"/>
+<text x="588.5" y="373" text-anchor="middle" font-size="13" font-weight="700" fill="#10B981" class="m">surface</text>
+<rect x="641" y="346" width="89" height="44" rx="9" fill="#141416" stroke="#FFD166" stroke-width="1.4"/>
+<text x="685.5" y="373" text-anchor="middle" font-size="13" font-weight="700" fill="#FFD166" class="m">capa</text>
+<rect x="738" y="346" width="89" height="44" rx="9" fill="#141416" stroke="#FFD166" stroke-width="1.4"/>
+<text x="782.5" y="373" text-anchor="middle" font-size="13" font-weight="700" fill="#FFD166" class="m">yara</text>
+
+<rect x="350" y="440" width="480" height="46" rx="12" fill="#1A1608" stroke="#F5B301" stroke-width="1.6"/>
+<text x="590.0" y="464.0" text-anchor="middle" font-size="15" font-weight="700" fill="#F5B301">Report  revlens/report@1</text>
+<text x="590.0" y="479.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">file, sections, imports, strings, components, findings</text>
+<rect x="350" y="411" width="10" height="10" rx="2" fill="#38BDF8"/><text x="366" y="420" font-size="12" fill="#A8A29E">Structure</text>
+<rect x="447" y="411" width="10" height="10" rx="2" fill="#F59E0B"/><text x="463" y="420" font-size="12" fill="#A8A29E">Content</text>
+<rect x="530" y="411" width="10" height="10" rx="2" fill="#14B8A6"/><text x="546" y="420" font-size="12" fill="#A8A29E">Containers</text>
+<rect x="634" y="411" width="10" height="10" rx="2" fill="#10B981"/><text x="650" y="420" font-size="12" fill="#A8A29E">Supply chain</text>
+<rect x="752" y="411" width="10" height="10" rx="2" fill="#FFD166"/><text x="768" y="420" font-size="12" fill="#A8A29E">Rules</text>
+<text x="590" y="525" text-anchor="middle" font-size="12" fill="#A8A29E">archive members (xpi, vsix, tgz, crx, asar) loop back in as child reports</text>
+<rect x="940" y="120" width="220" height="56" rx="12" fill="#141416" stroke="#FFD166" stroke-width="1.6"/>
+<text x="1050.0" y="149.0" text-anchor="middle" font-size="15" font-weight="700" fill="#FFD166">JSON</text>
+<text x="1050.0" y="164.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">--json</text>
+<path class="flow" d="M850 463 C 900 463, 900 148, 940 148" fill="none" stroke="#FFD166" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="940" y="192" width="220" height="56" rx="12" fill="#141416" stroke="#14B8A6" stroke-width="1.6"/>
+<text x="1050.0" y="221.0" text-anchor="middle" font-size="15" font-weight="700" fill="#14B8A6">Markdown</text>
+<text x="1050.0" y="236.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">--md</text>
+<path class="flow" d="M850 463 C 900 463, 900 220, 940 220" fill="none" stroke="#14B8A6" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="940" y="264" width="220" height="56" rx="12" fill="#141416" stroke="#38BDF8" stroke-width="1.6"/>
+<text x="1050.0" y="293.0" text-anchor="middle" font-size="15" font-weight="700" fill="#38BDF8">HTML</text>
+<text x="1050.0" y="308.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">--html</text>
+<path class="flow" d="M850 463 C 900 463, 900 292, 940 292" fill="none" stroke="#38BDF8" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="940" y="336" width="220" height="56" rx="12" fill="#141416" stroke="#F59E0B" stroke-width="1.6"/>
+<text x="1050.0" y="365.0" text-anchor="middle" font-size="15" font-weight="700" fill="#F59E0B">SARIF 2.1.0</text>
+<text x="1050.0" y="380.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">--sarif</text>
+<path class="flow" d="M850 463 C 900 463, 900 364, 940 364" fill="none" stroke="#F59E0B" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="940" y="408" width="220" height="56" rx="12" fill="#141416" stroke="#10B981" stroke-width="1.6"/>
+<text x="1050.0" y="437.0" text-anchor="middle" font-size="15" font-weight="700" fill="#10B981">CycloneDX 1.5</text>
+<text x="1050.0" y="452.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">--cyclonedx</text>
+<path class="flow" d="M850 463 C 900 463, 900 436, 940 436" fill="none" stroke="#10B981" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="940" y="480" width="220" height="56" rx="12" fill="#141416" stroke="#F5B301" stroke-width="1.6"/>
+<text x="1050.0" y="509.0" text-anchor="middle" font-size="15" font-weight="700" fill="#F5B301">OSV.dev, opt in</text>
+<text x="1050.0" y="524.0" text-anchor="middle" font-size="12" fill="#A8A29E" class="m">--osv</text>
+<path class="flow" d="M850 463 C 900 463, 900 508, 940 508" fill="none" stroke="#F5B301" stroke-width="1.6" marker-end="url(#arr)"/>
+<text x="40" y="590" font-size="13" fill="#A8A29E">No native dependencies. No upload. The only network call is the OSV lookup, and only when you ask for it.</text>
+</svg>

@@ -1,0 +1,14 @@
+{
+  "name": "@revlens/mcp",
+  "version": "0.1.0",
+  "description": "RevLens MCP server: give Claude Code, Codex, Cursor and other agents a zero-install reverse engineering toolkit.",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "revlens-mcp": "./dist/index.js" },
+  "files": ["dist"],
+  "scripts": { "build": "tsc -p tsconfig.json" },
+  "dependencies": { "@revlens/core": "0.1.0", "@modelcontextprotocol/sdk": "^1.20.0", "zod": "^3.24.1" },
+  "engines": { "node": ">=20.10.0" },
+  "keywords": ["mcp", "model-context-protocol", "reverse-engineering", "claude-code", "codex", "cursor", "agent"],
+  "repository": { "type": "git", "url": "https://github.com/aniruddhaadak80/re.git", "directory": "packages/mcp" }
+}

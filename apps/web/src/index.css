@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme='black'] {
+  --bg: 10 10 11;
+  --surface: 17 17 19;
+  --surface2: 26 26 29;
+  --line: 40 39 44;
+  --fg: 242 239 230;
+  --muted: 163 159 148;
+  color-scheme: dark;
+}
+[data-theme='dark'] {
+  --bg: 22 23 26;
+  --surface: 30 31 35;
+  --surface2: 39 40 45;
+  --line: 56 57 63;
+  --fg: 240 238 232;
+  --muted: 168 165 156;
+  color-scheme: dark;
+}
+[data-theme='sun'] {
+  --bg: 250 249 245;
+  --surface: 255 255 255;
+  --surface2: 244 242 235;
+  --line: 224 220 207;
+  --fg: 26 24 20;
+  --muted: 96 92 82;
+  color-scheme: light;
+}
+
+/* Accent: --accent fills, --accent2 the lighter tone, --ink is accent colored text that stays readable. */
+:root,
+[data-accent='gold'] { --accent: 245 179 1; --accent2: 255 209 102; --ink: 255 209 102; }
+[data-accent='teal'] { --accent: 20 184 166; --accent2: 94 234 212; --ink: 94 234 212; }
+[data-accent='amber'] { --accent: 245 158 11; --accent2: 252 211 77; --ink: 252 211 77; }
+[data-accent='emerald'] { --accent: 16 185 129; --accent2: 110 231 183; --ink: 110 231 183; }
+[data-accent='sky'] { --accent: 14 165 233; --accent2: 125 211 252; --ink: 125 211 252; }
+[data-accent='orange'] { --accent: 249 115 22; --accent2: 253 186 116; --ink: 253 186 116; }
+[data-theme='sun'][data-accent='gold'], [data-theme='sun']:not([data-accent]) { --ink: 146 98 0; }
+[data-theme='sun'][data-accent='teal'] { --ink: 13 110 100; }
+[data-theme='sun'][data-accent='amber'] { --ink: 146 84 6; }
+[data-theme='sun'][data-accent='emerald'] { --ink: 4 112 80; }
+[data-theme='sun'][data-accent='sky'] { --ink: 3 100 150; }
+[data-theme='sun'][data-accent='orange'] { --ink: 165 62 8; }
+
+html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+html[data-motion='reduced'] { scroll-behavior: auto; }
+html[data-motion='reduced'] *, html[data-motion='reduced'] *::before, html[data-motion='reduced'] *::after {
+  animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important;
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body { overflow-x: hidden; min-height: 100vh; }
+::selection { background: rgb(var(--accent) / 0.35); }
+* { scrollbar-width: thin; scrollbar-color: rgb(var(--line)) transparent; }
+
+@layer components {
+  .container-x { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+  .card { @apply rounded-2xl border border-line bg-surface; }
+  .card-hover { @apply transition duration-200 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-glow; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-primary { @apply btn bg-accent text-night hover:bg-accent2 active:scale-[0.98]; }
+  .btn-ghost { @apply btn border border-line bg-surface text-fg hover:border-accent/60 hover:text-ink; }
+  .btn-sm { @apply px-3 py-1.5 text-xs; }
+  .chip { @apply inline-flex items-center gap-1 rounded-full border border-line bg-surface2 px-2.5 py-0.5 text-xs text-muted; }
+  .input { @apply w-full rounded-xl border border-line bg-surface2 px-3 py-2 text-sm text-fg placeholder:text-muted/70 focus:border-accent/70 focus:outline-none focus:ring-2 focus:ring-accent/30; }
+  .label { @apply mb-1 block text-xs font-medium uppercase tracking-wider text-muted; }
+  .kbd { @apply rounded-md border border-line bg-surface2 px-1.5 py-0.5 font-mono text-[10px] text-muted; }
+  .text-gradient { background: linear-gradient(100deg, rgb(var(--accent)) 10%, rgb(var(--accent2)) 55%, rgb(var(--accent)) 95%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grid-bg { background-image: linear-gradient(rgb(var(--line) / 0.45) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--line) / 0.45) 1px, transparent 1px); background-size: 44px 44px; }
+}
+
+/* Markdown prose */
+.prose-rl { @apply text-[15.5px] leading-7 text-fg; overflow-wrap: anywhere; }
+.prose-rl h1 { @apply mb-4 mt-2 text-3xl font-semibold tracking-tight sm:text-4xl; }
+.prose-rl h2 { @apply mb-3 mt-10 scroll-mt-24 border-b border-line pb-2 text-2xl font-semibold tracking-tight; }
+.prose-rl h3 { @apply mb-2 mt-8 scroll-mt-24 text-lg font-semibold; }
+.prose-rl h4 { @apply mb-2 mt-6 font-semibold; }
+.prose-rl p { @apply my-4; }
+.prose-rl a { @apply text-ink underline decoration-accent/40 underline-offset-4 hover:decoration-accent; }
+.prose-rl ul { @apply my-4 list-disc pl-6; }
+.prose-rl ol { @apply my-4 list-decimal pl-6; }
+.prose-rl li { @apply my-1; }
+.prose-rl blockquote { @apply my-6 border-l-4 border-accent/60 bg-surface2/60 px-4 py-2 text-muted; }
+.prose-rl :not(pre) > code { @apply rounded-md border border-line bg-surface2 px-1.5 py-0.5 font-mono text-[0.85em] text-ink; }
+.prose-rl table { @apply my-6 block w-full overflow-x-auto text-sm; border-collapse: collapse; }
+.prose-rl th { @apply border border-line bg-surface2 px-3 py-2 text-left font-semibold; }
+.prose-rl td { @apply border border-line px-3 py-2 align-top; }
+.prose-rl img { @apply my-6 h-auto max-w-full rounded-xl border border-line; }
+.prose-rl hr { @apply my-10 border-line; }
+.prose-rl table code { white-space: nowrap; overflow-wrap: normal; }

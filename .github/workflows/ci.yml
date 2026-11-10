@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test on Node ${{ matrix.node }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        node: [20, 22, 24]
+        include:
+          - os: windows-latest
+            node: 22
+          - os: macos-latest
+            node: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - name: Fetch real world samples
+        run: node samples/fetch-samples.mjs
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm test
+      - name: CLI smoke test
+        shell: bash
+        run: |
+          node packages/cli/dist/index.js --version
+          node packages/cli/dist/index.js analyze samples/ls-linux.elf samples/left-pad-1.3.0.tgz
+          node packages/cli/dist/index.js verify samples/ls-linux.elf format=elf section=.text
+          node packages/cli/dist/index.js sbom samples/react-dom.production.min.js > sbom.json
+          node -e "const b=require('./sbom.json'); if(!b.components.some(c=>c.purl==='pkg:npm/react-dom@18.3.1')) process.exit(1)"
+
+  web:
+    name: Web app build and browser tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:web
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - name: End to end tests
+        run: npm run test:e2e --if-present
+        working-directory: apps/web
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-screenshots
+          path: apps/web/e2e/screenshots
+          if-no-files-found: ignore
