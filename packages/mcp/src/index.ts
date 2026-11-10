@@ -4,7 +4,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { readFileSync, statSync } from 'node:fs';
+import { readFileSync, openSync, fstatSync, closeSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import {
   analyze, diff, verifyClaim, scanRules, STARTER_RULES, toCycloneDX, toMarkdown, lookupOSV, ANALYZERS, REVLENS_VERSION,
@@ -14,12 +14,16 @@ import {
 const MAX_FILE = Number(process.env.REVLENS_MAX_FILE_MB ?? 256) * 1024 * 1024;
 const cache = new Map<string, { mtime: number; bytes: Uint8Array; report: Report }>();
 
+/** Opens the file once and checks and reads that same descriptor, so it cannot be swapped in between. */
 function readFile(path: string): { bytes: Uint8Array; abs: string; mtime: number } {
   const abs = resolve(path);
-  const st = statSync(abs);
-  if (!st.isFile()) throw new Error(`${abs} is not a regular file`);
-  if (st.size > MAX_FILE) throw new Error(`${abs} is larger than ${MAX_FILE} bytes. Raise REVLENS_MAX_FILE_MB to allow it.`);
-  return { bytes: new Uint8Array(readFileSync(abs)), abs, mtime: st.mtimeMs };
+  const fd = openSync(abs, 'r');
+  try {
+    const st = fstatSync(fd);
+    if (!st.isFile()) throw new Error(`${abs} is not a regular file`);
+    if (st.size > MAX_FILE) throw new Error(`${abs} is larger than ${MAX_FILE} bytes. Raise REVLENS_MAX_FILE_MB to allow it.`);
+    return { bytes: new Uint8Array(readFileSync(fd)), abs, mtime: st.mtimeMs };
+  } finally { closeSync(fd); }
 }
 
 async function reportFor(path: string, rules?: string): Promise<{ report: Report; bytes: Uint8Array }> {

@@ -130,8 +130,8 @@ test('diff reports dependency and endpoint changes between versions', async () =
   const v2 = await analyze(enc('/*! left-pad v1.3.0 */ fetch("https://api.example.dev/v2/users"); fetch("https://telemetry.example.dev/collect")'), { name: 'app-2.js' });
   const d = diff(v1, v2);
   assert.equal(d.components.changed?.[0]?.after.version, '1.3.0');
-  assert.ok(d.endpoints.added.includes('https://telemetry.example.dev/collect'));
-  assert.ok(d.endpoints.removed.includes('https://api.example.dev/v1/users'));
+  assert.ok(d.endpoints.added.some((u) => u === 'https://telemetry.example.dev/collect'));
+  assert.ok(d.endpoints.removed.some((u) => u === 'https://api.example.dev/v1/users'));
   assert.match(d.summary, /dependency change/);
   assert.match(diff(v1, v1).summary, /identical/);
 });

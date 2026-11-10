@@ -54,8 +54,23 @@ export function download(name: string, content: string | object, type = 'applica
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
+/** Removes <...> spans the way /<[^>]+>/g would, without a regex replace, in linear time. */
+function stripTags(s: string): string {
+  let out = '';
+  let i = 0;
+  while (i < s.length) {
+    const lt = s.indexOf('<', i);
+    if (lt < 0) { out += s.slice(i); break; }
+    const gt = s.indexOf('>', lt + 2);
+    if (gt < 0 || s[lt + 1] === '>') { out += s.slice(i, lt + 1); i = lt + 1; if (gt < 0) { out += s.slice(i); break; } continue; }
+    out += s.slice(i, lt);
+    i = gt + 1;
+  }
+  return out;
+}
+
 export function slugify(s: string): string {
-  return s.toLowerCase().replace(/<[^>]+>/g, '').replace(/[`*_~]/g, '').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+  return stripTags(s.toLowerCase()).replace(/[`*_~]/g, '').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-');
 }
 
 export const cx = (...c: (string | false | null | undefined)[]): string => c.filter(Boolean).join(' ');

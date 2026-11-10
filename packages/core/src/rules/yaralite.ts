@@ -96,6 +96,8 @@ export function assertSafeRegex(src: string): void {
   }
 }
 
+const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype', 'hasOwnProperty', 'toString', 'valueOf', 'toJSON']);
+
 export function parseRules(src: string): Rule[] {
   if (src.length > YARA_LIMITS.maxRuleText) throw new Error(`rule text is ${src.length} characters, the limit is ${YARA_LIMITS.maxRuleText}`);
   const text = stripComments(src);
@@ -117,11 +119,14 @@ export function parseRules(src: string): Rule[] {
       const r = new RegExp(`\\b${name}\\s*:([\\s\\S]*?)(?=\\b(?:meta|strings|condition)\\s*:|$)`);
       return r.exec(body)?.[1]?.trim() ?? '';
     };
-    const meta: Record<string, string> = {};
+    // Built with fromEntries so a meta key such as __proto__ becomes a plain own property
+    // instead of reaching the prototype. Keys that shadow Object methods are dropped.
+    const metaEntries: [string, string][] = [];
     for (const line of sec('meta').split('\n')) {
       const mm = /^\s*(\w+)\s*=\s*(?:"((?:[^"\\]|\\.)*)"|(\S+))/.exec(line);
-      if (mm) meta[mm[1] as string] = (mm[2] ?? mm[3]) as string;
+      if (mm && !UNSAFE_KEYS.has(mm[1] as string)) metaEntries.push([mm[1] as string, (mm[2] ?? mm[3]) as string]);
     }
+    const meta: Record<string, string> = Object.fromEntries(metaEntries);
     const strings: StrDef[] = [];
     const strSrc = sec('strings');
     // Each alternative is bounded and cannot cross a line (hex strings may span lines up to the

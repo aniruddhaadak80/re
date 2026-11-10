@@ -44,7 +44,7 @@ export function entropy(bytes: Uint8Array, start = 0, end = bytes.length): numbe
   const n = end - start;
   if (n <= 0) return 0;
   const counts = new Uint32Array(256);
-  for (let i = start; i < end; i++) counts[bytes[i] as number] = (counts[bytes[i] as number] as number) + 1;
+  for (let i = start; i < end; i++) { const b = (bytes[i] as number) & 0xff; counts[b] = (counts[b] as number) + 1; }
   let h = 0;
   for (let i = 0; i < 256; i++) {
     const c = counts[i] as number;

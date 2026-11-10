@@ -8,7 +8,8 @@ function allFindings(r: Report): Finding[] { return r.findings; }
 /** SARIF 2.1.0, ready for GitHub code scanning upload. */
 export function toSARIF(r: Report): object {
   const findings = allFindings(r);
-  const rules = [...new Map(findings.map((f) => [f.id.replace(/[.@].*$/, '') + '.' + f.analyzer, f])).values()];
+  const stem = (id: string) => { const k = id.search(/[.@]/); return k < 0 ? id : id.slice(0, k); };
+  const rules = [...new Map(findings.map((f) => [stem(f.id) + '.' + f.analyzer, f])).values()];
   return {
     $schema: 'https://json.schemastore.org/sarif-2.1.0.json',
     version: '2.1.0',

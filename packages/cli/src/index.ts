@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // RevLens CLI. Small on purpose: one dependency (the core), plain argument parsing.
-import { readFileSync, writeFileSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, openSync, fstatSync, closeSync } from 'node:fs';
 import { basename } from 'node:path';
 import {
   analyze, diff, verifyClaim, scanRules, STARTER_RULES, toSARIF, toMarkdown, toHTML, toCycloneDX, lookupOSV,
@@ -61,10 +61,13 @@ function parse(argv: string[]): Args {
   return a;
 }
 
+/** Opens the file once and checks and reads that same descriptor, so it cannot be swapped in between. */
 function read(path: string): Uint8Array {
-  const st = statSync(path);
-  if (!st.isFile()) throw new Error(`${path} is not a file`);
-  return new Uint8Array(readFileSync(path));
+  const fd = openSync(path, 'r');
+  try {
+    if (!fstatSync(fd).isFile()) throw new Error(`${path} is not a file`);
+    return new Uint8Array(readFileSync(fd));
+  } finally { closeSync(fd); }
 }
 
 function emit(text: string, flags: Args['flags']) {

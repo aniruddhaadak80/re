@@ -20,6 +20,7 @@ A security and supply chain release. No change to the report shape.
 - yara-lite now has hard limits on rule text size, rule count, string definition length, condition length, hex jumps, byte comparisons per string and condition evaluation steps (`YARA_LIMITS`). Comments are stripped in one linear pass, the rule header and string definition patterns can no longer backtrack quadratically, and regex strings with nested quantifiers or backreferences are refused with a clear message (`assertSafeRegex`).
 - `toHTML` escapes every value from the report, including severity, offsets, hashes and the tool version, coerces numbers, and adds a strict Content-Security-Policy meta tag that blocks scripts.
 - The web app sanitizes mermaid SVG with DOMPurify before it reaches the DOM, skips raw HTML in markdown, and only keeps http, https, mailto, anchor and relative links.
+- Fixed issues raised by CodeQL: yara-lite `meta` keys such as `__proto__` can no longer reach an object prototype, the CLI and MCP server check and read a file through one descriptor so it cannot be swapped between the two steps (file system race), the SARIF rule id stem no longer uses a quadratic regex, the analysis worker validates every message and checks its origin, and heading slugs drop tags without a partial regex sanitizer.
 - The theme bootstrap script moved out of `index.html` into `theme.js`, so the site runs under the Content-Security-Policy in `vercel.json` without inline scripts. `vite preview` now serves the same headers, so the browser tests run under that policy.
 
 ### Changed
@@ -35,7 +36,7 @@ A security and supply chain release. No change to the report shape.
 - CodeQL code scanning with the `security-extended` and `security-and-quality` query suites, on push, pull request and weekly.
 - OpenSSF Scorecard workflow with published results and SARIF upload.
 - Dependabot for npm (weekly, grouped) and GitHub Actions (weekly).
-- Hostile input tests for the analyzers, yara-lite and `toHTML`.
+- Hostile input tests for the analyzers, yara-lite and `toHTML`, and property based fuzz tests with fast-check (`packages/core/test/fuzz.test.ts`, `REVLENS_FUZZ_RUNS` sets the run count).
 
 ## [0.1.0] - 2026-11-10
 
