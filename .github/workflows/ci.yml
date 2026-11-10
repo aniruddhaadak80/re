@@ -59,7 +59,7 @@ jobs:
         run: npx playwright install --with-deps chromium
         working-directory: apps/web
       - name: End to end tests
-        run: npm run test:e2e --if-present
+        run: npm test
         working-directory: apps/web
       - uses: actions/upload-artifact@v4
         if: always()
