@@ -5,7 +5,7 @@ export { ANALYZERS } from './analyzers/index.js';
 export { md5, sha1, sha256, tlshLike, tlshDistance, ctph, ctphSimilarity } from './hash.js';
 export { entropy } from './bytes.js';
 export { extractStrings } from './analyzers/strings.js';
-export { scanRules, parseRules, STARTER_RULES } from './rules/yaralite.js';
+export { scanRules, parseRules, assertSafeRegex, YARA_LIMITS, STARTER_RULES } from './rules/yaralite.js';
 export { diff } from './diff.js';
 export { verifyClaim } from './verify.js';
 export { toSARIF, toMarkdown, toHTML, toCycloneDX } from './output/index.js';

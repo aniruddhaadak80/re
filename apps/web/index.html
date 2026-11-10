@@ -24,20 +24,7 @@
     <meta name="twitter:title" content="RevLens: look inside any binary, bundle or package" />
     <meta name="twitter:description" content="Zero-install reverse engineering triage in your browser, terminal or agent. Files never leave your device." />
     <meta name="twitter:image" content="https://aniruddhaadak80.github.io/re/og.png" />
-    <script>
-      (function () {
-        try {
-          var s = JSON.parse(localStorage.getItem('revlens.settings') || '{}');
-          var t = s.theme || 'black';
-          if (t === 'system') t = matchMedia('(prefers-color-scheme: light)').matches ? 'sun' : 'black';
-          var d = document.documentElement;
-          d.dataset.theme = t;
-          d.dataset.accent = s.accent || 'gold';
-          d.classList.toggle('dark', t !== 'sun');
-          if (s.motion === 'reduced') d.dataset.motion = 'reduced';
-        } catch (e) {}
-      })();
-    </script>
+    <script src="%BASE_URL%theme.js"></script>
   </head>
   <body class="bg-bg text-fg antialiased">
     <div id="root"></div>

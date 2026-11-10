@@ -1,10 +1,26 @@
 import { useEffect, useId, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { useSettings, resolvedTheme } from '../lib/settings';
 import { CodeBlock } from './CodeBlock';
 
 type MermaidApi = typeof import('mermaid').default;
 let loader: Promise<MermaidApi> | null = null;
 const load = () => (loader ??= import('mermaid').then((m) => m.default));
+
+/**
+ * Mermaid already renders with securityLevel strict, and its output is sanitized once more here
+ * before it reaches the DOM, so a hostile diagram in docs or a pasted report cannot run script.
+ * foreignObject stays because mermaid draws HTML labels inside it; scripts and handlers do not.
+ */
+export function cleanSvg(svg: string): string {
+  return DOMPurify.sanitize(svg, {
+    USE_PROFILES: { svg: true, svgFilters: true, html: true },
+    ADD_TAGS: ['foreignObject'],
+    HTML_INTEGRATION_POINTS: { foreignobject: true },
+    FORBID_TAGS: ['script', 'iframe', 'object', 'embed'],
+    FORBID_ATTR: ['xlink:href'],
+  });
+}
 
 /** Renders a mermaid diagram client side. The library loads only when a diagram is on screen. */
 export function Mermaid({ code }: { code: string }) {
@@ -34,7 +50,7 @@ export function Mermaid({ code }: { code: string }) {
       });
       try {
         const { svg } = await mermaid.render(`m${raw}${light ? 'l' : 'd'}`, code.trim());
-        if (alive) { setSvg(svg); setErr(null); }
+        if (alive) { setSvg(cleanSvg(svg)); setErr(null); }
       } catch (e) { if (alive) setErr((e as Error).message); }
     }).catch((e: Error) => alive && setErr(e.message));
     return () => { alive = false; };

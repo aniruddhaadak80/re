@@ -1,6 +1,6 @@
 {
   "name": "@revlens/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Pure TypeScript reverse engineering analysis core. Zero native dependencies. Runs in the browser, Node and workers.",
   "license": "MIT",
   "type": "module",

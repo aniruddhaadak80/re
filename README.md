@@ -570,7 +570,7 @@ jobs:
       - name: Analyze the build output
         run: npx -y revlens sarif ./dist/app.js --out revlens.sarif
       - name: Upload to code scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: revlens.sarif
           category: revlens

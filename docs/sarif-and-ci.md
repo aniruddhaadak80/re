@@ -54,7 +54,7 @@ jobs:
         run: npx -y revlens sarif ./dist/app.js --out revlens.sarif
 
       - name: Upload to code scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: revlens.sarif
           category: revlens
@@ -75,10 +75,30 @@ Put each SARIF file in one folder and upload the folder. Give each artifact its 
             npx -y revlens sarif "$f" --out "sarif/$(basename "$f").sarif"
           done
 
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: sarif
 ```
+
+## Upload only medium and higher
+
+Low and info findings are useful in a local report and noisy in the Security tab. Filter the SARIF before the upload step. RevLens writes the severity of each result to `properties.severity`:
+
+```yaml
+      - name: Keep medium, high and critical results
+        run: |
+          jq '.runs |= map(.results |= map(select(.properties.severity as $s | ["medium", "high", "critical"] | index($s))))' \
+            revlens.sarif > revlens.filtered.sarif
+
+      - uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: revlens.filtered.sarif
+          category: revlens
+```
+
+Keep the same `category` from run to run. When a later upload in that category no longer contains a result, GitHub closes its alert.
+
+This repository scans its own shipped bundles the same way in `.github/workflows/revlens-scan.yml`, with `scripts/self-scan.mjs`. That script also skips the known self matches listed in `.github/revlens-baseline.json`: RevLens ships its own signatures, so scanning its bundles with those signatures matches them by design.
 
 ## Fail the build on high findings
 

@@ -12,7 +12,7 @@ const RULES: Rule[] = [
   { id: 'github-pat', title: 'GitHub token', re: /\b(ghp|gho|ghu|ghs|ghr|github_pat)_[0-9A-Za-z_]{36,}\b/, severity: 'critical' },
   { id: 'slack', title: 'Slack token', re: /\bxox[baprs]-[0-9A-Za-z-]{10,}\b/, severity: 'high' },
   { id: 'stripe', title: 'Stripe secret key', re: /\b(sk|rk)_(live|test)_[0-9A-Za-z]{16,}\b/, severity: 'critical' },
-  { id: 'openai', title: 'OpenAI API key', re: /\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}T3BlbkFJ[A-Za-z0-9_-]{20,}\b/, severity: 'critical' },
+  { id: 'openai', title: 'OpenAI API key', re: /\bsk-(?:proj-)?[A-Za-z0-9_-]{20,200}T3BlbkFJ[A-Za-z0-9_-]{20,200}\b/, severity: 'critical' },
   { id: 'anthropic', title: 'Anthropic API key', re: /\bsk-ant-[A-Za-z0-9_-]{90,}\b/, severity: 'critical' },
   { id: 'google-oauth', title: 'Google OAuth client secret', re: /\bGOCSPX-[0-9A-Za-z_-]{28}\b/, severity: 'high' },
   { id: 'npm', title: 'npm access token', re: /\bnpm_[0-9A-Za-z]{36}\b/, severity: 'high' },

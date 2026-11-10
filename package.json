@@ -1,7 +1,7 @@
 {
   "name": "revlens-monorepo",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "RevLens: the zero-install reverse engineering lens for agents and humans",
   "license": "MIT",
   "type": "module",

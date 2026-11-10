@@ -1,5 +1,5 @@
 import { Children, isValidElement, type ReactNode } from 'react';
-import ReactMarkdown, { type Components } from 'react-markdown';
+import ReactMarkdown, { defaultUrlTransform, type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Link } from 'react-router-dom';
 import { CodeBlock } from './CodeBlock';
@@ -28,7 +28,22 @@ function normalize(md: string): string {
   }).join('\n');
 }
 
-/** Markdown with GFM, gold and teal code, mermaid diagrams and heading anchors. */
+/**
+ * Only http, https, mailto, in page anchors and relative links survive. react-markdown already
+ * drops javascript: and similar schemes; this also rules out data: and protocol relative URLs.
+ */
+function safeUrl(url: string): string {
+  const u = defaultUrlTransform(url.trim());
+  if (!u) return '';
+  if (/^(?:https?:|mailto:)/i.test(u) || u.startsWith('#')) return u;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(u) || u.startsWith('//') || u.startsWith('\\\\')) return '';
+  return u;
+}
+
+/**
+ * Markdown with GFM, gold and teal code, mermaid diagrams and heading anchors. Raw HTML in the
+ * source is skipped, never rendered, so there is no HTML string to sanitize.
+ */
 export function Markdown({ source, from }: { source: string; from: 'docs' | 'blog' | 'root' }) {
   const heading = (Tag: 'h2' | 'h3' | 'h4') => ({ children }: { children?: ReactNode }) => {
     const id = slugify(textOf(children));
@@ -53,5 +68,5 @@ export function Markdown({ source, from }: { source: string; from: 'docs' | 'blo
     img: ({ src = '', alt = '' }) => <img src={from === 'root' ? src : assetUrl(String(src), from)} alt={alt} loading="lazy" />,
     table: ({ children }) => <table>{children}</table>,
   };
-  return <div className="prose-rl"><ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>{normalize(source)}</ReactMarkdown></div>;
+  return <div className="prose-rl"><ReactMarkdown remarkPlugins={[remarkGfm]} components={components} skipHtml urlTransform={safeUrl}>{normalize(source)}</ReactMarkdown></div>;
 }

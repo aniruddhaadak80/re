@@ -14,9 +14,11 @@ const PACKERS: { name: string; markers: string[]; attack: string }[] = [
 ];
 
 /** Fingerprints of common JavaScript obfuscators, matched on text. */
-const JS_OBFUSCATORS: { name: string; re: RegExp }[] = [
+const JS_OBFUSCATORS: { name: string; re: RegExp; min?: number }[] = [
   { name: 'javascript-obfuscator (string array)', re: /var _0x[a-f0-9]{4,6}\s*=\s*\[|function _0x[a-f0-9]{4,6}\(\)\{/ },
-  { name: 'javascript-obfuscator (hex identifiers)', re: /(?:_0x[a-f0-9]{4,6}.*){40}/s },
+  // Counted with a global search instead of /(?:_0x....*){40}/s, which backtracks exponentially
+  // on text with fewer than 40 identifiers.
+  { name: 'javascript-obfuscator (hex identifiers)', re: /_0x[a-f0-9]{4,6}/g, min: 40 },
   { name: 'JSFuck', re: /^[\[\]\(\)!+\s]{200,}$/m },
   { name: 'Dean Edwards packer', re: /eval\(function\(p,a,c,k,e,(?:r|d)\)/ },
   { name: 'JJencode or AAencode', re: /\$=~\[\];|ﾟωﾟ/ },
@@ -72,7 +74,14 @@ export const entropyAnalyzer: Analyzer = {
     if (ctx.text) {
       const sample = ctx.text.length > 2_000_000 ? ctx.text.slice(0, 2_000_000) : ctx.text;
       for (const o of JS_OBFUSCATORS) {
-        const m = o.re.exec(sample);
+        let m: RegExpExecArray | null;
+        if (o.min) {
+          o.re.lastIndex = 0;
+          let first: RegExpExecArray | null = null;
+          let n = 0;
+          while (n < o.min && (m = o.re.exec(sample))) { first ??= m; n++; }
+          m = n >= o.min ? first : null;
+        } else m = o.re.exec(sample);
         if (m) {
           report.findings.push({
             id: `obfuscator.${o.name.toLowerCase().replace(/[^a-z]+/g, '-')}`, analyzer: 'entropy',

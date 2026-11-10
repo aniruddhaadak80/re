@@ -3,7 +3,7 @@ import type { Analyzer, AnalyzerContext, ExtractedString } from '../types.js';
 const RE = {
   url: /\bhttps?:\/\/[^\s"'<>)\]]{4,}/,
   ip: /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/,
-  email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/,
+  email: /(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}\b/,
   path: /(?:[A-Za-z]:\\|\/)(?:[\w .$+-]+[\\/])+[\w .$+-]+/,
   guid: /\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b/,
   registry: /\bHKEY_[A-Z_]+\\[^\s"']+/,
@@ -11,7 +11,11 @@ const RE = {
   version: /\b\d+\.\d+\.\d+(?:[-+][\w.]+)?\b/,
 };
 
-function tagOf(s: string): string | undefined {
+/** Longest prefix of a string that tagging looks at, which keeps regex work bounded on huge strings. */
+const TAG_SCAN = 512;
+
+function tagOf(value: string): string | undefined {
+  const s = value.length > TAG_SCAN ? value.slice(0, TAG_SCAN) : value;
   if (RE.url.test(s)) return 'url';
   if (RE.email.test(s)) return 'email';
   if (RE.registry.test(s)) return 'registry';

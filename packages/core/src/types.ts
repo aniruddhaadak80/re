@@ -189,4 +189,4 @@ export interface DiffReport {
   summary: string;
 }
 
-export const REVLENS_VERSION = '0.1.0';
+export const REVLENS_VERSION = '0.1.1';

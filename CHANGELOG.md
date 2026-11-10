@@ -8,6 +8,35 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 Nothing yet.
 
+## [0.1.1] - 2026-11-10
+
+A security and supply chain release. No change to the report shape.
+
+### Security
+
+- Fixed a regular expression denial of service in the `entropy` analyzer. The javascript-obfuscator hex identifier fingerprint used `(?:_0x....*){40}` with the dotall flag, which backtracked exponentially on text with fewer than 40 matches. It now counts matches with a linear global search.
+- Bounded the OpenAI key pattern in the `secrets` analyzer, which was quadratic on repeated `sk-` prefixes.
+- The `strings` analyzer tags only the first 512 characters of each string, and the email tag no longer restarts at every dot, so huge or crafted strings stay linear.
+- yara-lite now has hard limits on rule text size, rule count, string definition length, condition length, hex jumps, byte comparisons per string and condition evaluation steps (`YARA_LIMITS`). Comments are stripped in one linear pass, the rule header and string definition patterns can no longer backtrack quadratically, and regex strings with nested quantifiers or backreferences are refused with a clear message (`assertSafeRegex`).
+- `toHTML` escapes every value from the report, including severity, offsets, hashes and the tool version, coerces numbers, and adds a strict Content-Security-Policy meta tag that blocks scripts.
+- The web app sanitizes mermaid SVG with DOMPurify before it reaches the DOM, skips raw HTML in markdown, and only keeps http, https, mailto, anchor and relative links.
+- The theme bootstrap script moved out of `index.html` into `theme.js`, so the site runs under the Content-Security-Policy in `vercel.json` without inline scripts. `vite preview` now serves the same headers, so the browser tests run under that policy.
+
+### Changed
+
+- Upgraded to Vite 8 and `@vitejs/plugin-react` 6. Chunk groups use `build.rolldownOptions.output.codeSplitting`.
+- Upgraded `react-router-dom` to 7, Playwright to 1.65, zod to 4 and `@modelcontextprotocol/sdk` to 1.32, which supports zod 4. `npm audit` reports 0 vulnerabilities.
+- `playwright.config.ts` accepts `PW_CHROMIUM` with the path to a local Chromium, for hosts where Playwright has no browser build, such as Linux arm64.
+- The RevLens self scan now scans the code this repository ships (`packages/cli/dist`, `packages/mcp/dist` and `apps/web/dist`) with `scripts/self-scan.mjs` and uploads only medium, high and critical findings. Known self matches, from the signatures RevLens ships, are listed with a reason in `.github/revlens-baseline.json`. The old demo upload of a sample package is gone.
+- Every GitHub Action is pinned to a full commit SHA with a version comment, workflows default to read only tokens, and write permissions are granted per job.
+
+### Added
+
+- CodeQL code scanning with the `security-extended` and `security-and-quality` query suites, on push, pull request and weekly.
+- OpenSSF Scorecard workflow with published results and SARIF upload.
+- Dependabot for npm (weekly, grouped) and GitHub Actions (weekly).
+- Hostile input tests for the analyzers, yara-lite and `toHTML`.
+
 ## [0.1.0] - 2026-11-10
 
 The first public release.
@@ -71,5 +100,6 @@ The first public release.
 - yara-lite has no modules, `for` loops or hex alternations yet.
 - Go binaries can produce low severity URL noise because Go stores string literals end to end.
 
-[Unreleased]: https://github.com/aniruddhaadak80/re/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/aniruddhaadak80/re/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/aniruddhaadak80/re/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/aniruddhaadak80/re/releases/tag/v0.1.0

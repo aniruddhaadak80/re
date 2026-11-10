@@ -1,8 +1,8 @@
 // RevLens offline service worker. Pages load from the network when possible and fall back
 // to the cached app shell when offline. Hashed assets are cached on first use.
-const VERSION = 'revlens-v1';
+const VERSION = 'revlens-v2';
 const SCOPE = new URL(self.registration.scope).pathname;
-const SHELL = [SCOPE, SCOPE + 'manifest.webmanifest', SCOPE + 'favicon.svg'];
+const SHELL = [SCOPE, SCOPE + 'manifest.webmanifest', SCOPE + 'favicon.svg', SCOPE + 'theme.js'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

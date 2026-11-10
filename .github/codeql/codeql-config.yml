@@ -1,0 +1,7 @@
+name: RevLens CodeQL config
+
+# samples/ holds third party fixtures (minified jQuery, react-dom, a source map) that the tests
+# analyze. They are not code this repo writes or ships, so they are not scanned.
+paths-ignore:
+  - samples
+  - '**/dist'
