@@ -42,7 +42,7 @@ jobs:
       - name: System tools (binutils, gdb, lldb, llvm, binwalk, adb)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends binutils gdb lldb llvm binwalk adb unzip python3-pip pipx
+          sudo apt-get install -y --no-install-recommends binutils binutils-multiarch gdb lldb llvm binwalk adb unzip python3-pip pipx
           # Frida attaches to a process it did not start
           sudo sysctl -w kernel.yama.ptrace_scope=0
 

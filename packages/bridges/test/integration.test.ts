@@ -8,7 +8,7 @@ import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { detectAll } from '../src/detect.ts';
 import { runTool } from '../src/exec.ts';
 import { TOOLS } from '../src/tools.ts';
@@ -39,7 +39,7 @@ const tool = (n: string) => TOOLS.find((t) => t.name === n)!;
 const run = async (n: string, input: Record<string, unknown>) => (await tool(n).run(input)) as any;
 
 test('every tool reports {available:false, install} when its program is missing', async () => {
-  const code = `const { TOOLS } = await import(${JSON.stringify(join(repo, 'packages/bridges/src/tools.ts'))});
+  const code = `const { TOOLS } = await import(${JSON.stringify(pathToFileURL(join(repo, 'packages/bridges/src/tools.ts')).href)});
 const out = {};
 for (const t of TOOLS) {
   if (t.name === 'bridge_doctor' || t.name === 'bridge_setup_mcp' || t.name === 'bridge_frida_templates') continue;
@@ -86,8 +86,13 @@ test('radare2: add_numbers at 0x828 size 32, check_password called from main at 
   assert.ok(s.strings.some((v: any) => v.value === 'revlens-open-sesame' && v.vaddr === '0xa08'));
 });
 
-test('objdump and radare2 agree on addresses and bytes of add_numbers', { skip: skipUnless('objdump', 'radare2') }, async () => {
+// GNU objdump is built for one host architecture unless binutils-multiarch is installed, so on an x64 runner it
+// may not decode the AArch64 fixture at all. Those comparisons are skipped with that reason.
+const GNU_NO_ARCH = 'GNU objdump on this host cannot decode AArch64 (install binutils-multiarch)';
+
+test('objdump and radare2 agree on addresses and bytes of add_numbers', { skip: skipUnless('objdump', 'radare2') }, async (t) => {
   const o = await run('bridge_objdump', { path: ELF, function: 'add_numbers', engine: 'objdump' });
+  if (!o.functions?.length) { t.skip(GNU_NO_ARCH); return; }
   const r = await run('bridge_r2_disasm', { path: ELF, function: 'add_numbers' });
   const oi = o.functions[0].instructions;
   assert.equal(o.functions[0].address, '0x828');
@@ -100,10 +105,12 @@ test('objdump and radare2 agree on addresses and bytes of add_numbers', { skip: 
   assert.ok(sec.sections.some((s: any) => s.name === '.text' && s.vma === '0x700'));
 });
 
-test('llvm-objdump gives the same add_numbers bytes as GNU objdump', { skip: skipUnless('llvm-objdump', 'objdump') }, async () => {
+test('llvm-objdump gives the same add_numbers bytes as GNU objdump', { skip: skipUnless('llvm-objdump', 'objdump') }, async (t) => {
   const g = await run('bridge_objdump', { path: ELF, function: 'add_numbers', engine: 'objdump' });
   const l = await run('bridge_objdump', { path: ELF, function: 'add_numbers', engine: 'llvm-objdump' });
   assert.equal(l.tool, 'llvm-objdump');
+  assert.equal(l.functions[0]?.address, '0x828', JSON.stringify(l).slice(0, 400));
+  if (!g.functions?.length) { t.skip(GNU_NO_ARCH); return; }
   assert.deepEqual(l.functions[0].instructions.map((i: any) => [i.address, i.bytes]), g.functions[0].instructions.map((i: any) => [i.address, i.bytes]));
 });
 

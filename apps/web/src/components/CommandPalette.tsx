@@ -37,9 +37,11 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
   const shown = useMemo(() => {
     const t = q.trim().toLowerCase();
     if (!t) return items;
-    return items.filter((i) => `${i.group} ${i.label} ${i.hint ?? ''}`.toLowerCase().includes(t));
+    // Exact label first, then labels that start with the text, then any other match. Group order is kept within a rank.
+    const rank = (i: Item) => { const l = i.label.toLowerCase(); return l === t ? 0 : l.startsWith(t) ? 1 : 2; };
+    return items.filter((i) => `${i.group} ${i.label} ${i.hint ?? ''}`.toLowerCase().includes(t)).map((i, n) => ({ i, n, r: rank(i) })).sort((a, b) => a.r - b.r || a.n - b.n).map((x) => x.i);
   }, [items, q]);
-  useEffect(() => { if (open) { setQ(''); setSel(0); setTimeout(() => input.current?.focus(), 20); } }, [open]);
+  useEffect(() => { if (open) { setQ(''); setSel(0); input.current?.focus(); setTimeout(() => input.current?.focus(), 20); } }, [open]);
   useEffect(() => setSel(0), [q]);
   const pick = (i: Item | undefined) => { if (!i) return; onClose(); i.run(); };
 
@@ -51,7 +53,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
             initial={{ y: -12, scale: 0.98 }} animate={{ y: 0, scale: 1 }} exit={{ y: -8, scale: 0.98 }} transition={{ duration: 0.16 }} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 border-b border-line px-4">
               <Search size={18} className="text-muted" />
-              <input ref={input} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Jump to a page, doc or sample"
+              <input ref={input} autoFocus aria-label="Search pages, docs and samples" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Jump to a page, doc or sample"
                 className="h-14 w-full bg-transparent text-base outline-none placeholder:text-muted/70"
                 onKeyDown={(e) => {
                   if (e.key === 'ArrowDown') { e.preventDefault(); setSel((s) => Math.min(shown.length - 1, s + 1)); }
@@ -66,7 +68,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
               {shown.map((i, n) => (
                 <li key={i.id}>
                   {(n === 0 || shown[n - 1]?.group !== i.group) && <p className="px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-widest text-muted">{i.group}</p>}
-                  <button type="button" onMouseEnter={() => setSel(n)} onClick={() => pick(i)}
+                  <button type="button" onMouseMove={() => { if (sel !== n) setSel(n); }} onClick={() => pick(i)}
                     className={cx('flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition', n === sel ? 'bg-accent/15 text-fg' : 'text-muted hover:text-fg')}>
                     <span className={n === sel ? 'text-ink' : ''}>{i.icon}</span>
                     <span className="flex-1 truncate">{i.label}</span>

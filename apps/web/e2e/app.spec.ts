@@ -229,8 +229,12 @@ test('command palette opens with Ctrl+K and jumps to a page', async ({ page }) =
   await expect(page.locator('h1').first()).toBeVisible();
   await page.locator('body').click({ position: { x: 5, y: 300 } });
   await page.keyboard.press('Control+k');
-  await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible();
-  await page.keyboard.type('Verify');
+  const dialog = page.getByRole('dialog', { name: 'Command palette' });
+  await expect(dialog).toBeVisible();
+  const box = dialog.getByRole('textbox');
+  await expect(box).toBeFocused();
+  await box.fill('Verify');
+  await expect(box).toHaveValue('Verify');
   await expect(page.getByRole('dialog', { name: 'Command palette' }).getByText('Verify', { exact: true }).first()).toBeVisible();
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/re\/verify$/);

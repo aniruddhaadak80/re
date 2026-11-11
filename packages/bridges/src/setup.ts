@@ -4,7 +4,7 @@
 import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, join, posix, win32 } from 'node:path';
 
 export type McpClient = 'claude-code' | 'codex' | 'cursor' | 'vscode' | 'windsurf';
 export const MCP_CLIENTS: McpClient[] = ['claude-code', 'codex', 'cursor', 'vscode', 'windsurf'];
@@ -54,6 +54,8 @@ export function defaultServer(platform: NodeJS.Platform = process.platform): Mcp
 /** Where each client keeps its MCP config. */
 export function configPath(client: McpClient, scope: 'user' | 'project', o: { home: string; cwd: string; platform: NodeJS.Platform; env: NodeJS.ProcessEnv }): { path: string; format: 'json' | 'toml'; key: string } {
   const { home, cwd, platform, env } = o;
+  // Join with the separator of the target platform, not the host, so paths match what that client expects.
+  const join = platform === 'win32' ? win32.join : posix.join;
   switch (client) {
     case 'claude-code':
       return scope === 'project' ? { path: join(cwd, '.mcp.json'), format: 'json', key: 'mcpServers' } : { path: join(home, '.claude.json'), format: 'json', key: 'mcpServers' };
