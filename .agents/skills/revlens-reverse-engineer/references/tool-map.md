@@ -1,6 +1,6 @@
 # RevLens tool map
 
-Generated from the server by scripts/gen-tool-docs.mjs. 195 tools.
+Generated from the server by scripts/gen-tool-docs.mjs. 196 tools.
 
 ## Core triage and evidence
 
@@ -91,7 +91,7 @@ Generated from the server by scripts/gen-tool-docs.mjs. 195 tools.
 
 ## Extras
 
-- `x_demangle` (reads only): Demangle C++ (Itanium), Rust (legacy and v0) and MSVC symbols. Pass symbols, or a binary path to demangle its symbol table.
+- `x_demangle` (reads only): Demangle C++ (Itanium), Rust (legacy and v0), MSVC and Swift (old _T and new $s/$S/_T0 mangling) symbols. Pass symbols, or a binary path to demangle its symbol table.
 - `x_container` (reads only): Unified container view of ELF, PE or Mach-O (fat slices too): machine, entry, sections and segments with file offsets and addresses.
 - `x_read_bytes` (reads only): Read up to 64 KiB of raw bytes at a file offset or at a virtual address, as hex and printable text.
 - `x_search_bytes` (reads only): Search a file for a hex pattern with ?? wildcards (for example "48 8b ?? 24") or a text string (ASCII and UTF-16LE). Hits include offset, address and section.
@@ -131,6 +131,7 @@ Generated from the server by scripts/gen-tool-docs.mjs. 195 tools.
 - `x_wxapkg` (reads only): WeChat mini program package (.wxapkg): member table with offsets and sizes, app config, pages, kind (main, subpackage, plugin, game). Decrypts PC client V1MMWX packages when appId is given. With member, returns that file
 - `x_unity_bundle` (reads only): Unity asset bundle (UnityFS): header, Unity version, blocks (compression), node table; each serialized file summarised with target platform, types and objects by class (path id, offset, size). LZ4/LZ4HC and uncompressed 
 - `x_standalone_js` (reads only): JavaScript apps packed into one executable: Node.js SEA (fuse state, NODE_SEA_BLOB with entry script, code cache, assets, exec argv), Bun --compile (embedded module graph with sources) and Deno compile (metadata JSON, en
+- `x_swift_demangle` (reads only): Demangle Swift symbols (Swift 1 to 3 _T, Swift 4 _T0, Swift 4.x $S, Swift 5+ $s, macro @__swiftmacro_), matching swift-demangle 6.0.3 text. Optional simplified form and node tree. With a binary path, lists the Swift symb
 
 ## Desktop apps, processes and UI trees
 
