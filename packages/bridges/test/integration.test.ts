@@ -18,13 +18,16 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '..', '..', '..');
 const S = (f: string) => join(repo, 'samples', 'bridges', f);
 const ELF = S('crackme-aarch64.elf');
-const STATIC = S('crackme-aarch64-static.elf');
+// Static musl builds of src/crackme.c (zig cc), one per CPU, so the debuggers need no dynamic loader.
+const STATIC = process.arch === 'x64' ? S('crackme-x86_64-static.elf') : S('crackme-aarch64-static.elf');
+const ARG0 = process.arch === 'x64' ? 'rdi' : 'x0';
+const ARG1 = process.arch === 'x64' ? 'rsi' : 'x1';
 const cache = process.env.REVLENS_CACHE_DIR ?? mkdtempSync(join(tmpdir(), 'rl-int-'));
 process.env.REVLENS_CACHE_DIR = cache;
 process.on('exit', () => { if (!process.env.REVLENS_KEEP_CACHE) try { rmSync(cache, { recursive: true, force: true }); } catch { /* ignore */ } });
 
 const dets = await detectAll();
-const isArm64Linux = process.platform === 'linux' && process.arch === 'arm64';
+const staticOk = process.platform === 'linux' && (process.arch === 'arm64' || process.arch === 'x64');
 function skipUnless(...ids: ToolId[]): string | false {
   for (const id of ids) {
     const d = dets.get(id);
@@ -155,22 +158,22 @@ test('binwalk finds the planted files at their offsets', { skip: skipUnless('bin
   assert.match(String(at.get(2048)), /png/);
 });
 
-test('gdb on the static binary: x0=2 x1=41 at add_numbers, backtrace into main', { skip: skipUnless('gdb') || (!isArm64Linux && 'fixture is linux arm64') }, async () => {
-  const g = await run('bridge_gdb_run', { path: STATIC, args: ['a'], breakpoints: ['add_numbers', 'check_password'], registers: ['x0', 'x1', 'pc'], memory: { base: '$sp', count: 16 }, allowExecution: true });
+test('gdb on the static binary: first two args 2 and 41 (x0/x1 or rdi/rsi) at add_numbers, backtrace into main', { skip: skipUnless('gdb') || (!staticOk && 'static fixtures are Linux arm64 and x64 only') }, async () => {
+  const g = await run('bridge_gdb_run', { path: STATIC, args: ['a'], breakpoints: ['add_numbers', 'check_password'], registers: [ARG0, ARG1], memory: { base: '$sp', count: 16 }, allowExecution: true });
   assert.equal(g.ok, true, g.error);
   assert.equal(g.stopCount, 2);
-  assert.deepEqual([g.stops[0].registers.x0, g.stops[0].registers.x1], ['0x2', '0x29']);
+  assert.deepEqual([g.stops[0].registers[ARG0], g.stops[0].registers[ARG1]], ['0x2', '0x29']);
   assert.deepEqual(g.stops[0].backtrace.map((f: any) => f.function), ['add_numbers', 'main']);
   assert.equal(g.stops[0].memory.length, 2);
   assert.equal(g.stops[1].function, 'check_password');
   assert.equal(g.exitCode, 1);
 });
 
-test('lldb on the static binary: same registers as gdb', { skip: skipUnless('lldb') || (!isArm64Linux && 'fixture is linux arm64') }, async () => {
-  const l = await run('bridge_gdb_run', { debugger: 'lldb', path: STATIC, args: ['a'], breakpoints: ['add_numbers'], registers: ['x0', 'x1'], allowExecution: true });
+test('lldb on the static binary: same registers as gdb', { skip: skipUnless('lldb') || (!staticOk && 'static fixtures are Linux arm64 and x64 only') }, async () => {
+  const l = await run('bridge_gdb_run', { debugger: 'lldb', path: STATIC, args: ['a'], breakpoints: ['add_numbers'], registers: [ARG0, ARG1], allowExecution: true });
   assert.equal(l.ok, true, l.error);
   assert.equal(l.stopCount, 1);
-  assert.deepEqual([parseInt(l.stops[0].registers.x0, 16), parseInt(l.stops[0].registers.x1, 16)], [2, 41]);
+  assert.deepEqual([parseInt(l.stops[0].registers[ARG0], 16), parseInt(l.stops[0].registers[ARG1], 16)], [2, 41]);
   assert.equal(l.stops[0].backtrace[1].function, 'main');
   assert.equal(l.exitCode, 1);
 });
@@ -202,4 +205,24 @@ test('adb devices runs and parses (no device needed)', { skip: skipUnless('adb')
   const r = await run('bridge_adb_devices', {});
   assert.equal(r.ok, true, r.error);
   assert.ok(Array.isArray(r.devices));
+});
+
+test('opt in analyzers: skipped by default, r2 analyzer fills report.meta.bridges.r2 when enabled', { skip: skipUnless('radare2') }, async () => {
+  const { r2Analyzer, ANALYZERS } = await import('../src/analyzer.ts');
+  const { readFileSync } = await import('node:fs');
+  const report: any = { findings: [], meta: {}, timings: {} };
+  const ctx: any = { bytes: new Uint8Array(readFileSync(ELF)), name: 'crackme', format: 'elf', depth: 0, report, options: { maxStrings: 100, recurse: false, maxDepth: 1 } };
+  const prev = process.env.REVLENS_BRIDGES;
+  delete process.env.REVLENS_BRIDGES;
+  assert.equal(ANALYZERS.some((a) => a.applies(ctx)), false);
+  ctx.options.analyzers = ['bridges-r2'];
+  assert.equal(r2Analyzer.applies(ctx), true);
+  await r2Analyzer.run(ctx);
+  if (prev !== undefined) process.env.REVLENS_BRIDGES = prev;
+  const m = report.meta.bridges.r2;
+  assert.equal(m.available, true);
+  assert.ok(m.functions.some((f: any) => f.name === 'sym.add_numbers' && f.address === '0x828'));
+  assert.equal(m.info.machine, 'ARM aarch64');
+  assert.equal(report.findings[0].id, 'bridges.r2.functions');
+  JSON.stringify(report);
 });
