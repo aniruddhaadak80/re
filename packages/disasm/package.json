@@ -1,0 +1,23 @@
+{
+  "name": "@revlens/disasm",
+  "version": "1.0.0",
+  "description": "RevLens native code analysis: x86, x86-64, AArch64 and ARM disassembly, ELF/PE/Mach-O loading, functions, CFG, xrefs, call graph and readable pseudo-code.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./node": { "types": "./dist/node.d.ts", "default": "./dist/node.js" }
+  },
+  "files": ["dist"],
+  "scripts": { "build": "tsc -p tsconfig.json" },
+  "dependencies": {
+    "@revlens/core": "*",
+    "iced-x86": "^1.22.0",
+    "@alexaltea/capstone-js": "^5.0.9"
+  },
+  "engines": { "node": ">=20.10.0" },
+  "keywords": ["reverse-engineering", "disassembler", "x86", "aarch64", "arm", "elf", "pe", "macho", "cfg"],
+  "repository": { "type": "git", "url": "https://github.com/aniruddhaadak80/re.git", "directory": "packages/disasm" }
+}
