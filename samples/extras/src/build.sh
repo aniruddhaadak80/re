@@ -6,8 +6,8 @@ L=/workspace/work/tools/sysroot/usr/lib/llvm-19/bin
 cd "$(dirname "$0")"
 $Z c++ -O1 -target x86_64-linux-gnu demo.cpp -o ../demo-x64.elf
 $Z c++ -O1 -target aarch64-linux-musl -s demo.cpp -o ../demo-arm64-stripped.elf
-$L/llvm-rc -no-preprocess /FO hello.res hello.rc && $L/llvm-cvtres /machine:x64 /out:hello-res.obj hello.res
-$Z cc -O1 -target x86_64-windows-gnu hello-win.c hello-res.obj -o ../hello-res.exe
+$L/llvm-rc -no-preprocess /FO hello.res hello.rc
+$Z cc -O1 -target x86_64-windows-gnu hello-win.c hello.res -o ../hello-res.exe
 $Z cc -O1 -target aarch64-macos hello.c -o ../hello-arm64.macho
 $Z c++ -O1 -target x86_64-windows-msvc -c msvc.cpp -o ../demo-msvc.obj
 echo done

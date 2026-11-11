@@ -21,9 +21,27 @@ export interface AppleIps {
   threads: IpsThread[];
   images: IpsImage[];
   crashedFrames: IpsFrame[];
+  /** plain text after the JSON body (System Profile on macOS 12) */
+  trailer?: string;
 }
 
 const BUG_TYPES: Record<string, string> = { '109': 'legacy crash', '309': 'crash', '298': 'hang (stackshot)', '210': 'panic', '288': 'stackshot', '385': 'jetsam', '145': 'cpu resource', '142': 'wakeups resource', '202': 'disk writes resource', '211': 'analytics', '313': 'cpu resource' };
+
+/** End index (exclusive) of the first top level JSON object in s, string aware, or -1. */
+function jsonObjectEnd(s: string): number {
+  let i = 0;
+  while (i < s.length && /\s/.test(s[i] as string)) i++;
+  if (s[i] !== '{') return -1;
+  let depth = 0, inStr = false;
+  for (; i < s.length; i++) {
+    const c = s[i];
+    if (inStr) { if (c === '\\') i++; else if (c === '"') inStr = false; continue; }
+    if (c === '"') inStr = true;
+    else if (c === '{' || c === '[') depth++;
+    else if (c === '}' || c === ']') { depth--; if (depth === 0) return i + 1; if (depth < 0) return -1; }
+  }
+  return -1;
+}
 
 /** Parse an .ips report. Large reports are capped at `maxThreads` threads and `maxFrames` frames per thread. */
 export function parseIps(input: Uint8Array | string, opts: { maxThreads?: number; maxFrames?: number } = {}): AppleIps {
@@ -34,7 +52,15 @@ export function parseIps(input: Uint8Array | string, opts: { maxThreads?: number
   let header: Record<string, unknown>;
   let body: Record<string, unknown>;
   try { header = JSON.parse(text.slice(0, nl)); } catch { throw new ParseError('first line is not JSON', 0); }
-  try { body = JSON.parse(text.slice(nl + 1)); } catch { throw new ParseError('report body is not JSON', nl + 1); }
+  const rest = text.slice(nl + 1);
+  let trailer: string | undefined;
+  try { body = JSON.parse(rest); } catch {
+    // macOS 12 reports append a plain text "System Profile:" section after the JSON body
+    const end = jsonObjectEnd(rest);
+    if (end < 0) throw new ParseError('report body is not JSON', nl + 1);
+    try { body = JSON.parse(rest.slice(0, end)); } catch { throw new ParseError('report body is not JSON', nl + 1); }
+    trailer = rest.slice(end).trim().slice(0, 8192) || undefined;
+  }
   if (typeof header !== 'object' || header === null || !('bug_type' in header)) throw new ParseError('header has no bug_type');
   const bt = String(header.bug_type);
   const s = (x: unknown): string | undefined => (typeof x === 'string' ? x : undefined);
@@ -74,6 +100,6 @@ export function parseIps(input: Uint8Array | string, opts: { maxThreads?: number
     os: s(header.os_version) ?? (osv ? `${s(osv.train) ?? ''} ${s(osv.build) ?? ''}`.trim() : undefined), cpuType: s(body.cpuType), incident: s(header.incident_id) ?? s(body.incident), timestamp: s(header.timestamp) ?? s(body.captureTime),
     exception: Object.keys(ex).length ? { type: s(ex.type), signal: s(ex.signal), codes: s(ex.codes), subtype: s(ex.subtype), message: s(ex.message) } : undefined,
     termination: term ? { namespace: s(term.namespace), code: n(term.code), indicator: s(term.indicator), reasons: Array.isArray(term.reasons) ? (term.reasons as unknown[]).map(String).slice(0, 32) : undefined } : undefined,
-    faultingThread: ft, threads, images, crashedFrames: crashed?.frames ?? [],
+    faultingThread: ft, threads, images, crashedFrames: crashed?.frames ?? [], trailer,
   };
 }
