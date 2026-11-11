@@ -1,0 +1,24 @@
+RevLens
+Copyright (c) Aniruddha Adak and the RevLens contributors.
+
+RevLens is licensed under the MIT License (see LICENSE), except for the third party code listed
+below, which keeps its own license.
+
+Swift demangler in packages/extras/src/demangle/swift/
+
+  A TypeScript port of the Swift demangler from the Swift project, release swift-6.0.3-RELEASE
+  (https://github.com/swiftlang/swift/tree/swift-6.0.3-RELEASE).
+  Copyright (c) 2014 - 2024 Apple Inc. and the Swift project authors.
+  Licensed under the Apache License v2.0 with Runtime Library Exception
+  (SPDX: Apache-2.0 WITH Swift-exception). The full text is in packages/extras/LICENSE-SWIFT.txt,
+  and packages/extras/NOTICE lists the original files and what was changed.
+  See https://swift.org/LICENSE.txt and https://swift.org/CONTRIBUTORS.txt.
+
+Swift test data in samples/extras/swift/
+
+  Mangled names from the Swift project's test/Demangle/Inputs/manglings.txt (Apache License v2.0
+  with Runtime Library Exception) and symbol names from Maccy 2.8.0 (https://github.com/p0deje/Maccy,
+  MIT), each with the output of swift-demangle 6.0.3.
+
+Sample files in samples/ come from public projects and keep their original licenses; see the
+SOURCES.md file next to each set.

@@ -554,7 +554,8 @@ npm run cli -- analyze samples/jquery.min.js
 - **[OSV.dev](https://osv.dev)** for the free, open vulnerability database and batch API behind `--osv`.
 - **[MITRE ATT&CK](https://attack.mitre.org)** for the technique ids we map capabilities and rules to.
 - The ideas behind our capa-lite and yara-lite engines come from **[Mandiant capa](https://github.com/mandiant/capa)** and **[YARA](https://github.com/VirusTotal/yara)**. The import hash follows the convention made popular by **[pefile](https://github.com/erocarrera/pefile)**.
-- Sample files in `samples/` come from public npm packages and keep their original licenses.
+- The Swift demangler in `@revlens/extras` is a TypeScript port of the demangler from the **[Swift project](https://github.com/swiftlang/swift)** (swift-6.0.3-RELEASE), Copyright Apple Inc. and the Swift project authors, under the Apache License 2.0 with Runtime Library Exception. See [NOTICE](NOTICE) and [packages/extras/LICENSE-SWIFT.txt](packages/extras/LICENSE-SWIFT.txt).
+- Sample files in `samples/` come from public projects and keep their original licenses.
 
 ## About the author
 
@@ -576,5 +577,7 @@ npm run cli -- analyze samples/jquery.min.js
 ## License
 
 [MIT](LICENSE). Copyright Aniruddha Adak and RevLens contributors.
+
+The Swift demangler files in `packages/extras/src/demangle/swift/` are under the Apache License 2.0 with Runtime Library Exception (`Apache-2.0 WITH Swift-exception`), so `@revlens/extras` is published as `MIT AND Apache-2.0 WITH Swift-exception`. See [NOTICE](NOTICE).
 
 <img src="docs/assets/divider.svg" alt="" width="100%" />

@@ -69,3 +69,10 @@ The Assets.car test checks the facet names against the asset catalog source of t
 `packages/extras/scripts/make_standalone_fixtures.sh` rebuilds the full 100 MB executables into
 `samples/.cache/extras/standalone/` (not committed); `fetch-fixtures.mjs` downloads the 1.2 MB
 `unity-cards.unity3d` bundle (CardExample-Unity, MIT).
+
+## swift/ (Swift demangler references)
+
+| file | how it was made | license |
+|---|---|---|
+| `manglings-ref.json` | 470 mangled names from `test/Demangle/Inputs/manglings.txt` in the Swift project at swift-6.0.3-RELEASE (https://github.com/swiftlang/swift/blob/swift-6.0.3-RELEASE/test/Demangle/Inputs/manglings.txt). `ref` and `simplified` are the output of `swift-demangle -compact` and `swift-demangle -compact -simplified` from the Swift 6.0.3 toolchain (swift-6.0.3-RELEASE-debian12-aarch64), each name passed as one argument; `file` is the expected text from manglings.txt | Apache-2.0 with Runtime Library Exception (Swift project) |
+| `maccy-symbols-ref.json` | the 1947 Swift symbol names (`_$s...`) in the Mach-O symbol table of `Maccy.app/Contents/MacOS/Maccy` from Maccy 2.8.0 (https://github.com/p0deje/Maccy/releases/download/2.8.0/Maccy.app.zip), with the same two swift-demangle 6.0.3 outputs. The binary itself is fetched by `packages/extras/scripts/fetch-fixtures.mjs` as `samples/.cache/extras/maccy-Maccy.macho` | MIT (Maccy) |

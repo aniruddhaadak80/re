@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "RevLens: the zero-install reverse engineering lens for agents and humans",
-  "license": "MIT",
+  "license": "MIT AND Apache-2.0 WITH Swift-exception",
   "type": "module",
   "workspaces": [
     "packages/*",

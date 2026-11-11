@@ -1,12 +1,14 @@
-// One entry point for C++ (Itanium and MSVC), Rust (legacy and v0) and Swift detection.
+// One entry point for C++ (Itanium and MSVC), Rust (legacy and v0) and Swift (old and new mangling).
 
 import { demangleItanium } from './itanium.js';
 import { demangleRustLegacy, demangleRustV0 } from './rust.js';
 import { demangleMsvc } from './msvc.js';
+import { demangleSwift, demangleSwiftTree } from './swift/index.js';
 
 export { demangleItanium } from './itanium.js';
 export { demangleRustLegacy, demangleRustV0 } from './rust.js';
 export { demangleMsvc } from './msvc.js';
+export { demangleSwift, demangleSwiftTree, swiftDemangleCompat, SWIFT_DEFAULT_OPTIONS, SWIFT_SIMPLIFIED_OPTIONS, type SwiftDemangleOptions } from './swift/index.js';
 
 export type ManglingScheme = 'itanium' | 'rust-legacy' | 'rust-v0' | 'msvc' | 'swift' | 'none';
 
@@ -19,8 +21,16 @@ export function manglingScheme(sym: string): ManglingScheme {
   if (/^_ZN.*17h[0-9a-f]{16}E/.test(s)) return 'rust-legacy';
   if (/^_Z/.test(s)) return 'itanium';
   if (/^(\?|\.\?A)/.test(sym)) return 'msvc';
-  if (/^_?\$s|^_?\$S|^_T0|^_?\$e/.test(sym)) return 'swift';
+  if (/^_?_?\$[sS][0-9A-Za-z_]|^_?_T0[0-9A-Za-z_]|^@__swiftmacro_/.test(sym)) return 'swift';
+  // Old Swift 1 to 3 mangling (_T, or __T on Mach-O) shares its prefix with plain C names such as _Test,
+  // so it only counts as Swift when it really parses.
+  if (/^_?_T[a-zA-Z0-9]/.test(sym) && sym.length <= 4096 && demangleSwiftTree(swiftInput(sym)) !== null) return 'swift';
   return 'none';
+}
+
+/** Strip the extra Mach-O underscore from Swift symbols (__T..., __$s...) so the demangler sees the real prefix. */
+function swiftInput(sym: string): string {
+  return sym.startsWith('__T') || sym.startsWith('__$') ? sym.slice(1) : sym;
 }
 
 /** Demangle any supported symbol; output is null when the scheme is recognized but parsing fails. */
@@ -32,6 +42,7 @@ export function demangle(sym: string): Demangled {
     case 'rust-legacy': output = demangleRustLegacy(sym) ?? demangleItanium(sym.replace(/^__Z/, '_Z')); break;
     case 'itanium': output = demangleItanium(sym.replace(/^__Z/, '_Z')); break;
     case 'msvc': output = demangleMsvc(sym); break;
+    case 'swift': output = demangleSwift(swiftInput(sym)); break;
     default: output = null;
   }
   return { input: sym, scheme, output };

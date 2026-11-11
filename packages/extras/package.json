@@ -1,8 +1,8 @@
 {
   "name": "@revlens/extras",
   "version": "1.0.0",
-  "description": "RevLens extras in pure TypeScript: C++/Rust/MSVC demangling, raw byte tools, Go and Rust toolchain facts, deep PE (resources, version info, manifest, rich header, Authenticode, installers), ELF notes, unwind ranges and kernel modules, Mach-O code signatures, firmware containers, GPU code objects, V8 and Hermes headers, model files, Windows shortcuts, Apple crash reports, an evidence and claims ledger, and an agent eval harness.",
-  "license": "MIT",
+  "description": "RevLens extras in pure TypeScript: C++/Rust/MSVC/Swift demangling, raw byte tools, Go and Rust toolchain facts, deep PE (resources, version info, manifest, rich header, Authenticode, installers), ELF notes, unwind ranges and kernel modules, Mach-O code signatures, firmware containers, GPU code objects, V8 and Hermes headers, model files, Windows shortcuts, Apple crash reports, an evidence and claims ledger, and an agent eval harness.",
+  "license": "MIT AND Apache-2.0 WITH Swift-exception",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,7 +17,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "NOTICE",
+    "LICENSE-SWIFT.txt"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -33,6 +35,7 @@
   "keywords": [
     "reverse-engineering",
     "demangle",
+    "swift",
     "go",
     "gopclntab",
     "pe",

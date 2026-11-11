@@ -2,2351 +2,2821 @@
 {
 "m": "_TtBf32_",
 "ref": "Builtin.FPIEEE32",
-"file": "Builtin.FPIEEE32"
+"file": "Builtin.FPIEEE32",
+"simplified": "Builtin.FPIEEE32"
 },
 {
 "m": "_TtBf64_",
 "ref": "Builtin.FPIEEE64",
-"file": "Builtin.FPIEEE64"
+"file": "Builtin.FPIEEE64",
+"simplified": "Builtin.FPIEEE64"
 },
 {
 "m": "_TtBf80_",
 "ref": "Builtin.FPIEEE80",
-"file": "Builtin.FPIEEE80"
+"file": "Builtin.FPIEEE80",
+"simplified": "Builtin.FPIEEE80"
 },
 {
 "m": "_TtBi32_",
 "ref": "Builtin.Int32",
-"file": "Builtin.Int32"
+"file": "Builtin.Int32",
+"simplified": "Builtin.Int32"
 },
 {
 "m": "$sBf32_",
 "ref": "Builtin.FPIEEE32",
-"file": "Builtin.FPIEEE32"
+"file": "Builtin.FPIEEE32",
+"simplified": "Builtin.FPIEEE32"
 },
 {
 "m": "$sBf64_",
 "ref": "Builtin.FPIEEE64",
-"file": "Builtin.FPIEEE64"
+"file": "Builtin.FPIEEE64",
+"simplified": "Builtin.FPIEEE64"
 },
 {
 "m": "$sBf80_",
 "ref": "Builtin.FPIEEE80",
-"file": "Builtin.FPIEEE80"
+"file": "Builtin.FPIEEE80",
+"simplified": "Builtin.FPIEEE80"
 },
 {
 "m": "$sBi32_",
 "ref": "Builtin.Int32",
-"file": "Builtin.Int32"
+"file": "Builtin.Int32",
+"simplified": "Builtin.Int32"
 },
 {
 "m": "_TtBw",
 "ref": "Builtin.Word",
-"file": "Builtin.Word"
+"file": "Builtin.Word",
+"simplified": "Builtin.Word"
 },
 {
 "m": "_TtBO",
 "ref": "Builtin.UnknownObject",
-"file": "Builtin.UnknownObject"
+"file": "Builtin.UnknownObject",
+"simplified": "Builtin.UnknownObject"
 },
 {
 "m": "_TtBo",
 "ref": "Builtin.NativeObject",
-"file": "Builtin.NativeObject"
+"file": "Builtin.NativeObject",
+"simplified": "Builtin.NativeObject"
 },
 {
 "m": "_TtBp",
 "ref": "Builtin.RawPointer",
-"file": "Builtin.RawPointer"
+"file": "Builtin.RawPointer",
+"simplified": "Builtin.RawPointer"
 },
 {
 "m": "_TtBt",
 "ref": "Builtin.SILToken",
-"file": "Builtin.SILToken"
+"file": "Builtin.SILToken",
+"simplified": "Builtin.SILToken"
 },
 {
 "m": "_TtBv4Bi8_",
 "ref": "Builtin.Vec4xInt8",
-"file": "Builtin.Vec4xInt8"
+"file": "Builtin.Vec4xInt8",
+"simplified": "Builtin.Vec4xInt8"
 },
 {
 "m": "_TtBv4Bf16_",
 "ref": "Builtin.Vec4xFPIEEE16",
-"file": "Builtin.Vec4xFPIEEE16"
+"file": "Builtin.Vec4xFPIEEE16",
+"simplified": "Builtin.Vec4xFPIEEE16"
 },
 {
 "m": "_TtBv4Bp",
 "ref": "Builtin.Vec4xRawPointer",
-"file": "Builtin.Vec4xRawPointer"
+"file": "Builtin.Vec4xRawPointer",
+"simplified": "Builtin.Vec4xRawPointer"
 },
 {
 "m": "$sBi8_Bv4_",
 "ref": "Builtin.Vec4xInt8",
-"file": "Builtin.Vec4xInt8"
+"file": "Builtin.Vec4xInt8",
+"simplified": "Builtin.Vec4xInt8"
 },
 {
 "m": "$sBf16_Bv4_",
 "ref": "Builtin.Vec4xFPIEEE16",
-"file": "Builtin.Vec4xFPIEEE16"
+"file": "Builtin.Vec4xFPIEEE16",
+"simplified": "Builtin.Vec4xFPIEEE16"
 },
 {
 "m": "$sBpBv4_",
 "ref": "Builtin.Vec4xRawPointer",
-"file": "Builtin.Vec4xRawPointer"
+"file": "Builtin.Vec4xRawPointer",
+"simplified": "Builtin.Vec4xRawPointer"
 },
 {
 "m": "_TtSa",
 "ref": "Swift.Array",
-"file": "Swift.Array"
+"file": "Swift.Array",
+"simplified": "Array"
 },
 {
 "m": "_TtSb",
 "ref": "Swift.Bool",
-"file": "Swift.Bool"
+"file": "Swift.Bool",
+"simplified": "Bool"
 },
 {
 "m": "_TtSc",
 "ref": "Swift.UnicodeScalar",
-"file": "Swift.UnicodeScalar"
+"file": "Swift.UnicodeScalar",
+"simplified": "UnicodeScalar"
 },
 {
 "m": "_TtSd",
 "ref": "Swift.Double",
-"file": "Swift.Double"
+"file": "Swift.Double",
+"simplified": "Double"
 },
 {
 "m": "_TtSf",
 "ref": "Swift.Float",
-"file": "Swift.Float"
+"file": "Swift.Float",
+"simplified": "Float"
 },
 {
 "m": "_TtSi",
 "ref": "Swift.Int",
-"file": "Swift.Int"
+"file": "Swift.Int",
+"simplified": "Int"
 },
 {
 "m": "_TtSq",
 "ref": "Swift.Optional",
-"file": "Swift.Optional"
+"file": "Swift.Optional",
+"simplified": "Optional"
 },
 {
 "m": "_TtSS",
 "ref": "Swift.String",
-"file": "Swift.String"
+"file": "Swift.String",
+"simplified": "String"
 },
 {
 "m": "_TtSu",
 "ref": "Swift.UInt",
-"file": "Swift.UInt"
+"file": "Swift.UInt",
+"simplified": "UInt"
 },
 {
 "m": "_TtGSPSi_",
 "ref": "Swift.UnsafePointer<Swift.Int>",
-"file": "Swift.UnsafePointer<Swift.Int>"
+"file": "Swift.UnsafePointer<Swift.Int>",
+"simplified": "UnsafePointer<Int>"
 },
 {
 "m": "_TtGSpSi_",
 "ref": "Swift.UnsafeMutablePointer<Swift.Int>",
-"file": "Swift.UnsafeMutablePointer<Swift.Int>"
+"file": "Swift.UnsafeMutablePointer<Swift.Int>",
+"simplified": "UnsafeMutablePointer<Int>"
 },
 {
 "m": "_TtSV",
 "ref": "Swift.UnsafeRawPointer",
-"file": "Swift.UnsafeRawPointer"
+"file": "Swift.UnsafeRawPointer",
+"simplified": "UnsafeRawPointer"
 },
 {
 "m": "_TtSv",
 "ref": "Swift.UnsafeMutableRawPointer",
-"file": "Swift.UnsafeMutableRawPointer"
+"file": "Swift.UnsafeMutableRawPointer",
+"simplified": "UnsafeMutableRawPointer"
 },
 {
 "m": "_TtGSaSS_",
 "ref": "[Swift.String]",
-"file": "[Swift.String]"
+"file": "[Swift.String]",
+"simplified": "[String]"
 },
 {
 "m": "_TtGSqSS_",
 "ref": "Swift.String?",
-"file": "Swift.String?"
+"file": "Swift.String?",
+"simplified": "String?"
 },
 {
 "m": "_TtGVs10DictionarySSSi_",
 "ref": "[Swift.String : Swift.Int]",
-"file": "[Swift.String : Swift.Int]"
+"file": "[Swift.String : Swift.Int]",
+"simplified": "[String : Int]"
 },
 {
 "m": "_TtVs7CString",
 "ref": "Swift.CString",
-"file": "Swift.CString"
+"file": "Swift.CString",
+"simplified": "CString"
 },
 {
 "m": "_TtCSo8NSObject",
 "ref": "__C.NSObject",
-"file": "__C.NSObject"
+"file": "__C.NSObject",
+"simplified": "NSObject"
 },
 {
 "m": "_TtO6Monads6Either",
 "ref": "Monads.Either",
-"file": "Monads.Either"
+"file": "Monads.Either",
+"simplified": "Either"
 },
 {
 "m": "_TtbSiSu",
 "ref": "@convention(block) (Swift.Int) -> Swift.UInt",
-"file": "@convention(block) (Swift.Int) -> Swift.UInt"
+"file": "@convention(block) (Swift.Int) -> Swift.UInt",
+"simplified": "@convention(block) (_:)"
 },
 {
 "m": "_TtcSiSu",
 "ref": "@convention(c) (Swift.Int) -> Swift.UInt",
-"file": "@convention(c) (Swift.Int) -> Swift.UInt"
+"file": "@convention(c) (Swift.Int) -> Swift.UInt",
+"simplified": "@convention(c) (_:)"
 },
 {
 "m": "_TtbTSiSc_Su",
 "ref": "@convention(block) (Swift.Int, Swift.UnicodeScalar) -> Swift.UInt",
-"file": "@convention(block) (Swift.Int, Swift.UnicodeScalar) -> Swift.UInt"
+"file": "@convention(block) (Swift.Int, Swift.UnicodeScalar) -> Swift.UInt",
+"simplified": "@convention(block) (_:_:)"
 },
 {
 "m": "_TtcTSiSc_Su",
 "ref": "@convention(c) (Swift.Int, Swift.UnicodeScalar) -> Swift.UInt",
-"file": "@convention(c) (Swift.Int, Swift.UnicodeScalar) -> Swift.UInt"
+"file": "@convention(c) (Swift.Int, Swift.UnicodeScalar) -> Swift.UInt",
+"simplified": "@convention(c) (_:_:)"
 },
 {
 "m": "_TtFSiSu",
 "ref": "(Swift.Int) -> Swift.UInt",
-"file": "(Swift.Int) -> Swift.UInt"
+"file": "(Swift.Int) -> Swift.UInt",
+"simplified": "(_:)"
 },
 {
 "m": "_TtKSiSu",
 "ref": "@autoclosure (Swift.Int) -> Swift.UInt",
-"file": "@autoclosure (Swift.Int) -> Swift.UInt"
+"file": "@autoclosure (Swift.Int) -> Swift.UInt",
+"simplified": "@autoclosure (_:)"
 },
 {
 "m": "_TtFSiFScSu",
 "ref": "(Swift.Int) -> (Swift.UnicodeScalar) -> Swift.UInt",
-"file": "(Swift.Int) -> (Swift.UnicodeScalar) -> Swift.UInt"
+"file": "(Swift.Int) -> (Swift.UnicodeScalar) -> Swift.UInt",
+"simplified": "(_:)"
 },
 {
 "m": "_TtMSi",
 "ref": "Swift.Int.Type",
-"file": "Swift.Int.Type"
+"file": "Swift.Int.Type",
+"simplified": "Int.Type"
 },
 {
 "m": "_TtP_",
 "ref": "Any",
-"file": "Any"
+"file": "Any",
+"simplified": "Any"
 },
 {
 "m": "_TtP3foo3bar_",
 "ref": "foo.bar",
-"file": "foo.bar"
+"file": "foo.bar",
+"simplified": "bar"
 },
 {
 "m": "_TtP3foo3barS_3bas_",
 "ref": "foo.bar & foo.bas",
-"file": "foo.bar & foo.bas"
+"file": "foo.bar & foo.bas",
+"simplified": "bar & bas"
 },
 {
 "m": "_TtTP3foo3barS_3bas_PS1__PS1_S_3zimS0___",
 "ref": "(foo.bar & foo.bas, foo.bas, foo.bas & foo.zim & foo.bar)",
-"file": "(foo.bar & foo.bas, foo.bas, foo.bas & foo.zim & foo.bar)"
+"file": "(foo.bar & foo.bas, foo.bas, foo.bas & foo.zim & foo.bar)",
+"simplified": "(bar & bas, bas, bas & zim & bar)"
 },
 {
 "m": "_TtRSi",
 "ref": "inout Swift.Int",
-"file": "inout Swift.Int"
+"file": "inout Swift.Int",
+"simplified": "inout Int"
 },
 {
 "m": "_TtTSiSu_",
 "ref": "(Swift.Int, Swift.UInt)",
-"file": "(Swift.Int, Swift.UInt)"
+"file": "(Swift.Int, Swift.UInt)",
+"simplified": "(Int, UInt)"
 },
 {
 "m": "_TttSiSu_",
 "ref": "(Swift.Int, Swift.UInt...)",
-"file": "(Swift.Int, Swift.UInt...)"
+"file": "(Swift.Int, Swift.UInt...)",
+"simplified": "(Int, UInt...)"
 },
 {
 "m": "_TtT3fooSi3barSu_",
 "ref": "(foo: Swift.Int, bar: Swift.UInt)",
-"file": "(foo: Swift.Int, bar: Swift.UInt)"
+"file": "(foo: Swift.Int, bar: Swift.UInt)",
+"simplified": "(foo: Int, bar: UInt)"
 },
 {
 "m": "_TturFxx",
 "ref": "<A>(A) -> A",
-"file": "<A>(A) -> A"
+"file": "<A>(A) -> A",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuzrFT_T_",
 "ref": "<>() -> ()",
-"file": "<>() -> ()"
+"file": "<>() -> ()",
+"simplified": "<>()"
 },
 {
 "m": "_Ttu__rFxqd__",
 "ref": "<A><A1>(A) -> A1",
-"file": "<A><A1>(A) -> A1"
+"file": "<A><A1>(A) -> A1",
+"simplified": "<A><A1>(_:)"
 },
 {
 "m": "_Ttu_z_rFxqd0__",
 "ref": "<A><><A2>(A) -> A2",
-"file": "<A><><A2>(A) -> A2"
+"file": "<A><><A2>(A) -> A2",
+"simplified": "<A><><A2>(_:)"
 },
 {
 "m": "_Ttu0_rFxq_",
 "ref": "<A, B>(A) -> B",
-"file": "<A, B>(A) -> B"
+"file": "<A, B>(A) -> B",
+"simplified": "<A, B>(_:)"
 },
 {
 "m": "_TtuRxs8RunciblerFxwx5Mince",
 "ref": "<A where A: Swift.Runcible>(A) -> A.Mince",
-"file": "<A where A: Swift.Runcible>(A) -> A.Mince"
+"file": "<A where A: Swift.Runcible>(A) -> A.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxle64xs8RunciblerFxwx5Mince",
 "ref": "<A where A: _Trivial(64), A: Swift.Runcible>(A) -> A.Mince",
-"file": "<A where A: _Trivial(64), A: Swift.Runcible>(A) -> A.Mince"
+"file": "<A where A: _Trivial(64), A: Swift.Runcible>(A) -> A.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxlE64_16rFxwx5Mince",
 "ref": "<A where A: _Trivial(64, 16)>(A) -> A.Mince",
-"file": "<A where A: _Trivial(64, 16)>(A) -> A.Mince"
+"file": "<A where A: _Trivial(64, 16)>(A) -> A.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxlE64_32xs8RunciblerFxwx5Mince",
 "ref": "<A where A: _Trivial(64, 32), A: Swift.Runcible>(A) -> A.Mince",
-"file": "<A where A: _Trivial(64, 32), A: Swift.Runcible>(A) -> A.Mince"
+"file": "<A where A: _Trivial(64, 32), A: Swift.Runcible>(A) -> A.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxlM64_16rFxwx5Mince",
 "ref": "<A where A: _TrivialAtMost(64, 16)>(A) -> A.Mince",
-"file": "<A where A: _TrivialAtMost(64, 16)>(A) -> A.Mince"
+"file": "<A where A: _TrivialAtMost(64, 16)>(A) -> A.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxle64rFxwx5Mince",
 "ref": "<A where A: _Trivial(64)>(A) -> A.Mince",
-"file": "<A where A: _Trivial(64)>(A) -> A.Mince"
+"file": "<A where A: _Trivial(64)>(A) -> A.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxlm64rFxwx5Mince",
 "ref": "<A where A: _TrivialAtMost(64)>(A) -> A.Mince",
-"file": "<A where A: _TrivialAtMost(64)>(A) -> A.Mince"
+"file": "<A where A: _TrivialAtMost(64)>(A) -> A.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxlNrFxwx5Mince",
 "ref": "<A where A: _NativeRefCountedObject>(A) -> A.Mince",
-"file": "<A where A: _NativeRefCountedObject>(A) -> A.Mince"
+"file": "<A where A: _NativeRefCountedObject>(A) -> A.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxlRrFxwx5Mince",
 "ref": "<A where A: _RefCountedObject>(A) -> A.Mince",
-"file": "<A where A: _RefCountedObject>(A) -> A.Mince"
+"file": "<A where A: _RefCountedObject>(A) -> A.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxlUrFxwx5Mince",
 "ref": "<A where A: _UnknownLayout>(A) -> A.Mince",
-"file": "<A where A: _UnknownLayout>(A) -> A.Mince"
+"file": "<A where A: _UnknownLayout>(A) -> A.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxs8RunciblerFxWx5Mince6Quince_",
 "ref": "<A where A: Swift.Runcible>(A) -> A.Mince.Quince",
-"file": "<A where A: Swift.Runcible>(A) -> A.Mince.Quince"
+"file": "<A where A: Swift.Runcible>(A) -> A.Mince.Quince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxs8Runciblexs8FungiblerFxwxPS_5Mince",
 "ref": "<A where A: Swift.Runcible, A: Swift.Fungible>(A) -> A.Swift.Runcible.Mince",
-"file": "<A where A: Swift.Runcible, A: Swift.Fungible>(A) -> A.Swift.Runcible.Mince"
+"file": "<A where A: Swift.Runcible, A: Swift.Fungible>(A) -> A.Swift.Runcible.Mince",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxCs22AbstractRuncingFactoryrFxx",
 "ref": "<A where A: Swift.AbstractRuncingFactory>(A) -> A",
-"file": "<A where A: Swift.AbstractRuncingFactory>(A) -> A"
+"file": "<A where A: Swift.AbstractRuncingFactory>(A) -> A",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxs8Runciblewx5MincezxrFxx",
 "ref": "<A where A: Swift.Runcible, A.Mince == A>(A) -> A",
-"file": "<A where A: Swift.Runcible, A.Mince == A>(A) -> A"
+"file": "<A where A: Swift.Runcible, A.Mince == A>(A) -> A",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_TtuRxs8RuncibleWx5Mince6Quince_zxrFxx",
 "ref": "<A where A: Swift.Runcible, A.Mince.Quince == A>(A) -> A",
-"file": "<A where A: Swift.Runcible, A.Mince.Quince == A>(A) -> A"
+"file": "<A where A: Swift.Runcible, A.Mince.Quince == A>(A) -> A",
+"simplified": "<A>(_:)"
 },
 {
 "m": "_Ttu0_Rxs8Runcible_S_wx5Minces8Fungiblew_S0_S1_rFxq_",
 "ref": "<A, B where A: Swift.Runcible, B: Swift.Runcible, A.Mince: Swift.Fungible, B.Mince: Swift.Fungible>(A) -> B",
-"file": "<A, B where A: Swift.Runcible, B: Swift.Runcible, A.Mince: Swift.Fungible, B.Mince: Swift.Fungible>(A) -> B"
+"file": "<A, B where A: Swift.Runcible, B: Swift.Runcible, A.Mince: Swift.Fungible, B.Mince: Swift.Fungible>(A) -> B",
+"simplified": "<A, B>(_:)"
 },
 {
 "m": "_Ttu0_Rx3Foo3BarxCS_3Bas_S0__S1_rT_",
 "ref": "<A, B where A: Foo.Bar, A: Foo.Bas, B: Foo.Bar, B: Foo.Bas> ()",
-"file": "<A, B where A: Foo.Bar, A: Foo.Bas, B: Foo.Bar, B: Foo.Bas> ()"
+"file": "<A, B where A: Foo.Bar, A: Foo.Bas, B: Foo.Bar, B: Foo.Bas> ()",
+"simplified": "<A, B> ()"
 },
 {
 "m": "_Tv3foo3barSi",
 "ref": "foo.bar : Swift.Int",
-"file": "foo.bar : Swift.Int"
+"file": "foo.bar : Swift.Int",
+"simplified": "bar"
 },
 {
 "m": "_TF3fooau3barSi",
 "ref": "foo.bar.unsafeMutableAddressor : Swift.Int",
-"file": "foo.bar.unsafeMutableAddressor : Swift.Int"
+"file": "foo.bar.unsafeMutableAddressor : Swift.Int",
+"simplified": "bar.unsafeMutableAddressor"
 },
 {
 "m": "_TF3foolu3barSi",
 "ref": "foo.bar.unsafeAddressor : Swift.Int",
-"file": "foo.bar.unsafeAddressor : Swift.Int"
+"file": "foo.bar.unsafeAddressor : Swift.Int",
+"simplified": "bar.unsafeAddressor"
 },
 {
 "m": "_TF3fooaO3barSi",
 "ref": "foo.bar.owningMutableAddressor : Swift.Int",
-"file": "foo.bar.owningMutableAddressor : Swift.Int"
+"file": "foo.bar.owningMutableAddressor : Swift.Int",
+"simplified": "bar.owningMutableAddressor"
 },
 {
 "m": "_TF3foolO3barSi",
 "ref": "foo.bar.owningAddressor : Swift.Int",
-"file": "foo.bar.owningAddressor : Swift.Int"
+"file": "foo.bar.owningAddressor : Swift.Int",
+"simplified": "bar.owningAddressor"
 },
 {
 "m": "_TF3fooao3barSi",
 "ref": "foo.bar.nativeOwningMutableAddressor : Swift.Int",
-"file": "foo.bar.nativeOwningMutableAddressor : Swift.Int"
+"file": "foo.bar.nativeOwningMutableAddressor : Swift.Int",
+"simplified": "bar.nativeOwningMutableAddressor"
 },
 {
 "m": "_TF3foolo3barSi",
 "ref": "foo.bar.nativeOwningAddressor : Swift.Int",
-"file": "foo.bar.nativeOwningAddressor : Swift.Int"
+"file": "foo.bar.nativeOwningAddressor : Swift.Int",
+"simplified": "bar.nativeOwningAddressor"
 },
 {
 "m": "_TF3fooap3barSi",
 "ref": "foo.bar.nativePinningMutableAddressor : Swift.Int",
-"file": "foo.bar.nativePinningMutableAddressor : Swift.Int"
+"file": "foo.bar.nativePinningMutableAddressor : Swift.Int",
+"simplified": "bar.nativePinningMutableAddressor"
 },
 {
 "m": "_TF3foolp3barSi",
 "ref": "foo.bar.nativePinningAddressor : Swift.Int",
-"file": "foo.bar.nativePinningAddressor : Swift.Int"
+"file": "foo.bar.nativePinningAddressor : Swift.Int",
+"simplified": "bar.nativePinningAddressor"
 },
 {
 "m": "_TF3foog3barSi",
 "ref": "foo.bar.getter : Swift.Int",
-"file": "foo.bar.getter : Swift.Int"
+"file": "foo.bar.getter : Swift.Int",
+"simplified": "bar.getter"
 },
 {
 "m": "_TF3foos3barSi",
 "ref": "foo.bar.setter : Swift.Int",
-"file": "foo.bar.setter : Swift.Int"
+"file": "foo.bar.setter : Swift.Int",
+"simplified": "bar.setter"
 },
 {
 "m": "_TFC3foo3bar3basfT3zimCS_3zim_T_",
 "ref": "foo.bar.bas(zim: foo.zim) -> ()",
-"file": "foo.bar.bas(zim: foo.zim) -> ()"
+"file": "foo.bar.bas(zim: foo.zim) -> ()",
+"simplified": "bar.bas(zim:)"
 },
 {
 "m": "_TToFC3foo3bar3basfT3zimCS_3zim_T_",
 "ref": "@objc foo.bar.bas(zim: foo.zim) -> ()",
-"file": "{T:_TFC3foo3bar3basfT3zimCS_3zim_T_,C} @objc foo.bar.bas(zim: foo.zim) -> ()"
+"file": "{T:_TFC3foo3bar3basfT3zimCS_3zim_T_,C} @objc foo.bar.bas(zim: foo.zim) -> ()",
+"simplified": "@objc bar.bas(zim:)"
 },
 {
 "m": "_TTOFSC3fooFTSdSd_Sd",
 "ref": "@nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double",
-"file": "{T:_TFSC3fooFTSdSd_Sd} @nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double"
+"file": "{T:_TFSC3fooFTSdSd_Sd} @nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double",
+"simplified": "@nonobjc foo(_:_:)"
 },
 {
 "m": "_T03foo3barC3basyAA3zimCAE_tFTo",
 "ref": "@objc foo.bar.bas(zim: foo.zim) -> ()",
-"file": "{T:_T03foo3barC3basyAA3zimCAE_tF,C} @objc foo.bar.bas(zim: foo.zim) -> ()"
+"file": "{T:_T03foo3barC3basyAA3zimCAE_tF,C} @objc foo.bar.bas(zim: foo.zim) -> ()",
+"simplified": "@objc bar.bas(zim:)"
 },
 {
 "m": "_T0SC3fooS2d_SdtFTO",
 "ref": "@nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double",
-"file": "{T:_T0SC3fooS2d_SdtF} @nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double"
+"file": "{T:_T0SC3fooS2d_SdtF} @nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double",
+"simplified": "@nonobjc foo(_:_:)"
 },
 {
 "m": "_$s3foo3barC3bas3zimyAaEC_tFTo",
 "ref": "@objc foo.bar.bas(zim: foo.zim) -> ()",
-"file": "{T:_$s3foo3barC3bas3zimyAaEC_tF,C} @objc foo.bar.bas(zim: foo.zim) -> ()"
+"file": "{T:_$s3foo3barC3bas3zimyAaEC_tF,C} @objc foo.bar.bas(zim: foo.zim) -> ()",
+"simplified": "@objc bar.bas(zim:)"
 },
 {
 "m": "_$sSC3fooyS2d_SdtFTO",
 "ref": "@nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double",
-"file": "{T:_$sSC3fooyS2d_SdtF} @nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double"
+"file": "{T:_$sSC3fooyS2d_SdtF} @nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double",
+"simplified": "@nonobjc foo(_:_:)"
 },
 {
 "m": "_$S3foo3barC3bas3zimyAaEC_tFTo",
 "ref": "@objc foo.bar.bas(zim: foo.zim) -> ()",
-"file": "{T:_$S3foo3barC3bas3zimyAaEC_tF,C} @objc foo.bar.bas(zim: foo.zim) -> ()"
+"file": "{T:_$S3foo3barC3bas3zimyAaEC_tF,C} @objc foo.bar.bas(zim: foo.zim) -> ()",
+"simplified": "@objc bar.bas(zim:)"
 },
 {
 "m": "_$SSC3fooyS2d_SdtFTO",
 "ref": "@nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double",
-"file": "{T:_$SSC3fooyS2d_SdtF} @nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double"
+"file": "{T:_$SSC3fooyS2d_SdtF} @nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double",
+"simplified": "@nonobjc foo(_:_:)"
 },
 {
 "m": "_$S3foo3barC3bas3zimyAaEC_tFTo",
 "ref": "@objc foo.bar.bas(zim: foo.zim) -> ()",
-"file": "{T:_$S3foo3barC3bas3zimyAaEC_tF,C} @objc foo.bar.bas(zim: foo.zim) -> ()"
+"file": "{T:_$S3foo3barC3bas3zimyAaEC_tF,C} @objc foo.bar.bas(zim: foo.zim) -> ()",
+"simplified": "@objc bar.bas(zim:)"
 },
 {
 "m": "_$SSC3fooyS2d_SdtFTO",
 "ref": "@nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double",
-"file": "{T:_$SSC3fooyS2d_SdtF} @nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double"
+"file": "{T:_$SSC3fooyS2d_SdtF} @nonobjc __C_Synthesized.foo(Swift.Double, Swift.Double) -> Swift.Double",
+"simplified": "@nonobjc foo(_:_:)"
 },
 {
 "m": "_$sTA.123",
 "ref": "partial apply forwarder with unmangled suffix \".123\"",
-"file": "{T:} partial apply forwarder with unmangled suffix \".123\""
+"file": "{T:} partial apply forwarder with unmangled suffix \".123\"",
+"simplified": "partial apply"
 },
 {
 "m": "$s4main3fooyySiFyyXEfU_TA.1",
 "ref": "closure #1 () -> () in main.foo(Swift.Int) -> ()partial apply forwarder with unmangled suffix \".1\"",
-"file": "{T:} closure #1 () -> () in main.foo(Swift.Int) -> ()partial apply forwarder with unmangled suffix \".1\""
+"file": "{T:} closure #1 () -> () in main.foo(Swift.Int) -> ()partial apply forwarder with unmangled suffix \".1\"",
+"simplified": "closure #1 in foo(_:)partial apply"
 },
 {
 "m": "_TTDFC3foo3bar3basfT3zimCS_3zim_T_",
 "ref": "dynamic foo.bar.bas(zim: foo.zim) -> ()",
-"file": "dynamic foo.bar.bas(zim: foo.zim) -> ()"
+"file": "dynamic foo.bar.bas(zim: foo.zim) -> ()",
+"simplified": "dynamic bar.bas(zim:)"
 },
 {
 "m": "_TFC3foo3bar3basfT3zimCS_3zim_T_",
 "ref": "foo.bar.bas(zim: foo.zim) -> ()",
-"file": "foo.bar.bas(zim: foo.zim) -> ()"
+"file": "foo.bar.bas(zim: foo.zim) -> ()",
+"simplified": "bar.bas(zim:)"
 },
 {
 "m": "_TF3foooi1pFTCS_3barVS_3bas_OS_3zim",
 "ref": "foo.+ infix(foo.bar, foo.bas) -> foo.zim",
-"file": "foo.+ infix(foo.bar, foo.bas) -> foo.zim"
+"file": "foo.+ infix(foo.bar, foo.bas) -> foo.zim",
+"simplified": "+ infix(_:_:)"
 },
 {
 "m": "_TF3foooP1xFTCS_3barVS_3bas_OS_3zim",
 "ref": "foo.^ postfix(foo.bar, foo.bas) -> foo.zim",
-"file": "foo.^ postfix(foo.bar, foo.bas) -> foo.zim"
+"file": "foo.^ postfix(foo.bar, foo.bas) -> foo.zim",
+"simplified": "^ postfix(_:_:)"
 },
 {
 "m": "_TFC3foo3barCfT_S0_",
 "ref": "foo.bar.__allocating_init() -> foo.bar",
-"file": "foo.bar.__allocating_init() -> foo.bar"
+"file": "foo.bar.__allocating_init() -> foo.bar",
+"simplified": "bar.__allocating_init()"
 },
 {
 "m": "_TFC3foo3barcfT_S0_",
 "ref": "foo.bar.init() -> foo.bar",
-"file": "foo.bar.init() -> foo.bar"
+"file": "foo.bar.init() -> foo.bar",
+"simplified": "bar.init()"
 },
 {
 "m": "_TFC3foo3barD",
 "ref": "foo.bar.__deallocating_deinit",
-"file": "foo.bar.__deallocating_deinit"
+"file": "foo.bar.__deallocating_deinit",
+"simplified": "bar.__deallocating_deinit"
 },
 {
 "m": "_TFC3foo3bard",
 "ref": "foo.bar.deinit",
-"file": "foo.bar.deinit"
+"file": "foo.bar.deinit",
+"simplified": "bar.deinit"
 },
 {
 "m": "_TMPC3foo3bar",
 "ref": "generic type metadata pattern for foo.bar",
-"file": "generic type metadata pattern for foo.bar"
+"file": "generic type metadata pattern for foo.bar",
+"simplified": "generic type metadata pattern for bar"
 },
 {
 "m": "_TMnC3foo3bar",
 "ref": "nominal type descriptor for foo.bar",
-"file": "nominal type descriptor for foo.bar"
+"file": "nominal type descriptor for foo.bar",
+"simplified": "nominal type descriptor for bar"
 },
 {
 "m": "_TMmC3foo3bar",
 "ref": "metaclass for foo.bar",
-"file": "metaclass for foo.bar"
+"file": "metaclass for foo.bar",
+"simplified": "metaclass for bar"
 },
 {
 "m": "_TMC3foo3bar",
 "ref": "type metadata for foo.bar",
-"file": "type metadata for foo.bar"
+"file": "type metadata for foo.bar",
+"simplified": "type metadata for bar"
 },
 {
 "m": "_TMfC3foo3bar",
 "ref": "full type metadata for foo.bar",
-"file": "full type metadata for foo.bar"
+"file": "full type metadata for foo.bar",
+"simplified": "full type metadata for bar"
 },
 {
 "m": "_TwalC3foo3bar",
 "ref": "allocateBuffer value witness for foo.bar",
-"file": "{C} allocateBuffer value witness for foo.bar"
+"file": "{C} allocateBuffer value witness for foo.bar",
+"simplified": "allocateBuffer for bar"
 },
 {
 "m": "_TwcaC3foo3bar",
 "ref": "assignWithCopy value witness for foo.bar",
-"file": "{C} assignWithCopy value witness for foo.bar"
+"file": "{C} assignWithCopy value witness for foo.bar",
+"simplified": "assignWithCopy for bar"
 },
 {
 "m": "_TwtaC3foo3bar",
 "ref": "assignWithTake value witness for foo.bar",
-"file": "{C} assignWithTake value witness for foo.bar"
+"file": "{C} assignWithTake value witness for foo.bar",
+"simplified": "assignWithTake for bar"
 },
 {
 "m": "_TwdeC3foo3bar",
 "ref": "deallocateBuffer value witness for foo.bar",
-"file": "{C} deallocateBuffer value witness for foo.bar"
+"file": "{C} deallocateBuffer value witness for foo.bar",
+"simplified": "deallocateBuffer for bar"
 },
 {
 "m": "_TwxxC3foo3bar",
 "ref": "destroy value witness for foo.bar",
-"file": "{C} destroy value witness for foo.bar"
+"file": "{C} destroy value witness for foo.bar",
+"simplified": "destroy for bar"
 },
 {
 "m": "_TwXXC3foo3bar",
 "ref": "destroyBuffer value witness for foo.bar",
-"file": "{C} destroyBuffer value witness for foo.bar"
+"file": "{C} destroyBuffer value witness for foo.bar",
+"simplified": "destroyBuffer for bar"
 },
 {
 "m": "_TwCPC3foo3bar",
 "ref": "initializeBufferWithCopyOfBuffer value witness for foo.bar",
-"file": "{C} initializeBufferWithCopyOfBuffer value witness for foo.bar"
+"file": "{C} initializeBufferWithCopyOfBuffer value witness for foo.bar",
+"simplified": "initializeBufferWithCopyOfBuffer for bar"
 },
 {
 "m": "_TwCpC3foo3bar",
 "ref": "initializeBufferWithCopy value witness for foo.bar",
-"file": "{C} initializeBufferWithCopy value witness for foo.bar"
+"file": "{C} initializeBufferWithCopy value witness for foo.bar",
+"simplified": "initializeBufferWithCopy for bar"
 },
 {
 "m": "_TwcpC3foo3bar",
 "ref": "initializeWithCopy value witness for foo.bar",
-"file": "{C} initializeWithCopy value witness for foo.bar"
+"file": "{C} initializeWithCopy value witness for foo.bar",
+"simplified": "initializeWithCopy for bar"
 },
 {
 "m": "_TwTKC3foo3bar",
 "ref": "initializeBufferWithTakeOfBuffer value witness for foo.bar",
-"file": "{C} initializeBufferWithTakeOfBuffer value witness for foo.bar"
+"file": "{C} initializeBufferWithTakeOfBuffer value witness for foo.bar",
+"simplified": "initializeBufferWithTakeOfBuffer for bar"
 },
 {
 "m": "_TwTkC3foo3bar",
 "ref": "initializeBufferWithTake value witness for foo.bar",
-"file": "{C} initializeBufferWithTake value witness for foo.bar"
+"file": "{C} initializeBufferWithTake value witness for foo.bar",
+"simplified": "initializeBufferWithTake for bar"
 },
 {
 "m": "_TwtkC3foo3bar",
 "ref": "initializeWithTake value witness for foo.bar",
-"file": "{C} initializeWithTake value witness for foo.bar"
+"file": "{C} initializeWithTake value witness for foo.bar",
+"simplified": "initializeWithTake for bar"
 },
 {
 "m": "_TwprC3foo3bar",
 "ref": "projectBuffer value witness for foo.bar",
-"file": "{C} projectBuffer value witness for foo.bar"
+"file": "{C} projectBuffer value witness for foo.bar",
+"simplified": "projectBuffer for bar"
 },
 {
 "m": "_TWVC3foo3bar",
 "ref": "value witness table for foo.bar",
-"file": "value witness table for foo.bar"
+"file": "value witness table for foo.bar",
+"simplified": "value witness table for bar"
 },
 {
 "m": "_TWvdvC3foo3bar3basSi",
 "ref": "direct field offset for foo.bar.bas : Swift.Int",
-"file": "direct field offset for foo.bar.bas : Swift.Int"
+"file": "direct field offset for foo.bar.bas : Swift.Int",
+"simplified": "direct field offset for bar.bas"
 },
 {
 "m": "_TWvivC3foo3bar3basSi",
 "ref": "indirect field offset for foo.bar.bas : Swift.Int",
-"file": "indirect field offset for foo.bar.bas : Swift.Int"
+"file": "indirect field offset for foo.bar.bas : Swift.Int",
+"simplified": "indirect field offset for bar.bas"
 },
 {
 "m": "_TWPC3foo3barS_8barrables",
 "ref": "protocol witness table for foo.bar : foo.barrable in Swift",
-"file": "protocol witness table for foo.bar : foo.barrable in Swift"
+"file": "protocol witness table for foo.bar : foo.barrable in Swift",
+"simplified": "protocol witness table for bar"
 },
 {
 "m": "_TWaC3foo3barS_8barrableS_",
 "ref": "protocol witness table accessor for foo.bar : foo.barrable in foo",
-"file": "{C} protocol witness table accessor for foo.bar : foo.barrable in foo"
+"file": "{C} protocol witness table accessor for foo.bar : foo.barrable in foo",
+"simplified": "protocol witness table accessor for bar"
 },
 {
 "m": "_TWlC3foo3barS0_S_8barrableS_",
 "ref": "lazy protocol witness table accessor for type foo.bar and conformance foo.bar : foo.barrable in foo",
-"file": "{C} lazy protocol witness table accessor for type foo.bar and conformance foo.bar : foo.barrable in foo"
+"file": "{C} lazy protocol witness table accessor for type foo.bar and conformance foo.bar : foo.barrable in foo",
+"simplified": "lazy protocol witness table accessor for type bar and conformance bar"
 },
 {
 "m": "_TWLC3foo3barS0_S_8barrableS_",
 "ref": "lazy protocol witness table cache variable for type foo.bar and conformance foo.bar : foo.barrable in foo",
-"file": "lazy protocol witness table cache variable for type foo.bar and conformance foo.bar : foo.barrable in foo"
+"file": "lazy protocol witness table cache variable for type foo.bar and conformance foo.bar : foo.barrable in foo",
+"simplified": "lazy protocol witness table cache variable for type bar and conformance bar"
 },
 {
 "m": "_TWGC3foo3barS_8barrableS_",
 "ref": "generic protocol witness table for foo.bar : foo.barrable in foo",
-"file": "generic protocol witness table for foo.bar : foo.barrable in foo"
+"file": "generic protocol witness table for foo.bar : foo.barrable in foo",
+"simplified": "generic protocol witness table for bar"
 },
 {
 "m": "_TWIC3foo3barS_8barrableS_",
 "ref": "instantiation function for generic protocol witness table for foo.bar : foo.barrable in foo",
-"file": "{C} instantiation function for generic protocol witness table for foo.bar : foo.barrable in foo"
+"file": "{C} instantiation function for generic protocol witness table for foo.bar : foo.barrable in foo",
+"simplified": "instantiation function for generic protocol witness table for bar"
 },
 {
 "m": "_TWtC3foo3barS_8barrableS_4fred",
 "ref": "associated type metadata accessor for fred in foo.bar : foo.barrable in foo",
-"file": "{C} associated type metadata accessor for fred in foo.bar : foo.barrable in foo"
+"file": "{C} associated type metadata accessor for fred in foo.bar : foo.barrable in foo",
+"simplified": "associated type metadata accessor for fred in bar"
 },
 {
 "m": "_TWTC3foo3barS_8barrableS_4fredS_6thomas",
 "ref": "associated type witness table accessor for fred : foo.thomas in foo.bar : foo.barrable in foo",
-"file": "{C} associated type witness table accessor for fred : foo.thomas in foo.bar : foo.barrable in foo"
+"file": "{C} associated type witness table accessor for fred : foo.thomas in foo.bar : foo.barrable in foo",
+"simplified": "associated type witness table accessor for fred : thomas in bar"
 },
 {
 "m": "_TFSCg5greenVSC5Color",
 "ref": "__C_Synthesized.green.getter : __C_Synthesized.Color",
-"file": "__C_Synthesized.green.getter : __C_Synthesized.Color"
+"file": "__C_Synthesized.green.getter : __C_Synthesized.Color",
+"simplified": "green.getter"
 },
 {
 "m": "_TIF1t1fFT1iSi1sSS_T_A_",
 "ref": "default argument 0 of t.f(i: Swift.Int, s: Swift.String) -> ()",
-"file": "default argument 0 of t.f(i: Swift.Int, s: Swift.String) -> ()"
+"file": "default argument 0 of t.f(i: Swift.Int, s: Swift.String) -> ()",
+"simplified": "default argument 0 of f(i:s:)"
 },
 {
 "m": "_TIF1t1fFT1iSi1sSS_T_A0_",
 "ref": "default argument 1 of t.f(i: Swift.Int, s: Swift.String) -> ()",
-"file": "default argument 1 of t.f(i: Swift.Int, s: Swift.String) -> ()"
+"file": "default argument 1 of t.f(i: Swift.Int, s: Swift.String) -> ()",
+"simplified": "default argument 1 of f(i:s:)"
 },
 {
 "m": "_TFSqcfT_GSqx_",
 "ref": "Swift.Optional.init() -> A?",
-"file": "Swift.Optional.init() -> A?"
+"file": "Swift.Optional.init() -> A?",
+"simplified": "Optional.init()"
 },
 {
 "m": "_TF21class_bound_protocols32class_bound_protocol_compositionFT1xPS_10ClassBoundS_13NotClassBound__PS0_S1__",
 "ref": "class_bound_protocols.class_bound_protocol_composition(x: class_bound_protocols.ClassBound & class_bound_protocols.NotClassBound) -> class_bound_protocols.ClassBound & class_bound_protocols.NotClassBound",
-"file": "class_bound_protocols.class_bound_protocol_composition(x: class_bound_protocols.ClassBound & class_bound_protocols.NotClassBound) -> class_bound_protocols.ClassBound & class_bound_protocols.NotClassBound"
+"file": "class_bound_protocols.class_bound_protocol_composition(x: class_bound_protocols.ClassBound & class_bound_protocols.NotClassBound) -> class_bound_protocols.ClassBound & class_bound_protocols.NotClassBound",
+"simplified": "class_bound_protocol_composition(x:)"
 },
 {
 "m": "_TtZZ",
 "ref": "_TtZZ",
-"file": "_TtZZ"
+"file": "_TtZZ",
+"simplified": "_TtZZ"
 },
 {
 "m": "_TtB",
 "ref": "_TtB",
-"file": "_TtB"
+"file": "_TtB",
+"simplified": "_TtB"
 },
 {
 "m": "_TtBSi",
 "ref": "_TtBSi",
-"file": "_TtBSi"
+"file": "_TtBSi",
+"simplified": "_TtBSi"
 },
 {
 "m": "_TtBx",
 "ref": "_TtBx",
-"file": "_TtBx"
+"file": "_TtBx",
+"simplified": "_TtBx"
 },
 {
 "m": "_TtC",
 "ref": "_TtC",
-"file": "_TtC"
+"file": "_TtC",
+"simplified": "_TtC"
 },
 {
 "m": "_TtT",
 "ref": "_TtT",
-"file": "_TtT"
+"file": "_TtT",
+"simplified": "_TtT"
 },
 {
 "m": "_TtTSi",
 "ref": "_TtTSi",
-"file": "_TtTSi"
+"file": "_TtTSi",
+"simplified": "_TtTSi"
 },
 {
 "m": "_TtQd_",
 "ref": "_TtQd_",
-"file": "_TtQd_"
+"file": "_TtQd_",
+"simplified": "_TtQd_"
 },
 {
 "m": "_TtU__FQo_Si",
 "ref": "_TtU__FQo_Si",
-"file": "_TtU__FQo_Si"
+"file": "_TtU__FQo_Si",
+"simplified": "_TtU__FQo_Si"
 },
 {
 "m": "_TtU__FQD__Si",
 "ref": "_TtU__FQD__Si",
-"file": "_TtU__FQD__Si"
+"file": "_TtU__FQD__Si",
+"simplified": "_TtU__FQD__Si"
 },
 {
 "m": "_TtU___FQ_U____FQd0__T_",
 "ref": "_TtU___FQ_U____FQd0__T_",
-"file": "_TtU___FQ_U____FQd0__T_"
+"file": "_TtU___FQ_U____FQd0__T_",
+"simplified": "_TtU___FQ_U____FQd0__T_"
 },
 {
 "m": "_TtU___FQ_U____FQd_1_T_",
 "ref": "_TtU___FQ_U____FQd_1_T_",
-"file": "_TtU___FQ_U____FQd_1_T_"
+"file": "_TtU___FQ_U____FQd_1_T_",
+"simplified": "_TtU___FQ_U____FQd_1_T_"
 },
 {
 "m": "_TtU___FQ_U____FQ2_T_",
 "ref": "_TtU___FQ_U____FQ2_T_",
-"file": "_TtU___FQ_U____FQ2_T_"
+"file": "_TtU___FQ_U____FQ2_T_",
+"simplified": "_TtU___FQ_U____FQ2_T_"
 },
 {
 "m": "_Tw",
 "ref": "_Tw",
-"file": "_Tw"
+"file": "_Tw",
+"simplified": "_Tw"
 },
 {
 "m": "_TWa",
 "ref": "_TWa",
-"file": "_TWa"
+"file": "_TWa",
+"simplified": "_TWa"
 },
 {
 "m": "_Twal",
 "ref": "_Twal",
-"file": "_Twal"
+"file": "_Twal",
+"simplified": "_Twal"
 },
 {
 "m": "_T",
 "ref": "_T",
-"file": "_T"
+"file": "_T",
+"simplified": "_T"
 },
 {
 "m": "_TTo",
 "ref": "_TTo",
-"file": "{T:_T} _TTo"
+"file": "{T:_T} _TTo",
+"simplified": "_TTo"
 },
 {
 "m": "_TC",
 "ref": "_TC",
-"file": "_TC"
+"file": "_TC",
+"simplified": "_TC"
 },
 {
 "m": "_TM",
 "ref": "_TM",
-"file": "_TM"
+"file": "_TM",
+"simplified": "_TM"
 },
 {
 "m": "_TM",
 "ref": "_TM",
-"file": "_TM"
+"file": "_TM",
+"simplified": "_TM"
 },
 {
 "m": "_TW",
 "ref": "_TW",
-"file": "_TW"
+"file": "_TW",
+"simplified": "_TW"
 },
 {
 "m": "_TWV",
 "ref": "_TWV",
-"file": "_TWV"
+"file": "_TWV",
+"simplified": "_TWV"
 },
 {
 "m": "_TWo",
 "ref": "_TWo",
-"file": "_TWo"
+"file": "_TWo",
+"simplified": "_TWo"
 },
 {
 "m": "_TWv",
 "ref": "_TWv",
-"file": "_TWv"
+"file": "_TWv",
+"simplified": "_TWv"
 },
 {
 "m": "_TWvd",
 "ref": "_TWvd",
-"file": "_TWvd"
+"file": "_TWvd",
+"simplified": "_TWvd"
 },
 {
 "m": "_TWvi",
 "ref": "_TWvi",
-"file": "_TWvi"
+"file": "_TWvi",
+"simplified": "_TWvi"
 },
 {
 "m": "_TWvx",
 "ref": "_TWvx",
-"file": "_TWvx"
+"file": "_TWvx",
+"simplified": "_TWvx"
 },
 {
 "m": "_TtVCC4main3Foo4Ding3Str",
 "ref": "main.Foo.Ding.Str",
-"file": "main.Foo.Ding.Str"
+"file": "main.Foo.Ding.Str",
+"simplified": "Foo.Ding.Str"
 },
 {
 "m": "_TFVCC6nested6AClass12AnotherClass7AStruct9aFunctionfT1aSi_S2_",
 "ref": "nested.AClass.AnotherClass.AStruct.aFunction(a: Swift.Int) -> nested.AClass.AnotherClass.AStruct",
-"file": "nested.AClass.AnotherClass.AStruct.aFunction(a: Swift.Int) -> nested.AClass.AnotherClass.AStruct"
+"file": "nested.AClass.AnotherClass.AStruct.aFunction(a: Swift.Int) -> nested.AClass.AnotherClass.AStruct",
+"simplified": "AClass.AnotherClass.AStruct.aFunction(a:)"
 },
 {
 "m": "_TtXwC10attributes10SwiftClass",
 "ref": "weak attributes.SwiftClass",
-"file": "weak attributes.SwiftClass"
+"file": "weak attributes.SwiftClass",
+"simplified": "weak SwiftClass"
 },
 {
 "m": "_TtXoC10attributes10SwiftClass",
 "ref": "unowned attributes.SwiftClass",
-"file": "unowned attributes.SwiftClass"
+"file": "unowned attributes.SwiftClass",
+"simplified": "unowned SwiftClass"
 },
 {
 "m": "_TtERR",
 "ref": "<ERROR TYPE>",
-"file": "<ERROR TYPE>"
+"file": "<ERROR TYPE>",
+"simplified": "<ERROR TYPE>"
 },
 {
 "m": "_TtGSqGSaC5sugar7MyClass__",
 "ref": "[sugar.MyClass]?",
-"file": "[sugar.MyClass]?"
+"file": "[sugar.MyClass]?",
+"simplified": "[MyClass]?"
 },
 {
 "m": "_TtGSaGSqC5sugar7MyClass__",
 "ref": "[sugar.MyClass?]",
-"file": "[sugar.MyClass?]"
+"file": "[sugar.MyClass?]",
+"simplified": "[MyClass?]"
 },
 {
 "m": "_TtaC9typealias5DWARF9DIEOffset",
 "ref": "typealias.DWARF.DIEOffset",
-"file": "typealias.DWARF.DIEOffset"
+"file": "typealias.DWARF.DIEOffset",
+"simplified": "DWARF.DIEOffset"
 },
 {
 "m": "_Tta1t5Alias",
 "ref": "t.Alias",
-"file": "t.Alias"
+"file": "t.Alias",
+"simplified": "Alias"
 },
 {
 "m": "_Ttas3Int",
 "ref": "Swift.Int",
-"file": "Swift.Int"
+"file": "Swift.Int",
+"simplified": "Int"
 },
 {
 "m": "_TTRXFo_dSc_dSb_XFo_iSc_iSb_",
 "ref": "reabstraction thunk helper from @callee_owned (@in Swift.UnicodeScalar) -> (@out Swift.Bool) to @callee_owned (@unowned Swift.UnicodeScalar) -> (@unowned Swift.Bool)",
-"file": "reabstraction thunk helper from @callee_owned (@in Swift.UnicodeScalar) -> (@out Swift.Bool) to @callee_owned (@unowned Swift.UnicodeScalar) -> (@unowned Swift.Bool)"
+"file": "reabstraction thunk helper from @callee_owned (@in Swift.UnicodeScalar) -> (@out Swift.Bool) to @callee_owned (@unowned Swift.UnicodeScalar) -> (@unowned Swift.Bool)",
+"simplified": "thunk for @callee_owned (@in UnicodeScalar) -> (@out Bool)"
 },
 {
 "m": "_TTRXFo_dSi_dGSqSi__XFo_iSi_iGSqSi__",
 "ref": "reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@out Swift.Int?) to @callee_owned (@unowned Swift.Int) -> (@unowned Swift.Int?)",
-"file": "reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@out Swift.Int?) to @callee_owned (@unowned Swift.Int) -> (@unowned Swift.Int?)"
+"file": "reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@out Swift.Int?) to @callee_owned (@unowned Swift.Int) -> (@unowned Swift.Int?)",
+"simplified": "thunk for @callee_owned (@in Int) -> (@out Int?)"
 },
 {
 "m": "_TTRGrXFo_iV18switch_abstraction1A_ix_XFo_dS0__ix_",
 "ref": "reabstraction thunk helper <A> from @callee_owned (@unowned switch_abstraction.A) -> (@out A) to @callee_owned (@in switch_abstraction.A) -> (@out A)",
-"file": "reabstraction thunk helper <A> from @callee_owned (@unowned switch_abstraction.A) -> (@out A) to @callee_owned (@in switch_abstraction.A) -> (@out A)"
+"file": "reabstraction thunk helper <A> from @callee_owned (@unowned switch_abstraction.A) -> (@out A) to @callee_owned (@in switch_abstraction.A) -> (@out A)",
+"simplified": "thunk for @callee_owned (@unowned A) -> (@out A)"
 },
 {
 "m": "_TFCF5types1gFT1bSb_T_L0_10Collection3zimfT_T_",
 "ref": "zim() -> () in Collection #2 in types.g(b: Swift.Bool) -> ()",
-"file": "zim() -> () in Collection #2 in types.g(b: Swift.Bool) -> ()"
+"file": "zim() -> () in Collection #2 in types.g(b: Swift.Bool) -> ()",
+"simplified": "zim() in Collection #2 in g(b:)"
 },
 {
 "m": "_TFF17capture_promotion22test_capture_promotionFT_FT_SiU_FT_Si_promote0",
 "ref": "closure #1 () -> Swift.Int in capture_promotion.test_capture_promotion() -> () -> Swift.Int with unmangled suffix \"_promote0\"",
-"file": "closure #1 () -> Swift.Int in capture_promotion.test_capture_promotion() -> () -> Swift.Int with unmangled suffix \"_promote0\""
+"file": "closure #1 () -> Swift.Int in capture_promotion.test_capture_promotion() -> () -> Swift.Int with unmangled suffix \"_promote0\"",
+"simplified": "closure #1 in test_capture_promotion()"
 },
 {
 "m": "_TFIVs8_Processi10_argumentsGSaSS_U_FT_GSaSS_",
 "ref": "_arguments : [Swift.String] in variable initialization expression of Swift._Process with unmangled suffix \"U_FT_GSaSS_\"",
-"file": "_arguments : [Swift.String] in variable initialization expression of Swift._Process with unmangled suffix \"U_FT_GSaSS_\""
+"file": "_arguments : [Swift.String] in variable initialization expression of Swift._Process with unmangled suffix \"U_FT_GSaSS_\"",
+"simplified": "_arguments in variable initialization expression of _Process"
 },
 {
 "m": "_TFIvVs8_Process10_argumentsGSaSS_iU_FT_GSaSS_",
 "ref": "closure #1 () -> [Swift.String] in variable initialization expression of Swift._Process._arguments : [Swift.String]",
-"file": "closure #1 () -> [Swift.String] in variable initialization expression of Swift._Process._arguments : [Swift.String]"
+"file": "closure #1 () -> [Swift.String] in variable initialization expression of Swift._Process._arguments : [Swift.String]",
+"simplified": "closure #1 in variable initialization expression of _Process._arguments"
 },
 {
 "m": "_TFCSo1AE",
 "ref": "__C.A.__ivar_destroyer",
-"file": "__C.A.__ivar_destroyer"
+"file": "__C.A.__ivar_destroyer",
+"simplified": "A.__ivar_destroyer"
 },
 {
 "m": "_TFCSo1Ae",
 "ref": "__C.A.__ivar_initializer",
-"file": "__C.A.__ivar_initializer"
+"file": "__C.A.__ivar_initializer",
+"simplified": "A.__ivar_initializer"
 },
 {
 "m": "_TTWC13call_protocol1CS_1PS_FS1_3foofT_Si",
 "ref": "protocol witness for call_protocol.P.foo() -> Swift.Int in conformance call_protocol.C : call_protocol.P in call_protocol",
-"file": "protocol witness for call_protocol.P.foo() -> Swift.Int in conformance call_protocol.C : call_protocol.P in call_protocol"
+"file": "protocol witness for call_protocol.P.foo() -> Swift.Int in conformance call_protocol.C : call_protocol.P in call_protocol",
+"simplified": "protocol witness for P.foo() in conformance C"
 },
 {
 "m": "_T013call_protocol1CCAA1PA2aDP3fooSiyFTW",
 "ref": "protocol witness for call_protocol.P.foo() -> Swift.Int in conformance call_protocol.C : call_protocol.P in call_protocol",
-"file": "{T:} protocol witness for call_protocol.P.foo() -> Swift.Int in conformance call_protocol.C : call_protocol.P in call_protocol"
+"file": "{T:} protocol witness for call_protocol.P.foo() -> Swift.Int in conformance call_protocol.C : call_protocol.P in call_protocol",
+"simplified": "protocol witness for P.foo() in conformance C"
 },
 {
 "m": "_TFC12dynamic_self1X1ffT_DS0_",
 "ref": "dynamic_self.X.f() -> Self",
-"file": "dynamic_self.X.f() -> Self"
+"file": "dynamic_self.X.f() -> Self",
+"simplified": "X.f()"
 },
 {
 "m": "_TTSg5Si___TFSqcfT_GSqx_",
 "ref": "generic specialization <Swift.Int> of Swift.Optional.init() -> A?",
-"file": "generic specialization <Swift.Int> of Swift.Optional.init() -> A?"
+"file": "generic specialization <Swift.Int> of Swift.Optional.init() -> A?",
+"simplified": "specialized Optional.init()"
 },
 {
 "m": "_TTSgq5Si___TFSqcfT_GSqx_",
 "ref": "generic specialization <serialized, Swift.Int> of Swift.Optional.init() -> A?",
-"file": "generic specialization <serialized, Swift.Int> of Swift.Optional.init() -> A?"
+"file": "generic specialization <serialized, Swift.Int> of Swift.Optional.init() -> A?",
+"simplified": "specialized Optional.init()"
 },
 {
 "m": "_TTSg5SiSis3Foos_Sf___TFSqcfT_GSqx_",
 "ref": "generic specialization <Swift.Int with Swift.Int : Swift.Foo in Swift, Swift.Float> of Swift.Optional.init() -> A?",
-"file": "generic specialization <Swift.Int with Swift.Int : Swift.Foo in Swift, Swift.Float> of Swift.Optional.init() -> A?"
+"file": "generic specialization <Swift.Int with Swift.Int : Swift.Foo in Swift, Swift.Float> of Swift.Optional.init() -> A?",
+"simplified": "specialized Optional.init()"
 },
 {
 "m": "_TTSg5Si_Sf___TFSqcfT_GSqx_",
 "ref": "generic specialization <Swift.Int, Swift.Float> of Swift.Optional.init() -> A?",
-"file": "generic specialization <Swift.Int, Swift.Float> of Swift.Optional.init() -> A?"
+"file": "generic specialization <Swift.Int, Swift.Float> of Swift.Optional.init() -> A?",
+"simplified": "specialized Optional.init()"
 },
 {
 "m": "_TTSg5Si_Sf___TFSqcfT_GSqx_",
 "ref": "generic specialization <Swift.Int, Swift.Float> of Swift.Optional.init() -> A?",
-"file": "generic specialization <Swift.Int, Swift.Float> of Swift.Optional.init() -> A?"
+"file": "generic specialization <Swift.Int, Swift.Float> of Swift.Optional.init() -> A?",
+"simplified": "specialized Optional.init()"
 },
 {
 "m": "_TTSgS",
 "ref": "_TTSgS",
-"file": "_TTSgS"
+"file": "_TTSgS",
+"simplified": "_TTSgS"
 },
 {
 "m": "_TTSg5S",
 "ref": "_TTSg5S",
-"file": "_TTSg5S"
+"file": "_TTSg5S",
+"simplified": "_TTSg5S"
 },
 {
 "m": "_TTSgSi",
 "ref": "_TTSgSi",
-"file": "_TTSgSi"
+"file": "_TTSgSi",
+"simplified": "_TTSgSi"
 },
 {
 "m": "_TTSg5Si",
 "ref": "_TTSg5Si",
-"file": "_TTSg5Si"
+"file": "_TTSg5Si",
+"simplified": "_TTSg5Si"
 },
 {
 "m": "_TTSgSi_",
 "ref": "_TTSgSi_",
-"file": "_TTSgSi_"
+"file": "_TTSgSi_",
+"simplified": "_TTSgSi_"
 },
 {
 "m": "_TTSgSi__",
 "ref": "_TTSgSi__",
-"file": "_TTSgSi__"
+"file": "_TTSgSi__",
+"simplified": "_TTSgSi__"
 },
 {
 "m": "_TTSgSiS_",
 "ref": "_TTSgSiS_",
-"file": "_TTSgSiS_"
+"file": "_TTSgSiS_",
+"simplified": "_TTSgSiS_"
 },
 {
 "m": "_TTSgSi__xyz",
 "ref": "_TTSgSi__xyz",
-"file": "_TTSgSi__xyz"
+"file": "_TTSgSi__xyz",
+"simplified": "_TTSgSi__xyz"
 },
 {
 "m": "_TTSr5Si___TF4test7genericurFxx",
 "ref": "generic not re-abstracted specialization <Swift.Int> of test.generic<A>(A) -> A",
-"file": "generic not re-abstracted specialization <Swift.Int> of test.generic<A>(A) -> A"
+"file": "generic not re-abstracted specialization <Swift.Int> of test.generic<A>(A) -> A",
+"simplified": "specialized generic<A>(_:)"
 },
 {
 "m": "_TTSrq5Si___TF4test7genericurFxx",
 "ref": "generic not re-abstracted specialization <serialized, Swift.Int> of test.generic<A>(A) -> A",
-"file": "generic not re-abstracted specialization <serialized, Swift.Int> of test.generic<A>(A) -> A"
+"file": "generic not re-abstracted specialization <serialized, Swift.Int> of test.generic<A>(A) -> A",
+"simplified": "specialized generic<A>(_:)"
 },
 {
 "m": "_TPA__TTRXFo_oSSoSS_dSb_XFo_iSSiSS_dSb_",
 "ref": "partial apply forwarder for reabstraction thunk helper from @callee_owned (@in Swift.String, @in Swift.String) -> (@unowned Swift.Bool) to @callee_owned (@owned Swift.String, @owned Swift.String) -> (@unowned Swift.Bool)",
-"file": "{T:_TTRXFo_oSSoSS_dSb_XFo_iSSiSS_dSb_} partial apply forwarder for reabstraction thunk helper from @callee_owned (@in Swift.String, @in Swift.String) -> (@unowned Swift.Bool) to @callee_owned (@owned Swift.String, @owned Swift.String) -> (@unowned Swift.Bool)"
+"file": "{T:_TTRXFo_oSSoSS_dSb_XFo_iSSiSS_dSb_} partial apply forwarder for reabstraction thunk helper from @callee_owned (@in Swift.String, @in Swift.String) -> (@unowned Swift.Bool) to @callee_owned (@owned Swift.String, @owned Swift.String) -> (@unowned Swift.Bool)",
+"simplified": "partial apply for thunk for @callee_owned (@in String, @in String) -> (@unowned Bool)"
 },
 {
 "m": "_TPAo__TTRGrXFo_dGSPx__dGSPx_zoPs5Error__XFo_iGSPx__iGSPx_zoPS___",
 "ref": "partial apply ObjC forwarder for reabstraction thunk helper <A> from @callee_owned (@in Swift.UnsafePointer<A>) -> (@out Swift.UnsafePointer<A>, @error @owned Swift.Error) to @callee_owned (@unowned Swift.UnsafePointer<A>) -> (@unowned Swift.UnsafePointer<A>, @error @owned Swift.Error)",
-"file": "{T:_TTRGrXFo_dGSPx__dGSPx_zoPs5Error__XFo_iGSPx__iGSPx_zoPS___} partial apply ObjC forwarder for reabstraction thunk helper <A> from @callee_owned (@in Swift.UnsafePointer<A>) -> (@out Swift.UnsafePointer<A>, @error @owned Swift.Error) to @callee_owned (@unowned Swift.UnsafePointer<A>) -> (@unowned Swift.UnsafePointer<A>, @error @owned Swift.Error)"
+"file": "{T:_TTRGrXFo_dGSPx__dGSPx_zoPs5Error__XFo_iGSPx__iGSPx_zoPS___} partial apply ObjC forwarder for reabstraction thunk helper <A> from @callee_owned (@in Swift.UnsafePointer<A>) -> (@out Swift.UnsafePointer<A>, @error @owned Swift.Error) to @callee_owned (@unowned Swift.UnsafePointer<A>) -> (@unowned Swift.UnsafePointer<A>, @error @owned Swift.Error)",
+"simplified": "partial apply for thunk for @callee_owned (@in UnsafePointer<A>) -> (@out UnsafePointer<A>, @error @owned Error)"
 },
 {
 "m": "_T0S2SSbIxxxd_S2SSbIxiid_TRTA",
 "ref": "partial apply forwarder for reabstraction thunk helper from @callee_owned (@owned Swift.String, @owned Swift.String) -> (@unowned Swift.Bool) to @callee_owned (@in Swift.String, @in Swift.String) -> (@unowned Swift.Bool)",
-"file": "{T:_T0S2SSbIxxxd_S2SSbIxiid_TR} partial apply forwarder for reabstraction thunk helper from @callee_owned (@owned Swift.String, @owned Swift.String) -> (@unowned Swift.Bool) to @callee_owned (@in Swift.String, @in Swift.String) -> (@unowned Swift.Bool)"
+"file": "{T:_T0S2SSbIxxxd_S2SSbIxiid_TR} partial apply forwarder for reabstraction thunk helper from @callee_owned (@owned Swift.String, @owned Swift.String) -> (@unowned Swift.Bool) to @callee_owned (@in Swift.String, @in Swift.String) -> (@unowned Swift.Bool)",
+"simplified": "partial apply for thunk for @callee_owned (@owned String, @owned String) -> (@unowned Bool)"
 },
 {
 "m": "_T0SPyxGAAs5Error_pIxydzo_A2AsAB_pIxirzo_lTRTa",
 "ref": "partial apply ObjC forwarder for reabstraction thunk helper <A> from @callee_owned (@unowned Swift.UnsafePointer<A>) -> (@unowned Swift.UnsafePointer<A>, @error @owned Swift.Error) to @callee_owned (@in Swift.UnsafePointer<A>) -> (@out Swift.UnsafePointer<A>, @error @owned Swift.Error)",
-"file": "{T:_T0SPyxGAAs5Error_pIxydzo_A2AsAB_pIxirzo_lTR} partial apply ObjC forwarder for reabstraction thunk helper <A> from @callee_owned (@unowned Swift.UnsafePointer<A>) -> (@unowned Swift.UnsafePointer<A>, @error @owned Swift.Error) to @callee_owned (@in Swift.UnsafePointer<A>) -> (@out Swift.UnsafePointer<A>, @error @owned Swift.Error)"
+"file": "{T:_T0SPyxGAAs5Error_pIxydzo_A2AsAB_pIxirzo_lTR} partial apply ObjC forwarder for reabstraction thunk helper <A> from @callee_owned (@unowned Swift.UnsafePointer<A>) -> (@unowned Swift.UnsafePointer<A>, @error @owned Swift.Error) to @callee_owned (@in Swift.UnsafePointer<A>) -> (@out Swift.UnsafePointer<A>, @error @owned Swift.Error)",
+"simplified": "partial apply for thunk for @callee_owned (@unowned UnsafePointer<A>) -> (@unowned UnsafePointer<A>, @error @owned Error)"
 },
 {
 "m": "_TiC4Meow5MyCls9subscriptFT1iSi_Sf",
 "ref": "Meow.MyCls.subscript(i: Swift.Int) -> Swift.Float",
-"file": "Meow.MyCls.subscript(i: Swift.Int) -> Swift.Float"
+"file": "Meow.MyCls.subscript(i: Swift.Int) -> Swift.Float",
+"simplified": "MyCls.subscript(i:)"
 },
 {
 "m": "_TF8manglingX22egbpdajGbuEbxfgehfvwxnFT_T_",
 "ref": "mangling.ليهمابتكلموشعربي؟() -> ()",
-"file": "mangling.ليهمابتكلموشعربي؟() -> ()"
+"file": "mangling.ليهمابتكلموشعربي؟() -> ()",
+"simplified": "ليهمابتكلموشعربي؟()"
 },
 {
 "m": "_TF8manglingX24ihqwcrbEcvIaIdqgAFGpqjyeFT_T_",
 "ref": "mangling.他们为什么不说中文() -> ()",
-"file": "mangling.他们为什么不说中文() -> ()"
+"file": "mangling.他们为什么不说中文() -> ()",
+"simplified": "他们为什么不说中文()"
 },
 {
 "m": "_TF8manglingX27ihqwctvzcJBfGFJdrssDxIboAybFT_T_",
 "ref": "mangling.他們爲什麽不說中文() -> ()",
-"file": "mangling.他們爲什麽不說中文() -> ()"
+"file": "mangling.他們爲什麽不說中文() -> ()",
+"simplified": "他們爲什麽不說中文()"
 },
 {
 "m": "_TF8manglingX30Proprostnemluvesky_uybCEdmaEBaFT_T_",
 "ref": "mangling.Pročprostěnemluvíčesky() -> ()",
-"file": "mangling.Pročprostěnemluvíčesky() -> ()"
+"file": "mangling.Pročprostěnemluvíčesky() -> ()",
+"simplified": "Pročprostěnemluvíčesky()"
 },
 {
 "m": "_TF8manglingXoi7p_qcaDcFTSiSi_Si",
 "ref": "mangling.«+» infix(Swift.Int, Swift.Int) -> Swift.Int",
-"file": "mangling.«+» infix(Swift.Int, Swift.Int) -> Swift.Int"
+"file": "mangling.«+» infix(Swift.Int, Swift.Int) -> Swift.Int",
+"simplified": "«+» infix(_:_:)"
 },
 {
 "m": "_TF8manglingoi2qqFTSiSi_T_",
 "ref": "mangling.?? infix(Swift.Int, Swift.Int) -> ()",
-"file": "mangling.?? infix(Swift.Int, Swift.Int) -> ()"
+"file": "mangling.?? infix(Swift.Int, Swift.Int) -> ()",
+"simplified": "?? infix(_:_:)"
 },
 {
 "m": "_TFE11ext_structAV11def_structA1A4testfT_T_",
 "ref": "(extension in ext_structA):def_structA.A.test() -> ()",
-"file": "(extension in ext_structA):def_structA.A.test() -> ()"
+"file": "(extension in ext_structA):def_structA.A.test() -> ()",
+"simplified": "A.test()"
 },
 {
 "m": "_TF13devirt_accessP5_DISC15getPrivateClassFT_CS_P5_DISC12PrivateClass",
 "ref": "devirt_access.(getPrivateClass in _DISC)() -> devirt_access.(PrivateClass in _DISC)",
-"file": "devirt_access.(getPrivateClass in _DISC)() -> devirt_access.(PrivateClass in _DISC)"
+"file": "devirt_access.(getPrivateClass in _DISC)() -> devirt_access.(PrivateClass in _DISC)",
+"simplified": "getPrivateClass()"
 },
 {
 "m": "_TF4mainP5_mainX3wxaFT_T_",
 "ref": "main.(λ in _main)() -> ()",
-"file": "main.(λ in _main)() -> ()"
+"file": "main.(λ in _main)() -> ()",
+"simplified": "λ()"
 },
 {
 "m": "_TF4mainP5_main3abcFT_aS_P5_DISC3xyz",
 "ref": "main.(abc in _main)() -> main.(xyz in _DISC)",
-"file": "main.(abc in _main)() -> main.(xyz in _DISC)"
+"file": "main.(abc in _main)() -> main.(xyz in _DISC)",
+"simplified": "abc()"
 },
 {
 "m": "_TtPMP_",
 "ref": "Any.Type",
-"file": "Any.Type"
+"file": "Any.Type",
+"simplified": "Any.Type"
 },
 {
 "m": "_TFCs13_NSSwiftArray29canStoreElementsOfDynamicTypefPMP_Sb",
 "ref": "Swift._NSSwiftArray.canStoreElementsOfDynamicType(Any.Type) -> Swift.Bool",
-"file": "Swift._NSSwiftArray.canStoreElementsOfDynamicType(Any.Type) -> Swift.Bool"
+"file": "Swift._NSSwiftArray.canStoreElementsOfDynamicType(Any.Type) -> Swift.Bool",
+"simplified": "_NSSwiftArray.canStoreElementsOfDynamicType(_:)"
 },
 {
 "m": "_TFCs13_NSSwiftArrayg17staticElementTypePMP_",
 "ref": "Swift._NSSwiftArray.staticElementType.getter : Any.Type",
-"file": "Swift._NSSwiftArray.staticElementType.getter : Any.Type"
+"file": "Swift._NSSwiftArray.staticElementType.getter : Any.Type",
+"simplified": "_NSSwiftArray.staticElementType.getter"
 },
 {
 "m": "_TFCs17_DictionaryMirrorg9valueTypePMP_",
 "ref": "Swift._DictionaryMirror.valueType.getter : Any.Type",
-"file": "Swift._DictionaryMirror.valueType.getter : Any.Type"
+"file": "Swift._DictionaryMirror.valueType.getter : Any.Type",
+"simplified": "_DictionaryMirror.valueType.getter"
 },
 {
 "m": "_TTSf1cl35_TFF7specgen6callerFSiT_U_FTSiSi_T_Si___TF7specgen12take_closureFFTSiSi_T_T_",
 "ref": "function signature specialization <Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()",
-"file": "function signature specialization <Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()"
+"file": "function signature specialization <Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()",
+"simplified": "specialized take_closure(_:)"
 },
 {
 "m": "_TTSfq1cl35_TFF7specgen6callerFSiT_U_FTSiSi_T_Si___TF7specgen12take_closureFFTSiSi_T_T_",
 "ref": "function signature specialization <serialized, Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()",
-"file": "function signature specialization <serialized, Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()"
+"file": "function signature specialization <serialized, Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()",
+"simplified": "specialized take_closure(_:)"
 },
 {
 "m": "_TTSf1cl35_TFF7specgen6callerFSiT_U_FTSiSi_T_Si___TTSg5Si___TF7specgen12take_closureFFTSiSi_T_T_",
 "ref": "function signature specialization <Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of generic specialization <Swift.Int> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()",
-"file": "function signature specialization <Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of generic specialization <Swift.Int> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()"
+"file": "function signature specialization <Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of generic specialization <Swift.Int> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()",
+"simplified": "specialized take_closure(_:)"
 },
 {
 "m": "_TTSg5Si___TTSf1cl35_TFF7specgen6callerFSiT_U_FTSiSi_T_Si___TF7specgen12take_closureFFTSiSi_T_T_",
 "ref": "generic specialization <Swift.Int> of function signature specialization <Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()",
-"file": "generic specialization <Swift.Int> of function signature specialization <Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()"
+"file": "generic specialization <Swift.Int> of function signature specialization <Arg[0] = [Closure Propagated : closure #1 (Swift.Int, Swift.Int) -> () in specgen.caller(Swift.Int) -> (), Argument Types : [Swift.Int]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()",
+"simplified": "specialized take_closure(_:)"
 },
 {
 "m": "_TTSf1cpfr24_TF8capturep6helperFSiT__n___TTRXFo_dSi_dT__XFo_iSi_dT__",
 "ref": "function signature specialization <Arg[0] = [Constant Propagated Function : capturep.helper(Swift.Int) -> ()]> of reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@unowned ()) to @callee_owned (@unowned Swift.Int) -> (@unowned ())",
-"file": "function signature specialization <Arg[0] = [Constant Propagated Function : capturep.helper(Swift.Int) -> ()]> of reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@unowned ()) to @callee_owned (@unowned Swift.Int) -> (@unowned ())"
+"file": "function signature specialization <Arg[0] = [Constant Propagated Function : capturep.helper(Swift.Int) -> ()]> of reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@unowned ()) to @callee_owned (@unowned Swift.Int) -> (@unowned ())",
+"simplified": "specialized thunk for @callee_owned (@in Int) -> (@unowned ())"
 },
 {
 "m": "_TTSf1cpfr24_TF8capturep6helperFSiT__n___TTRXFo_dSi_DT__XFo_iSi_DT__",
 "ref": "function signature specialization <Arg[0] = [Constant Propagated Function : capturep.helper(Swift.Int) -> ()]> of reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@unowned_inner_pointer ()) to @callee_owned (@unowned Swift.Int) -> (@unowned_inner_pointer ())",
-"file": "function signature specialization <Arg[0] = [Constant Propagated Function : capturep.helper(Swift.Int) -> ()]> of reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@unowned_inner_pointer ()) to @callee_owned (@unowned Swift.Int) -> (@unowned_inner_pointer ())"
+"file": "function signature specialization <Arg[0] = [Constant Propagated Function : capturep.helper(Swift.Int) -> ()]> of reabstraction thunk helper from @callee_owned (@in Swift.Int) -> (@unowned_inner_pointer ()) to @callee_owned (@unowned Swift.Int) -> (@unowned_inner_pointer ())",
+"simplified": "specialized thunk for @callee_owned (@in Int) -> (@unowned_inner_pointer ())"
 },
 {
 "m": "_TTSf1cpi0_cpfl0_cpse0v4u123_cpg53globalinit_33_06E7F1D906492AE070936A9B58CBAE1C_token8_cpfr36_TFtest_capture_propagation2_closure___TF7specgen12take_closureFFTSiSi_T_T_",
 "ref": "function signature specialization <Arg[0] = [Constant Propagated Integer : 0], Arg[1] = [Constant Propagated Float : 0], Arg[2] = [Constant Propagated String : u8'u123'], Arg[3] = [Constant Propagated Global : globalinit_33_06E7F1D906492AE070936A9B58CBAE1C_token8], Arg[4] = [Constant Propagated Function : _TFtest_capture_propagation2_closure]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()",
-"file": "function signature specialization <Arg[0] = [Constant Propagated Integer : 0], Arg[1] = [Constant Propagated Float : 0], Arg[2] = [Constant Propagated String : u8'u123'], Arg[3] = [Constant Propagated Global : globalinit_33_06E7F1D906492AE070936A9B58CBAE1C_token8], Arg[4] = [Constant Propagated Function : _TFtest_capture_propagation2_closure]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()"
+"file": "function signature specialization <Arg[0] = [Constant Propagated Integer : 0], Arg[1] = [Constant Propagated Float : 0], Arg[2] = [Constant Propagated String : u8'u123'], Arg[3] = [Constant Propagated Global : globalinit_33_06E7F1D906492AE070936A9B58CBAE1C_token8], Arg[4] = [Constant Propagated Function : _TFtest_capture_propagation2_closure]> of specgen.take_closure((Swift.Int, Swift.Int) -> ()) -> ()",
+"simplified": "specialized take_closure(_:)"
 },
 {
 "m": "_TTSf0gs___TFVs17_LegacyStringCore15_invariantCheckfT_T_",
 "ref": "function signature specialization <Arg[0] = Owned To Guaranteed and Exploded> of Swift._LegacyStringCore._invariantCheck() -> ()",
-"file": "function signature specialization <Arg[0] = Owned To Guaranteed and Exploded> of Swift._LegacyStringCore._invariantCheck() -> ()"
+"file": "function signature specialization <Arg[0] = Owned To Guaranteed and Exploded> of Swift._LegacyStringCore._invariantCheck() -> ()",
+"simplified": "specialized _LegacyStringCore._invariantCheck()"
 },
 {
 "m": "_TTSf2g___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_",
 "ref": "function signature specialization <Arg[0] = Owned To Guaranteed> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
-"file": "function signature specialization <Arg[0] = Owned To Guaranteed> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
+"file": "function signature specialization <Arg[0] = Owned To Guaranteed> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
+"simplified": "specialized _LegacyStringCore.init(_:)"
 },
 {
 "m": "_TTSf2dg___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_",
 "ref": "function signature specialization <Arg[0] = Dead and Owned To Guaranteed> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
-"file": "function signature specialization <Arg[0] = Dead and Owned To Guaranteed> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
+"file": "function signature specialization <Arg[0] = Dead and Owned To Guaranteed> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
+"simplified": "specialized _LegacyStringCore.init(_:)"
 },
 {
 "m": "_TTSf2dgs___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_",
 "ref": "function signature specialization <Arg[0] = Dead and Owned To Guaranteed and Exploded> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
-"file": "function signature specialization <Arg[0] = Dead and Owned To Guaranteed and Exploded> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
+"file": "function signature specialization <Arg[0] = Dead and Owned To Guaranteed and Exploded> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
+"simplified": "specialized _LegacyStringCore.init(_:)"
 },
 {
 "m": "_TTSf3d_i_d_i_d_i___TFVs17_LegacyStringCoreCfVs13_StringBufferS_",
 "ref": "function signature specialization <Arg[0] = Dead, Arg[1] = Value Promoted from Box, Arg[2] = Dead, Arg[3] = Value Promoted from Box, Arg[4] = Dead, Arg[5] = Value Promoted from Box> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
-"file": "function signature specialization <Arg[0] = Dead, Arg[1] = Value Promoted from Box, Arg[2] = Dead, Arg[3] = Value Promoted from Box, Arg[4] = Dead, Arg[5] = Value Promoted from Box> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
+"file": "function signature specialization <Arg[0] = Dead, Arg[1] = Value Promoted from Box, Arg[2] = Dead, Arg[3] = Value Promoted from Box, Arg[4] = Dead, Arg[5] = Value Promoted from Box> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
+"simplified": "specialized _LegacyStringCore.init(_:)"
 },
 {
 "m": "_TTSf3d_i_n_i_d_i___TFVs17_LegacyStringCoreCfVs13_StringBufferS_",
 "ref": "function signature specialization <Arg[0] = Dead, Arg[1] = Value Promoted from Box, Arg[3] = Value Promoted from Box, Arg[4] = Dead, Arg[5] = Value Promoted from Box> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
-"file": "function signature specialization <Arg[0] = Dead, Arg[1] = Value Promoted from Box, Arg[3] = Value Promoted from Box, Arg[4] = Dead, Arg[5] = Value Promoted from Box> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
+"file": "function signature specialization <Arg[0] = Dead, Arg[1] = Value Promoted from Box, Arg[3] = Value Promoted from Box, Arg[4] = Dead, Arg[5] = Value Promoted from Box> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
+"simplified": "specialized _LegacyStringCore.init(_:)"
 },
 {
 "m": "_TFIZvV8mangling10HasVarInit5stateSbiu_KT_Sb",
 "ref": "implicit closure #1 : @autoclosure () -> Swift.Bool in variable initialization expression of static mangling.HasVarInit.state : Swift.Bool",
-"file": "implicit closure #1 : @autoclosure () -> Swift.Bool in variable initialization expression of static mangling.HasVarInit.state : Swift.Bool"
+"file": "implicit closure #1 : @autoclosure () -> Swift.Bool in variable initialization expression of static mangling.HasVarInit.state : Swift.Bool",
+"simplified": "implicit closure #1 in variable initialization expression of static HasVarInit.state"
 },
 {
 "m": "_TFFV23interface_type_mangling18GenericTypeContext23closureInGenericContexturFqd__T_L_3fooFTqd__x_T_",
 "ref": "foo #1 (A1, A) -> () in interface_type_mangling.GenericTypeContext.closureInGenericContext<A>(A1) -> ()",
-"file": "foo #1 (A1, A) -> () in interface_type_mangling.GenericTypeContext.closureInGenericContext<A>(A1) -> ()"
+"file": "foo #1 (A1, A) -> () in interface_type_mangling.GenericTypeContext.closureInGenericContext<A>(A1) -> ()",
+"simplified": "foo #1 (_:_:) in GenericTypeContext.closureInGenericContext<A>(_:)"
 },
 {
 "m": "_TFFV23interface_type_mangling18GenericTypeContextg31closureInGenericPropertyContextxL_3fooFT_x",
 "ref": "foo #1 () -> A in interface_type_mangling.GenericTypeContext.closureInGenericPropertyContext.getter : A",
-"file": "foo #1 () -> A in interface_type_mangling.GenericTypeContext.closureInGenericPropertyContext.getter : A"
+"file": "foo #1 () -> A in interface_type_mangling.GenericTypeContext.closureInGenericPropertyContext.getter : A",
+"simplified": "foo #1 () in GenericTypeContext.closureInGenericPropertyContext.getter"
 },
 {
 "m": "_TTWurGV23interface_type_mangling18GenericTypeContextx_S_18GenericWitnessTestS_FS1_23closureInGenericContextuRxS1_rfqd__T_",
 "ref": "protocol witness for interface_type_mangling.GenericWitnessTest.closureInGenericContext<A where A: interface_type_mangling.GenericWitnessTest>(A1) -> () in conformance <A> interface_type_mangling.GenericTypeContext<A> : interface_type_mangling.GenericWitnessTest in interface_type_mangling",
-"file": "protocol witness for interface_type_mangling.GenericWitnessTest.closureInGenericContext<A where A: interface_type_mangling.GenericWitnessTest>(A1) -> () in conformance <A> interface_type_mangling.GenericTypeContext<A> : interface_type_mangling.GenericWitnessTest in interface_type_mangling"
+"file": "protocol witness for interface_type_mangling.GenericWitnessTest.closureInGenericContext<A where A: interface_type_mangling.GenericWitnessTest>(A1) -> () in conformance <A> interface_type_mangling.GenericTypeContext<A> : interface_type_mangling.GenericWitnessTest in interface_type_mangling",
+"simplified": "protocol witness for GenericWitnessTest.closureInGenericContext<A>(_:) in conformance <A> GenericTypeContext<A>"
 },
 {
 "m": "_TTWurGV23interface_type_mangling18GenericTypeContextx_S_18GenericWitnessTestS_FS1_g31closureInGenericPropertyContextwx3Tee",
 "ref": "protocol witness for interface_type_mangling.GenericWitnessTest.closureInGenericPropertyContext.getter : A.Tee in conformance <A> interface_type_mangling.GenericTypeContext<A> : interface_type_mangling.GenericWitnessTest in interface_type_mangling",
-"file": "protocol witness for interface_type_mangling.GenericWitnessTest.closureInGenericPropertyContext.getter : A.Tee in conformance <A> interface_type_mangling.GenericTypeContext<A> : interface_type_mangling.GenericWitnessTest in interface_type_mangling"
+"file": "protocol witness for interface_type_mangling.GenericWitnessTest.closureInGenericPropertyContext.getter : A.Tee in conformance <A> interface_type_mangling.GenericTypeContext<A> : interface_type_mangling.GenericWitnessTest in interface_type_mangling",
+"simplified": "protocol witness for GenericWitnessTest.closureInGenericPropertyContext.getter in conformance <A> GenericTypeContext<A>"
 },
 {
 "m": "_TTWurGV23interface_type_mangling18GenericTypeContextx_S_18GenericWitnessTestS_FS1_16twoParamsAtDepthu0_RxS1_rfTqd__1yqd_0__T_",
 "ref": "protocol witness for interface_type_mangling.GenericWitnessTest.twoParamsAtDepth<A, B where A: interface_type_mangling.GenericWitnessTest>(A1, y: B1) -> () in conformance <A> interface_type_mangling.GenericTypeContext<A> : interface_type_mangling.GenericWitnessTest in interface_type_mangling",
-"file": "protocol witness for interface_type_mangling.GenericWitnessTest.twoParamsAtDepth<A, B where A: interface_type_mangling.GenericWitnessTest>(A1, y: B1) -> () in conformance <A> interface_type_mangling.GenericTypeContext<A> : interface_type_mangling.GenericWitnessTest in interface_type_mangling"
+"file": "protocol witness for interface_type_mangling.GenericWitnessTest.twoParamsAtDepth<A, B where A: interface_type_mangling.GenericWitnessTest>(A1, y: B1) -> () in conformance <A> interface_type_mangling.GenericTypeContext<A> : interface_type_mangling.GenericWitnessTest in interface_type_mangling",
+"simplified": "protocol witness for GenericWitnessTest.twoParamsAtDepth<A, B>(_:y:) in conformance <A> GenericTypeContext<A>"
 },
 {
 "m": "_TFC3red11BaseClassEHcfzT1aSi_S0_",
 "ref": "red.BaseClassEH.init(a: Swift.Int) throws -> red.BaseClassEH",
-"file": "red.BaseClassEH.init(a: Swift.Int) throws -> red.BaseClassEH"
+"file": "red.BaseClassEH.init(a: Swift.Int) throws -> red.BaseClassEH",
+"simplified": "BaseClassEH.init(a:)"
 },
 {
 "m": "_TFe27mangling_generic_extensionsRxS_8RunciblerVS_3Foog1aSi",
 "ref": "(extension in mangling_generic_extensions):mangling_generic_extensions.Foo<A where A: mangling_generic_extensions.Runcible>.a.getter : Swift.Int",
-"file": "(extension in mangling_generic_extensions):mangling_generic_extensions.Foo<A where A: mangling_generic_extensions.Runcible>.a.getter : Swift.Int"
+"file": "(extension in mangling_generic_extensions):mangling_generic_extensions.Foo<A where A: mangling_generic_extensions.Runcible>.a.getter : Swift.Int",
+"simplified": "Foo<A>.a.getter"
 },
 {
 "m": "_TFe27mangling_generic_extensionsRxS_8RunciblerVS_3Foog1bx",
 "ref": "(extension in mangling_generic_extensions):mangling_generic_extensions.Foo<A where A: mangling_generic_extensions.Runcible>.b.getter : A",
-"file": "(extension in mangling_generic_extensions):mangling_generic_extensions.Foo<A where A: mangling_generic_extensions.Runcible>.b.getter : A"
+"file": "(extension in mangling_generic_extensions):mangling_generic_extensions.Foo<A where A: mangling_generic_extensions.Runcible>.b.getter : A",
+"simplified": "Foo<A>.b.getter"
 },
 {
 "m": "_TTRXFo_iT__iT_zoPs5Error__XFo__dT_zoPS___",
 "ref": "reabstraction thunk helper from @callee_owned () -> (@unowned (), @error @owned Swift.Error) to @callee_owned (@in ()) -> (@out (), @error @owned Swift.Error)",
-"file": "reabstraction thunk helper from @callee_owned () -> (@unowned (), @error @owned Swift.Error) to @callee_owned (@in ()) -> (@out (), @error @owned Swift.Error)"
+"file": "reabstraction thunk helper from @callee_owned () -> (@unowned (), @error @owned Swift.Error) to @callee_owned (@in ()) -> (@out (), @error @owned Swift.Error)",
+"simplified": "thunk for @callee_owned () -> (@unowned (), @error @owned Error)"
 },
 {
 "m": "_TFE1a",
 "ref": "_TFE1a",
-"file": "_TFE1a"
+"file": "_TFE1a",
+"simplified": "_TFE1a"
 },
 {
 "m": "_TF21$__lldb_module_for_E0au3$E0Ps5Error_",
 "ref": "$__lldb_module_for_E0.$E0.unsafeMutableAddressor : Swift.Error",
-"file": "$__lldb_module_for_E0.$E0.unsafeMutableAddressor : Swift.Error"
+"file": "$__lldb_module_for_E0.$E0.unsafeMutableAddressor : Swift.Error",
+"simplified": "$E0.unsafeMutableAddressor"
 },
 {
 "m": "_TMps10Comparable",
 "ref": "protocol descriptor for Swift.Comparable",
-"file": "protocol descriptor for Swift.Comparable"
+"file": "protocol descriptor for Swift.Comparable",
+"simplified": "protocol descriptor for Comparable"
 },
 {
 "m": "_TFC4testP33_83378C430F65473055F1BD53F3ADCDB71C5doFoofT_T_",
 "ref": "test.(C in _83378C430F65473055F1BD53F3ADCDB7).doFoo() -> ()",
-"file": "test.(C in _83378C430F65473055F1BD53F3ADCDB7).doFoo() -> ()"
+"file": "test.(C in _83378C430F65473055F1BD53F3ADCDB7).doFoo() -> ()",
+"simplified": "C.doFoo()"
 },
 {
 "m": "_TFVV15nested_generics5Lunch6DinnerCfT11firstCoursex12secondCourseGSqqd___9leftoversx14transformationFxqd___GS1_x_qd___",
 "ref": "nested_generics.Lunch.Dinner.init(firstCourse: A, secondCourse: A1?, leftovers: A, transformation: (A) -> A1) -> nested_generics.Lunch<A>.Dinner<A1>",
-"file": "nested_generics.Lunch.Dinner.init(firstCourse: A, secondCourse: A1?, leftovers: A, transformation: (A) -> A1) -> nested_generics.Lunch<A>.Dinner<A1>"
+"file": "nested_generics.Lunch.Dinner.init(firstCourse: A, secondCourse: A1?, leftovers: A, transformation: (A) -> A1) -> nested_generics.Lunch<A>.Dinner<A1>",
+"simplified": "Lunch.Dinner.init(firstCourse:secondCourse:leftovers:transformation:)"
 },
 {
 "m": "_TFVFC15nested_generics7HotDogs11applyRelishFT_T_L_6RelishCfT8materialx_GS1_x_",
 "ref": "init(material: A) -> Relish #1 in nested_generics.HotDogs.applyRelish() -> ()<A> in Relish #1 in nested_generics.HotDogs.applyRelish() -> ()",
-"file": "init(material: A) -> Relish #1 in nested_generics.HotDogs.applyRelish() -> ()<A> in Relish #1 in nested_generics.HotDogs.applyRelish() -> ()"
+"file": "init(material: A) -> Relish #1 in nested_generics.HotDogs.applyRelish() -> ()<A> in Relish #1 in nested_generics.HotDogs.applyRelish() -> ()",
+"simplified": "init(material:) in Relish #1 in HotDogs.applyRelish()"
 },
 {
 "m": "_TFVFE15nested_genericsSS3fooFT_T_L_6CheeseCfT8materialx_GS0_x_",
 "ref": "init(material: A) -> Cheese #1 in (extension in nested_generics):Swift.String.foo() -> ()<A> in Cheese #1 in (extension in nested_generics):Swift.String.foo() -> ()",
-"file": "init(material: A) -> Cheese #1 in (extension in nested_generics):Swift.String.foo() -> ()<A> in Cheese #1 in (extension in nested_generics):Swift.String.foo() -> ()"
+"file": "init(material: A) -> Cheese #1 in (extension in nested_generics):Swift.String.foo() -> ()<A> in Cheese #1 in (extension in nested_generics):Swift.String.foo() -> ()",
+"simplified": "init(material:) in Cheese #1 in String.foo()"
 },
 {
 "m": "_TTWOE5imojiCSo5Imoji14ImojiMatchRankS_9RankValueS_FS2_g9rankValueqq_Ss16RawRepresentable8RawValue",
 "ref": "_TTWOE5imojiCSo5Imoji14ImojiMatchRankS_9RankValueS_FS2_g9rankValueqq_Ss16RawRepresentable8RawValue",
-"file": "_TTWOE5imojiCSo5Imoji14ImojiMatchRankS_9RankValueS_FS2_g9rankValueqq_Ss16RawRepresentable8RawValue"
+"file": "_TTWOE5imojiCSo5Imoji14ImojiMatchRankS_9RankValueS_FS2_g9rankValueqq_Ss16RawRepresentable8RawValue",
+"simplified": "_TTWOE5imojiCSo5Imoji14ImojiMatchRankS_9RankValueS_FS2_g9rankValueqq_Ss16RawRepresentable8RawValue"
 },
 {
 "m": "_T0s17MutableCollectionP1asAARzs012RandomAccessB0RzsAA11SubSequences013BidirectionalB0PRpzsAdHRQlE06rotatecD05Indexs01_A9IndexablePQzAM15shiftingToStart_tFAJs01_J4BasePQzAQcfU_",
 "ref": "closure #1 (A.Swift._IndexableBase.Index) -> A.Swift._IndexableBase.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.MutableCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Swift._MutableIndexable.Index) -> A.Swift._MutableIndexable.Index",
-"file": "closure #1 (A.Swift._IndexableBase.Index) -> A.Swift._IndexableBase.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.MutableCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Swift._MutableIndexable.Index) -> A.Swift._MutableIndexable.Index"
+"file": "closure #1 (A.Swift._IndexableBase.Index) -> A.Swift._IndexableBase.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.MutableCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Swift._MutableIndexable.Index) -> A.Swift._MutableIndexable.Index",
+"simplified": "closure #1 in MutableCollection<A>.rotateRandomAccess(shiftingToStart:)"
 },
 {
 "m": "_$Ss17MutableCollectionP1asAARzs012RandomAccessB0RzsAA11SubSequences013BidirectionalB0PRpzsAdHRQlE06rotatecD015shiftingToStart5Indexs01_A9IndexablePQzAN_tFAKs01_M4BasePQzAQcfU_",
 "ref": "closure #1 (A.Swift._IndexableBase.Index) -> A.Swift._IndexableBase.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.MutableCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Swift._MutableIndexable.Index) -> A.Swift._MutableIndexable.Index",
-"file": "closure #1 (A.Swift._IndexableBase.Index) -> A.Swift._IndexableBase.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.MutableCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Swift._MutableIndexable.Index) -> A.Swift._MutableIndexable.Index"
+"file": "closure #1 (A.Swift._IndexableBase.Index) -> A.Swift._IndexableBase.Index in (extension in a):Swift.MutableCollection<A where A: Swift.MutableCollection, A: Swift.RandomAccessCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.MutableCollection, A.Swift.BidirectionalCollection.SubSequence: Swift.RandomAccessCollection>.rotateRandomAccess(shiftingToStart: A.Swift._MutableIndexable.Index) -> A.Swift._MutableIndexable.Index",
+"simplified": "closure #1 in MutableCollection<A>.rotateRandomAccess(shiftingToStart:)"
 },
 {
 "m": "_T03foo4_123ABTf3psbpsb_n",
 "ref": "function signature specialization <Arg[0] = [Constant Propagated String : u8'123'], Arg[1] = [Constant Propagated String : u8'123']> of foo",
-"file": "function signature specialization <Arg[0] = [Constant Propagated String : u8'123'], Arg[1] = [Constant Propagated String : u8'123']> of foo"
+"file": "function signature specialization <Arg[0] = [Constant Propagated String : u8'123'], Arg[1] = [Constant Propagated String : u8'123']> of foo",
+"simplified": "specialized foo"
 },
 {
 "m": "_T04main5innerys5Int32Vz_yADctF25closure_with_box_argumentxz_Bi32__lXXTf1nc_n",
 "ref": "function signature specialization <Arg[1] = [Closure Propagated : closure_with_box_argument, Argument Types : [<A> { var A } <Builtin.Int32>]> of main.inner(inout Swift.Int32, (Swift.Int32) -> ()) -> ()",
-"file": "function signature specialization <Arg[1] = [Closure Propagated : closure_with_box_argument, Argument Types : [<A> { var A } <Builtin.Int32>]> of main.inner(inout Swift.Int32, (Swift.Int32) -> ()) -> ()"
+"file": "function signature specialization <Arg[1] = [Closure Propagated : closure_with_box_argument, Argument Types : [<A> { var A } <Builtin.Int32>]> of main.inner(inout Swift.Int32, (Swift.Int32) -> ()) -> ()",
+"simplified": "specialized inner(_:_:)"
 },
 {
 "m": "_$S4main5inneryys5Int32Vz_yADctF25closure_with_box_argumentxz_Bi32__lXXTf1nc_n",
 "ref": "function signature specialization <Arg[1] = [Closure Propagated : closure_with_box_argument, Argument Types : [<A> { var A } <Builtin.Int32>]> of main.inner(inout Swift.Int32, (Swift.Int32) -> ()) -> ()",
-"file": "function signature specialization <Arg[1] = [Closure Propagated : closure_with_box_argument, Argument Types : [<A> { var A } <Builtin.Int32>]> of main.inner(inout Swift.Int32, (Swift.Int32) -> ()) -> ()"
+"file": "function signature specialization <Arg[1] = [Closure Propagated : closure_with_box_argument, Argument Types : [<A> { var A } <Builtin.Int32>]> of main.inner(inout Swift.Int32, (Swift.Int32) -> ()) -> ()",
+"simplified": "specialized inner(_:_:)"
 },
 {
 "m": "_T03foo6testityyyc_yyctF1a1bTf3pfpf_n",
 "ref": "function signature specialization <Arg[0] = [Constant Propagated Function : a], Arg[1] = [Constant Propagated Function : b]> of foo.testit(() -> (), () -> ()) -> ()",
-"file": "function signature specialization <Arg[0] = [Constant Propagated Function : a], Arg[1] = [Constant Propagated Function : b]> of foo.testit(() -> (), () -> ()) -> ()"
+"file": "function signature specialization <Arg[0] = [Constant Propagated Function : a], Arg[1] = [Constant Propagated Function : b]> of foo.testit(() -> (), () -> ()) -> ()",
+"simplified": "specialized testit(_:_:)"
 },
 {
 "m": "_$S3foo6testityyyyc_yyctF1a1bTf3pfpf_n",
 "ref": "function signature specialization <Arg[0] = [Constant Propagated Function : a], Arg[1] = [Constant Propagated Function : b]> of foo.testit(() -> (), () -> ()) -> ()",
-"file": "function signature specialization <Arg[0] = [Constant Propagated Function : a], Arg[1] = [Constant Propagated Function : b]> of foo.testit(() -> (), () -> ()) -> ()"
+"file": "function signature specialization <Arg[0] = [Constant Propagated Function : a], Arg[1] = [Constant Propagated Function : b]> of foo.testit(() -> (), () -> ()) -> ()",
+"simplified": "specialized testit(_:_:)"
 },
 {
 "m": "_SocketJoinOrLeaveMulticast",
 "ref": "_SocketJoinOrLeaveMulticast",
-"file": "_SocketJoinOrLeaveMulticast"
+"file": "_SocketJoinOrLeaveMulticast",
+"simplified": "_SocketJoinOrLeaveMulticast"
 },
 {
 "m": "_T0s10DictionaryV3t17E6Index2V1loiSbAEyxq__G_AGtFZ",
 "ref": "static (extension in t17):Swift.Dictionary.Index2.< infix((extension in t17):[A : B].Index2, (extension in t17):[A : B].Index2) -> Swift.Bool",
-"file": "static (extension in t17):Swift.Dictionary.Index2.< infix((extension in t17):[A : B].Index2, (extension in t17):[A : B].Index2) -> Swift.Bool"
+"file": "static (extension in t17):Swift.Dictionary.Index2.< infix((extension in t17):[A : B].Index2, (extension in t17):[A : B].Index2) -> Swift.Bool",
+"simplified": "static Dictionary.Index2.< infix(_:_:)"
 },
 {
 "m": "_T08mangling14varargsVsArrayySi3arrd_SS1ntF",
 "ref": "mangling.varargsVsArray(arr: Swift.Int..., n: Swift.String) -> ()",
-"file": "mangling.varargsVsArray(arr: Swift.Int..., n: Swift.String) -> ()"
+"file": "mangling.varargsVsArray(arr: Swift.Int..., n: Swift.String) -> ()",
+"simplified": "varargsVsArray(arr:n:)"
 },
 {
 "m": "_T08mangling14varargsVsArrayySaySiG3arr_SS1ntF",
 "ref": "mangling.varargsVsArray(arr: [Swift.Int], n: Swift.String) -> ()",
-"file": "mangling.varargsVsArray(arr: [Swift.Int], n: Swift.String) -> ()"
+"file": "mangling.varargsVsArray(arr: [Swift.Int], n: Swift.String) -> ()",
+"simplified": "varargsVsArray(arr:n:)"
 },
 {
 "m": "_T08mangling14varargsVsArrayySaySiG3arrd_SS1ntF",
 "ref": "mangling.varargsVsArray(arr: [Swift.Int]..., n: Swift.String) -> ()",
-"file": "mangling.varargsVsArray(arr: [Swift.Int]..., n: Swift.String) -> ()"
+"file": "mangling.varargsVsArray(arr: [Swift.Int]..., n: Swift.String) -> ()",
+"simplified": "varargsVsArray(arr:n:)"
 },
 {
 "m": "_T08mangling14varargsVsArrayySi3arrd_tF",
 "ref": "mangling.varargsVsArray(arr: Swift.Int...) -> ()",
-"file": "mangling.varargsVsArray(arr: Swift.Int...) -> ()"
+"file": "mangling.varargsVsArray(arr: Swift.Int...) -> ()",
+"simplified": "varargsVsArray(arr:)"
 },
 {
 "m": "_T08mangling14varargsVsArrayySaySiG3arrd_tF",
 "ref": "mangling.varargsVsArray(arr: [Swift.Int]...) -> ()",
-"file": "mangling.varargsVsArray(arr: [Swift.Int]...) -> ()"
+"file": "mangling.varargsVsArray(arr: [Swift.Int]...) -> ()",
+"simplified": "varargsVsArray(arr:)"
 },
 {
 "m": "_$Ss10DictionaryV3t17E6Index2V1loiySbAEyxq__G_AGtFZ",
 "ref": "static (extension in t17):Swift.Dictionary.Index2.< infix((extension in t17):[A : B].Index2, (extension in t17):[A : B].Index2) -> Swift.Bool",
-"file": "static (extension in t17):Swift.Dictionary.Index2.< infix((extension in t17):[A : B].Index2, (extension in t17):[A : B].Index2) -> Swift.Bool"
+"file": "static (extension in t17):Swift.Dictionary.Index2.< infix((extension in t17):[A : B].Index2, (extension in t17):[A : B].Index2) -> Swift.Bool",
+"simplified": "static Dictionary.Index2.< infix(_:_:)"
 },
 {
 "m": "_$S8mangling14varargsVsArray3arr1nySid_SStF",
 "ref": "mangling.varargsVsArray(arr: Swift.Int..., n: Swift.String) -> ()",
-"file": "mangling.varargsVsArray(arr: Swift.Int..., n: Swift.String) -> ()"
+"file": "mangling.varargsVsArray(arr: Swift.Int..., n: Swift.String) -> ()",
+"simplified": "varargsVsArray(arr:n:)"
 },
 {
 "m": "_$S8mangling14varargsVsArray3arr1nySaySiG_SStF",
 "ref": "mangling.varargsVsArray(arr: [Swift.Int], n: Swift.String) -> ()",
-"file": "mangling.varargsVsArray(arr: [Swift.Int], n: Swift.String) -> ()"
+"file": "mangling.varargsVsArray(arr: [Swift.Int], n: Swift.String) -> ()",
+"simplified": "varargsVsArray(arr:n:)"
 },
 {
 "m": "_$S8mangling14varargsVsArray3arr1nySaySiGd_SStF",
 "ref": "mangling.varargsVsArray(arr: [Swift.Int]..., n: Swift.String) -> ()",
-"file": "mangling.varargsVsArray(arr: [Swift.Int]..., n: Swift.String) -> ()"
+"file": "mangling.varargsVsArray(arr: [Swift.Int]..., n: Swift.String) -> ()",
+"simplified": "varargsVsArray(arr:n:)"
 },
 {
 "m": "_$S8mangling14varargsVsArray3arrySid_tF",
 "ref": "mangling.varargsVsArray(arr: Swift.Int...) -> ()",
-"file": "mangling.varargsVsArray(arr: Swift.Int...) -> ()"
+"file": "mangling.varargsVsArray(arr: Swift.Int...) -> ()",
+"simplified": "varargsVsArray(arr:)"
 },
 {
 "m": "_$S8mangling14varargsVsArray3arrySaySiGd_tF",
 "ref": "mangling.varargsVsArray(arr: [Swift.Int]...) -> ()",
-"file": "mangling.varargsVsArray(arr: [Swift.Int]...) -> ()"
+"file": "mangling.varargsVsArray(arr: [Swift.Int]...) -> ()",
+"simplified": "varargsVsArray(arr:)"
 },
 {
 "m": "_T0s13_UnicodeViewsVss22RandomAccessCollectionRzs0A8EncodingR_11SubSequence_5IndexQZAFRtzsAcERpzAE_AEQZAIRSs15UnsignedInteger8Iterator_7ElementRPzAE_AlMQZANRS13EncodedScalar_AlMQY_AORSr0_lE13CharacterViewVyxq__G",
 "ref": "(extension in Swift):Swift._UnicodeViews<A, B><A, B where A: Swift.RandomAccessCollection, B: Swift.UnicodeEncoding, A.Index == A.SubSequence.Index, A.SubSequence: Swift.RandomAccessCollection, A.SubSequence == A.SubSequence.SubSequence, A.Iterator.Element: Swift.UnsignedInteger, A.Iterator.Element == A.SubSequence.Iterator.Element, A.SubSequence.Iterator.Element == B.EncodedScalar.Iterator.Element>.CharacterView",
-"file": "(extension in Swift):Swift._UnicodeViews<A, B><A, B where A: Swift.RandomAccessCollection, B: Swift.UnicodeEncoding, A.Index == A.SubSequence.Index, A.SubSequence: Swift.RandomAccessCollection, A.SubSequence == A.SubSequence.SubSequence, A.Iterator.Element: Swift.UnsignedInteger, A.Iterator.Element == A.SubSequence.Iterator.Element, A.SubSequence.Iterator.Element == B.EncodedScalar.Iterator.Element>.CharacterView"
+"file": "(extension in Swift):Swift._UnicodeViews<A, B><A, B where A: Swift.RandomAccessCollection, B: Swift.UnicodeEncoding, A.Index == A.SubSequence.Index, A.SubSequence: Swift.RandomAccessCollection, A.SubSequence == A.SubSequence.SubSequence, A.Iterator.Element: Swift.UnsignedInteger, A.Iterator.Element == A.SubSequence.Iterator.Element, A.SubSequence.Iterator.Element == B.EncodedScalar.Iterator.Element>.CharacterView",
+"simplified": "_UnicodeViews<A, B><A, B>.CharacterView"
 },
 {
 "m": "_T010Foundation11MeasurementV12SimulatorKitSo9UnitAngleCRszlE11OrientationO2eeoiSbAcDEAGOyAF_G_AKtFZ",
 "ref": "static (extension in SimulatorKit):Foundation.Measurement<A where A == __C.UnitAngle>.Orientation.== infix((extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation, (extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation) -> Swift.Bool",
-"file": "static (extension in SimulatorKit):Foundation.Measurement<A where A == __C.UnitAngle>.Orientation.== infix((extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation, (extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation) -> Swift.Bool"
+"file": "static (extension in SimulatorKit):Foundation.Measurement<A where A == __C.UnitAngle>.Orientation.== infix((extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation, (extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation) -> Swift.Bool",
+"simplified": "static Measurement<A>.Orientation.== infix(_:_:)"
 },
 {
 "m": "_$S10Foundation11MeasurementV12SimulatorKitSo9UnitAngleCRszlE11OrientationO2eeoiySbAcDEAGOyAF_G_AKtFZ",
 "ref": "static (extension in SimulatorKit):Foundation.Measurement<A where A == __C.UnitAngle>.Orientation.== infix((extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation, (extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation) -> Swift.Bool",
-"file": "static (extension in SimulatorKit):Foundation.Measurement<A where A == __C.UnitAngle>.Orientation.== infix((extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation, (extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation) -> Swift.Bool"
+"file": "static (extension in SimulatorKit):Foundation.Measurement<A where A == __C.UnitAngle>.Orientation.== infix((extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation, (extension in SimulatorKit):Foundation.Measurement<__C.UnitAngle>.Orientation) -> Swift.Bool",
+"simplified": "static Measurement<A>.Orientation.== infix(_:_:)"
 },
 {
 "m": "_T04main1_yyF",
 "ref": "main._() -> ()",
-"file": "main._() -> ()"
+"file": "main._() -> ()",
+"simplified": "_()"
 },
 {
 "m": "_T04test6testitSiyt_tF",
 "ref": "test.testit(()) -> Swift.Int",
-"file": "test.testit(()) -> Swift.Int"
+"file": "test.testit(()) -> Swift.Int",
+"simplified": "testit(_:)"
 },
 {
 "m": "_$S4test6testitySiyt_tF",
 "ref": "test.testit(()) -> Swift.Int",
-"file": "test.testit(()) -> Swift.Int"
+"file": "test.testit(()) -> Swift.Int",
+"simplified": "testit(_:)"
 },
 {
 "m": "_T08_ElementQzSbs5Error_pIxxdzo_ABSbsAC_pIxidzo_s26RangeReplaceableCollectionRzABRLClTR",
 "ref": "reabstraction thunk helper <A where A: Swift.RangeReplaceableCollection, A._Element: AnyObject> from @callee_owned (@owned A._Element) -> (@unowned Swift.Bool, @error @owned Swift.Error) to @callee_owned (@in A._Element) -> (@unowned Swift.Bool, @error @owned Swift.Error)",
-"file": "{T:} reabstraction thunk helper <A where A: Swift.RangeReplaceableCollection, A._Element: AnyObject> from @callee_owned (@owned A._Element) -> (@unowned Swift.Bool, @error @owned Swift.Error) to @callee_owned (@in A._Element) -> (@unowned Swift.Bool, @error @owned Swift.Error)"
+"file": "{T:} reabstraction thunk helper <A where A: Swift.RangeReplaceableCollection, A._Element: AnyObject> from @callee_owned (@owned A._Element) -> (@unowned Swift.Bool, @error @owned Swift.Error) to @callee_owned (@in A._Element) -> (@unowned Swift.Bool, @error @owned Swift.Error)",
+"simplified": "thunk for @callee_owned (@owned A._Element) -> (@unowned Bool, @error @owned Error)"
 },
 {
 "m": "_T0Ix_IyB_Tr",
 "ref": "reabstraction thunk from @callee_owned () -> () to @callee_unowned @convention(block) () -> ()",
-"file": "{T:} reabstraction thunk from @callee_owned () -> () to @callee_unowned @convention(block) () -> ()"
+"file": "{T:} reabstraction thunk from @callee_owned () -> () to @callee_unowned @convention(block) () -> ()",
+"simplified": "thunk for @callee_owned () -> ()"
 },
 {
 "m": "_T0Rml",
 "ref": "_T0Rml",
-"file": "_T0Rml"
+"file": "_T0Rml",
+"simplified": "_T0Rml"
 },
 {
 "m": "_T0Tk",
 "ref": "_T0Tk",
-"file": "_T0Tk"
+"file": "_T0Tk",
+"simplified": "_T0Tk"
 },
 {
 "m": "_T0A8",
 "ref": "_T0A8",
-"file": "_T0A8"
+"file": "_T0A8",
+"simplified": "_T0A8"
 },
 {
 "m": "_T0s30ReversedRandomAccessCollectionVyxGTfq3nnpf_nTfq1cn_nTfq4x_n",
 "ref": "_T0s30ReversedRandomAccessCollectionVyxGTfq3nnpf_nTfq1cn_nTfq4x_n",
-"file": "_T0s30ReversedRandomAccessCollectionVyxGTfq3nnpf_nTfq1cn_nTfq4x_n"
+"file": "_T0s30ReversedRandomAccessCollectionVyxGTfq3nnpf_nTfq1cn_nTfq4x_n",
+"simplified": "_T0s30ReversedRandomAccessCollectionVyxGTfq3nnpf_nTfq1cn_nTfq4x_n"
 },
 {
 "m": "_T03abc6testitySiFTm",
 "ref": "merged abc.testit(Swift.Int) -> ()",
-"file": "merged abc.testit(Swift.Int) -> ()"
+"file": "merged abc.testit(Swift.Int) -> ()",
+"simplified": "testit(_:)"
 },
 {
 "m": "_T04main4TestCACSi1x_tc6_PRIV_Llfc",
 "ref": "main.Test.(in _PRIV_).init(x: Swift.Int) -> main.Test",
-"file": "main.Test.(in _PRIV_).init(x: Swift.Int) -> main.Test"
+"file": "main.Test.(in _PRIV_).init(x: Swift.Int) -> main.Test",
+"simplified": "Test.init(x:)"
 },
 {
 "m": "_$S3abc6testityySiFTm",
 "ref": "merged abc.testit(Swift.Int) -> ()",
-"file": "merged abc.testit(Swift.Int) -> ()"
+"file": "merged abc.testit(Swift.Int) -> ()",
+"simplified": "testit(_:)"
 },
 {
 "m": "_$S4main4TestC1xACSi_tc6_PRIV_Llfc",
 "ref": "main.Test.(in _PRIV_).init(x: Swift.Int) -> main.Test",
-"file": "main.Test.(in _PRIV_).init(x: Swift.Int) -> main.Test"
+"file": "main.Test.(in _PRIV_).init(x: Swift.Int) -> main.Test",
+"simplified": "Test.init(x:)"
 },
 {
 "m": "_T0SqWOy.17",
 "ref": "outlined copy of Swift.Optional with unmangled suffix \".17\"",
-"file": "outlined copy of Swift.Optional with unmangled suffix \".17\""
+"file": "outlined copy of Swift.Optional with unmangled suffix \".17\"",
+"simplified": "outlined copy of Optional"
 },
 {
 "m": "_T0SqWOC",
 "ref": "outlined init with copy of Swift.Optional",
-"file": "outlined init with copy of Swift.Optional"
+"file": "outlined init with copy of Swift.Optional",
+"simplified": "outlined init with copy of Optional"
 },
 {
 "m": "_T0SqWOD",
 "ref": "outlined assign with take of Swift.Optional",
-"file": "outlined assign with take of Swift.Optional"
+"file": "outlined assign with take of Swift.Optional",
+"simplified": "outlined assign with take of Optional"
 },
 {
 "m": "_T0SqWOF",
 "ref": "outlined assign with copy of Swift.Optional",
-"file": "outlined assign with copy of Swift.Optional"
+"file": "outlined assign with copy of Swift.Optional",
+"simplified": "outlined assign with copy of Optional"
 },
 {
 "m": "_T0SqWOH",
 "ref": "outlined destroy of Swift.Optional",
-"file": "outlined destroy of Swift.Optional"
+"file": "outlined destroy of Swift.Optional",
+"simplified": "outlined destroy of Optional"
 },
 {
 "m": "_T03nix6testitSaySiGyFTv_",
 "ref": "outlined variable #0 of nix.testit() -> [Swift.Int]",
-"file": "outlined variable #0 of nix.testit() -> [Swift.Int]"
+"file": "outlined variable #0 of nix.testit() -> [Swift.Int]",
+"simplified": "outlined variable #0 of testit()"
 },
 {
 "m": "_T03nix6testitSaySiGyFTv_r",
 "ref": "outlined read-only object #0 of nix.testit() -> [Swift.Int]",
-"file": "outlined read-only object #0 of nix.testit() -> [Swift.Int]"
+"file": "outlined read-only object #0 of nix.testit() -> [Swift.Int]",
+"simplified": "outlined read-only object #0 of testit()"
 },
 {
 "m": "_T03nix6testitSaySiGyFTv0_",
 "ref": "outlined variable #1 of nix.testit() -> [Swift.Int]",
-"file": "outlined variable #1 of nix.testit() -> [Swift.Int]"
+"file": "outlined variable #1 of nix.testit() -> [Swift.Int]",
+"simplified": "outlined variable #1 of testit()"
 },
 {
 "m": "_T0So11UITextFieldC4textSSSgvgToTepb_",
 "ref": "outlined bridged method (pb) of @objc __C.UITextField.text.getter : Swift.String?",
-"file": "outlined bridged method (pb) of @objc __C.UITextField.text.getter : Swift.String?"
+"file": "outlined bridged method (pb) of @objc __C.UITextField.text.getter : Swift.String?",
+"simplified": "outlined bridged method (pb) of @objc UITextField.text.getter"
 },
 {
 "m": "_T0So11UITextFieldC4textSSSgvgToTeab_",
 "ref": "outlined bridged method (ab) of @objc __C.UITextField.text.getter : Swift.String?",
-"file": "outlined bridged method (ab) of @objc __C.UITextField.text.getter : Swift.String?"
+"file": "outlined bridged method (ab) of @objc __C.UITextField.text.getter : Swift.String?",
+"simplified": "outlined bridged method (ab) of @objc UITextField.text.getter"
 },
 {
 "m": "$sSo5GizmoC11doSomethingyypSgSaySSGSgFToTembgnn_",
 "ref": "outlined bridged method (mbgnn) of @objc __C.Gizmo.doSomething([Swift.String]?) -> Any?",
-"file": "outlined bridged method (mbgnn) of @objc __C.Gizmo.doSomething([Swift.String]?) -> Any?"
+"file": "outlined bridged method (mbgnn) of @objc __C.Gizmo.doSomething([Swift.String]?) -> Any?",
+"simplified": "outlined bridged method (mbgnn) of @objc Gizmo.doSomething(_:)"
 },
 {
 "m": "_T04test1SVyxGAA1RA2A1ZRzAA1Y2ZZRpzl1A_AhaGPWT",
 "ref": "associated type witness table accessor for A.ZZ : test.Y in <A where A: test.Z, A.ZZ: test.Y> test.S<A> : test.R in test",
-"file": "{C} associated type witness table accessor for A.ZZ : test.Y in <A where A: test.Z, A.ZZ: test.Y> test.S<A> : test.R in test"
+"file": "{C} associated type witness table accessor for A.ZZ : test.Y in <A where A: test.Z, A.ZZ: test.Y> test.S<A> : test.R in test",
+"simplified": "associated type witness table accessor for A.ZZ : Y in <A> S<A>"
 },
 {
 "m": "_T0s24_UnicodeScalarExceptions33_0E4228093681F6920F0AB2E48B4F1C69LLVACycfC",
 "ref": "Swift.(_UnicodeScalarExceptions in _0E4228093681F6920F0AB2E48B4F1C69).init() -> Swift.(_UnicodeScalarExceptions in _0E4228093681F6920F0AB2E48B4F1C69)",
-"file": "{T:_T0s24_UnicodeScalarExceptions33_0E4228093681F6920F0AB2E48B4F1C69LLVACycfc} Swift.(_UnicodeScalarExceptions in _0E4228093681F6920F0AB2E48B4F1C69).init() -> Swift.(_UnicodeScalarExceptions in _0E4228093681F6920F0AB2E48B4F1C69)"
+"file": "{T:_T0s24_UnicodeScalarExceptions33_0E4228093681F6920F0AB2E48B4F1C69LLVACycfc} Swift.(_UnicodeScalarExceptions in _0E4228093681F6920F0AB2E48B4F1C69).init() -> Swift.(_UnicodeScalarExceptions in _0E4228093681F6920F0AB2E48B4F1C69)",
+"simplified": "_UnicodeScalarExceptions.init()"
 },
 {
 "m": "_T0D",
 "ref": "_T0D",
-"file": "_T0D"
+"file": "_T0D",
+"simplified": "_T0D"
 },
 {
 "m": "_T0s18EnumeratedIteratorVyxGs8Sequencess0B8ProtocolRzlsADP5splitSay03SubC0QzGSi9maxSplits_Sb25omittingEmptySubsequencesSb7ElementQzKc14whereSeparatortKFTW",
 "ref": "protocol witness for Swift.Sequence.split(maxSplits: Swift.Int, omittingEmptySubsequences: Swift.Bool, whereSeparator: (A.Element) throws -> Swift.Bool) throws -> [A.SubSequence] in conformance <A where A: Swift.IteratorProtocol> Swift.EnumeratedIterator<A> : Swift.Sequence in Swift",
-"file": "{T:} protocol witness for Swift.Sequence.split(maxSplits: Swift.Int, omittingEmptySubsequences: Swift.Bool, whereSeparator: (A.Element) throws -> Swift.Bool) throws -> [A.SubSequence] in conformance <A where A: Swift.IteratorProtocol> Swift.EnumeratedIterator<A> : Swift.Sequence in Swift"
+"file": "{T:} protocol witness for Swift.Sequence.split(maxSplits: Swift.Int, omittingEmptySubsequences: Swift.Bool, whereSeparator: (A.Element) throws -> Swift.Bool) throws -> [A.SubSequence] in conformance <A where A: Swift.IteratorProtocol> Swift.EnumeratedIterator<A> : Swift.Sequence in Swift",
+"simplified": "protocol witness for Sequence.split(maxSplits:omittingEmptySubsequences:whereSeparator:) in conformance <A> EnumeratedIterator<A>"
 },
 {
 "m": "_T0s3SetVyxGs10CollectiotySivm",
 "ref": "_T0s3SetVyxGs10CollectiotySivm",
-"file": "_T0s3SetVyxGs10CollectiotySivm"
+"file": "_T0s3SetVyxGs10CollectiotySivm",
+"simplified": "_T0s3SetVyxGs10CollectiotySivm"
 },
 {
 "m": "_S$s3SetVyxGs10CollectiotySivm",
 "ref": "_S$s3SetVyxGs10CollectiotySivm",
-"file": "_S$s3SetVyxGs10CollectiotySivm"
+"file": "_S$s3SetVyxGs10CollectiotySivm",
+"simplified": "_S$s3SetVyxGs10CollectiotySivm"
 },
 {
 "m": "_T0s18ReversedCollectionVyxGs04LazyB8ProtocolfC",
 "ref": "_T0s18ReversedCollectionVyxGs04LazyB8ProtocolfC",
-"file": "_T0s18ReversedCollectionVyxGs04LazyB8ProtocolfC"
+"file": "_T0s18ReversedCollectionVyxGs04LazyB8ProtocolfC",
+"simplified": "_T0s18ReversedCollectionVyxGs04LazyB8ProtocolfC"
 },
 {
 "m": "_S$s18ReversedCollectionVyxGs04LazyB8ProtocolfC",
 "ref": "_S$s18ReversedCollectionVyxGs04LazyB8ProtocolfC",
-"file": "_S$s18ReversedCollectionVyxGs04LazyB8ProtocolfC"
+"file": "_S$s18ReversedCollectionVyxGs04LazyB8ProtocolfC",
+"simplified": "_S$s18ReversedCollectionVyxGs04LazyB8ProtocolfC"
 },
 {
 "m": "_T0iW",
 "ref": "_T0iW",
-"file": "_T0iW"
+"file": "_T0iW",
+"simplified": "_T0iW"
 },
 {
 "m": "_S$iW",
 "ref": "_S$iW",
-"file": "_S$iW"
+"file": "_S$iW",
+"simplified": "_S$iW"
 },
 {
 "m": "_T0s5print_9separator10terminatoryypfC",
 "ref": "_T0s5print_9separator10terminatoryypfC",
-"file": "_T0s5print_9separator10terminatoryypfC"
+"file": "_T0s5print_9separator10terminatoryypfC",
+"simplified": "_T0s5print_9separator10terminatoryypfC"
 },
 {
 "m": "_S$s5print_9separator10terminatoryypfC",
 "ref": "_S$s5print_9separator10terminatoryypfC",
-"file": "_S$s5print_9separator10terminatoryypfC"
+"file": "_S$s5print_9separator10terminatoryypfC",
+"simplified": "_S$s5print_9separator10terminatoryypfC"
 },
 {
 "m": "_T0So13GenericOptionas8HashableSCsACP9hashValueSivgTW",
 "ref": "protocol witness for Swift.Hashable.hashValue.getter : Swift.Int in conformance __C.GenericOption : Swift.Hashable in __C_Synthesized",
-"file": "{T:} protocol witness for Swift.Hashable.hashValue.getter : Swift.Int in conformance __C.GenericOption : Swift.Hashable in __C_Synthesized"
+"file": "{T:} protocol witness for Swift.Hashable.hashValue.getter : Swift.Int in conformance __C.GenericOption : Swift.Hashable in __C_Synthesized",
+"simplified": "protocol witness for Hashable.hashValue.getter in conformance GenericOption"
 },
 {
 "m": "_T0So11CrappyColorVs16RawRepresentableSCMA",
 "ref": "reflection metadata associated type descriptor __C.CrappyColor : Swift.RawRepresentable in __C_Synthesized",
-"file": "reflection metadata associated type descriptor __C.CrappyColor : Swift.RawRepresentable in __C_Synthesized"
+"file": "reflection metadata associated type descriptor __C.CrappyColor : Swift.RawRepresentable in __C_Synthesized",
+"simplified": "reflection metadata associated type descriptor CrappyColor"
 },
 {
 "m": "$S28protocol_conformance_records15NativeValueTypeVAA8RuncibleAAMc",
 "ref": "protocol conformance descriptor for protocol_conformance_records.NativeValueType : protocol_conformance_records.Runcible in protocol_conformance_records",
-"file": "protocol conformance descriptor for protocol_conformance_records.NativeValueType : protocol_conformance_records.Runcible in protocol_conformance_records"
+"file": "protocol conformance descriptor for protocol_conformance_records.NativeValueType : protocol_conformance_records.Runcible in protocol_conformance_records",
+"simplified": "protocol conformance descriptor for NativeValueType"
 },
 {
 "m": "$ss6SimpleHr",
 "ref": "protocol descriptor runtime record for Swift.Simple",
-"file": "protocol descriptor runtime record for Swift.Simple"
+"file": "protocol descriptor runtime record for Swift.Simple",
+"simplified": "protocol descriptor runtime record for Simple"
 },
 {
 "m": "$ss5OtherVs6SimplesHc",
 "ref": "protocol conformance descriptor runtime record for Swift.Other : Swift.Simple in Swift",
-"file": "protocol conformance descriptor runtime record for Swift.Other : Swift.Simple in Swift"
+"file": "protocol conformance descriptor runtime record for Swift.Other : Swift.Simple in Swift",
+"simplified": "protocol conformance descriptor runtime record for Other"
 },
 {
 "m": "$ss5OtherVHn",
 "ref": "nominal type descriptor runtime record for Swift.Other",
-"file": "nominal type descriptor runtime record for Swift.Other"
+"file": "nominal type descriptor runtime record for Swift.Other",
+"simplified": "nominal type descriptor runtime record for Other"
 },
 {
 "m": "$s18opaque_return_type3fooQryFQOHo",
 "ref": "opaque type descriptor runtime record for <<opaque return type of opaque_return_type.foo() -> some>>",
-"file": "opaque type descriptor runtime record for <<opaque return type of opaque_return_type.foo() -> some>>"
+"file": "opaque type descriptor runtime record for <<opaque return type of opaque_return_type.foo() -> some>>",
+"simplified": "opaque type descriptor runtime record for <<opaque return type of foo()>>"
 },
 {
 "m": "$SSC9SomeErrorLeVD",
 "ref": "__C_Synthesized.related decl 'e' for SomeError",
-"file": "__C_Synthesized.related decl 'e' for SomeError"
+"file": "__C_Synthesized.related decl 'e' for SomeError",
+"simplified": "related decl 'e' for SomeError"
 },
 {
 "m": "$s20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PAAyHCg_AiJ1QAAyHCg1_GF",
 "ref": "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()",
-"file": "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()"
+"file": "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()",
+"simplified": "test0(_:)"
 },
 {
 "m": "$s20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PHPyHCg_AiJ1QHPyHCg1_GF",
 "ref": "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()",
-"file": "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()"
+"file": "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()",
+"simplified": "test0(_:)"
 },
 {
 "m": "$s20mangling_retroactive5test0yyAA1ZVy12RetroactiveB1XVSiAE1YVAG0D1A1PHpyHCg_AiJ1QHpyHCg1_GF",
 "ref": "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()",
-"file": "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()"
+"file": "mangling_retroactive.test0(mangling_retroactive.Z<RetroactiveB.X, Swift.Int, RetroactiveB.Y>) -> ()",
+"simplified": "test0(_:)"
 },
 {
 "m": "_T0LiteralAByxGxd_tcfC",
 "ref": "_T0LiteralAByxGxd_tcfC",
-"file": "_T0LiteralAByxGxd_tcfC"
+"file": "_T0LiteralAByxGxd_tcfC",
+"simplified": "_T0LiteralAByxGxd_tcfC"
 },
 {
 "m": "_T0XZ",
 "ref": "_T0XZ",
-"file": "_T0XZ"
+"file": "_T0XZ",
+"simplified": "_T0XZ"
 },
 {
 "m": "_TTSf0os___TFVs17_LegacyStringCore15_invariantCheckfT_T_",
 "ref": "function signature specialization <Arg[0] = Guaranteed To Owned and Exploded> of Swift._LegacyStringCore._invariantCheck() -> ()",
-"file": "function signature specialization <Arg[0] = Guaranteed To Owned and Exploded> of Swift._LegacyStringCore._invariantCheck() -> ()"
+"file": "function signature specialization <Arg[0] = Guaranteed To Owned and Exploded> of Swift._LegacyStringCore._invariantCheck() -> ()",
+"simplified": "specialized _LegacyStringCore._invariantCheck()"
 },
 {
 "m": "_TTSf2o___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_",
 "ref": "function signature specialization <Arg[0] = Guaranteed To Owned> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
-"file": "function signature specialization <Arg[0] = Guaranteed To Owned> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
+"file": "function signature specialization <Arg[0] = Guaranteed To Owned> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
+"simplified": "specialized _LegacyStringCore.init(_:)"
 },
 {
 "m": "_TTSf2do___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_",
 "ref": "function signature specialization <Arg[0] = Dead and Guaranteed To Owned> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
-"file": "function signature specialization <Arg[0] = Dead and Guaranteed To Owned> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
+"file": "function signature specialization <Arg[0] = Dead and Guaranteed To Owned> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
+"simplified": "specialized _LegacyStringCore.init(_:)"
 },
 {
 "m": "_TTSf2dos___TTSf2s_d___TFVs17_LegacyStringCoreCfVs13_StringBufferS_",
 "ref": "function signature specialization <Arg[0] = Dead and Guaranteed To Owned and Exploded> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
-"file": "function signature specialization <Arg[0] = Dead and Guaranteed To Owned and Exploded> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore"
+"file": "function signature specialization <Arg[0] = Dead and Guaranteed To Owned and Exploded> of function signature specialization <Arg[0] = Exploded, Arg[1] = Dead> of Swift._LegacyStringCore.init(Swift._StringBuffer) -> Swift._LegacyStringCore",
+"simplified": "specialized _LegacyStringCore.init(_:)"
 },
 {
 "m": "_TTSf",
 "ref": "_TTSf",
-"file": "_TTSf"
+"file": "_TTSf",
+"simplified": "_TTSf"
 },
 {
 "m": "_TtW0_j",
 "ref": "_TtW0_j",
-"file": "_TtW0_j"
+"file": "_TtW0_j",
+"simplified": "_TtW0_j"
 },
 {
 "m": "_TtW_4m3a3v",
 "ref": "_TtW_4m3a3v",
-"file": "_TtW_4m3a3v"
+"file": "_TtW_4m3a3v",
+"simplified": "_TtW_4m3a3v"
 },
 {
 "m": "_TVGVGSS_2v0",
 "ref": "_TVGVGSS_2v0",
-"file": "_TVGVGSS_2v0"
+"file": "_TVGVGSS_2v0",
+"simplified": "_TVGVGSS_2v0"
 },
 {
 "m": "$SSD1BySSSBsg_G",
 "ref": "$SSD1BySSSBsg_G",
-"file": "$SSD1BySSSBsg_G"
+"file": "$SSD1BySSSBsg_G",
+"simplified": "$SSD1BySSSBsg_G"
 },
 {
 "m": "_Ttu4222222222222222222222222_rW_2T_2TJ_",
 "ref": "<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AB, BB, CB, DB, EB, FB, GB, HB, IB, JB, KB, LB, MB, NB, OB, PB, QB, RB, SB, TB, UB, VB, WB, XB, YB, ZB, AC, BC, CC, DC, EC, FC, GC, HC, IC, JC, KC, LC, MC, NC, OC, PC, QC, RC, SC, TC, UC, VC, WC, XC, YC, ZC, AD, BD, CD, DD, ED, FD, GD, HD, ID, JD, KD, LD, MD, ND, OD, PD, QD, RD, SD, TD, UD, VD, WD, XD, YD, ZD, AE, BE, CE, DE, EE, FE, GE, HE, IE, JE, KE, LE, ME, NE, OE, PE, QE, RE, SE, TE, UE, VE, WE, XE, ...> B.T_.TJ",
-"file": "<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AB, BB, CB, DB, EB, FB, GB, HB, IB, JB, KB, LB, MB, NB, OB, PB, QB, RB, SB, TB, UB, VB, WB, XB, YB, ZB, AC, BC, CC, DC, EC, FC, GC, HC, IC, JC, KC, LC, MC, NC, OC, PC, QC, RC, SC, TC, UC, VC, WC, XC, YC, ZC, AD, BD, CD, DD, ED, FD, GD, HD, ID, JD, KD, LD, MD, ND, OD, PD, QD, RD, SD, TD, UD, VD, WD, XD, YD, ZD, AE, BE, CE, DE, EE, FE, GE, HE, IE, JE, KE, LE, ME, NE, OE, PE, QE, RE, SE, TE, UE, VE, WE, XE, ...> B.T_.TJ"
+"file": "<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AB, BB, CB, DB, EB, FB, GB, HB, IB, JB, KB, LB, MB, NB, OB, PB, QB, RB, SB, TB, UB, VB, WB, XB, YB, ZB, AC, BC, CC, DC, EC, FC, GC, HC, IC, JC, KC, LC, MC, NC, OC, PC, QC, RC, SC, TC, UC, VC, WC, XC, YC, ZC, AD, BD, CD, DD, ED, FD, GD, HD, ID, JD, KD, LD, MD, ND, OD, PD, QD, RD, SD, TD, UD, VD, WD, XD, YD, ZD, AE, BE, CE, DE, EE, FE, GE, HE, IE, JE, KE, LE, ME, NE, OE, PE, QE, RE, SE, TE, UE, VE, WE, XE, ...> B.T_.TJ",
+"simplified": "<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, AB, BB, CB, DB, EB, FB, GB, HB, IB, JB, KB, LB, MB, NB, OB, PB, QB, RB, SB, TB, UB, VB, WB, XB, YB, ZB, AC, BC, CC, DC, EC, FC, GC, HC, IC, JC, KC, LC, MC, NC, OC, PC, QC, RC, SC, TC, UC, VC, WC, XC, YC, ZC, AD, BD, CD, DD, ED, FD, GD, HD, ID, JD, KD, LD, MD, ND, OD, PD, QD, RD, SD, TD, UD, VD, WD, XD, YD, ZD, AE, BE, CE, DE, EE, FE, GE, HE, IE, JE, KE, LE, ME, NE, OE, PE, QE, RE, SE, TE, UE, VE, WE, XE, ...> B.T_.TJ"
 },
 {
 "m": "_$S3BBBBf0602365061_",
 "ref": "_$S3BBBBf0602365061_",
-"file": "_$S3BBBBf0602365061_"
+"file": "_$S3BBBBf0602365061_",
+"simplified": "_$S3BBBBf0602365061_"
 },
 {
 "m": "_$S3BBBBi0602365061_",
 "ref": "_$S3BBBBi0602365061_",
-"file": "_$S3BBBBi0602365061_"
+"file": "_$S3BBBBi0602365061_",
+"simplified": "_$S3BBBBi0602365061_"
 },
 {
 "m": "_$S3BBBBv0602365061_",
 "ref": "_$S3BBBBv0602365061_",
-"file": "_$S3BBBBv0602365061_"
+"file": "_$S3BBBBv0602365061_",
+"simplified": "_$S3BBBBv0602365061_"
 },
 {
 "m": "_T0lxxxmmmTk",
 "ref": "_T0lxxxmmmTk",
-"file": "_T0lxxxmmmTk"
+"file": "_T0lxxxmmmTk",
+"simplified": "_T0lxxxmmmTk"
 },
 {
 "m": "_TtCF4test11doNotCrash1FT_QuL_8MyClass1",
 "ref": "MyClass1 #1 in test.doNotCrash1() -> some",
-"file": "MyClass1 #1 in test.doNotCrash1() -> some"
+"file": "MyClass1 #1 in test.doNotCrash1() -> some",
+"simplified": "MyClass1 #1 in doNotCrash1()"
 },
 {
 "m": "$s3Bar3FooVAA5DrinkVyxGs5Error_pSeRzSERzlyShy4AbcdAHO6MemberVGALSeHPAKSeAAyHC_HCg_ALSEHPAKSEAAyHC_HCg0_Iseggozo_SgWOe",
 "ref": "outlined consume of (@escaping @callee_guaranteed @substituted <A where A: Swift.Decodable, A: Swift.Encodable> (@guaranteed Bar.Foo) -> (@owned Bar.Drink<A>, @error @owned Swift.Error) for <Swift.Set<Abcd.Abcd.Member>>)?",
-"file": "outlined consume of (@escaping @callee_guaranteed @substituted <A where A: Swift.Decodable, A: Swift.Encodable> (@guaranteed Bar.Foo) -> (@owned Bar.Drink<A>, @error @owned Swift.Error) for <Swift.Set<Abcd.Abcd.Member>>)?"
+"file": "outlined consume of (@escaping @callee_guaranteed @substituted <A where A: Swift.Decodable, A: Swift.Encodable> (@guaranteed Bar.Foo) -> (@owned Bar.Drink<A>, @error @owned Swift.Error) for <Swift.Set<Abcd.Abcd.Member>>)?",
+"simplified": "outlined consume of (@escaping @callee_guaranteed @substituted <A> (@guaranteed Foo) -> (@owned Drink<A>, @error @owned Error) for <Set<Abcd.Member>>)?"
 },
 {
 "m": "$s4Test5ProtoP8IteratorV10collectionAEy_qd__Gqd___tcfc",
 "ref": "Test.Proto.Iterator.init(collection: A1) -> Test.Proto.Iterator<A1>",
-"file": "Test.Proto.Iterator.init(collection: A1) -> Test.Proto.Iterator<A1>"
+"file": "Test.Proto.Iterator.init(collection: A1) -> Test.Proto.Iterator<A1>",
+"simplified": "Proto.Iterator.init(collection:)"
 },
 {
 "m": "$s4test3fooV4blahyAA1SV1fQryFQOy_Qo_AHF",
 "ref": "test.foo.blah(<<opaque return type of test.S.f() -> some>>.0) -> <<opaque return type of test.S.f() -> some>>.0",
-"file": "test.foo.blah(<<opaque return type of test.S.f() -> some>>.0) -> <<opaque return type of test.S.f() -> some>>.0"
+"file": "test.foo.blah(<<opaque return type of test.S.f() -> some>>.0) -> <<opaque return type of test.S.f() -> some>>.0",
+"simplified": "foo.blah(_:)"
 },
 {
 "m": "$S3nix8MystructV1xACyxGx_tcfc7MyaliasL_ayx__GD",
 "ref": "Myalias #1 in nix.Mystruct<A>.init(x: A) -> nix.Mystruct<A>",
-"file": "Myalias #1 in nix.Mystruct<A>.init(x: A) -> nix.Mystruct<A>"
+"file": "Myalias #1 in nix.Mystruct<A>.init(x: A) -> nix.Mystruct<A>",
+"simplified": "Myalias #1 in Mystruct<A>.init(x:)"
 },
 {
 "m": "$S3nix7MyclassCfd7MyaliasL_ayx__GD",
 "ref": "Myalias #1 in nix.Myclass<A>.deinit",
-"file": "Myalias #1 in nix.Myclass<A>.deinit"
+"file": "Myalias #1 in nix.Myclass<A>.deinit",
+"simplified": "Myalias #1 in Myclass<A>.deinit"
 },
 {
 "m": "$S3nix8MystructVyS2icig7MyaliasL_ayx__GD",
 "ref": "Myalias #1 in nix.Mystruct<A>.subscript.getter : (Swift.Int) -> Swift.Int",
-"file": "Myalias #1 in nix.Mystruct<A>.subscript.getter : (Swift.Int) -> Swift.Int"
+"file": "Myalias #1 in nix.Mystruct<A>.subscript.getter : (Swift.Int) -> Swift.Int",
+"simplified": "Myalias #1 in Mystruct<A>.subscript.getter"
 },
 {
 "m": "$S3nix8MystructV1x1uACyxGx_qd__tclufc7MyaliasL_ayx_qd___GD",
 "ref": "Myalias #1 in nix.Mystruct<A>.<A1>(x: A, u: A1) -> nix.Mystruct<A>",
-"file": "Myalias #1 in nix.Mystruct<A>.<A1>(x: A, u: A1) -> nix.Mystruct<A>"
+"file": "Myalias #1 in nix.Mystruct<A>.<A1>(x: A, u: A1) -> nix.Mystruct<A>",
+"simplified": "Myalias #1 in Mystruct<A>.<A1>(x:u:)"
 },
 {
 "m": "$S3nix8MystructV6testit1xyx_tF7MyaliasL_ayx__GD",
 "ref": "Myalias #1 in nix.Mystruct<A>.testit(x: A) -> ()",
-"file": "Myalias #1 in nix.Mystruct<A>.testit(x: A) -> ()"
+"file": "Myalias #1 in nix.Mystruct<A>.testit(x: A) -> ()",
+"simplified": "Myalias #1 in Mystruct<A>.testit(x:)"
 },
 {
 "m": "$S3nix8MystructV6testit1x1u1vyx_qd__qd_0_tr0_lF7MyaliasL_ayx_qd__qd_0__GD",
 "ref": "Myalias #1 in nix.Mystruct<A>.testit<A1, B1>(x: A, u: A1, v: B1) -> ()",
-"file": "Myalias #1 in nix.Mystruct<A>.testit<A1, B1>(x: A, u: A1, v: B1) -> ()"
+"file": "Myalias #1 in nix.Mystruct<A>.testit<A1, B1>(x: A, u: A1, v: B1) -> ()",
+"simplified": "Myalias #1 in Mystruct<A>.testit<A1, B1>(x:u:v:)"
 },
 {
 "m": "$S4blah8PatatinoaySiGD",
 "ref": "blah.Patatino<Swift.Int>",
-"file": "blah.Patatino<Swift.Int>"
+"file": "blah.Patatino<Swift.Int>",
+"simplified": "Patatino<Int>"
 },
 {
 "m": "$SSiSHsWP",
 "ref": "protocol witness table for Swift.Int : Swift.Hashable in Swift",
-"file": "protocol witness table for Swift.Int : Swift.Hashable in Swift"
+"file": "protocol witness table for Swift.Int : Swift.Hashable in Swift",
+"simplified": "protocol witness table for Int"
 },
 {
 "m": "$S7TestMod5OuterV3Fooayx_SiGD",
 "ref": "TestMod.Outer<A>.Foo<Swift.Int>",
-"file": "TestMod.Outer<A>.Foo<Swift.Int>"
+"file": "TestMod.Outer<A>.Foo<Swift.Int>",
+"simplified": "Outer<A>.Foo<Int>"
 },
 {
 "m": "$Ss17_VariantSetBufferO05CocoaC0ayx_GD",
 "ref": "Swift._VariantSetBuffer<A>.CocoaBuffer",
-"file": "Swift._VariantSetBuffer<A>.CocoaBuffer"
+"file": "Swift._VariantSetBuffer<A>.CocoaBuffer",
+"simplified": "_VariantSetBuffer<A>.CocoaBuffer"
 },
 {
 "m": "$S2t21QP22ProtocolTypeAliasThingayAA4BlahV5SomeQa_GSgD",
 "ref": "t2.Blah.SomeQ as t2.Q.ProtocolTypeAliasThing?",
-"file": "t2.Blah.SomeQ as t2.Q.ProtocolTypeAliasThing?"
+"file": "t2.Blah.SomeQ as t2.Q.ProtocolTypeAliasThing?",
+"simplified": "Blah.SomeQ as Q.ProtocolTypeAliasThing?"
 },
 {
 "m": "$s1A1gyyxlFx_qd__t_Ti5",
 "ref": "inlined generic function <(A, A1)> of A.g<A>(A) -> ()",
-"file": "inlined generic function <(A, A1)> of A.g<A>(A) -> ()"
+"file": "inlined generic function <(A, A1)> of A.g<A>(A) -> ()",
+"simplified": "specialized g<A>(_:)"
 },
 {
 "m": "$S1T19protocol_resilience17ResilientProtocolPTl",
 "ref": "associated type descriptor for protocol_resilience.ResilientProtocol.T",
-"file": "associated type descriptor for protocol_resilience.ResilientProtocol.T"
+"file": "associated type descriptor for protocol_resilience.ResilientProtocol.T",
+"simplified": "associated type descriptor for ResilientProtocol.T"
 },
 {
 "m": "$S18resilient_protocol21ResilientBaseProtocolTL",
 "ref": "protocol requirements base descriptor for resilient_protocol.ResilientBaseProtocol",
-"file": "protocol requirements base descriptor for resilient_protocol.ResilientBaseProtocol"
+"file": "protocol requirements base descriptor for resilient_protocol.ResilientBaseProtocol",
+"simplified": "protocol requirements base descriptor for ResilientBaseProtocol"
 },
 {
 "m": "$S1t1PP10AssocType2_AA1QTn",
 "ref": "associated conformance descriptor for t.P.AssocType2: t.Q",
-"file": "associated conformance descriptor for t.P.AssocType2: t.Q"
+"file": "associated conformance descriptor for t.P.AssocType2: t.Q",
+"simplified": "associated conformance descriptor for P.AssocType2: Q"
 },
 {
 "m": "$S1t1PP10AssocType2_AA1QTN",
 "ref": "default associated conformance accessor for t.P.AssocType2: t.Q",
-"file": "default associated conformance accessor for t.P.AssocType2: t.Q"
+"file": "default associated conformance accessor for t.P.AssocType2: t.Q",
+"simplified": "default associated conformance accessor for P.AssocType2: Q"
 },
 {
 "m": "$s4Test6testityyxlFAA8MystructV_TB5",
 "ref": "generic specialization <Test.Mystruct> of Test.testit<A>(A) -> ()",
-"file": "generic specialization <Test.Mystruct> of Test.testit<A>(A) -> ()"
+"file": "generic specialization <Test.Mystruct> of Test.testit<A>(A) -> ()",
+"simplified": "specialized testit<A>(_:)"
 },
 {
 "m": "$sSUss17FixedWidthIntegerRzrlEyxqd__cSzRd__lufCSu_SiTgm5",
 "ref": "generic specialization <Swift.UInt, Swift.Int> of (extension in Swift):Swift.UnsignedInteger< where A: Swift.FixedWidthInteger>.init<A where A1: Swift.BinaryInteger>(A1) -> A",
-"file": "generic specialization <Swift.UInt, Swift.Int> of (extension in Swift):Swift.UnsignedInteger< where A: Swift.FixedWidthInteger>.init<A where A1: Swift.BinaryInteger>(A1) -> A"
+"file": "generic specialization <Swift.UInt, Swift.Int> of (extension in Swift):Swift.UnsignedInteger< where A: Swift.FixedWidthInteger>.init<A where A1: Swift.BinaryInteger>(A1) -> A",
+"simplified": "specialized UnsignedInteger<>.init<A>(_:)"
 },
 {
 "m": "$sSD5IndexVy__GD",
 "ref": "$sSD5IndexVy__GD",
-"file": "$sSD5IndexVy__GD"
+"file": "$sSD5IndexVy__GD",
+"simplified": "$sSD5IndexVy__GD"
 },
 {
 "m": "$s4test3StrCACycfC",
 "ref": "test.Str.__allocating_init() -> test.Str",
-"file": "{T:$s4test3StrCACycfc} test.Str.__allocating_init() -> test.Str"
+"file": "{T:$s4test3StrCACycfc} test.Str.__allocating_init() -> test.Str",
+"simplified": "Str.__allocating_init()"
 },
 {
 "m": "$s18keypaths_inlinable13KeypathStructV8computedSSvpACTKq ",
 "ref": "$s18keypaths_inlinable13KeypathStructV8computedSSvpACTKq ",
-"file": "key path getter for keypaths_inlinable.KeypathStruct.computed : Swift.String : keypaths_inlinable.KeypathStruct, serialized"
+"file": "key path getter for keypaths_inlinable.KeypathStruct.computed : Swift.String : keypaths_inlinable.KeypathStruct, serialized",
+"simplified": "$s18keypaths_inlinable13KeypathStructV8computedSSvpACTKq "
 },
 {
 "m": "$s3red4testyAA3ResOyxSayq_GAEs5ErrorAAq_sAFHD1__HCg_GADyxq_GsAFR_r0_lF",
 "ref": "red.test<A, B where B: Swift.Error>(red.Res<A, B>) -> red.Res<A, [B]>",
-"file": "red.test<A, B where B: Swift.Error>(red.Res<A, B>) -> red.Res<A, [B]>"
+"file": "red.test<A, B where B: Swift.Error>(red.Res<A, B>) -> red.Res<A, [B]>",
+"simplified": "test<A, B>(_:)"
 },
 {
 "m": "$s3red4testyAA7OurTypeOy4them05TheirD0Vy5AssocQzGAjE0F8ProtocolAAxAA0c7DerivedH0HD1_AA0c4BaseH0HI1_AieKHA2__HCg_GxmAaLRzlF",
 "ref": "red.test<A where A: red.OurDerivedProtocol>(A.Type) -> red.OurType<them.TheirType<A.Assoc>>",
-"file": "red.test<A where A: red.OurDerivedProtocol>(A.Type) -> red.OurType<them.TheirType<A.Assoc>>"
+"file": "red.test<A where A: red.OurDerivedProtocol>(A.Type) -> red.OurType<them.TheirType<A.Assoc>>",
+"simplified": "test<A>(_:)"
 },
 {
 "m": "$s17property_wrappers10WithTuplesV9fractionsSd_S2dtvpfP",
 "ref": "property wrapper backing initializer of property_wrappers.WithTuples.fractions : (Swift.Double, Swift.Double, Swift.Double)",
-"file": "property wrapper backing initializer of property_wrappers.WithTuples.fractions : (Swift.Double, Swift.Double, Swift.Double)"
+"file": "property wrapper backing initializer of property_wrappers.WithTuples.fractions : (Swift.Double, Swift.Double, Swift.Double)",
+"simplified": "property wrapper backing initializer of WithTuples.fractions"
 },
 {
 "m": "$sSo17OS_dispatch_queueC4sync7executeyyyXE_tFTOTA",
 "ref": "partial apply forwarder for @nonobjc __C.OS_dispatch_queue.sync(execute: () -> ()) -> ()",
-"file": "{T:$sSo17OS_dispatch_queueC4sync7executeyyyXE_tFTO} partial apply forwarder for @nonobjc __C.OS_dispatch_queue.sync(execute: () -> ()) -> ()"
+"file": "{T:$sSo17OS_dispatch_queueC4sync7executeyyyXE_tFTO} partial apply forwarder for @nonobjc __C.OS_dispatch_queue.sync(execute: () -> ()) -> ()",
+"simplified": "partial apply for @nonobjc OS_dispatch_queue.sync(execute:)"
 },
 {
 "m": "$s4main1gyySiXCvp",
 "ref": "main.g : @convention(c) (Swift.Int) -> ()",
-"file": "main.g : @convention(c) (Swift.Int) -> ()"
+"file": "main.g : @convention(c) (Swift.Int) -> ()",
+"simplified": "g"
 },
 {
 "m": "$s4main1gyySiXBvp",
 "ref": "main.g : @convention(block) (Swift.Int) -> ()",
-"file": "main.g : @convention(block) (Swift.Int) -> ()"
+"file": "main.g : @convention(block) (Swift.Int) -> ()",
+"simplified": "g"
 },
 {
 "m": "$sxq_Ifgnr_D",
 "ref": "@differentiable(_forward) @callee_guaranteed (@in_guaranteed A) -> (@out B)",
-"file": "@differentiable(_forward) @callee_guaranteed (@in_guaranteed A) -> (@out B)"
+"file": "@differentiable(_forward) @callee_guaranteed (@in_guaranteed A) -> (@out B)",
+"simplified": "@differentiable(_forward) @callee_guaranteed (@in_guaranteed A) -> (@out B)"
 },
 {
 "m": "$sxq_Irgnr_D",
 "ref": "@differentiable(reverse) @callee_guaranteed (@in_guaranteed A) -> (@out B)",
-"file": "@differentiable(reverse) @callee_guaranteed (@in_guaranteed A) -> (@out B)"
+"file": "@differentiable(reverse) @callee_guaranteed (@in_guaranteed A) -> (@out B)",
+"simplified": "@differentiable(reverse) @callee_guaranteed (@in_guaranteed A) -> (@out B)"
 },
 {
 "m": "$sxq_Idgnr_D",
 "ref": "@differentiable @callee_guaranteed (@in_guaranteed A) -> (@out B)",
-"file": "@differentiable @callee_guaranteed (@in_guaranteed A) -> (@out B)"
+"file": "@differentiable @callee_guaranteed (@in_guaranteed A) -> (@out B)",
+"simplified": "@differentiable @callee_guaranteed (@in_guaranteed A) -> (@out B)"
 },
 {
 "m": "$sxq_Ilgnr_D",
 "ref": "@differentiable(_linear) @callee_guaranteed (@in_guaranteed A) -> (@out B)",
-"file": "@differentiable(_linear) @callee_guaranteed (@in_guaranteed A) -> (@out B)"
+"file": "@differentiable(_linear) @callee_guaranteed (@in_guaranteed A) -> (@out B)",
+"simplified": "@differentiable(_linear) @callee_guaranteed (@in_guaranteed A) -> (@out B)"
 },
 {
 "m": "$sS3fIedgyywd_D",
 "ref": "@escaping @differentiable @callee_guaranteed (@unowned Swift.Float, @unowned @noDerivative Swift.Float) -> (@unowned Swift.Float)",
-"file": "@escaping @differentiable @callee_guaranteed (@unowned Swift.Float, @unowned @noDerivative Swift.Float) -> (@unowned Swift.Float)"
+"file": "@escaping @differentiable @callee_guaranteed (@unowned Swift.Float, @unowned @noDerivative Swift.Float) -> (@unowned Swift.Float)",
+"simplified": "@escaping @differentiable @callee_guaranteed (@unowned Float, @unowned @noDerivative Float) -> (@unowned Float)"
 },
 {
 "m": "$sS5fIertyyywddw_D",
 "ref": "@escaping @differentiable(reverse) @convention(thin) (@unowned Swift.Float, @unowned Swift.Float, @unowned @noDerivative Swift.Float) -> (@unowned Swift.Float, @unowned @noDerivative Swift.Float)",
-"file": "@escaping @differentiable(reverse) @convention(thin) (@unowned Swift.Float, @unowned Swift.Float, @unowned @noDerivative Swift.Float) -> (@unowned Swift.Float, @unowned @noDerivative Swift.Float)"
+"file": "@escaping @differentiable(reverse) @convention(thin) (@unowned Swift.Float, @unowned Swift.Float, @unowned @noDerivative Swift.Float) -> (@unowned Swift.Float, @unowned @noDerivative Swift.Float)",
+"simplified": "@escaping @differentiable(reverse) @convention(thin) (@unowned Float, @unowned Float, @unowned @noDerivative Float) -> (@unowned Float, @unowned @noDerivative Float)"
 },
 {
 "m": "$syQo",
 "ref": "$syQo",
-"file": "$syQo"
+"file": "$syQo",
+"simplified": "$syQo"
 },
 {
 "m": "$s0059xxxxxxxxxxxxxxx_ttttttttBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBee",
 "ref": "$s0059xxxxxxxxxxxxxxx_ttttttttBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBee",
-"file": "$s0059xxxxxxxxxxxxxxx_ttttttttBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBee"
+"file": "$s0059xxxxxxxxxxxxxxx_ttttttttBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBee",
+"simplified": "$s0059xxxxxxxxxxxxxxx_ttttttttBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBee"
 },
 {
 "m": "$sx1td_t",
 "ref": "(t: A...)",
-"file": "(t: A...)"
+"file": "(t: A...)",
+"simplified": "(t: A...)"
 },
 {
 "m": "$s7example1fyyYaF",
 "ref": "example.f() async -> ()",
-"file": "example.f() async -> ()"
+"file": "example.f() async -> ()",
+"simplified": "f()"
 },
 {
 "m": "$s7example1fyyYaKF",
 "ref": "example.f() async throws -> ()",
-"file": "example.f() async throws -> ()"
+"file": "example.f() async throws -> ()",
+"simplified": "f()"
 },
 {
 "m": "$s4main20receiveInstantiationyySo34__CxxTemplateInst12MagicWrapperIiEVzF",
 "ref": "main.receiveInstantiation(inout __C.__CxxTemplateInst12MagicWrapperIiE) -> ()",
-"file": "main.receiveInstantiation(inout __C.__CxxTemplateInst12MagicWrapperIiE) -> ()"
+"file": "main.receiveInstantiation(inout __C.__CxxTemplateInst12MagicWrapperIiE) -> ()",
+"simplified": "receiveInstantiation(_:)"
 },
 {
 "m": "$s4main19returnInstantiationSo34__CxxTemplateInst12MagicWrapperIiEVyF",
 "ref": "main.returnInstantiation() -> __C.__CxxTemplateInst12MagicWrapperIiE",
-"file": "main.returnInstantiation() -> __C.__CxxTemplateInst12MagicWrapperIiE"
+"file": "main.returnInstantiation() -> __C.__CxxTemplateInst12MagicWrapperIiE",
+"simplified": "returnInstantiation()"
 },
 {
 "m": "$s4main6testityyYaFTu",
 "ref": "async function pointer to main.testit() async -> ()",
-"file": "async function pointer to main.testit() async -> ()"
+"file": "async function pointer to main.testit() async -> ()",
+"simplified": "async function pointer to testit()"
 },
 {
 "m": "$s13test_mangling3fooyS2f_S2ftFTJfUSSpSr",
 "ref": "forward-mode derivative of test_mangling.foo(Swift.Float, Swift.Float, Swift.Float) -> Swift.Float with respect to parameters {1, 2} and results {0}",
-"file": "forward-mode derivative of test_mangling.foo(Swift.Float, Swift.Float, Swift.Float) -> Swift.Float with respect to parameters {1, 2} and results {0}"
+"file": "forward-mode derivative of test_mangling.foo(Swift.Float, Swift.Float, Swift.Float) -> Swift.Float with respect to parameters {1, 2} and results {0}",
+"simplified": "forward-mode derivative of foo(_:_:_:)"
 },
 {
 "m": "$s13test_mangling4foo21xq_x_t16_Differentiation14DifferentiableR_AA1P13TangentVectorRp_r0_lFAdERzAdER_AafGRpzAafHRQr0_lTJrSpSr",
 "ref": "reverse-mode derivative of test_mangling.foo2<A, B where B: _Differentiation.Differentiable, B.TangentVector: test_mangling.P>(x: A) -> B with respect to parameters {0} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, A.TangentVector: test_mangling.P, B.TangentVector: test_mangling.P>",
-"file": "reverse-mode derivative of test_mangling.foo2<A, B where B: _Differentiation.Differentiable, B.TangentVector: test_mangling.P>(x: A) -> B with respect to parameters {0} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, A.TangentVector: test_mangling.P, B.TangentVector: test_mangling.P>"
+"file": "reverse-mode derivative of test_mangling.foo2<A, B where B: _Differentiation.Differentiable, B.TangentVector: test_mangling.P>(x: A) -> B with respect to parameters {0} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, A.TangentVector: test_mangling.P, B.TangentVector: test_mangling.P>",
+"simplified": "reverse-mode derivative of foo2<A, B>(x:)"
 },
 {
 "m": "$s13test_mangling4foo21xq_x_t16_Differentiation14DifferentiableR_AA1P13TangentVectorRp_r0_lFAdERzAdER_AafGRpzAafHRQr0_lTJVrSpSr",
 "ref": "vtable thunk for reverse-mode derivative of test_mangling.foo2<A, B where B: _Differentiation.Differentiable, B.TangentVector: test_mangling.P>(x: A) -> B with respect to parameters {0} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, A.TangentVector: test_mangling.P, B.TangentVector: test_mangling.P>",
-"file": "vtable thunk for reverse-mode derivative of test_mangling.foo2<A, B where B: _Differentiation.Differentiable, B.TangentVector: test_mangling.P>(x: A) -> B with respect to parameters {0} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, A.TangentVector: test_mangling.P, B.TangentVector: test_mangling.P>"
+"file": "vtable thunk for reverse-mode derivative of test_mangling.foo2<A, B where B: _Differentiation.Differentiable, B.TangentVector: test_mangling.P>(x: A) -> B with respect to parameters {0} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, A.TangentVector: test_mangling.P, B.TangentVector: test_mangling.P>",
+"simplified": "vtable thunk for reverse-mode derivative of foo2<A, B>(x:)"
 },
 {
 "m": "$s13test_mangling3fooyS2f_xq_t16_Differentiation14DifferentiableR_r0_lFAcDRzAcDR_r0_lTJpUSSpSr",
 "ref": "pullback of test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>",
-"file": "pullback of test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>"
+"file": "pullback of test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>",
+"simplified": "pullback of foo<A, B>(_:_:_:)"
 },
 {
 "m": "$s13test_mangling4foo21xq_x_t16_Differentiation14DifferentiableR_AA1P13TangentVectorRp_r0_lFTSAdERzAdER_AafGRpzAafHRQr0_lTJrSpSr",
 "ref": "reverse-mode derivative of protocol self-conformance witness for test_mangling.foo2<A, B where B: _Differentiation.Differentiable, B.TangentVector: test_mangling.P>(x: A) -> B with respect to parameters {0} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, A.TangentVector: test_mangling.P, B.TangentVector: test_mangling.P>",
-"file": "reverse-mode derivative of protocol self-conformance witness for test_mangling.foo2<A, B where B: _Differentiation.Differentiable, B.TangentVector: test_mangling.P>(x: A) -> B with respect to parameters {0} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, A.TangentVector: test_mangling.P, B.TangentVector: test_mangling.P>"
+"file": "reverse-mode derivative of protocol self-conformance witness for test_mangling.foo2<A, B where B: _Differentiation.Differentiable, B.TangentVector: test_mangling.P>(x: A) -> B with respect to parameters {0} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, A.TangentVector: test_mangling.P, B.TangentVector: test_mangling.P>",
+"simplified": "reverse-mode derivative of protocol self-conformance witness for foo2<A, B>(x:)"
 },
 {
 "m": "$s13test_mangling3fooyS2f_xq_t16_Differentiation14DifferentiableR_r0_lFAcDRzAcDR_r0_lTJpUSSpSrTj",
 "ref": "dispatch thunk of pullback of test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>",
-"file": "dispatch thunk of pullback of test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>"
+"file": "dispatch thunk of pullback of test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>",
+"simplified": "dispatch thunk of pullback of foo<A, B>(_:_:_:)"
 },
 {
 "m": "$s13test_mangling3fooyS2f_xq_t16_Differentiation14DifferentiableR_r0_lFAcDRzAcDR_r0_lTJpUSSpSrTq",
 "ref": "method descriptor for pullback of test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>",
-"file": "method descriptor for pullback of test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>"
+"file": "method descriptor for pullback of test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>",
+"simplified": "method descriptor for pullback of foo<A, B>(_:_:_:)"
 },
 {
 "m": "$s13TangentVector16_Differentiation14DifferentiablePQzAaDQy_SdAFIegnnnr_TJSdSSSpSrSUSP",
 "ref": "autodiff subset parameters thunk for differential from @escaping @callee_guaranteed (@in_guaranteed A._Differentiation.Differentiable.TangentVector, @in_guaranteed B._Differentiation.Differentiable.TangentVector, @in_guaranteed Swift.Double) -> (@out B._Differentiation.Differentiable.TangentVector) with respect to parameters {0, 1, 2} and results {0} to parameters {0, 2}",
-"file": "autodiff subset parameters thunk for differential from @escaping @callee_guaranteed (@in_guaranteed A._Differentiation.Differentiable.TangentVector, @in_guaranteed B._Differentiation.Differentiable.TangentVector, @in_guaranteed Swift.Double) -> (@out B._Differentiation.Differentiable.TangentVector) with respect to parameters {0, 1, 2} and results {0} to parameters {0, 2}"
+"file": "autodiff subset parameters thunk for differential from @escaping @callee_guaranteed (@in_guaranteed A._Differentiation.Differentiable.TangentVector, @in_guaranteed B._Differentiation.Differentiable.TangentVector, @in_guaranteed Swift.Double) -> (@out B._Differentiation.Differentiable.TangentVector) with respect to parameters {0, 1, 2} and results {0} to parameters {0, 2}",
+"simplified": "autodiff subset parameters thunk for differential from @escaping @callee_guaranteed (@in_guaranteed A.Differentiable.TangentVector, @in_guaranteed B.Differentiable.TangentVector, @in_guaranteed Double) -> (@out B.Differentiable.TangentVector)"
 },
 {
 "m": "$s13TangentVector16_Differentiation14DifferentiablePQy_AaDQzAESdIegnrrr_TJSpSSSpSrSUSP",
 "ref": "autodiff subset parameters thunk for pullback from @escaping @callee_guaranteed (@in_guaranteed B._Differentiation.Differentiable.TangentVector) -> (@out A._Differentiation.Differentiable.TangentVector, @out B._Differentiation.Differentiable.TangentVector, @out Swift.Double) with respect to parameters {0, 1, 2} and results {0} to parameters {0, 2}",
-"file": "autodiff subset parameters thunk for pullback from @escaping @callee_guaranteed (@in_guaranteed B._Differentiation.Differentiable.TangentVector) -> (@out A._Differentiation.Differentiable.TangentVector, @out B._Differentiation.Differentiable.TangentVector, @out Swift.Double) with respect to parameters {0, 1, 2} and results {0} to parameters {0, 2}"
+"file": "autodiff subset parameters thunk for pullback from @escaping @callee_guaranteed (@in_guaranteed B._Differentiation.Differentiable.TangentVector) -> (@out A._Differentiation.Differentiable.TangentVector, @out B._Differentiation.Differentiable.TangentVector, @out Swift.Double) with respect to parameters {0, 1, 2} and results {0} to parameters {0, 2}",
+"simplified": "autodiff subset parameters thunk for pullback from @escaping @callee_guaranteed (@in_guaranteed B.Differentiable.TangentVector) -> (@out A.Differentiable.TangentVector, @out B.Differentiable.TangentVector, @out Double)"
 },
 {
 "m": "$s39differentiation_subset_parameters_thunk19inoutIndirectCalleryq_x_q_q0_t16_Differentiation14DifferentiableRzAcDR_AcDR0_r1_lFxq_Sdq_xq_Sdr0_ly13TangentVectorAcDPQy_AeFQzIsegnrr_Iegnnnro_TJSrSSSpSrSUSP",
 "ref": "autodiff subset parameters thunk for reverse-mode derivative from differentiation_subset_parameters_thunk.inoutIndirectCaller<A, B, C where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, C: _Differentiation.Differentiable>(A, B, C) -> B with respect to parameters {0, 1, 2} and results {0} to parameters {0, 2} of type @escaping @callee_guaranteed (@in_guaranteed A, @in_guaranteed B, @in_guaranteed Swift.Double) -> (@out B, @owned @escaping @callee_guaranteed @substituted <A, B> (@in_guaranteed A) -> (@out B, @out Swift.Double) for <B._Differentiation.Differentiable.TangentVectorA._Differentiation.Differentiable.TangentVector>)",
-"file": "autodiff subset parameters thunk for reverse-mode derivative from differentiation_subset_parameters_thunk.inoutIndirectCaller<A, B, C where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, C: _Differentiation.Differentiable>(A, B, C) -> B with respect to parameters {0, 1, 2} and results {0} to parameters {0, 2} of type @escaping @callee_guaranteed (@in_guaranteed A, @in_guaranteed B, @in_guaranteed Swift.Double) -> (@out B, @owned @escaping @callee_guaranteed @substituted <A, B> (@in_guaranteed A) -> (@out B, @out Swift.Double) for <B._Differentiation.Differentiable.TangentVectorA._Differentiation.Differentiable.TangentVector>)"
+"file": "autodiff subset parameters thunk for reverse-mode derivative from differentiation_subset_parameters_thunk.inoutIndirectCaller<A, B, C where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable, C: _Differentiation.Differentiable>(A, B, C) -> B with respect to parameters {0, 1, 2} and results {0} to parameters {0, 2} of type @escaping @callee_guaranteed (@in_guaranteed A, @in_guaranteed B, @in_guaranteed Swift.Double) -> (@out B, @owned @escaping @callee_guaranteed @substituted <A, B> (@in_guaranteed A) -> (@out B, @out Swift.Double) for <B._Differentiation.Differentiable.TangentVectorA._Differentiation.Differentiable.TangentVector>)",
+"simplified": "autodiff subset parameters thunk for reverse-mode derivative from inoutIndirectCaller<A, B, C>(_:_:_:)"
 },
 {
 "m": "$sS2f8mangling3FooV13TangentVectorVIegydd_SfAESfIegydd_TJOp",
 "ref": "autodiff self-reordering reabstraction thunk for pullback from @escaping @callee_guaranteed (@unowned Swift.Float) -> (@unowned Swift.Float, @unowned mangling.Foo.TangentVector) to @escaping @callee_guaranteed (@unowned Swift.Float) -> (@unowned mangling.Foo.TangentVector, @unowned Swift.Float)",
-"file": "autodiff self-reordering reabstraction thunk for pullback from @escaping @callee_guaranteed (@unowned Swift.Float) -> (@unowned Swift.Float, @unowned mangling.Foo.TangentVector) to @escaping @callee_guaranteed (@unowned Swift.Float) -> (@unowned mangling.Foo.TangentVector, @unowned Swift.Float)"
+"file": "autodiff self-reordering reabstraction thunk for pullback from @escaping @callee_guaranteed (@unowned Swift.Float) -> (@unowned Swift.Float, @unowned mangling.Foo.TangentVector) to @escaping @callee_guaranteed (@unowned Swift.Float) -> (@unowned mangling.Foo.TangentVector, @unowned Swift.Float)",
+"simplified": "autodiff self-reordering reabstraction thunk for @escaping @callee_guaranteed (@unowned Float) -> (@unowned Float, @unowned Foo.TangentVector)"
 },
 {
 "m": "$s13test_mangling3fooyS2f_S2ftFWJrSpSr",
 "ref": "reverse-mode differentiability witness for test_mangling.foo(Swift.Float, Swift.Float, Swift.Float) -> Swift.Float with respect to parameters {0} and results {0}",
-"file": "reverse-mode differentiability witness for test_mangling.foo(Swift.Float, Swift.Float, Swift.Float) -> Swift.Float with respect to parameters {0} and results {0}"
+"file": "reverse-mode differentiability witness for test_mangling.foo(Swift.Float, Swift.Float, Swift.Float) -> Swift.Float with respect to parameters {0} and results {0}",
+"simplified": "reverse-mode differentiability witness for foo(_:_:_:) with respect to parameters {0} and results {0}"
 },
 {
 "m": "$s13test_mangling3fooyS2f_xq_t16_Differentiation14DifferentiableR_r0_lFAcDRzAcDR_r0_lWJrUSSpSr",
 "ref": "reverse-mode differentiability witness for test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>",
-"file": "reverse-mode differentiability witness for test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>"
+"file": "reverse-mode differentiability witness for test_mangling.foo<A, B where B: _Differentiation.Differentiable>(Swift.Float, A, B) -> Swift.Float with respect to parameters {1, 2} and results {0} with <A, B where A: _Differentiation.Differentiable, B: _Differentiation.Differentiable>",
+"simplified": "reverse-mode differentiability witness for foo<A, B>(_:_:_:) with respect to parameters {1, 2} and results {0} with <A, B>"
 },
 {
 "m": "$s5async1hyyS2iYbXEF",
 "ref": "async.h(@Sendable (Swift.Int) -> Swift.Int) -> ()",
-"file": "async.h(@Sendable (Swift.Int) -> Swift.Int) -> ()"
+"file": "async.h(@Sendable (Swift.Int) -> Swift.Int) -> ()",
+"simplified": "h(_:)"
 },
 {
 "m": "$s5Actor02MyA0C17testAsyncFunctionyyYaKFTY0_",
 "ref": "(1) suspend resume partial function for Actor.MyActor.testAsyncFunction() async throws -> ()",
-"file": "(1) suspend resume partial function for Actor.MyActor.testAsyncFunction() async throws -> ()"
+"file": "(1) suspend resume partial function for Actor.MyActor.testAsyncFunction() async throws -> ()",
+"simplified": "MyActor.testAsyncFunction()"
 },
 {
 "m": "$s5Actor02MyA0C17testAsyncFunctionyyYaKFTQ1_",
 "ref": "(2) await resume partial function for Actor.MyActor.testAsyncFunction() async throws -> ()",
-"file": "(2) await resume partial function for Actor.MyActor.testAsyncFunction() async throws -> ()"
+"file": "(2) await resume partial function for Actor.MyActor.testAsyncFunction() async throws -> ()",
+"simplified": "MyActor.testAsyncFunction()"
 },
 {
 "m": "$s4diff1hyyS2iYjfXEF",
 "ref": "diff.h(@differentiable(_forward) (Swift.Int) -> Swift.Int) -> ()",
-"file": "diff.h(@differentiable(_forward) (Swift.Int) -> Swift.Int) -> ()"
+"file": "diff.h(@differentiable(_forward) (Swift.Int) -> Swift.Int) -> ()",
+"simplified": "h(_:)"
 },
 {
 "m": "$s4diff1hyyS2iYjrXEF",
 "ref": "diff.h(@differentiable(reverse) (Swift.Int) -> Swift.Int) -> ()",
-"file": "diff.h(@differentiable(reverse) (Swift.Int) -> Swift.Int) -> ()"
+"file": "diff.h(@differentiable(reverse) (Swift.Int) -> Swift.Int) -> ()",
+"simplified": "h(_:)"
 },
 {
 "m": "$s4diff1hyyS2iYjdXEF",
 "ref": "diff.h(@differentiable (Swift.Int) -> Swift.Int) -> ()",
-"file": "diff.h(@differentiable (Swift.Int) -> Swift.Int) -> ()"
+"file": "diff.h(@differentiable (Swift.Int) -> Swift.Int) -> ()",
+"simplified": "h(_:)"
 },
 {
 "m": "$s4diff1hyyS2iYjlXEF",
 "ref": "diff.h(@differentiable(_linear) (Swift.Int) -> Swift.Int) -> ()",
-"file": "diff.h(@differentiable(_linear) (Swift.Int) -> Swift.Int) -> ()"
+"file": "diff.h(@differentiable(_linear) (Swift.Int) -> Swift.Int) -> ()",
+"simplified": "h(_:)"
 },
 {
 "m": "$s4test3fooyyS2f_SfYkztYjrXEF",
 "ref": "test.foo(@differentiable(reverse) (Swift.Float, inout @noDerivative Swift.Float) -> Swift.Float) -> ()",
-"file": "test.foo(@differentiable(reverse) (Swift.Float, inout @noDerivative Swift.Float) -> Swift.Float) -> ()"
+"file": "test.foo(@differentiable(reverse) (Swift.Float, inout @noDerivative Swift.Float) -> Swift.Float) -> ()",
+"simplified": "foo(_:)"
 },
 {
 "m": "$s4test3fooyyS2f_SfYkntYjrXEF",
 "ref": "test.foo(@differentiable(reverse) (Swift.Float, __owned @noDerivative Swift.Float) -> Swift.Float) -> ()",
-"file": "test.foo(@differentiable(reverse) (Swift.Float, __owned @noDerivative Swift.Float) -> Swift.Float) -> ()"
+"file": "test.foo(@differentiable(reverse) (Swift.Float, __owned @noDerivative Swift.Float) -> Swift.Float) -> ()",
+"simplified": "foo(_:)"
 },
 {
 "m": "$s4test3fooyyS2f_SfYktYjrXEF",
 "ref": "test.foo(@differentiable(reverse) (Swift.Float, @noDerivative Swift.Float) -> Swift.Float) -> ()",
-"file": "test.foo(@differentiable(reverse) (Swift.Float, @noDerivative Swift.Float) -> Swift.Float) -> ()"
+"file": "test.foo(@differentiable(reverse) (Swift.Float, @noDerivative Swift.Float) -> Swift.Float) -> ()",
+"simplified": "foo(_:)"
 },
 {
 "m": "$s4test3fooyyS2f_SfYktYaYbYjrXEF",
 "ref": "test.foo(@differentiable(reverse) @Sendable (Swift.Float, @noDerivative Swift.Float) async -> Swift.Float) -> ()",
-"file": "test.foo(@differentiable(reverse) @Sendable (Swift.Float, @noDerivative Swift.Float) async -> Swift.Float) -> ()"
+"file": "test.foo(@differentiable(reverse) @Sendable (Swift.Float, @noDerivative Swift.Float) async -> Swift.Float) -> ()",
+"simplified": "foo(_:)"
 },
 {
 "m": "$sScA",
 "ref": "Swift.Actor",
-"file": "Swift.Actor"
+"file": "Swift.Actor",
+"simplified": "Actor"
 },
 {
 "m": "$sScGySiG",
 "ref": "Swift.TaskGroup<Swift.Int>",
-"file": "Swift.TaskGroup<Swift.Int>"
+"file": "Swift.TaskGroup<Swift.Int>",
+"simplified": "TaskGroup<Int>"
 },
 {
 "m": "$s4test10returnsOptyxycSgxyScMYccSglF",
 "ref": "test.returnsOpt<A>((@Swift.MainActor () -> A)?) -> (() -> A)?",
-"file": "test.returnsOpt<A>((@Swift.MainActor () -> A)?) -> (() -> A)?"
+"file": "test.returnsOpt<A>((@Swift.MainActor () -> A)?) -> (() -> A)?",
+"simplified": "returnsOpt<A>(_:)"
 },
 {
 "m": "$sSvSgA3ASbIetCyyd_SgSbIetCyyyd_SgD",
 "ref": "(@escaping @convention(thin) @convention(c) (@unowned Swift.UnsafeMutableRawPointer?, @unowned Swift.UnsafeMutableRawPointer?, @unowned (@escaping @convention(thin) @convention(c) (@unowned Swift.UnsafeMutableRawPointer?, @unowned Swift.UnsafeMutableRawPointer?) -> (@unowned Swift.Bool))?) -> (@unowned Swift.Bool))?",
-"file": "(@escaping @convention(thin) @convention(c) (@unowned Swift.UnsafeMutableRawPointer?, @unowned Swift.UnsafeMutableRawPointer?, @unowned (@escaping @convention(thin) @convention(c) (@unowned Swift.UnsafeMutableRawPointer?, @unowned Swift.UnsafeMutableRawPointer?) -> (@unowned Swift.Bool))?) -> (@unowned Swift.Bool))?"
+"file": "(@escaping @convention(thin) @convention(c) (@unowned Swift.UnsafeMutableRawPointer?, @unowned Swift.UnsafeMutableRawPointer?, @unowned (@escaping @convention(thin) @convention(c) (@unowned Swift.UnsafeMutableRawPointer?, @unowned Swift.UnsafeMutableRawPointer?) -> (@unowned Swift.Bool))?) -> (@unowned Swift.Bool))?",
+"simplified": "(@escaping @convention(thin) @convention(c) (@unowned UnsafeMutableRawPointer?, @unowned UnsafeMutableRawPointer?, @unowned (@escaping @convention(thin) @convention(c) (@unowned UnsafeMutableRawPointer?, @unowned UnsafeMutableRawPointer?) -> (@unowned Bool))?) -> (@unowned Bool))?"
 },
 {
 "m": "$s4test10returnsOptyxycSgxyScMYccSglF",
 "ref": "test.returnsOpt<A>((@Swift.MainActor () -> A)?) -> (() -> A)?",
-"file": "test.returnsOpt<A>((@Swift.MainActor () -> A)?) -> (() -> A)?"
+"file": "test.returnsOpt<A>((@Swift.MainActor () -> A)?) -> (() -> A)?",
+"simplified": "returnsOpt<A>(_:)"
 },
 {
 "m": "$s1t10globalFuncyyAA7MyActorCYiF",
 "ref": "t.globalFunc(isolated t.MyActor) -> ()",
-"file": "t.globalFunc(isolated t.MyActor) -> ()"
+"file": "t.globalFunc(isolated t.MyActor) -> ()",
+"simplified": "globalFunc(_:)"
 },
 {
 "m": "$sSIxip6foobarP",
 "ref": "foobar in Swift.DefaultIndices.subscript : A",
-"file": "foobar in Swift.DefaultIndices.subscript : A"
+"file": "foobar in Swift.DefaultIndices.subscript : A",
+"simplified": "foobar in DefaultIndices.subscript"
 },
 {
 "m": "$s13__lldb_expr_110$10016c2d8yXZ1B10$10016c2e0LLC",
 "ref": "__lldb_expr_1.(unknown context at $10016c2d8).(B in $10016c2e0)",
-"file": "__lldb_expr_1.(unknown context at $10016c2d8).(B in $10016c2e0)"
+"file": "__lldb_expr_1.(unknown context at $10016c2d8).(B in $10016c2e0)",
+"simplified": "B"
 },
 {
 "m": "$s__TJO",
 "ref": "$s__TJO",
-"file": "$s__TJO"
+"file": "$s__TJO",
+"simplified": "$s__TJO"
 },
 {
 "m": "$s6Foobar7Vector2VAASdRszlE10simdMatrix5scale6rotate9translateSo0C10_double3x3aACySdG_SdAJtFZ0D4TypeL_aySd__GD",
 "ref": "MatrixType #1 in static (extension in Foobar):Foobar.Vector2<Swift.Double><A where A == Swift.Double>.simdMatrix(scale: Foobar.Vector2<Swift.Double>, rotate: Swift.Double, translate: Foobar.Vector2<Swift.Double>) -> __C.simd_double3x3",
-"file": "MatrixType #1 in static (extension in Foobar):Foobar.Vector2<Swift.Double><A where A == Swift.Double>.simdMatrix(scale: Foobar.Vector2<Swift.Double>, rotate: Swift.Double, translate: Foobar.Vector2<Swift.Double>) -> __C.simd_double3x3"
+"file": "MatrixType #1 in static (extension in Foobar):Foobar.Vector2<Swift.Double><A where A == Swift.Double>.simdMatrix(scale: Foobar.Vector2<Swift.Double>, rotate: Swift.Double, translate: Foobar.Vector2<Swift.Double>) -> __C.simd_double3x3",
+"simplified": "MatrixType #1 in static Vector2<Double><A>.simdMatrix(scale:rotate:translate:)"
 },
 {
 "m": "$s17distributed_thunk2DAC1fyyFTE",
 "ref": "distributed thunk distributed_thunk.DA.f() -> ()",
-"file": "distributed thunk distributed_thunk.DA.f() -> ()"
+"file": "distributed thunk distributed_thunk.DA.f() -> ()",
+"simplified": "DA.f()"
 },
 {
 "m": "$s16distributed_test1XC7computeyS2iFTF",
 "ref": "distributed accessor for distributed_test.X.compute(Swift.Int) -> Swift.Int",
-"file": "distributed accessor for distributed_test.X.compute(Swift.Int) -> Swift.Int"
+"file": "distributed accessor for distributed_test.X.compute(Swift.Int) -> Swift.Int",
+"simplified": "X.compute(_:)"
 },
 {
 "m": "$s27distributed_actor_accessors7MyActorC7simple2ySSSiFTETFHF",
 "ref": "accessible function runtime record for distributed accessor for distributed thunk distributed_actor_accessors.MyActor.simple2(Swift.Int) -> Swift.String",
-"file": "accessible function runtime record for distributed accessor for distributed thunk distributed_actor_accessors.MyActor.simple2(Swift.Int) -> Swift.String"
+"file": "accessible function runtime record for distributed accessor for distributed thunk distributed_actor_accessors.MyActor.simple2(Swift.Int) -> Swift.String",
+"simplified": "MyActor.simple2(_:)"
 },
 {
 "m": "$s1A3bar1aySSYt_tF",
 "ref": "A.bar(a: _const Swift.String) -> ()",
-"file": "A.bar(a: _const Swift.String) -> ()"
+"file": "A.bar(a: _const Swift.String) -> ()",
+"simplified": "bar(a:)"
 },
 {
 "m": "$s1t1fyyFSiAA3StrVcs7KeyPathCyADSiGcfu_SiADcfu0_33_556644b740b1b333fecb81e55a7cce98ADSiTf3npk_n",
 "ref": "function signature specialization <Arg[1] = [Constant Propagated KeyPath : _556644b740b1b333fecb81e55a7cce98<t.Str,Swift.Int>]> of implicit closure #2 (t.Str) -> Swift.Int in implicit closure #1 (Swift.KeyPath<t.Str, Swift.Int>) -> (t.Str) -> Swift.Int in t.f() -> ()",
-"file": "function signature specialization <Arg[1] = [Constant Propagated KeyPath : _556644b740b1b333fecb81e55a7cce98<t.Str,Swift.Int>]> of implicit closure #2 (t.Str) -> Swift.Int in implicit closure #1 (Swift.KeyPath<t.Str, Swift.Int>) -> (t.Str) -> Swift.Int in t.f() -> ()"
+"file": "function signature specialization <Arg[1] = [Constant Propagated KeyPath : _556644b740b1b333fecb81e55a7cce98<t.Str,Swift.Int>]> of implicit closure #2 (t.Str) -> Swift.Int in implicit closure #1 (Swift.KeyPath<t.Str, Swift.Int>) -> (t.Str) -> Swift.Int in t.f() -> ()",
+"simplified": "specialized implicit closure #2 in implicit closure #1 in f()"
 },
 {
 "m": "$s21back_deploy_attribute0A12DeployedFuncyyFTwb",
 "ref": "back deployment thunk for back_deploy_attribute.backDeployedFunc() -> ()",
-"file": "back deployment thunk for back_deploy_attribute.backDeployedFunc() -> ()"
+"file": "back deployment thunk for back_deploy_attribute.backDeployedFunc() -> ()",
+"simplified": "backDeployedFunc()"
 },
 {
 "m": "$s21back_deploy_attribute0A12DeployedFuncyyFTwB",
 "ref": "back deployment fallback for back_deploy_attribute.backDeployedFunc() -> ()",
-"file": "back deployment fallback for back_deploy_attribute.backDeployedFunc() -> ()"
+"file": "back deployment fallback for back_deploy_attribute.backDeployedFunc() -> ()",
+"simplified": "back deployment fallback for backDeployedFunc()"
 },
 {
 "m": "$s4test3fooyyAA1P_px1TRts_XPlF",
 "ref": "test.foo<A>(any test.P<Self.T == A>) -> ()",
-"file": "test.foo<A>(any test.P<Self.T == A>) -> ()"
+"file": "test.foo<A>(any test.P<Self.T == A>) -> ()",
+"simplified": "foo<A>(_:)"
 },
 {
 "m": "$s4test3fooyyAA1P_pSS1TAaCPRts_Si1UAERtsXPF",
 "ref": "test.foo(any test.P<Self.test.P.T == Swift.String, Self.test.P.U == Swift.Int>) -> ()",
-"file": "test.foo(any test.P<Self.test.P.T == Swift.String, Self.test.P.U == Swift.Int>) -> ()"
+"file": "test.foo(any test.P<Self.test.P.T == Swift.String, Self.test.P.U == Swift.Int>) -> ()",
+"simplified": "foo(_:)"
 },
 {
 "m": "$s4test3FooVAAyyAA1P_pF",
 "ref": "test.Foo.test(test.P) -> ()",
-"file": "test.Foo.test(test.P) -> ()"
+"file": "test.Foo.test(test.P) -> ()",
+"simplified": "Foo.test(_:)"
 },
 {
 "m": "$sxxxIxzCXxxxesy",
 "ref": "$sxxxIxzCXxxxesy",
-"file": "$sxxxIxzCXxxxesy"
+"file": "$sxxxIxzCXxxxesy",
+"simplified": "$sxxxIxzCXxxxesy"
 },
 {
 "m": "$Sxxx_x_xxIxzCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC$x",
 "ref": "$Sxxx_x_xxIxzCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC$x",
-"file": "$Sxxx_x_xxIxzCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC$x"
+"file": "$Sxxx_x_xxIxzCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC$x",
+"simplified": "$Sxxx_x_xxIxzCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC$x"
 },
 {
 "m": "$sxIeghHr_xs5Error_pIegHrzo_s8SendableRzs5NeverORs_r0_lTRTATQ0_",
 "ref": "(1) await resume partial function for partial apply forwarder for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)",
-"file": "{T:$sxIeghHr_xs5Error_pIegHrzo_s8SendableRzs5NeverORs_r0_lTR} (1) await resume partial function for partial apply forwarder for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)"
+"file": "{T:$sxIeghHr_xs5Error_pIegHrzo_s8SendableRzs5NeverORs_r0_lTR} (1) await resume partial function for partial apply forwarder for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)",
+"simplified": "partial apply for thunk for @escaping @callee_guaranteed @Sendable @async () -> (@out A)"
 },
 {
 "m": "$sxIeghHr_xs5Error_pIegHrzo_s8SendableRzs5NeverORs_r0_lTRTQ0_",
 "ref": "(1) await resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)",
-"file": "{T:} (1) await resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)"
+"file": "{T:} (1) await resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)",
+"simplified": "thunk for @escaping @callee_guaranteed @Sendable @async () -> (@out A)"
 },
 {
 "m": "$sxIeghHr_xs5Error_pIegHrzo_s8SendableRzs5NeverORs_r0_lTRTY0_",
 "ref": "(1) suspend resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)",
-"file": "{T:} (1) suspend resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)"
+"file": "{T:} (1) suspend resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)",
+"simplified": "thunk for @escaping @callee_guaranteed @Sendable @async () -> (@out A)"
 },
 {
 "m": "$sxIeghHr_xs5Error_pIegHrzo_s8SendableRzs5NeverORs_r0_lTRTY_",
 "ref": "(0) suspend resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)",
-"file": "{T:} (0) suspend resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)"
+"file": "{T:} (0) suspend resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)",
+"simplified": "thunk for @escaping @callee_guaranteed @Sendable @async () -> (@out A)"
 },
 {
 "m": "$sxIeghHr_xs5Error_pIegHrzo_s8SendableRzs5NeverORs_r0_lTRTQ12_",
 "ref": "(13) await resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)",
-"file": "{T:} (13) await resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)"
+"file": "{T:} (13) await resume partial function for reabstraction thunk helper <A, B where A: Swift.Sendable, B == Swift.Never> from @escaping @callee_guaranteed @Sendable @async () -> (@out A) to @escaping @callee_guaranteed @async () -> (@out A, @error @owned Swift.Error)",
+"simplified": "thunk for @escaping @callee_guaranteed @Sendable @async () -> (@out A)"
 },
 {
 "m": "$s7Library3fooyyFTwS",
 "ref": "#_hasSymbol query for Library.foo() -> ()",
-"file": "#_hasSymbol query for Library.foo() -> ()"
+"file": "#_hasSymbol query for Library.foo() -> ()",
+"simplified": "#_hasSymbol query for foo()"
 },
 {
 "m": "$s7Library5KlassCTwS",
 "ref": "#_hasSymbol query for Library.Klass",
-"file": "#_hasSymbol query for Library.Klass"
+"file": "#_hasSymbol query for Library.Klass",
+"simplified": "#_hasSymbol query for Klass"
 },
 {
 "m": "$s14swift_ide_test14myColorLiteral3red5green4blue5alphaAA0E0VSf_S3ftcfm",
 "ref": "swift_ide_test.myColorLiteral(red: Swift.Float, green: Swift.Float, blue: Swift.Float, alpha: Swift.Float) -> swift_ide_test.Color",
-"file": "swift_ide_test.myColorLiteral(red: Swift.Float, green: Swift.Float, blue: Swift.Float, alpha: Swift.Float) -> swift_ide_test.Color"
+"file": "swift_ide_test.myColorLiteral(red: Swift.Float, green: Swift.Float, blue: Swift.Float, alpha: Swift.Float) -> swift_ide_test.Color",
+"simplified": "myColorLiteral(red:green:blue:alpha:)"
 },
 {
 "m": "$s14swift_ide_test10myFilenamexfm",
 "ref": "swift_ide_test.myFilename : A",
-"file": "swift_ide_test.myFilename : A"
+"file": "swift_ide_test.myFilename : A",
+"simplified": "myFilename"
 },
 {
 "m": "$s9MacroUser13testStringify1a1bySi_SitF9stringifyfMf1_",
 "ref": "freestanding macro expansion #3 of stringify in MacroUser.testStringify(a: Swift.Int, b: Swift.Int) -> ()",
-"file": "freestanding macro expansion #3 of stringify in MacroUser.testStringify(a: Swift.Int, b: Swift.Int) -> ()"
+"file": "freestanding macro expansion #3 of stringify in MacroUser.testStringify(a: Swift.Int, b: Swift.Int) -> ()",
+"simplified": "freestanding macro expansion #3 of stringify in testStringify(a:b:)"
 },
 {
 "m": "$s9MacroUser016testFreestandingA9ExpansionyyF4Foo3L_V23bitwidthNumberedStructsfMf_6methodfMu0_",
 "ref": "unique name #2 of method in freestanding macro expansion #1 of bitwidthNumberedStructs in Foo3 #1 in MacroUser.testFreestandingMacroExpansion() -> ()",
-"file": "unique name #2 of method in freestanding macro expansion #1 of bitwidthNumberedStructs in Foo3 #1 in MacroUser.testFreestandingMacroExpansion() -> ()"
+"file": "unique name #2 of method in freestanding macro expansion #1 of bitwidthNumberedStructs in Foo3 #1 in MacroUser.testFreestandingMacroExpansion() -> ()",
+"simplified": "unique name #2 of method in freestanding macro expansion #1 of bitwidthNumberedStructs in Foo3 #1 in testFreestandingMacroExpansion()"
 },
 {
 "m": "@__swiftmacro_1a13testStringifyAA1bySi_SitF9stringifyfMf_ ",
 "ref": "@__swiftmacro_1a13testStringifyAA1bySi_SitF9stringifyfMf_ ",
-"file": "freestanding macro expansion #1 of stringify in a.testStringify(a: Swift.Int, b: Swift.Int) -> ()"
+"file": "freestanding macro expansion #1 of stringify in a.testStringify(a: Swift.Int, b: Swift.Int) -> ()",
+"simplified": "@__swiftmacro_1a13testStringifyAA1bySi_SitF9stringifyfMf_ "
 },
 {
 "m": "@__swiftmacro_18macro_expand_peers1SV1f20addCompletionHandlerfMp_",
 "ref": "peer macro @addCompletionHandler expansion #1 of f in macro_expand_peers.S",
-"file": "peer macro @addCompletionHandler expansion #1 of f in macro_expand_peers.S"
+"file": "peer macro @addCompletionHandler expansion #1 of f in macro_expand_peers.S",
+"simplified": "peer macro @addCompletionHandler expansion #1 of f in S"
 },
 {
 "m": "@__swiftmacro_9MacroUser16MemberNotCoveredV33_4361AD9339943F52AE6186DD51E04E91Ll0dE0fMf0_",
 "ref": "freestanding macro expansion #2 of NotCovered(in _4361AD9339943F52AE6186DD51E04E91) in MacroUser.MemberNotCovered",
-"file": "freestanding macro expansion #2 of NotCovered(in _4361AD9339943F52AE6186DD51E04E91) in MacroUser.MemberNotCovered"
+"file": "freestanding macro expansion #2 of NotCovered(in _4361AD9339943F52AE6186DD51E04E91) in MacroUser.MemberNotCovered",
+"simplified": "freestanding macro expansion #2 of NotCovered in MemberNotCovered"
 },
 {
 "m": "$sxSo8_NSRangeVRlzCRl_Cr0_llySo12ModelRequestCyxq_GIsPetWAlYl_TC",
 "ref": "coroutine continuation prototype for @escaping @convention(thin) @convention(witness_method) @yield_once <A, B where A: AnyObject, B: AnyObject> @substituted <A> (@inout A) -> (@yields @inout __C._NSRange) for <__C.ModelRequest<A, B>>",
-"file": "coroutine continuation prototype for @escaping @convention(thin) @convention(witness_method) @yield_once <A, B where A: AnyObject, B: AnyObject> @substituted <A> (@inout A) -> (@yields @inout __C._NSRange) for <__C.ModelRequest<A, B>>"
+"file": "coroutine continuation prototype for @escaping @convention(thin) @convention(witness_method) @yield_once <A, B where A: AnyObject, B: AnyObject> @substituted <A> (@inout A) -> (@yields @inout __C._NSRange) for <__C.ModelRequest<A, B>>",
+"simplified": "coroutine continuation prototype for @escaping @convention(thin) @convention(witness_method) @yield_once <A, B> @substituted <A> (@inout A) -> (@yields @inout _NSRange) for <ModelRequest<A, B>>"
 },
 {
 "m": "$SyyySGSS_IIxxxxx____xsIyFSySIxx_@xIxx____xxI",
 "ref": "$SyyySGSS_IIxxxxx____xsIyFSySIxx_@xIxx____xxI",
-"file": "$SyyySGSS_IIxxxxx____xsIyFSySIxx_@xIxx____xxI"
+"file": "$SyyySGSS_IIxxxxx____xsIyFSySIxx_@xIxx____xxI",
+"simplified": "$SyyySGSS_IIxxxxx____xsIyFSySIxx_@xIxx____xxI"
 },
 {
 "m": "$s12typed_throws15rethrowConcreteyyAA7MyErrorOYKF",
 "ref": "typed_throws.rethrowConcrete() throws(typed_throws.MyError) -> ()",
-"file": "typed_throws.rethrowConcrete() throws(typed_throws.MyError) -> ()"
+"file": "typed_throws.rethrowConcrete() throws(typed_throws.MyError) -> ()",
+"simplified": "rethrowConcrete()"
 },
 {
 "m": "$s28implicit_lifetime_dependence10BufferViewVyA2ChYlscfC",
 "ref": "implicit_lifetime_dependence.BufferView.init(lifetime dependence: scope __shared implicit_lifetime_dependence.BufferView) -> implicit_lifetime_dependence.BufferView",
-"file": "{T:$s28implicit_lifetime_dependence10BufferViewVyA2ChYlscfc} implicit_lifetime_dependence.BufferView.init(lifetime dependence: scope __shared implicit_lifetime_dependence.BufferView) -> implicit_lifetime_dependence.BufferView"
+"file": "{T:$s28implicit_lifetime_dependence10BufferViewVyA2ChYlscfc} implicit_lifetime_dependence.BufferView.init(lifetime dependence: scope __shared implicit_lifetime_dependence.BufferView) -> implicit_lifetime_dependence.BufferView",
+"simplified": "BufferView.init(_:)"
 },
 {
 "m": "$s28implicit_lifetime_dependence10BufferViewVyA2CYlicfC",
 "ref": "implicit_lifetime_dependence.BufferView.init(lifetime dependence: inherit implicit_lifetime_dependence.BufferView) -> implicit_lifetime_dependence.BufferView",
-"file": "{T:$s28implicit_lifetime_dependence10BufferViewVyA2CYlicfc} implicit_lifetime_dependence.BufferView.init(lifetime dependence: inherit implicit_lifetime_dependence.BufferView) -> implicit_lifetime_dependence.BufferView"
+"file": "{T:$s28implicit_lifetime_dependence10BufferViewVyA2CYlicfc} implicit_lifetime_dependence.BufferView.init(lifetime dependence: inherit implicit_lifetime_dependence.BufferView) -> implicit_lifetime_dependence.BufferView",
+"simplified": "BufferView.init(_:)"
 },
 {
 "m": "$s28implicit_lifetime_dependence7WrapperV8getView1AA10BufferViewVyYLsF",
 "ref": "implicit_lifetime_dependence.Wrapper.getView1(self lifetime dependence: scope) () -> implicit_lifetime_dependence.BufferView",
-"file": "implicit_lifetime_dependence.Wrapper.getView1(self lifetime dependence: scope) () -> implicit_lifetime_dependence.BufferView"
+"file": "implicit_lifetime_dependence.Wrapper.getView1(self lifetime dependence: scope) () -> implicit_lifetime_dependence.BufferView",
+"simplified": "Wrapper.getView1(self lifetime dependence: scope) ()"
 },
 {
 "m": "$s28implicit_lifetime_dependence7WrapperV8getView2AA10BufferViewVyYLiF",
 "ref": "implicit_lifetime_dependence.Wrapper.getView2(self lifetime dependence: inherit) () -> implicit_lifetime_dependence.BufferView",
-"file": "implicit_lifetime_dependence.Wrapper.getView2(self lifetime dependence: inherit) () -> implicit_lifetime_dependence.BufferView"
+"file": "implicit_lifetime_dependence.Wrapper.getView2(self lifetime dependence: inherit) () -> implicit_lifetime_dependence.BufferView",
+"simplified": "Wrapper.getView2(self lifetime dependence: inherit) ()"
 },
 {
 "m": "$s3red3use2fnySiyYAXE_tF",
 "ref": "red.use(fn: @isolated(any) () -> Swift.Int) -> ()",
-"file": "red.use(fn: @isolated(any) () -> Swift.Int) -> ()"
+"file": "red.use(fn: @isolated(any) () -> Swift.Int) -> ()",
+"simplified": "use(fn:)"
 },
 {
 "m": "$s4testAAyAA5KlassC_ACtACnYTF",
 "ref": "test.test(__owned test.Klass) -> sending (test.Klass, test.Klass)",
-"file": "test.test(__owned test.Klass) -> sending (test.Klass, test.Klass)"
+"file": "test.test(__owned test.Klass) -> sending (test.Klass, test.Klass)",
+"simplified": "test(_:)"
 },
 {
 "m": "$s5test24testyyAA5KlassCnYuF",
 "ref": "test2.test(sending __owned test2.Klass) -> ()",
-"file": "test2.test(sending __owned test2.Klass) -> ()"
+"file": "test2.test(sending __owned test2.Klass) -> ()",
+"simplified": "test(_:)"
 },
 {
 "m": "$s7ElementSTQzqd__s5Error_pIgnrzo_ABqd__sAC_pIegnrzr_SlRzr__lTR",
 "ref": "reabstraction thunk helper <A><A1 where A: Swift.Collection> from @callee_guaranteed (@in_guaranteed A.Swift.Sequence.Element) -> (@out A1, @error @owned Swift.Error) to @escaping @callee_guaranteed (@in_guaranteed A.Swift.Sequence.Element) -> (@out A1, @error @out Swift.Error)",
-"file": "{T:} reabstraction thunk helper <A><A1 where A: Swift.Collection> from @callee_guaranteed (@in_guaranteed A.Swift.Sequence.Element) -> (@out A1, @error @owned Swift.Error) to @escaping @callee_guaranteed (@in_guaranteed A.Swift.Sequence.Element) -> (@out A1, @error @out Swift.Error)"
+"file": "{T:} reabstraction thunk helper <A><A1 where A: Swift.Collection> from @callee_guaranteed (@in_guaranteed A.Swift.Sequence.Element) -> (@out A1, @error @owned Swift.Error) to @escaping @callee_guaranteed (@in_guaranteed A.Swift.Sequence.Element) -> (@out A1, @error @out Swift.Error)",
+"simplified": "thunk for @callee_guaranteed (@in_guaranteed A.Sequence.Element) -> (@out A1, @error @owned Error)"
 },
 {
 "m": "$sS3fIedgyywTd_D",
 "ref": "@escaping @differentiable @callee_guaranteed (@unowned Swift.Float, @unowned @noDerivative sending Swift.Float) -> (@unowned Swift.Float)",
-"file": "@escaping @differentiable @callee_guaranteed (@unowned Swift.Float, @unowned @noDerivative sending Swift.Float) -> (@unowned Swift.Float)"
+"file": "@escaping @differentiable @callee_guaranteed (@unowned Swift.Float, @unowned @noDerivative sending Swift.Float) -> (@unowned Swift.Float)",
+"simplified": "@escaping @differentiable @callee_guaranteed (@unowned Float, @unowned @noDerivative sending Float) -> (@unowned Float)"
 },
 {
 "m": "$sS3fIedgyyTd_D",
 "ref": "@escaping @differentiable @callee_guaranteed (@unowned Swift.Float, @unowned sending Swift.Float) -> (@unowned Swift.Float)",
-"file": "@escaping @differentiable @callee_guaranteed (@unowned Swift.Float, @unowned sending Swift.Float) -> (@unowned Swift.Float)"
+"file": "@escaping @differentiable @callee_guaranteed (@unowned Swift.Float, @unowned sending Swift.Float) -> (@unowned Swift.Float)",
+"simplified": "@escaping @differentiable @callee_guaranteed (@unowned Float, @unowned sending Float) -> (@unowned Float)"
 },
 {
 "m": "$s4testA2A5KlassCyYTF",
 "ref": "test.test() -> sending test.Klass",
-"file": "test.test() -> sending test.Klass"
+"file": "test.test() -> sending test.Klass",
+"simplified": "test()"
 },
 {
 "m": "$s4main5KlassCACYTcMD",
 "ref": "demangling cache variable for type metadata for (main.Klass) -> sending main.Klass",
-"file": "demangling cache variable for type metadata for (main.Klass) -> sending main.Klass"
+"file": "demangling cache variable for type metadata for (main.Klass) -> sending main.Klass",
+"simplified": "demangling cache variable for type metadata for (_:)"
 },
 {
 "m": "$s4null19transferAsyncResultAA16NonSendableKlassCyYaYTF",
 "ref": "null.transferAsyncResult() -> sending null.NonSendableKlass",
-"file": "null.transferAsyncResult() -> sending null.NonSendableKlass"
+"file": "null.transferAsyncResult() -> sending null.NonSendableKlass",
+"simplified": "transferAsyncResult()"
 },
 {
 "m": "$s4null16NonSendableKlassCIegHo_ACs5Error_pIegHTrzo_TR",
 "ref": "reabstraction thunk helper from @escaping @callee_guaranteed @async () -> (@owned null.NonSendableKlass) to @escaping @callee_guaranteed @async () -> sending (@out null.NonSendableKlass, @error @owned Swift.Error)",
-"file": "{T:} reabstraction thunk helper from @escaping @callee_guaranteed @async () -> (@owned null.NonSendableKlass) to @escaping @callee_guaranteed @async () -> sending (@out null.NonSendableKlass, @error @owned Swift.Error)"
+"file": "{T:} reabstraction thunk helper from @escaping @callee_guaranteed @async () -> (@owned null.NonSendableKlass) to @escaping @callee_guaranteed @async () -> sending (@out null.NonSendableKlass, @error @owned Swift.Error)",
+"simplified": "thunk for @escaping @callee_guaranteed @async () -> (@owned NonSendableKlass)"
 },
 {
 "m": "$sSRyxG15Synchronization19AtomicRepresentableABRi_zrlMc",
 "ref": "protocol conformance descriptor for < where A: ~Swift.Copyable> Swift.UnsafeBufferPointer<A> : Synchronization.AtomicRepresentable in Synchronization",
-"file": "protocol conformance descriptor for < where A: ~Swift.Copyable> Swift.UnsafeBufferPointer<A> : Synchronization.AtomicRepresentable in Synchronization"
+"file": "protocol conformance descriptor for < where A: ~Swift.Copyable> Swift.UnsafeBufferPointer<A> : Synchronization.AtomicRepresentable in Synchronization",
+"simplified": "protocol conformance descriptor for <> UnsafeBufferPointer<A>"
 },
 {
 "m": "$sSRyxG15Synchronization19AtomicRepresentableABRi0_zrlMc",
 "ref": "protocol conformance descriptor for < where A: ~Swift.Escapable> Swift.UnsafeBufferPointer<A> : Synchronization.AtomicRepresentable in Synchronization",
-"file": "protocol conformance descriptor for < where A: ~Swift.Escapable> Swift.UnsafeBufferPointer<A> : Synchronization.AtomicRepresentable in Synchronization"
+"file": "protocol conformance descriptor for < where A: ~Swift.Escapable> Swift.UnsafeBufferPointer<A> : Synchronization.AtomicRepresentable in Synchronization",
+"simplified": "protocol conformance descriptor for <> UnsafeBufferPointer<A>"
 },
 {
 "m": "$sSRyxG15Synchronization19AtomicRepresentableABRi1_zrlMc",
 "ref": "protocol conformance descriptor for < where A: ~Swift.<bit 2>> Swift.UnsafeBufferPointer<A> : Synchronization.AtomicRepresentable in Synchronization",
-"file": "protocol conformance descriptor for < where A: ~Swift.<bit 2>> Swift.UnsafeBufferPointer<A> : Synchronization.AtomicRepresentable in Synchronization"
+"file": "protocol conformance descriptor for < where A: ~Swift.<bit 2>> Swift.UnsafeBufferPointer<A> : Synchronization.AtomicRepresentable in Synchronization",
+"simplified": "protocol conformance descriptor for <> UnsafeBufferPointer<A>"
 },
 {
 "m": "$s23variadic_generic_opaque2G2VyAA2S1V_AA2S2VQPGAA1PHPAeA1QHPyHC_AgaJHPyHCHX_HC",
 "ref": "concrete protocol conformance variadic_generic_opaque.G2<Pack{variadic_generic_opaque.S1, variadic_generic_opaque.S2}> to protocol conformance ref (type's module) variadic_generic_opaque.P with conditional requirements: (pack protocol conformance (concrete protocol conformance variadic_generic_opaque.S1 to protocol conformance ref (type's module) variadic_generic_opaque.Q, concrete protocol conformance variadic_generic_opaque.S2 to protocol conformance ref (type's module) variadic_generic_opaque.Q))",
-"file": "concrete protocol conformance variadic_generic_opaque.G2<Pack{variadic_generic_opaque.S1, variadic_generic_opaque.S2}> to protocol conformance ref (type's module) variadic_generic_opaque.P with conditional requirements: (pack protocol conformance (concrete protocol conformance variadic_generic_opaque.S1 to protocol conformance ref (type's module) variadic_generic_opaque.Q, concrete protocol conformance variadic_generic_opaque.S2 to protocol conformance ref (type's module) variadic_generic_opaque.Q))"
+"file": "concrete protocol conformance variadic_generic_opaque.G2<Pack{variadic_generic_opaque.S1, variadic_generic_opaque.S2}> to protocol conformance ref (type's module) variadic_generic_opaque.P with conditional requirements: (pack protocol conformance (concrete protocol conformance variadic_generic_opaque.S1 to protocol conformance ref (type's module) variadic_generic_opaque.Q, concrete protocol conformance variadic_generic_opaque.S2 to protocol conformance ref (type's module) variadic_generic_opaque.Q))",
+"simplified": "concrete protocol conformance G2<Pack{S1, S2}> to protocol conformance ref (type's module) P with conditional requirements: (pack protocol conformance (concrete protocol conformance S1 to protocol conformance ref (type's module) Q, concrete protocol conformance S2 to protocol conformance ref (type's module) Q))"
 },
 {
 "m": "$s9MacroUser0023macro_expandswift_elFCffMX436_4_23bitwidthNumberedStructsfMf_",
 "ref": "freestanding macro expansion #1 of bitwidthNumberedStructs in module MacroUser file macro_expand.swift line 437 column 5",
-"file": "freestanding macro expansion #1 of bitwidthNumberedStructs in module MacroUser file macro_expand.swift line 437 column 5"
+"file": "freestanding macro expansion #1 of bitwidthNumberedStructs in module MacroUser file macro_expand.swift line 437 column 5",
+"simplified": "freestanding macro expansion #1 of bitwidthNumberedStructs in module MacroUser file macro_expand.swift line 437 column 5"
 }
 ]

@@ -36,7 +36,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | inspect_macho / trace_dylib_resolution | src/native | extras | covered | covered | load commands, rpath expansion, code signature and entitlements |
 | inspect_go_binary | src/go | extras + core | covered | covered | pclntab across Go 1.2 to 1.22+ magics even on stripped binaries, plus buildinfo deps |
 | inspect_rust_binary | src/rust | extras + core | partial | covered | x_rust_info: rustc version, crates from paths, v0 and legacy demangle |
-| demangle-swift (CLI) | src/cli | extras | missing | partial | scheme detection in the tools; a port of the Swift 6.0.3 new mangling demangler is in the tree (223 of 223 test symbols match swift-demangle) but not exposed as a tool yet |
+| demangle-swift (CLI) | src/cli | extras | missing | covered | pure TS port of swift-demangle 6.0.3 (old _T and new $s/$S/_T0 mangling): 470/470 swift test vectors and 1947/1947 Maccy symbols identical, default and simplified; in x_demangle, x_swift_demangle and x-swift-demangle; rea needs a native helper |
 | match_native_functions / compare_functions | src/native | disasm | partial | covered | disasm_match_functions maps functions across builds by code, strings, calls, CFG shape and neighbors (95 percent or better on stripped Lua and esbuild versions); disasm_compare_functions diffs two functions with addresses normalized; also in the web Labs |
 | trace_native_values / resolve_native_call_targets | src/native | disasm | missing | covered | disasm_trace_values follows values backward to call arguments and forward to sinks; disasm_indirect_targets resolves jump tables, pointer tables, constants and C++ vtable slots |
 | inspect_native_api / inspect_native_dispatch_metadata / inspect_native_data_type | src/native | disasm | missing | missing | left: ObjC/Swift dispatch metadata and type libraries |
@@ -167,7 +167,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | state | covered | partial | missing |
 |---|---|---|---|
 | before | 49 | 26 | 40 |
-| after | 80 | 26 | 9 |
+| after | 81 | 25 | 9 |
 
 ## Where RevLens already exceeds rea
 
@@ -177,7 +177,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 - Report outputs for humans and CI: SARIF, CycloneDX, HTML and Markdown.
 - Extension and package supply chain audits: VSIX, npm tarballs, browser extensions.
 - Authenticode verification that recomputes the PE digest and checks the signature, not only listing certificates.
-- Demanglers for Itanium C++, Rust legacy and v0, and MSVC in pure TS (rea ships Swift demangling through a native helper only).
+- Demanglers for Itanium C++, Rust legacy and v0, MSVC and Swift in pure TS, Swift verified identical to swift-demangle 6.0.3 (rea ships Swift demangling through a native helper only).
 - Go symbol recovery from pclntab on stripped binaries across all Go magics, in TS.
 - Claims ledger where every claim is bound to a byte range hash and can be re-verified by any reader without the original session.
 - pcap DNS, HTTP, SNI and JA3 in TS with no tshark dependency.

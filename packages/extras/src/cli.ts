@@ -27,7 +27,7 @@ function parseArgs(argv: string[], tool: ToolDef): { input: Record<string, unkno
       else input[key] = val;
     } else rest.push(a);
   }
-  const looksMangled = (a: string) => /^(_Z|__Z|_R|__R|\?)/.test(a);
+  const looksMangled = (a: string) => /^(_Z|__Z|_R|__R|\?|_?_?\$[sS]|_?_T|@__swiftmacro_)/.test(a);
   if (tool.inputSchema.symbols && rest.length && rest.every(looksMangled)) input.symbols = rest.splice(0);
   if (rest.length && tool.inputSchema.path && input.path === undefined) input.path = rest.shift();
   return { input, json };
@@ -82,7 +82,8 @@ function command(cmd: string, toolName: string, summary: string): CliCommand {
 }
 
 export const CLI_COMMANDS: CliCommand[] = [
-  command('x-demangle', 'x_demangle', 'Demangle C++, Rust and MSVC names, or a binary symbol table'),
+  command('x-demangle', 'x_demangle', 'Demangle C++, Rust, MSVC and Swift names, or a binary symbol table'),
+  command('x-swift-demangle', 'x_swift_demangle', 'Demangle Swift names like swift-demangle, with --simplified and --tree'),
   command('x-container', 'x_container', 'Sections and segments of ELF, PE or Mach-O'),
   command('x-read-bytes', 'x_read_bytes', 'Hex dump at a file offset or virtual address'),
   command('x-search-bytes', 'x_search_bytes', 'Search a hex pattern with wildcards or a string'),

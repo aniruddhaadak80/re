@@ -15,6 +15,7 @@ import { jsonSafe } from './tools.js';
 import { parseWxapkgAny, wxapkgMember } from './containers/wxapkg.js';
 import { parseUnityFs, unityNodeBytes, parseSerializedFile } from './containers/unityfs.js';
 import { inspectStandaloneJs, standaloneFile } from './containers/standalone.js';
+import { demangleSwift, demangleSwiftTree, Node as SwiftNode } from './demangle/swift/index.js';
 
 const P = PATH_INPUT;
 const LIMIT: Record<string, InputSpec> = {
@@ -181,4 +182,55 @@ export const CONTAINER_TOOLS: ToolDef[] = [
   },
 ];
 
-export const GAP_TOOLS: ToolDef[] = [...WINDOWS_TOOLS, ...APPLE_TOOLS, ...CONTAINER_TOOLS];
+interface SwiftTreeJson { kind: string; text?: string; index?: number; children?: SwiftTreeJson[] }
+
+/** Swift node tree as plain JSON, capped at 64 levels and 4000 nodes. */
+export function swiftTreeJson(n: SwiftNode, budget = { left: 4000 }, depth = 0): SwiftTreeJson {
+  budget.left--;
+  const o: SwiftTreeJson = { kind: n.kind };
+  if (n.text !== undefined) o.text = n.text;
+  if (n.index !== undefined) o.index = n.index;
+  if (n.children.length) {
+    if (depth >= 64 || budget.left <= 0) o.children = [{ kind: '[truncated]' }];
+    else o.children = n.children.map((c) => (budget.left > 0 ? swiftTreeJson(c, budget, depth + 1) : { kind: '[truncated]' }));
+  }
+  return o;
+}
+
+/** Demangle Swift symbols like swift-demangle 6.0.3; output is null when a name does not demangle. */
+export function swiftDemangleSymbols(symbols: string[], opts: { simplified?: boolean; tree?: boolean } = {}): { input: string; output: string | null; tree?: SwiftTreeJson | null }[] {
+  return symbols.slice(0, 10000).map((raw) => {
+    const sym = raw.startsWith('__T') || raw.startsWith('__$') ? raw.slice(1) : raw;
+    const output = demangleSwift(sym, { simplified: !!opts.simplified });
+    if (!opts.tree) return { input: raw, output };
+    const t = demangleSwiftTree(sym);
+    return { input: raw, output, tree: t ? swiftTreeJson(t) : null };
+  });
+}
+
+const SWIFT_TOOLS: ToolDef[] = [
+  {
+    name: 'x_swift_demangle',
+    description: 'Demangle Swift symbols (Swift 1 to 3 _T, Swift 4 _T0, Swift 4.x $S, Swift 5+ $s, macro @__swiftmacro_), matching swift-demangle 6.0.3 text. Optional simplified form and node tree. With a binary path, lists the Swift symbols of its symbol table.',
+    inputSchema: {
+      symbols: { type: 'array', description: 'Mangled Swift names', optional: true },
+      ...P,
+      simplified: { type: 'boolean', description: 'Short form like swift-demangle -simplified', optional: true },
+      tree: { type: 'boolean', description: 'Include the demangler node tree (capped) for each symbol', optional: true },
+      filter: { type: 'string', description: 'With a path: keep demangled names containing this text', optional: true },
+      ...LIMIT,
+    },
+    async run(i) {
+      if (Array.isArray(i.symbols) || typeof i.symbols === 'string') {
+        const list: string[] = (Array.isArray(i.symbols) ? i.symbols : [i.symbols]).map(String);
+        return { items: swiftDemangleSymbols(list, { simplified: !!i.simplified, tree: !!i.tree }) };
+      }
+      const { TOOLS } = await import('./tools.js');
+      const all = await TOOLS.find((t) => t.name === 'x_demangle')!.run({ ...i, limit: 1000000, offset: 0 }) as { items: { mangled: string; demangled: string; scheme: string; address: string }[] };
+      const rows = all.items.filter((r) => r.scheme === 'swift').map((r) => (i.simplified ? { ...r, demangled: swiftDemangleSymbols([r.mangled], { simplified: true })[0]!.output ?? r.demangled } : r));
+      return page(rows, num(i.offset, 0), num(i.limit, 200));
+    },
+  },
+];
+
+export const GAP_TOOLS: ToolDef[] = [...WINDOWS_TOOLS, ...APPLE_TOOLS, ...CONTAINER_TOOLS, ...SWIFT_TOOLS];
