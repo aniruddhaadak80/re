@@ -1,6 +1,6 @@
 # RevLens tool map
 
-Generated from the server by scripts/gen-tool-docs.mjs. 185 tools.
+Generated from the server by scripts/gen-tool-docs.mjs. 195 tools.
 
 ## Core triage and evidence
 
@@ -121,6 +121,16 @@ Generated from the server by scripts/gen-tool-docs.mjs. 185 tools.
 - `x_ledger_import` (writes files): Import an exported ledger after checking its schema and hash chain. Replaces the session ledger, or writes ledgerPath.
 - `x_eval_tasks` (reads only): Reverse engineering eval tasks with hidden ground truth on the RevLens sample fixtures. Answer them with any tools, then score with x_eval_score.
 - `x_eval_score` (reads only): Score answers to x_eval_tasks against ground truth verified with reference tools. Pass answers as {taskId: answer}.
+- `x_registry_hive` (reads only): Windows registry hive (regf: SYSTEM, SOFTWARE, SAM, NTUSER.DAT, UsrClass.dat, Amcache.hve, BCD). Without key: header (dirty flag, checksum), root and totals. With key: that key, its subkeys and decoded values. With recur
+- `x_prefetch` (reads only): Windows Prefetch (.pf) file, XP to 11, including Windows 10+ MAM (LZXPRESS Huffman) compressed files: executable, hash, run count, last 8 run times, loaded files, volumes with serials and directories.
+- `x_jump_list` (reads only): Windows Jump Lists: *.automaticDestinations-ms (DestList entries with path, pin state, access count, host, droid ids, and each embedded shell link) and *.customDestinations-ms (shell links by offset).
+- `x_ole_compound` (reads only): OLE compound file (MSI, legacy Office, Jump Lists, thumbs.db): directory entries with paths, sizes, CLSIDs and times; optionally the hex of one stream.
+- `x_keyed_archive` (reads only): Decode an NSKeyedArchiver archive (binary or XML plist, for example .nib keyed archives, NSUserDefaults blobs, iOS backups, saved state): resolves CF$UID references from $top into plain JSON, maps Foundation classes, lis
+- `x_nib` (reads only): Compiled Interface Builder file (.nib from ibtool, NIBArchive format; keyed-archive nibs are decoded too): class histogram, user visible strings, outlet and action connections, custom classes, and the raw objects with ty
+- `x_asset_catalog` (reads only): Compiled asset catalog (Assets.car, a BOM store): CoreUI header and authoring tool, deployment target, key format, facets (asset names), appearances, and every rendition with name, asset, size, scale, pixel format, layou
+- `x_wxapkg` (reads only): WeChat mini program package (.wxapkg): member table with offsets and sizes, app config, pages, kind (main, subpackage, plugin, game). Decrypts PC client V1MMWX packages when appId is given. With member, returns that file
+- `x_unity_bundle` (reads only): Unity asset bundle (UnityFS): header, Unity version, blocks (compression), node table; each serialized file summarised with target platform, types and objects by class (path id, offset, size). LZ4/LZ4HC and uncompressed 
+- `x_standalone_js` (reads only): JavaScript apps packed into one executable: Node.js SEA (fuse state, NODE_SEA_BLOB with entry script, code cache, assets, exec argv), Bun --compile (embedded module graph with sources) and Deno compile (metadata JSON, en
 
 ## Desktop apps, processes and UI trees
 

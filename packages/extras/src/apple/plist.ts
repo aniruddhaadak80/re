@@ -105,7 +105,7 @@ export function parseXmlPlistText(xml: string, opts: { maxObjects?: number } = {
       case 'true': return true;
       case 'false': return false;
       case 'string': return t.empty ? '' : text('string');
-      case 'integer': { const s = text('integer').trim(); const n = Number(s); return Number.isSafeInteger(n) ? n : BigInt(s); }
+      case 'integer': { const s = text('integer').trim(); const n = Number(s); if (Number.isSafeInteger(n)) return n; if (!/^[+-]?(?:\d{1,40}|0x[0-9a-f]{1,32})$/i.test(s)) throw new ParseError(`bad <integer> ${JSON.stringify(s.slice(0, 40))}`); return s.startsWith('-') ? -BigInt(s.slice(1)) : BigInt(s.replace(/^\+/, '')); }
       case 'real': return Number(text('real'));
       case 'date': return { $date: new Date(text('date').trim()).toISOString() };
       case 'data': { const s = t.empty ? '' : text('data').replace(/\s+/g, ''); let bin = ''; try { bin = atob(s); } catch { throw new ParseError('bad base64 in <data>'); } let h = ''; for (let i = 0; i < bin.length; i++) h += bin.charCodeAt(i).toString(16).padStart(2, '0'); return { $data: h, length: bin.length }; }
