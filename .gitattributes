@@ -1,0 +1,2 @@
+# Test fixtures and reference outputs are compared byte for byte, so git must never rewrite their line endings.
+samples/** -text

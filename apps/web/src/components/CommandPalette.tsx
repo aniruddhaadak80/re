@@ -11,7 +11,7 @@ import { cx } from '../lib/util';
 interface Item { id: string; group: string; label: string; hint?: string; icon: JSX.Element; run: () => void }
 
 export const PAGES = [
-  { to: '/', label: 'Home' }, { to: '/analyze', label: 'Analyze' }, { to: '/diff', label: 'Diff' }, { to: '/verify', label: 'Verify' },
+  { to: '/', label: 'Home' }, { to: '/analyze', label: 'Analyze' }, { to: '/labs', label: 'Tools' }, { to: '/labs/disassembler', label: 'Disassembler' }, { to: '/diff', label: 'Diff' }, { to: '/verify', label: 'Verify' },
   { to: '/docs', label: 'Docs' }, { to: '/blog', label: 'Blog' }, { to: '/about', label: 'About' }, { to: '/changelog', label: 'Changelog' }, { to: '/settings', label: 'Settings' },
 ];
 

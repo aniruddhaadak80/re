@@ -231,6 +231,7 @@ test('command palette opens with Ctrl+K and jumps to a page', async ({ page }) =
   await page.keyboard.press('Control+k');
   await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible();
   await page.keyboard.type('Verify');
+  await expect(page.getByRole('dialog', { name: 'Command palette' }).getByText('Verify', { exact: true }).first()).toBeVisible();
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/re\/verify$/);
   await expect(page.locator('h1')).toContainText('Check a claim');
