@@ -8,19 +8,40 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-    "./node": { "types": "./dist/node.d.ts", "default": "./dist/node.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
+    }
   },
-  "files": ["dist"],
-  "scripts": { "build": "tsc -p tsconfig.json" },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
   "dependencies": {
+    "@revlens/bridges": "1.0.0",
     "@revlens/core": "1.0.0",
     "@revlens/disasm": "1.0.0",
     "@revlens/managed": "1.0.0",
     "@revlens/mobile": "1.0.0",
     "@revlens/webrt": "1.0.0"
   },
-  "engines": { "node": ">=20.10.0" },
-  "keywords": ["reverse-engineering", "revlens", "engine"],
-  "repository": { "type": "git", "url": "https://github.com/aniruddhaadak80/re.git", "directory": "packages/engine" }
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "keywords": [
+    "reverse-engineering",
+    "revlens",
+    "engine"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aniruddhaadak80/re.git",
+    "directory": "packages/engine"
+  }
 }

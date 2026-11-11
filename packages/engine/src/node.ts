@@ -5,8 +5,9 @@ import * as managed from '@revlens/managed';
 import * as webrt from '@revlens/webrt/node';
 import * as mobile from '@revlens/mobile/node';
 import * as disasm from '@revlens/disasm/node';
-import { analyzeAll, type EngineOptions } from './index.js';
-import type { Report } from '@revlens/core';
+import * as bridges from '@revlens/bridges/node';
+import { analyzeAll, ALL_ANALYZERS, type EngineOptions } from './index.js';
+import type { Analyzer, Report } from '@revlens/core';
 
 export * from './index.js';
 
@@ -43,7 +44,23 @@ export const TOOL_GROUPS: ToolGroup[] = [
   { id: 'managed', npm: '@revlens/managed', title: 'Managed and bytecode runtimes', tools: managed.TOOLS as unknown as PackageTool[], commands: managed.CLI_COMMANDS as PackageCommand[] },
   { id: 'web', npm: '@revlens/webrt', title: 'Web runtime', tools: webrt.TOOLS as unknown as PackageTool[], commands: webrt.CLI_COMMANDS as PackageCommand[] },
   { id: 'disasm', npm: '@revlens/disasm', title: 'Native code', tools: disasm.TOOLS as unknown as PackageTool[], commands: disasm.CLI_COMMANDS as PackageCommand[] },
+  // bridges' own commands (doctor, setup, bridge) are top level CLI commands, see TOP_LEVEL_COMMANDS
+  { id: 'bridges', npm: '@revlens/bridges', title: 'External tool bridges', tools: bridges.TOOLS as unknown as PackageTool[], commands: [] },
 ];
+
+/** CLI commands that live at the top level: revlens doctor, revlens setup <client>, revlens bridge <tool>. */
+export const TOP_LEVEL_COMMANDS: PackageCommand[] = bridges.CLI_COMMANDS as PackageCommand[];
+
+/**
+ * Node-only analyzers. The bridges analyzers (bridges-inventory, bridges-r2, bridges-jadx) only run when
+ * named in options.analyzers or when REVLENS_BRIDGES=1, because they start external programs.
+ */
+export const NODE_ANALYZERS: Analyzer[] = bridges.ANALYZERS as Analyzer[];
+
+/** analyzeAll plus the Node-only analyzers. */
+export async function analyzeAllNode(bytes: Uint8Array, opts: EngineOptions = {}): Promise<Report> {
+  return analyzeAll(bytes, { ...opts, extraAnalyzers: [...(opts.extraAnalyzers ?? []), ...NODE_ANALYZERS] });
+}
 
 /** All package tools, flat. Names are unique across packages (each is prefixed with its area). */
 export const PACKAGE_TOOLS: (PackageTool & { group: string })[] = TOOL_GROUPS.flatMap((g) => g.tools.map((t) => ({ ...t, group: g.id })));
@@ -57,6 +74,11 @@ export const TOOL_EFFECTS: Record<string, { writes?: boolean; network?: boolean;
   web_asar_extract: { writes: true },
   web_sourcemap_recover: { writes: true },
   web_browser_capture: { network: true, executes: true },
+  bridge_frida_run: { executes: true },
+  bridge_gdb_run: { executes: true },
+  bridge_adb_pull_apk: { writes: true },
+  bridge_adb_logcat: { network: true },
+  bridge_setup_mcp: { writes: true },
 };
 
 const MAX_FILE = Number(process.env.REVLENS_MAX_FILE_MB ?? 256) * 1024 * 1024;
@@ -76,5 +98,11 @@ export function readInput(path: string, maxBytes = MAX_FILE): { bytes: Uint8Arra
 /** Analyze a file on disk with core plus every package. */
 export async function analyzeFile(path: string, opts: EngineOptions = {}): Promise<Report> {
   const { bytes, abs } = readInput(path);
-  return analyzeAll(bytes, { name: basename(abs), ...opts });
+  return analyzeAllNode(bytes, { name: basename(abs), ...opts });
 }
+
+/** Every analyzer, including the opt in Node-only ones. */
+export const ALL_ANALYZERS_NODE = [
+  ...ALL_ANALYZERS,
+  ...NODE_ANALYZERS.map((a) => ({ id: a.id, title: a.title, description: `${a.description} (opt in)`, package: 'bridges' })),
+];

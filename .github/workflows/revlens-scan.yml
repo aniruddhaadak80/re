@@ -31,7 +31,7 @@ jobs:
       - run: npm run build
       - run: npm run build:web
       - name: Scan shipped bundles to SARIF
-        run: node scripts/self-scan.mjs --min medium --out revlens.sarif packages/core/dist packages/engine/dist packages/managed/dist packages/webrt/dist packages/mobile/dist packages/disasm/dist packages/cli/dist packages/mcp/dist apps/web/dist
+        run: node scripts/self-scan.mjs --min medium --out revlens.sarif packages/core/dist packages/engine/dist packages/managed/dist packages/webrt/dist packages/mobile/dist packages/disasm/dist packages/bridges/dist packages/cli/dist packages/mcp/dist apps/web/dist
       - uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
           sarif_file: revlens.sarif

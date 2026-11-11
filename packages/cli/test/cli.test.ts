@@ -9,7 +9,8 @@ import { tmpdir } from 'node:os';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const S = (p: string) => join(root, 'samples', p);
-const run = (...args: string[]) => execFileSync(process.execPath, ['--import', 'tsx', join(root, 'packages/cli/src/index.ts'), ...args], { cwd: root, encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' }, maxBuffer: 64 * 1024 * 1024, timeout: 90_000 });
+const runIn = (cwd: string, ...args: string[]) => execFileSync(process.execPath, ['--import', import.meta.resolve('tsx'), join(root, 'packages/cli/src/index.ts'), ...args], { cwd, encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' }, maxBuffer: 64 * 1024 * 1024, timeout: 90_000 });
+const run = (...args: string[]) => runIn(root, ...args);
 
 test('help shows core commands and every area', () => {
   const h = run('--help');
@@ -44,9 +45,12 @@ test('analyze gives one combined report', () => {
   assert.equal(JSON.parse(run('analyze', S('disasm/hello-arm64.elf'), '--json', '--packages', 'mobile')).meta.disasm, undefined);
 });
 
-test('setup writes a merged Cursor config', () => {
+test('setup writes a project Cursor config, doctor and bridge list run at the top level', () => {
   const dir = mkdtempSync(join(tmpdir(), 'revlens-setup-'));
-  run('setup', 'cursor', '--write', '--dir', dir);
+  runIn(dir, 'setup', 'cursor', '--scope', 'project', '--write');
   const cfg = JSON.parse(readFileSync(join(dir, '.cursor/mcp.json'), 'utf8'));
-  assert.deepEqual(cfg.mcpServers.revlens.args, ['-y', '@revlens/mcp@latest']);
+  assert.ok(JSON.stringify(cfg.mcpServers.revlens.args).includes('@revlens/mcp'));
+  assert.ok(JSON.parse(run('doctor', '--json')));
+  assert.match(run('bridge', 'list'), /r2_functions/);
+  assert.match(run('--help'), /revlens doctor/);
 });

@@ -56,6 +56,6 @@ test('registry lists analyzers, tools and commands from every package', () => {
   assert.ok(ALL_ANALYZERS.some((a) => a.package === 'disasm'));
   const names = PACKAGE_TOOLS.map((t) => t.name);
   assert.equal(new Set(names).size, names.length);
-  assert.equal(names.length, 47);
+  assert.equal(names.length, 47 + 27);
   assert.equal(TOOL_GROUPS.reduce((n, g) => n + g.commands.length, 0), 42);
 });

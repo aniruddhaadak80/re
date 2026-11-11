@@ -1,10 +1,12 @@
-# Integration workflow for @revlens/bridges. The integrator copies this file to
-# .github/workflows/bridges-integration.yml. It installs real tools on Ubuntu x64 and runs
+# Integration workflow for @revlens/bridges (source: packages/bridges/ci/integration.yml). It installs real tools on Ubuntu x64 and runs
 # packages/bridges/test/integration.test.ts, which skips any test whose tool is missing.
-name: bridges-integration
+name: Bridges integration
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['packages/bridges/**', 'samples/bridges/**', '.github/workflows/bridges-integration.yml']
   pull_request:
     paths: ['packages/bridges/**', 'samples/bridges/**']
   schedule:
@@ -22,16 +24,18 @@ jobs:
       GHIDRA_URL: https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.2_build/ghidra_12.2_PUBLIC_20261016.zip
       JADX_VERSION: '1.5.6'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: npm
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
         with:
           distribution: temurin
           java-version: '25'
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: '8.0.x'
 

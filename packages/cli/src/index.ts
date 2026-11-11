@@ -6,9 +6,8 @@ import {
   diff, verifyClaim, scanRules, STARTER_RULES, toSARIF, toMarkdown, toHTML, toCycloneDX, lookupOSV,
   REVLENS_VERSION, type Report, type Claim, type Severity, type FormatId,
 } from '@revlens/core';
-import { analyzeAll, ALL_ANALYZERS, PACKAGES, TOOL_GROUPS, packageViews, type PackageCommand } from '@revlens/engine/node';
+import { analyzeAllNode as analyzeAll, ALL_ANALYZERS_NODE as ALL_ANALYZERS, PACKAGES, TOOL_GROUPS, TOP_LEVEL_COMMANDS, packageViews, type PackageCommand } from '@revlens/engine/node';
 import { toolCatalog } from '@revlens/mcp/server';
-import { runSetup } from './setup.js';
 
 const C = process.stdout.isTTY && !process.env.NO_COLOR
   ? { gold: (s: string) => `\x1b[38;5;220m${s}\x1b[0m`, teal: (s: string) => `\x1b[38;5;37m${s}\x1b[0m`, dim: (s: string) => `\x1b[2m${s}\x1b[0m`,
@@ -32,7 +31,7 @@ const OPTIONS_HELP = `Options
   --no-recurse        Do not analyze archive members
   -h, --help  -v, --version`;
 
-const CORE_COMMANDS = new Set(['analyze', 'scan', 'diff', 'verify', 'rules', 'sbom', 'sarif', 'analyzers', 'tools', 'setup', 'mcp', 'serve-mcp', 'help']);
+const CORE_COMMANDS = new Set(['analyze', 'scan', 'diff', 'verify', 'rules', 'sbom', 'sarif', 'analyzers', 'tools', 'mcp', 'serve-mcp', 'help', ...TOP_LEVEL_COMMANDS.map((c) => c.name)]);
 
 /** Argument text of a package usage line, without the leading "revlens" and command name. */
 function usageArgs(c: PackageCommand): string {
@@ -75,10 +74,12 @@ function fullHelp(): string {
     '  revlens sarif <file>             Print SARIF 2.1.0 for GitHub code scanning',
     '  revlens analyzers                List analyzers from every package',
     '  revlens tools [--json]           List every MCP tool the server offers',
-    '  revlens setup [client]           Show or write MCP config for agents (claude, codex, cursor, vscode)',
     '  revlens mcp                      Start the MCP server on stdio',
+    '',
+    'Setup and external tools',
+    ...TOP_LEVEL_COMMANDS.map((c) => `  ${c.usage.replace(/^revlens\s+/, 'revlens ').split('   ')[0]!.padEnd(32)} ${c.summary}`),
     ''];
-  for (const g of TOOL_GROUPS) L.push(`${g.title}  ${C.dim!(`revlens ${g.id} <command>, see revlens help ${g.id}`)}`, '  ' + g.commands.map((c) => c.name).join('  '), '');
+  for (const g of TOOL_GROUPS) if (g.commands.length) L.push(`${g.title}  ${C.dim!(`revlens ${g.id} <command>, see revlens help ${g.id}`)}`, '  ' + g.commands.map((c) => c.name).join('  '), '');
   L.push(C.dim!('Commands with a unique name also work without the area, for example revlens smali app.apk.'), '', OPTIONS_HELP);
   return L.join('\n');
 }
@@ -174,6 +175,8 @@ async function main(): Promise<number> {
   if (!cmd) { console.log(fullHelp()); return 0; }
   const f = a.flags;
   if (cmd === 'help') { console.log(rest[0] ? areaHelp(rest[0]) : fullHelp()); return 0; }
+  const top = TOP_LEVEL_COMMANDS.find((c) => c.name === cmd);
+  if (top) { const raw = process.argv.slice(2); return top.run(raw.slice(raw.indexOf(cmd) + 1)); }
   if (a.flags.help && CORE_COMMANDS.has(cmd)) { console.log(fullHelp()); return 0; }
 
   switch (cmd) {
@@ -192,7 +195,7 @@ async function main(): Promise<number> {
       console.log(C.dim!(`${all.length} MCP tools in total`));
       return 0;
     }
-    case 'setup': return runSetup(rest, f);
+
     case 'analyze': case 'scan': {
       if (!rest.length) throw new Error('give at least one file');
       const reports: Report[] = [];

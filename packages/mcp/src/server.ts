@@ -7,7 +7,7 @@ import {
   diff, verifyClaim, scanRules, STARTER_RULES, toCycloneDX, toMarkdown, lookupOSV, REVLENS_VERSION,
   type Report, type Claim,
 } from '@revlens/core';
-import { analyzeAll, ALL_ANALYZERS, PACKAGE_TOOLS, TOOL_EFFECTS, TOOL_GROUPS, packageViews, readInput, type PackageTool, type ToolParam } from '@revlens/engine/node';
+import { analyzeAllNode as analyzeAll, ALL_ANALYZERS_NODE as ALL_ANALYZERS, PACKAGE_TOOLS, TOOL_EFFECTS, TOOL_GROUPS, packageViews, readInput, type PackageTool, type ToolParam } from '@revlens/engine/node';
 
 /** Largest text a single tool answer may carry. Larger answers are cut with a note on how to page. */
 export const MAX_OUTPUT_CHARS = Math.max(4_000, Number(process.env.REVLENS_MCP_MAX_CHARS ?? 60_000));

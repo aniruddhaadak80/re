@@ -51,6 +51,27 @@
         "entropy/obfuscator.jjencode-or-aaencode"
       ],
       "reason": "Since 1.0.0 the self scan also covers every published package. These three core files are the capa-lite symbol lists, the packer and obfuscator fingerprints and the yara-lite starter pack, so the same signatures match them by design. Other rules on these files, and all rules on other package files, are still reported."
+    },
+    {
+      "files": [
+        "apps/web/dist/assets/capstone-*.js"
+      ],
+      "rules": [
+        "entropy/packer.pecompact"
+      ],
+      "reason": "The Capstone register table in this file has the constant ARM64_SYSREG_TRCIMSPEC2, which contains the text PEC2 that the PECompact check looks for. It is a name, not a packer marker."
+    },
+    {
+      "files": [
+        "apps/web/dist/samples/webrt/obfuscated.js"
+      ],
+      "rules": [
+        "entropy/obfuscator.javascript-obfuscator-string-array-",
+        "entropy/obfuscator.javascript-obfuscator-hex-identifiers-",
+        "yara/rule.JS_Eval_Decoded",
+        "entropy/obfuscator.eval-of-decoded-payload"
+      ],
+      "reason": "This is the obfuscated JavaScript sample for the JavaScript tool page's Try a sample button. It is obfuscated on purpose so the deobfuscator has something real to undo."
     }
   ]
 }
