@@ -30,7 +30,7 @@ export default defineConfig({
       { find: /^@revlens\/core$/, replacement: `${coreSrc}index.ts` },
       { find: /^@revlens\/core\/internal\/(.*)$/, replacement: `${coreSrc}$1` },
       // the browser builds of the packages, from source (Node-only entries are never imported here)
-      { find: /^@revlens\/(engine|managed|webrt|mobile|disasm|extras)$/, replacement: `${pkgSrc('$1')}index.ts` },
+      { find: /^@revlens\/(engine|managed|webrt|mobile|disasm|extras|desktop)$/, replacement: `${pkgSrc('$1')}index.ts` },
       // iced-x86 ships a Node build that reads its .wasm with fs; in the browser Capstone decodes x86 too
       { find: /^iced-x86$/, replacement: icedStub },
     ],

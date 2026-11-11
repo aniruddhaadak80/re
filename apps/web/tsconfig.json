@@ -25,7 +25,8 @@
       "@revlens/webrt": ["../../packages/webrt/src/index.ts"],
       "@revlens/mobile": ["../../packages/mobile/src/index.ts"],
       "@revlens/disasm": ["../../packages/disasm/src/index.ts"],
-      "@revlens/extras": ["../../packages/extras/src/index.ts"]
+      "@revlens/extras": ["../../packages/extras/src/index.ts"],
+      "@revlens/desktop": ["../../packages/desktop/src/index.ts"]
     }
   },
   "include": ["src", "e2e", "vite.config.ts", "playwright.config.ts"]
