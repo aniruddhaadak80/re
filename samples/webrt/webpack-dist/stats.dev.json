@@ -1,0 +1,66 @@
+[
+ {
+  "chunk": "dashboard_js",
+  "files": [
+   "chunk.dashboard_js.dev.js"
+  ],
+  "modules": [
+   {
+    "id": "./dashboard.js",
+    "name": "./dashboard.js"
+   }
+  ]
+ },
+ {
+  "chunk": "main",
+  "files": [
+   "bundle.dev.js"
+  ],
+  "modules": [
+   {
+    "id": "./api.js",
+    "name": "./api.js"
+   },
+   {
+    "id": "./index.js",
+    "name": "./index.js"
+   },
+   {
+    "id": "./util/format.js",
+    "name": "./util/format.js"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/define property getters"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/ensure chunk"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/get javascript chunk filename"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/hasOwnProperty shorthand"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/jsonp chunk loading"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/load script"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/make namespace object"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/publicPath"
+   }
+  ]
+ }
+]

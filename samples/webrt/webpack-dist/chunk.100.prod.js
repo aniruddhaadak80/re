@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[100],{100(e,n,d){function t(e){const n=document.createElement("div");n.textContent="Dashboard for "+e.id,navigator.sendBeacon("/telemetry/dashboard-open",JSON.stringify({id:e.id})),document.body.appendChild(n)}d.d(n,{renderDashboard:()=>t})}}]);
+//# sourceMappingURL=chunk.100.prod.js.map
