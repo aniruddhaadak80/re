@@ -1,0 +1,55 @@
+{
+ "toc": {
+  "pyimod_stub": [
+   0,
+   95,
+   113,
+   1,
+   "m"
+  ],
+  "pyiboot_stub": [
+   95,
+   97,
+   114,
+   1,
+   "s"
+  ],
+  "fixture_main": [
+   192,
+   181,
+   231,
+   1,
+   "s"
+  ],
+  "data.txt": [
+   373,
+   24,
+   16,
+   1,
+   "x"
+  ],
+  "PYZ.pyz": [
+   397,
+   405,
+   405,
+   0,
+   "z"
+  ]
+ },
+ "options": [
+  "pyi-contents-directory _internal"
+ ],
+ "pyz": {
+  "fixture_pkg": [
+   1,
+   17,
+   108
+  ],
+  "fixture_pkg.helper": [
+   0,
+   125,
+   204
+  ]
+ },
+ "size": 1185
+}

@@ -1,0 +1,42 @@
+{
+ "sample.5.1.luac": {
+  "size": 979,
+  "version": "Lua 5.1",
+  "jit": ""
+ },
+ "sample.5.2.luac": {
+  "size": 1022,
+  "version": "Lua 5.2",
+  "jit": ""
+ },
+ "sample.5.3.luac": {
+  "size": 800,
+  "version": "Lua 5.3",
+  "jit": ""
+ },
+ "sample.5.3.stripped.luac": {
+  "size": 415,
+  "version": "Lua 5.3",
+  "jit": ""
+ },
+ "sample.5.4.luac": {
+  "size": 529,
+  "version": "Lua 5.4",
+  "jit": ""
+ },
+ "sample.5.4.stripped.luac": {
+  "size": 344,
+  "version": "Lua 5.4",
+  "jit": ""
+ },
+ "sample.luajit2.1.luac": {
+  "size": 408,
+  "version": "Lua 5.1",
+  "jit": "LuaJIT 2.1.1774896198"
+ },
+ "sample.luajit2.1.stripped.luac": {
+  "size": 260,
+  "version": "Lua 5.1",
+  "jit": "LuaJIT 2.1.1774896198"
+ }
+}
