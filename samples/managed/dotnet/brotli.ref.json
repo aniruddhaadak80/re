@@ -1,0 +1,1537 @@
+{
+"assembly": {
+"name": "System.IO.Compression.Brotli",
+"version": "8.0.0.0"
+},
+"assemblyRefs": [
+"System.Runtime",
+"System.Runtime.InteropServices",
+"System.IO.Compression",
+"System.Threading",
+"System.Memory"
+],
+"moduleRefs": [
+"libSystem.IO.Compression.Native"
+],
+"implMap": [
+"BrotliDecoderDecompress",
+"BrotliDecoderDestroyInstance",
+"BrotliEncoderDestroyInstance",
+"BrotliEncoderCompress",
+"BrotliDecoderCreateInstance",
+"BrotliDecoderDecompressStream",
+"BrotliDecoderIsFinished",
+"BrotliEncoderCreateInstance",
+"BrotliEncoderSetParameter",
+"BrotliEncoderCompressStream",
+"BrotliEncoderHasMoreOutput"
+],
+"resources": [
+"FxResources.System.IO.Compression.Brotli.SR.resources",
+"ILLink.Substitutions.xml"
+],
+"typeNames": [
+"<Module>",
+"Interop",
+"Brotli",
+"BOOL",
+"FxResources.System.IO.Compression.Brotli.SR",
+"Microsoft.Win32.SafeHandles.SafeBrotliEncoderHandle",
+"Microsoft.Win32.SafeHandles.SafeBrotliDecoderHandle",
+"System.SR",
+"System.IO.Compression.BrotliStream",
+"<<ReadAsync>g__Core|25_0>d",
+"<DisposeAsync>d__39",
+"<FlushAsyncCore>d__14",
+"<WriteAsyncMemoryCore>d__11",
+"System.IO.Compression.BrotliUtils",
+"System.IO.Compression.BrotliDecoder",
+"System.IO.Compression.BrotliEncoder",
+"System.IO.Compression.BrotliEncoderOperation",
+"System.IO.Compression.BrotliEncoderParameter"
+],
+"rowCounts": {
+"Module": 1,
+"TypeRef": 87,
+"TypeDef": 18,
+"Field": 58,
+"MethodDef": 123,
+"Param": 171,
+"InterfaceImpl": 6,
+"MemberRef": 161,
+"Constant": 16,
+"CustomAttribute": 71,
+"StandAloneSig": 29,
+"PropertyMap": 4,
+"Property": 27,
+"MethodSemantics": 28,
+"MethodImpl": 8,
+"ModuleRef": 1,
+"TypeSpec": 13,
+"ImplMap": 11,
+"Assembly": 1,
+"AssemblyRef": 5,
+"ManifestResource": 2,
+"NestedClass": 6,
+"MethodSpec": 17
+},
+"methods": {
+"06000001": {
+"n": 30,
+"sha1": "d682c1ad96f800ee0ec4c91e8dfd496d4fc64fd8",
+"first": [
+"ldc.i4.0",
+"stloc.0",
+"ldnull",
+"stloc.1",
+"ldc.i4.0",
+"conv.i"
+],
+"codeSize": 56,
+"maxStack": 3
+},
+"06000002": {
+"n": 56,
+"sha1": "7dd164522a7d0bd6b977b7e038c620c9ada6552f",
+"first": [
+"ldarg.s",
+"call",
+"ldc.i4.0",
+"conv.i",
+"stloc.0",
+"ldc.i4.0"
+],
+"codeSize": 102,
+"maxStack": 6
+},
+"06000005": {
+"n": 22,
+"sha1": "ceafd4278018fe5beaeeef00698552f5513ed3a1",
+"first": [
+"ldc.i4.0",
+"conv.i",
+"stloc.0",
+"ldc.i4.0",
+"stloc.1",
+"ldloca.s"
+],
+"codeSize": 48,
+"maxStack": 2
+},
+"06000006": {
+"n": 30,
+"sha1": "d682c1ad96f800ee0ec4c91e8dfd496d4fc64fd8",
+"first": [
+"ldc.i4.0",
+"stloc.0",
+"ldnull",
+"stloc.1",
+"ldc.i4.0",
+"conv.i"
+],
+"codeSize": 56,
+"maxStack": 3
+},
+"06000007": {
+"n": 24,
+"sha1": "413533fbfce1a6b973bdd742deae944ab50a8de5",
+"first": [
+"ldc.i4.0",
+"conv.i",
+"stloc.0",
+"ldc.i4.0",
+"stloc.1",
+"ldloca.s"
+],
+"codeSize": 50,
+"maxStack": 3
+},
+"06000008": {
+"n": 57,
+"sha1": "4dc721971c7019da7160055e9ad714c2d2c44868",
+"first": [
+"ldarg.s",
+"call",
+"ldc.i4.0",
+"conv.i",
+"stloc.0",
+"ldc.i4.0"
+],
+"codeSize": 104,
+"maxStack": 7
+},
+"06000009": {
+"n": 22,
+"sha1": "ceafd4278018fe5beaeeef00698552f5513ed3a1",
+"first": [
+"ldc.i4.0",
+"conv.i",
+"stloc.0",
+"ldc.i4.0",
+"stloc.1",
+"ldloca.s"
+],
+"codeSize": 48,
+"maxStack": 2
+},
+"06000013": {
+"n": 5,
+"sha1": "bf391a6ff0d1a6e1dcce6b839a668d1f6de30638",
+"first": [
+"ldarg.0",
+"ldsfld",
+"ldc.i4.1",
+"call",
+"ret"
+],
+"codeSize": 13,
+"maxStack": 8
+},
+"06000014": {
+"n": 5,
+"sha1": "cb28b10f335c25b09ec625abca72b566df803d07",
+"first": [
+"ldarg.0",
+"ldfld",
+"call",
+"ldc.i4.1",
+"ret"
+],
+"codeSize": 13,
+"maxStack": 8
+},
+"06000015": {
+"n": 5,
+"sha1": "46b354ec0d460db8a351c4cba50f4755e95f793c",
+"first": [
+"ldarg.0",
+"ldfld",
+"ldsfld",
+"ceq",
+"ret"
+],
+"codeSize": 14,
+"maxStack": 8
+},
+"06000016": {
+"n": 5,
+"sha1": "bf391a6ff0d1a6e1dcce6b839a668d1f6de30638",
+"first": [
+"ldarg.0",
+"ldsfld",
+"ldc.i4.1",
+"call",
+"ret"
+],
+"codeSize": 13,
+"maxStack": 8
+},
+"06000017": {
+"n": 5,
+"sha1": "cb28b10f335c25b09ec625abca72b566df803d07",
+"first": [
+"ldarg.0",
+"ldfld",
+"call",
+"ldc.i4.1",
+"ret"
+],
+"codeSize": 13,
+"maxStack": 8
+},
+"06000018": {
+"n": 5,
+"sha1": "46b354ec0d460db8a351c4cba50f4755e95f793c",
+"first": [
+"ldarg.0",
+"ldfld",
+"ldsfld",
+"ceq",
+"ret"
+],
+"codeSize": 14,
+"maxStack": 8
+},
+"06000019": {
+"n": 2,
+"sha1": "e736ea69932304fa57212260025634cf6afd2954",
+"first": [
+"ldsfld",
+"ret"
+],
+"codeSize": 6,
+"maxStack": 8
+},
+"0600001a": {
+"n": 15,
+"sha1": "51f4a1c1df9c8ed6ac86969852b46e249bebe858",
+"first": [
+"call",
+"brfalse.s",
+"ldarg.0",
+"ret",
+"ldnull",
+"stloc.0"
+],
+"codeSize": 30,
+"maxStack": 2
+},
+"0600001b": {
+"n": 19,
+"sha1": "d607b0a61a6a87825107deb5e70f8383d001abb3",
+"first": [
+"call",
+"brfalse.s",
+"ldstr",
+"ldc.i4.2",
+"newarr",
+"dup"
+],
+"codeSize": 40,
+"maxStack": 8
+},
+"0600001c": {
+"n": 29,
+"sha1": "71eb9df109d76f73a02b73c62ab15520a2944dd2",
+"first": [
+"call",
+"brfalse.s",
+"ldstr",
+"ldc.i4.4",
+"newarr",
+"dup"
+],
+"codeSize": 50,
+"maxStack": 8
+},
+"0600001d": {
+"n": 10,
+"sha1": "4ce3b7d9e2e1eebd34cf52b0816330541830f842",
+"first": [
+"ldsfld",
+"dup",
+"brtrue.s",
+"pop",
+"ldtoken",
+"call"
+],
+"codeSize": 31,
+"maxStack": 8
+},
+"0600001e": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"0600001f": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000020": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000021": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000022": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000023": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000024": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000025": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000026": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000027": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000028": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000029": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"0600002a": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"0600002b": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"0600002c": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"0600002d": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"0600002e": {
+"n": 3,
+"sha1": "f79f18f8b9c34d98c3dd376310b861db52ff5d98",
+"first": [
+"ldstr",
+"call",
+"ret"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"0600002f": {
+"n": 9,
+"sha1": "8c33225c8a4d71930f73b4a38fec24206ef097c0",
+"first": [
+"ldstr",
+"ldloca.s",
+"call",
+"brtrue.s",
+"ldc.i4.0",
+"br.s"
+],
+"codeSize": 24,
+"maxStack": 2
+},
+"06000030": {
+"n": 6,
+"sha1": "7d931100bfe744c8caf78503b0709eacbdbc3ed6",
+"first": [
+"ldarg.0",
+"ldarg.1",
+"ldarg.2",
+"ldc.i4.0",
+"call",
+"ret"
+],
+"codeSize": 10,
+"maxStack": 8
+},
+"06000031": {
+"n": 11,
+"sha1": "53815b6cb385760cb2bdead9ddfced26ea2b2464",
+"first": [
+"ldarg.0",
+"ldarg.1",
+"ldc.i4.1",
+"ldarg.3",
+"call",
+"ldarg.0"
+],
+"codeSize": 27,
+"maxStack": 8
+},
+"06000032": {
+"n": 12,
+"sha1": "6dd87da9eaf16e729bd8b2a1f71449464857a55c",
+"first": [
+"ldarg.1",
+"ldarg.2",
+"ldarg.3",
+"call",
+"ldarg.0",
+"ldarg.1"
+],
+"codeSize": 24,
+"maxStack": 8
+},
+"06000033": {
+"n": 6,
+"sha1": "0d1eb82c33fe6190cf98d05f3af5ea649c8610ee",
+"first": [
+"ldarg.0",
+"ldarga.s",
+"newobj",
+"ldc.i4.0",
+"call",
+"ret"
+],
+"codeSize": 15,
+"maxStack": 8
+},
+"06000034": {
+"n": 5,
+"sha1": "f881e239c91e175211bd928adf1fc5cf338f2ef4",
+"first": [
+"ldarg.0",
+"ldarg.1",
+"ldc.i4.0",
+"call",
+"ret"
+],
+"codeSize": 9,
+"maxStack": 8
+},
+"06000035": {
+"n": 53,
+"sha1": "3f3b43ec9f86e250a891105e03f8e6c6e55bb209",
+"first": [
+"ldarg.0",
+"ldfld",
+"ldc.i4.1",
+"beq.s",
+"call",
+"newobj"
+],
+"codeSize": 125,
+"maxStack": 6
+},
+"06000036": {
+"n": 10,
+"sha1": "9e890d3ecff644de04d408bdd932824942d54649",
+"first": [
+"ldarg.0",
+"ldarg.1",
+"ldarg.2",
+"ldarg.3",
+"call",
+"callvirt"
+],
+"codeSize": 24,
+"maxStack": 8
+},
+"06000037": {
+"n": 3,
+"sha1": "272a0c3417633920bd54ffad6ed75e43105b41c1",
+"first": [
+"ldarg.1",
+"call",
+"ret"
+],
+"codeSize": 7,
+"maxStack": 8
+},
+"06000038": {
+"n": 15,
+"sha1": "7eac75531a07a009edc51881f902be40c0e77b2d",
+"first": [
+"ldarg.1",
+"ldarg.2",
+"ldarg.3",
+"call",
+"ldarg.0",
+"ldarg.1"
+],
+"codeSize": 33,
+"maxStack": 4
+},
+"06000039": {
+"n": 23,
+"sha1": "19b349b7de28121bdefc2698d8e899c48ae2577f",
+"first": [
+"ldarg.0",
+"ldfld",
+"ldc.i4.1",
+"beq.s",
+"call",
+"newobj"
+],
+"codeSize": 58,
+"maxStack": 8
+},
+"0600003a": {
+"n": 26,
+"sha1": "c7e9bb8a9db1152013bf1c01e22075ae31c1c379",
+"first": [
+"ldloca.s",
+"call",
+"stfld",
+"ldloca.s",
+"ldarg.0",
+"stfld"
+],
+"codeSize": 79,
+"maxStack": 2
+},
+"0600003b": {
+"n": 53,
+"sha1": "6133ebc5581bba011e074b9db6c512117fd39526",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.0",
+"ldfld",
+"ldc.i4.1",
+"bne.un.s"
+],
+"codeSize": 139,
+"maxStack": 4
+},
+"0600003c": {
+"n": 20,
+"sha1": "cc3c8e18d91a5acfe8bc156546aa70e049ff7c6a",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.0",
+"call",
+"ldarga.s",
+"call"
+],
+"codeSize": 51,
+"maxStack": 8
+},
+"0600003d": {
+"n": 20,
+"sha1": "70fc16cc28e261b301060ffd5cccac5545da8756",
+"first": [
+"ldloca.s",
+"call",
+"stfld",
+"ldloca.s",
+"ldarg.0",
+"stfld"
+],
+"codeSize": 63,
+"maxStack": 2
+},
+"0600003e": {
+"n": 11,
+"sha1": "521a1fcf468f1f0d388e2e78d8e76d9a3f5db638",
+"first": [
+"ldarg.1",
+"ldarg.2",
+"ldarg.3",
+"call",
+"ldarg.0",
+"ldarg.1"
+],
+"codeSize": 23,
+"maxStack": 8
+},
+"0600003f": {
+"n": 13,
+"sha1": "d9f547d0bd31b80bdf56c7e600dfd21ea2084cb0",
+"first": [
+"ldc.i4.0",
+"stloc.0",
+"ldarg.0",
+"ldloca.s",
+"newobj",
+"callvirt"
+],
+"codeSize": 23,
+"maxStack": 2
+},
+"06000040": {
+"n": 61,
+"sha1": "e927789df759e9fce2c9e43d0d01eaa2f307a49b",
+"first": [
+"ldarg.0",
+"ldfld",
+"brfalse.s",
+"call",
+"newobj",
+"throw"
+],
+"codeSize": 156,
+"maxStack": 5
+},
+"06000041": {
+"n": 10,
+"sha1": "9e890d3ecff644de04d408bdd932824942d54649",
+"first": [
+"ldarg.0",
+"ldarg.1",
+"ldarg.2",
+"ldarg.3",
+"call",
+"callvirt"
+],
+"codeSize": 24,
+"maxStack": 8
+},
+"06000042": {
+"n": 3,
+"sha1": "272a0c3417633920bd54ffad6ed75e43105b41c1",
+"first": [
+"ldarg.1",
+"call",
+"ret"
+],
+"codeSize": 7,
+"maxStack": 8
+},
+"06000043": {
+"n": 15,
+"sha1": "7eac75531a07a009edc51881f902be40c0e77b2d",
+"first": [
+"ldarg.1",
+"ldarg.2",
+"ldarg.3",
+"call",
+"ldarg.0",
+"ldarg.1"
+],
+"codeSize": 33,
+"maxStack": 4
+},
+"06000044": {
+"n": 21,
+"sha1": "afb7f34318c645f753b37d6bdb2818584efeb40f",
+"first": [
+"ldarg.0",
+"ldfld",
+"brfalse.s",
+"call",
+"newobj",
+"throw"
+],
+"codeSize": 56,
+"maxStack": 8
+},
+"06000045": {
+"n": 73,
+"sha1": "50e4ca12ab99e5e0d87bcc94a32b6ebfcc629295",
+"first": [
+"ldarg.0",
+"ldflda",
+"ldarg.0",
+"ldfld",
+"ldarg.0",
+"ldfld"
+],
+"codeSize": 180,
+"maxStack": 5
+},
+"06000046": {
+"n": 3,
+"sha1": "ab30a0c515b757a21fdfb70f6421af98591b455d",
+"first": [
+"call",
+"newobj",
+"throw"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000047": {
+"n": 3,
+"sha1": "ab30a0c515b757a21fdfb70f6421af98591b455d",
+"first": [
+"call",
+"newobj",
+"throw"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"06000048": {
+"n": 6,
+"sha1": "7d931100bfe744c8caf78503b0709eacbdbc3ed6",
+"first": [
+"ldarg.0",
+"ldarg.1",
+"ldarg.2",
+"ldc.i4.0",
+"call",
+"ret"
+],
+"codeSize": 10,
+"maxStack": 8
+},
+"06000049": {
+"n": 52,
+"sha1": "1405cb60818614b0e2746774f6b2132e8188979e",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.1",
+"ldstr",
+"call",
+"ldarg.2"
+],
+"codeSize": 158,
+"maxStack": 3
+},
+"0600004a": {
+"n": 7,
+"sha1": "c51aaddc0d44bbbc9776fbb1304ca6786a139320",
+"first": [
+"ldarg.0",
+"ldfld",
+"ldnull",
+"ceq",
+"ldarg.0",
+"call"
+],
+"codeSize": 16,
+"maxStack": 8
+},
+"0600004b": {
+"n": 27,
+"sha1": "b20029eccb68d7cd6dba87cd6efe09994e1edeb6",
+"first": [
+"ldarg.1",
+"brfalse.s",
+"ldarg.0",
+"ldfld",
+"brfalse.s",
+"ldarg.0"
+],
+"codeSize": 68,
+"maxStack": 3
+},
+"0600004c": {
+"n": 17,
+"sha1": "7bc6f4f0d11c79cb02ee25ec13cadff6fa26e5f3",
+"first": [
+"ldloca.s",
+"call",
+"stfld",
+"ldloca.s",
+"ldarg.0",
+"stfld"
+],
+"codeSize": 55,
+"maxStack": 2
+},
+"0600004d": {
+"n": 25,
+"sha1": "2edfbce946e1a1c570bf3a505f6ba51ed1a24b49",
+"first": [
+"ldarg.0",
+"ldnull",
+"stfld",
+"ldarg.0",
+"ldflda",
+"call"
+],
+"codeSize": 67,
+"maxStack": 3
+},
+"0600004e": {
+"n": 3,
+"sha1": "ebf9d7bd29acbb9b6749d1410e95eb66a9007de3",
+"first": [
+"ldarg.0",
+"ldfld",
+"ret"
+],
+"codeSize": 7,
+"maxStack": 8
+},
+"0600004f": {
+"n": 12,
+"sha1": "60849a0b79b07cc68e9190b0e69e1cb3dd53be25",
+"first": [
+"ldarg.0",
+"ldfld",
+"brtrue.s",
+"ldarg.0",
+"ldfld",
+"brfalse.s"
+],
+"codeSize": 30,
+"maxStack": 8
+},
+"06000050": {
+"n": 13,
+"sha1": "6e5e674cd119fe81b7690a0368d69a90ad1fc9f0",
+"first": [
+"ldarg.0",
+"ldfld",
+"ldc.i4.1",
+"bne.un.s",
+"ldarg.0",
+"ldfld"
+],
+"codeSize": 31,
+"maxStack": 8
+},
+"06000051": {
+"n": 2,
+"sha1": "f3346394278bf450ed2e1b77d4d6b879462420a2",
+"first": [
+"ldc.i4.0",
+"ret"
+],
+"codeSize": 2,
+"maxStack": 8
+},
+"06000052": {
+"n": 2,
+"sha1": "6477d52b77997e3e089a4c711ebd6b28bcdbc50d",
+"first": [
+"newobj",
+"throw"
+],
+"codeSize": 6,
+"maxStack": 8
+},
+"06000053": {
+"n": 2,
+"sha1": "6477d52b77997e3e089a4c711ebd6b28bcdbc50d",
+"first": [
+"newobj",
+"throw"
+],
+"codeSize": 6,
+"maxStack": 8
+},
+"06000054": {
+"n": 2,
+"sha1": "6477d52b77997e3e089a4c711ebd6b28bcdbc50d",
+"first": [
+"newobj",
+"throw"
+],
+"codeSize": 6,
+"maxStack": 8
+},
+"06000055": {
+"n": 2,
+"sha1": "6477d52b77997e3e089a4c711ebd6b28bcdbc50d",
+"first": [
+"newobj",
+"throw"
+],
+"codeSize": 6,
+"maxStack": 8
+},
+"06000056": {
+"n": 2,
+"sha1": "6477d52b77997e3e089a4c711ebd6b28bcdbc50d",
+"first": [
+"newobj",
+"throw"
+],
+"codeSize": 6,
+"maxStack": 8
+},
+"06000057": {
+"n": 5,
+"sha1": "d630f1f8753ef2af4ede6afe50dc9e77a1dfd3ff",
+"first": [
+"ldarg.0",
+"ldfld",
+"ldc.i4.0",
+"cgt.un",
+"ret"
+],
+"codeSize": 10,
+"maxStack": 8
+},
+"06000058": {
+"n": 5,
+"sha1": "7e5b020d13e6d97f4a64f9a132b043875c79235d",
+"first": [
+"ldarg.0",
+"call",
+"brfalse.s",
+"call",
+"ret"
+],
+"codeSize": 14,
+"maxStack": 8
+},
+"06000059": {
+"n": 7,
+"sha1": "4e44298227698520b8e09bff8620a3aef32a2473",
+"first": [
+"ldarg.0",
+"ldflda",
+"ldc.i4.1",
+"call",
+"brfalse.s",
+"call"
+],
+"codeSize": 20,
+"maxStack": 8
+},
+"0600005a": {
+"n": 5,
+"sha1": "f2b95f9ffd039220582ff001d7656cc9e0dde807",
+"first": [
+"ldarg.0",
+"ldflda",
+"ldc.i4.0",
+"call",
+"ret"
+],
+"codeSize": 13,
+"maxStack": 8
+},
+"0600005b": {
+"n": 3,
+"sha1": "ab30a0c515b757a21fdfb70f6421af98591b455d",
+"first": [
+"call",
+"newobj",
+"throw"
+],
+"codeSize": 11,
+"maxStack": 8
+},
+"0600005c": {
+"n": 9,
+"sha1": "8c33225c8a4d71930f73b4a38fec24206ef097c0",
+"first": [
+"ldstr",
+"ldloca.s",
+"call",
+"brtrue.s",
+"ldc.i4.0",
+"br.s"
+],
+"codeSize": 24,
+"maxStack": 2
+},
+"0600005d": {
+"n": 23,
+"sha1": "e0c8155d1a609b3ba7ebd51d1f0460e99a5eda55",
+"first": [
+"ldloca.s",
+"call",
+"stfld",
+"ldloca.s",
+"ldarg.0",
+"stfld"
+],
+"codeSize": 71,
+"maxStack": 2
+},
+"0600005e": {
+"n": 131,
+"sha1": "97d8d1068231b35089391430a8e414ce2c709f63",
+"first": [
+"ldarg.0",
+"ldfld",
+"stloc.0",
+"ldarg.0",
+"ldfld",
+"stloc.1"
+],
+"codeSize": 348,
+"maxStack": 3
+},
+"0600005f": {
+"n": 5,
+"sha1": "e92acf8540b52515ee306fe1caf16e35a91fd089",
+"first": [
+"ldarg.0",
+"ldflda",
+"ldarg.1",
+"call",
+"ret"
+],
+"codeSize": 13,
+"maxStack": 8
+},
+"06000060": {
+"n": 134,
+"sha1": "85565965eacd1164bd25810b3b38cfc17c4802f4",
+"first": [
+"ldarg.0",
+"ldfld",
+"stloc.0",
+"ldarg.0",
+"ldfld",
+"stloc.1"
+],
+"codeSize": 341,
+"maxStack": 4
+},
+"06000061": {
+"n": 5,
+"sha1": "e92acf8540b52515ee306fe1caf16e35a91fd089",
+"first": [
+"ldarg.0",
+"ldflda",
+"ldarg.1",
+"call",
+"ret"
+],
+"codeSize": 13,
+"maxStack": 8
+},
+"06000062": {
+"n": 171,
+"sha1": "27799625c1a5954c3fb8999e6c90974babe442df",
+"first": [
+"ldarg.0",
+"ldfld",
+"stloc.0",
+"ldarg.0",
+"ldfld",
+"stloc.1"
+],
+"codeSize": 465,
+"maxStack": 4
+},
+"06000063": {
+"n": 5,
+"sha1": "e92acf8540b52515ee306fe1caf16e35a91fd089",
+"first": [
+"ldarg.0",
+"ldflda",
+"ldarg.1",
+"call",
+"ret"
+],
+"codeSize": 13,
+"maxStack": 8
+},
+"06000064": {
+"n": 132,
+"sha1": "256cdb0a3bd0a1f4c8bd55c6ba1a05f6168769e4",
+"first": [
+"ldarg.0",
+"ldfld",
+"stloc.0",
+"ldarg.0",
+"ldfld",
+"stloc.1"
+],
+"codeSize": 346,
+"maxStack": 7
+},
+"06000065": {
+"n": 5,
+"sha1": "e92acf8540b52515ee306fe1caf16e35a91fd089",
+"first": [
+"ldarg.0",
+"ldflda",
+"ldarg.1",
+"call",
+"ret"
+],
+"codeSize": 13,
+"maxStack": 8
+},
+"06000066": {
+"n": 21,
+"sha1": "04f3359b8abc5f81be448cfee12d712ff4530589",
+"first": [
+"ldarg.0",
+"switch",
+"br.s",
+"ldc.i4.0",
+"stloc.0",
+"br.s"
+],
+"codeSize": 59,
+"maxStack": 2
+},
+"06000067": {
+"n": 14,
+"sha1": "d921373d22f83869a5b392a6445654c47959c232",
+"first": [
+"ldarg.0",
+"ldsfld",
+"ldsfld",
+"ldsfld",
+"call",
+"stfld"
+],
+"codeSize": 51,
+"maxStack": 8
+},
+"06000068": {
+"n": 8,
+"sha1": "0cb805f4ab063b44fc6dec62f745e194a626cdae",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.0",
+"ldfld",
+"brtrue.s",
+"ldarg.0"
+],
+"codeSize": 21,
+"maxStack": 8
+},
+"06000069": {
+"n": 11,
+"sha1": "b45453026cf4c915ed0fb96cbeae118c3ae87d37",
+"first": [
+"ldarg.0",
+"ldc.i4.1",
+"stfld",
+"ldarg.0",
+"ldfld",
+"dup"
+],
+"codeSize": 24,
+"maxStack": 8
+},
+"0600006a": {
+"n": 8,
+"sha1": "10fbabfbf0c9c5f9f87663ed0d5bc88be7ddd344",
+"first": [
+"ldarg.0",
+"ldfld",
+"brfalse.s",
+"ldstr",
+"call",
+"newobj"
+],
+"codeSize": 25,
+"maxStack": 8
+},
+"0600006b": {
+"n": 115,
+"sha1": "b7ed634174ae76795cca31061d72df77a31564f7",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.3",
+"ldc.i4.0",
+"stind.i4",
+"ldarg.s"
+],
+"codeSize": 235,
+"maxStack": 6
+},
+"0600006c": {
+"n": 33,
+"sha1": "f60a318e6fadb60bcd86bb76dda124706ff088aa",
+"first": [
+"ldarg.0",
+"call",
+"stloc.1",
+"ldloc.1",
+"conv.u",
+"stloc.0"
+],
+"codeSize": 61,
+"maxStack": 4
+},
+"0600006d": {
+"n": 23,
+"sha1": "3d57a5ac9eb750f00e67cc2f95040a8ba7f56e92",
+"first": [
+"ldarg.0",
+"ldc.i4.0",
+"stfld",
+"ldarg.0",
+"ldsfld",
+"ldsfld"
+],
+"codeSize": 72,
+"maxStack": 4
+},
+"0600006e": {
+"n": 16,
+"sha1": "c366bc203a1247e82c7b6ca20d445479344c24fd",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.0",
+"ldsfld",
+"ldsfld",
+"ldsfld"
+],
+"codeSize": 57,
+"maxStack": 8
+},
+"0600006f": {
+"n": 8,
+"sha1": "0cb805f4ab063b44fc6dec62f745e194a626cdae",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.0",
+"ldfld",
+"brtrue.s",
+"ldarg.0"
+],
+"codeSize": 21,
+"maxStack": 8
+},
+"06000070": {
+"n": 11,
+"sha1": "b45453026cf4c915ed0fb96cbeae118c3ae87d37",
+"first": [
+"ldarg.0",
+"ldc.i4.1",
+"stfld",
+"ldarg.0",
+"ldfld",
+"dup"
+],
+"codeSize": 24,
+"maxStack": 8
+},
+"06000071": {
+"n": 8,
+"sha1": "10fbabfbf0c9c5f9f87663ed0d5bc88be7ddd344",
+"first": [
+"ldarg.0",
+"ldfld",
+"brfalse.s",
+"ldstr",
+"call",
+"newobj"
+],
+"codeSize": 25,
+"maxStack": 8
+},
+"06000072": {
+"n": 44,
+"sha1": "3d768bc68886756012c7559732324d4c07446fa5",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.0",
+"ldfld",
+"brfalse.s",
+"ldarg.0"
+],
+"codeSize": 132,
+"maxStack": 5
+},
+"06000073": {
+"n": 44,
+"sha1": "ac9597ba85a901e55b5b57342cce3197d9c4d5f2",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.0",
+"ldfld",
+"brfalse.s",
+"ldarg.0"
+],
+"codeSize": 134,
+"maxStack": 5
+},
+"06000074": {
+"n": 42,
+"sha1": "471f542617edefc7ee6452fc2a996933e9555074",
+"first": [
+"ldarg.0",
+"ldstr",
+"call",
+"ldarg.0",
+"ldc.i4",
+"ldstr"
+],
+"codeSize": 76,
+"maxStack": 3
+},
+"06000075": {
+"n": 6,
+"sha1": "0173de1e693bc625ea20214064ff7765898c5f5a",
+"first": [
+"ldarg.0",
+"ldarga.s",
+"call",
+"ldarg.2",
+"call",
+"ret"
+],
+"codeSize": 15,
+"maxStack": 8
+},
+"06000076": {
+"n": 8,
+"sha1": "328078f5ed620f47bd3e8e38626b085af776cdb8",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.1",
+"ldloca.s",
+"ldarg.2",
+"ldc.i4.1"
+],
+"codeSize": 17,
+"maxStack": 6
+},
+"06000077": {
+"n": 10,
+"sha1": "3f041309fb474f7f7ba2ce3833971b6f5a0e85fb",
+"first": [
+"ldarg.0",
+"ldarga.s",
+"call",
+"ldarga.s",
+"call",
+"ldarg.3"
+],
+"codeSize": 26,
+"maxStack": 8
+},
+"06000078": {
+"n": 12,
+"sha1": "aef48667a39afcc13cc04afc2e7790bb0aebe603",
+"first": [
+"ldarg.0",
+"ldarg.1",
+"ldarg.2",
+"ldarg.3",
+"ldarg.s",
+"ldarg.s"
+],
+"codeSize": 20,
+"maxStack": 8
+},
+"06000079": {
+"n": 104,
+"sha1": "15ca9997bf6bfcde8a0a98bdac5f49ab277c6a09",
+"first": [
+"ldarg.0",
+"call",
+"ldarg.s",
+"ldc.i4.0",
+"stind.i4",
+"ldarg.3"
+],
+"codeSize": 204,
+"maxStack": 7
+},
+"0600007a": {
+"n": 7,
+"sha1": "0a6e4145958def9b636c4a030ccb42fd312a45de",
+"first": [
+"ldarg.0",
+"ldarg.1",
+"ldarg.2",
+"ldc.i4.4",
+"ldc.i4.s",
+"call"
+],
+"codeSize": 12,
+"maxStack": 8
+},
+"0600007b": {
+"n": 70,
+"sha1": "1f1da4eed7395970bdfab0b34c18d34bbb8437b9",
+"first": [
+"ldarg.3",
+"ldc.i4.0",
+"blt.s",
+"ldarg.3",
+"ldc.i4.s",
+"ble.s"
+],
+"codeSize": 168,
+"maxStack": 7
+}
+}
+}
