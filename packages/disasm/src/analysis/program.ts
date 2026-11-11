@@ -704,7 +704,16 @@ export class Program {
         if (r.exec || r.fsize === 0 || !this.isReadOnly(r.start) || !/rel\.ro|const|rodata|rdata/.test(r.name)) continue;
         let run: number[] = [];
         let runStart = 0;
-        const flush = () => { if (run.length >= 2) out.push({ addr: runStart, slots: run }); run = []; };
+        // Itanium shape: [offset to top: 0 or a small negative][RTTI pointer or 0][slots...]; MSVC: [RTTI locator][slots...]
+        const header = (a: number) => {
+          const rtti = this.readPtr(a - ptr);
+          const rttiOk = rtti === 0 || (rtti !== undefined && this.mem.isMapped(rtti) && !this.mem.isExec(rtti));
+          if (this.img.format === 'pe') return rttiOk;
+          const top = this.readPtr(a - 2 * ptr);
+          const topOk = top !== undefined && (top === 0 || (ptr === 8 ? top > 2 ** 64 - 2 ** 20 : top > 2 ** 32 - 2 ** 20));
+          return rttiOk && topOk;
+        };
+        const flush = () => { if (run.length >= 1 && header(runStart)) out.push({ addr: runStart, slots: run }); run = []; };
         for (let a = r.start; a + ptr <= r.end && out.length < 20000; a += ptr) {
           const v = this.readPtr(a);
           if (isFn(v)) { if (!run.length) runStart = a; run.push(v!); } else flush();
@@ -771,6 +780,8 @@ export class Program {
     if (a.t === 'load') { vptr = a; off = 0; }
     else if (a.t === 'sum' && a.base.t === 'load') { vptr = a.base; off = a.k; }
     if (!vptr || off < 0 || off % ptr !== 0) return undefined;
+    // Go interface calls go through itabs, whose method sets are not tied to one slot layout: no class hierarchy guess there
+    if (this.img.goVersionHint) return undefined;
     const slot = off / ptr;
     const tables = this.vtables().filter((t) => t.name === undefined || /^_?_ZTV/.test(t.name));
     const cands = [...new Set(tables.map((t) => t.slots[slot]).filter((x): x is number => x !== undefined))];

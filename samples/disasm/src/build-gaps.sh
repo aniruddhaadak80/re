@@ -23,3 +23,5 @@ if [ -n "$LUA" ]; then
   $ZIG cc -target x86_64-linux-gnu -O2 -g0 -DLUA_USE_LINUX -o lua-x64-reordered.unstripped $RFILES -lm
   $ZIG objcopy --strip-all lua-x64-reordered.unstripped lua-x64-stripped.elf
 fi
+# stripped copy of the virtual call fixture (no .symtab): vtables must be found by shape
+python3 $SRC/strip-debug.py virt-x64.elf virt-x64-stripped.elf --all

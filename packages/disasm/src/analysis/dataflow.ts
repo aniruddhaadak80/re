@@ -259,7 +259,7 @@ class Tracker {
       const c = this.opts.readConst(addr.v, w);
       if (c !== undefined) return { t: 'const', v: c };
     }
-    if (addr.t === 'top') return TOP;
+    // a load through an unknown pointer stays symbolic (object -> vtable -> slot chains)
     return { t: 'load', addr, w };
   }
 
