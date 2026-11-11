@@ -68,7 +68,8 @@ export function scoreTask(t: EvalTask, got: unknown): TaskScore {
       return { ...base, score: ok ? 1 : 0, correct: ok };
     }
     default: {
-      const ok = norm(t.answer) === norm(got);
+      // whitespace never changes meaning here: "a<b<int> >" and "a<b<int>>" are the same answer
+      const ok = norm(t.answer) === norm(got) || norm(t.answer).replace(/\s+/g, '') === norm(got).replace(/\s+/g, '');
       return { ...base, score: ok ? 1 : 0, correct: ok };
     }
   }
