@@ -1,0 +1,136 @@
+{
+ "entitlements": {
+  "application-identifier": "ABCDE12345.org.wikimedia.wikipedia",
+  "aps-environment": "development",
+  "com.apple.developer.associated-domains": [
+   "applinks:*.wikipedia.org",
+   "webcredentials:*.wikipedia.org",
+   "activitycontinuation:*.wikipedia.org",
+   "applinks:wikipedia.org",
+   "activitycontinuation:wikipedia.org",
+   "webcredentials:wikipedia.org",
+   "applinks:en.wikipedia.beta.wmflabs.org",
+   "applinks:en.m.wikipedia.beta.wmflabs.org"
+  ],
+  "com.apple.developer.in-app-payments": [
+   "merchant.com.adyen.wikimedia.test",
+   "merchant.com.adyen.wikimedia"
+  ],
+  "com.apple.developer.usernotifications.time-sensitive": true,
+  "com.apple.security.application-groups": [
+   "group.org.wikimedia.wikipedia",
+   "group.org.wikimedia.wikipedia.alpha",
+   "group.org.wikimedia.wikipedia.beta"
+  ],
+  "get-task-allow": true
+ },
+ "info": {
+  "BGTaskSchedulerPermittedIdentifiers": [
+   "org.wikimedia.wikipedia.appRefresh",
+   "org.wikimedia.wikipedia.databaseHousekeeper"
+  ],
+  "CADisableMinimumFrameDurationOnPhone": true,
+  "CFBundleDevelopmentRegion": "en",
+  "CFBundleDisplayName": "Wikipedia",
+  "CFBundleExecutable": "Wikipedia",
+  "CFBundleIdentifier": "org.wikimedia.wikipedia",
+  "CFBundleInfoDictionaryVersion": "6.0",
+  "CFBundleName": "Wikipedia",
+  "CFBundlePackageType": "APPL",
+  "CFBundleShortVersionString": "0.0.0",
+  "CFBundleSignature": "????",
+  "CFBundleSupportedPlatforms": [
+   "iPhoneOS"
+  ],
+  "CFBundleURLTypes": [
+   {
+    "CFBundleTypeRole": "Editor",
+    "CFBundleURLName": "org.wikimedia.wikipedia",
+    "CFBundleURLSchemes": [
+     "wikipedia",
+     "wikipedia-official"
+    ]
+   }
+  ],
+  "CFBundleVersion": "0",
+  "CoreSpotlightContinuation": true,
+  "ITSAppUsesNonExemptEncryption": false,
+  "LSApplicationQueriesSchemes": [
+   "mailto"
+  ],
+  "LSRequiresIPhoneOS": true,
+  "MinimumOSVersion": "16.6",
+  "NSAppTransportSecurity": {
+   "NSAllowsArbitraryLoads": true
+  },
+  "NSLocationAlwaysUsageDescription": "Get article recommendations based on your location",
+  "NSLocationUsageDescription": "Get article recommendations based on your location",
+  "NSLocationWhenInUseUsageDescription": "Get article recommendations based on your location",
+  "NSPhotoLibraryAddUsageDescription": "Save photos from Wikipedia to your photo library",
+  "NSPhotoLibraryUsageDescription": "Save photos from Wikipedia to your photo library",
+  "NSUserActivityTypes": [
+   "org.wikimedia.wikipedia.explore",
+   "org.wikimedia.wikipedia.settings",
+   "org.wikimedia.wikipedia.saved",
+   "org.wikimedia.wikipedia.history",
+   "org.wikimedia.wikipedia.search",
+   "org.wikimedia.wikipedia.article",
+   "org.wikimedia.wikipedia.searchresults"
+  ],
+  "UIApplicationSceneManifest": {
+   "UIApplicationSupportsMultipleScenes": false,
+   "UISceneConfigurations": {
+    "UIWindowSceneSessionRoleApplication": [
+     {
+      "UISceneConfigurationName": "Default Configuration",
+      "UISceneDelegateClassName": "Wikipedia.SceneDelegate"
+     }
+    ]
+   }
+  },
+  "UIApplicationShortcutWidget": "org.wikimedia.wikipedia.ContinueReadingWidget",
+  "UIBackgroundModes": [
+   "fetch",
+   "processing"
+  ],
+  "UIDeviceFamily": [
+   1,
+   2
+  ],
+  "UIFileSharingEnabled": true,
+  "UILaunchStoryboardName": "Launch Screen",
+  "UIPrerenderedIcon": true,
+  "UIRequiredDeviceCapabilities": [
+   "armv7"
+  ],
+  "UIRequiresFullScreen": false,
+  "UIStatusBarHidden": false,
+  "UISupportedInterfaceOrientations": [
+   "UIInterfaceOrientationPortrait",
+   "UIInterfaceOrientationLandscapeLeft",
+   "UIInterfaceOrientationLandscapeRight"
+  ],
+  "UISupportedInterfaceOrientations~ipad": [
+   "UIInterfaceOrientationPortrait",
+   "UIInterfaceOrientationPortraitUpsideDown",
+   "UIInterfaceOrientationLandscapeLeft",
+   "UIInterfaceOrientationLandscapeRight"
+  ],
+  "UIViewControllerBasedStatusBarAppearance": true
+ },
+ "source": "python plistlib (CPython 3) decoding the fixture plists",
+ "widgets": {
+  "CFBundleDevelopmentRegion": "en",
+  "CFBundleDisplayName": "Widgets",
+  "CFBundleExecutable": "Widgets",
+  "CFBundleIdentifier": "org.wikimedia.wikipedia.Widgets",
+  "CFBundleInfoDictionaryVersion": "6.0",
+  "CFBundleName": "Widgets",
+  "CFBundlePackageType": "XPC!",
+  "CFBundleShortVersionString": "0.0.0",
+  "CFBundleVersion": "0",
+  "NSExtension": {
+   "NSExtensionPointIdentifier": "com.apple.widgetkit-extension"
+  }
+ }
+}

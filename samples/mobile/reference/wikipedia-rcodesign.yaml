@@ -1,0 +1,156 @@
+- path: /tmp/ipa/Wikipedia
+  file_size: 25616
+  file_sha256: e31316747029b7b0f08a91a9a2ded069d4152d95a08fbbdda725623689cc681c
+  entity:
+    mach_o:
+      macho_linkedit_start_offset: 16384 / 0x4000
+      macho_signature_start_offset: 16400 / 0x4010
+      macho_signature_end_offset: 19419 / 0x4bdb
+      macho_linkedit_end_offset: 25616 / 0x6410
+      macho_end_offset: 25616 / 0x6410
+      linkedit_signature_start_offset: 16 / 0x10
+      linkedit_signature_end_offset: 3035 / 0xbdb
+      linkedit_bytes_after_signature: 6197 / 0x1835
+      signature:
+        superblob_length: 3019 / 0xbcb
+        blob_count: 6
+        blobs:
+        - slot: CodeDirectory (0)
+          magic: fade0c02
+          length: 352
+          sha1: c353322e4453b7badf035d7c2b9da53887fcd482
+          sha256: decabbc9f09a3c70261b8d9e9cf103d9b92a04f8bd10e81fc1fa891a38d21a90
+        - slot: RequirementSet (2)
+          magic: fade0c01
+          length: 12
+          sha1: 3a75f6db058529148e14dd7ea1b4729cc09ec973
+          sha256: 987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986
+        - slot: Entitlements (5)
+          magic: fade7171
+          length: 1328
+          sha1: 33e8c150042fe35395895ee19a2b0cd7233d55b9
+          sha256: c597d050fe751753517c36d017091ac4875f6da4e46fe71c5cc5b9dcc8628a7b
+        - slot: DER Entitlements (7)
+          magic: fade7172
+          length: 763
+          sha1: 0c9328448eb3ce38fe8d9db6ff6343f55c3eccc7
+          sha256: 72501f018184627854a2576fb03868c9427195962f9a3a0b1c245557e9f1f16e
+        - slot: 'CodeDirectory Alternate #0 (4096)'
+          magic: fade0c02
+          length: 496
+          sha1: 103ed29d93e08b2857d701b8c5b7eb4dffc70f5f
+          sha256: 6532e90490b4e6dadaec97c7b1aa7afe90630ed4adfc9cbdadfff79cb0a35197
+        - slot: CMS Signature (65536)
+          magic: fade0b01
+          length: 8
+          sha1: 2a7254313aa41796079bb0e9d0f044345f69f98b
+          sha256: e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0
+        code_directory:
+          version: '0x20400'
+          flags: CodeSignatureFlags(ADHOC)
+          identifier: org.wikimedia.wikipedia
+          digest_type: sha1
+          platform: 0
+          signed_entity_size: 16400
+          executable_segment_flags: ExecutableSegmentFlags(MAIN_BINARY | ALLOW_UNSIGNED)
+          code_digests_count: 5
+          slot_digests:
+          - 'Info (1): 0000000000000000000000000000000000000000'
+          - 'RequirementSet (2): 3a75f6db058529148e14dd7ea1b4729cc09ec973'
+          - 'Resources (3): 0000000000000000000000000000000000000000'
+          - 'Application (4): 0000000000000000000000000000000000000000'
+          - 'Entitlements (5): 33e8c150042fe35395895ee19a2b0cd7233d55b9'
+          - 'Rep Specific (6): 0000000000000000000000000000000000000000'
+          - 'DER Entitlements (7): 0c9328448eb3ce38fe8d9db6ff6343f55c3eccc7'
+        alternative_code_directories:
+        - - 'CodeDirectory Alternate #0 (4096)'
+          - version: '0x20400'
+            flags: CodeSignatureFlags(ADHOC)
+            identifier: org.wikimedia.wikipedia
+            digest_type: sha256
+            platform: 0
+            signed_entity_size: 16400
+            executable_segment_flags: ExecutableSegmentFlags(MAIN_BINARY | ALLOW_UNSIGNED)
+            code_digests_count: 5
+            slot_digests:
+            - 'Info (1): 0000000000000000000000000000000000000000000000000000000000000000'
+            - 'RequirementSet (2): 987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986'
+            - 'Resources (3): 0000000000000000000000000000000000000000000000000000000000000000'
+            - 'Application (4): 0000000000000000000000000000000000000000000000000000000000000000'
+            - 'Entitlements (5): c597d050fe751753517c36d017091ac4875f6da4e46fe71c5cc5b9dcc8628a7b'
+            - 'Rep Specific (6): 0000000000000000000000000000000000000000000000000000000000000000'
+            - 'DER Entitlements (7): 72501f018184627854a2576fb03868c9427195962f9a3a0b1c245557e9f1f16e'
+        entitlements_plist:
+        - <?xml version="1.0" encoding="UTF-8"?>
+        - <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        - <plist version="1.0">
+        - <dict>
+        - '  <key>application-identifier</key>'
+        - '  <string>ABCDE12345.org.wikimedia.wikipedia</string>'
+        - '  <key>aps-environment</key>'
+        - '  <string>development</string>'
+        - '  <key>com.apple.developer.associated-domains</key>'
+        - '  <array>'
+        - '    <string>applinks:*.wikipedia.org</string>'
+        - '    <string>webcredentials:*.wikipedia.org</string>'
+        - '    <string>activitycontinuation:*.wikipedia.org</string>'
+        - '    <string>applinks:wikipedia.org</string>'
+        - '    <string>activitycontinuation:wikipedia.org</string>'
+        - '    <string>webcredentials:wikipedia.org</string>'
+        - '    <string>applinks:en.wikipedia.beta.wmflabs.org</string>'
+        - '    <string>applinks:en.m.wikipedia.beta.wmflabs.org</string>'
+        - '  </array>'
+        - '  <key>com.apple.developer.in-app-payments</key>'
+        - '  <array>'
+        - '    <string>merchant.com.adyen.wikimedia.test</string>'
+        - '    <string>merchant.com.adyen.wikimedia</string>'
+        - '  </array>'
+        - '  <key>com.apple.developer.usernotifications.time-sensitive</key>'
+        - '  <true/>'
+        - '  <key>com.apple.security.application-groups</key>'
+        - '  <array>'
+        - '    <string>group.org.wikimedia.wikipedia</string>'
+        - '    <string>group.org.wikimedia.wikipedia.alpha</string>'
+        - '    <string>group.org.wikimedia.wikipedia.beta</string>'
+        - '  </array>'
+        - '  <key>get-task-allow</key>'
+        - '  <true/>'
+        - </dict>
+        - </plist>
+        entitlements_der_plist:
+        - <?xml version="1.0" encoding="UTF-8"?>
+        - <plist version="1.0">
+        - '  <dict>'
+        - '    <key>application-identifier</key>'
+        - '    <string>ABCDE12345.org.wikimedia.wikipedia</string>'
+        - '    <key>aps-environment</key>'
+        - '    <string>development</string>'
+        - '    <key>com.apple.developer.associated-domains</key>'
+        - '    <array>'
+        - '      <string>applinks:*.wikipedia.org</string>'
+        - '      <string>webcredentials:*.wikipedia.org</string>'
+        - '      <string>activitycontinuation:*.wikipedia.org</string>'
+        - '      <string>applinks:wikipedia.org</string>'
+        - '      <string>activitycontinuation:wikipedia.org</string>'
+        - '      <string>webcredentials:wikipedia.org</string>'
+        - '      <string>applinks:en.wikipedia.beta.wmflabs.org</string>'
+        - '      <string>applinks:en.m.wikipedia.beta.wmflabs.org</string>'
+        - '    </array>'
+        - '    <key>com.apple.developer.in-app-payments</key>'
+        - '    <array>'
+        - '      <string>merchant.com.adyen.wikimedia.test</string>'
+        - '      <string>merchant.com.adyen.wikimedia</string>'
+        - '    </array>'
+        - '    <key>com.apple.developer.usernotifications.time-sensitive</key>'
+        - '    <true />'
+        - '    <key>com.apple.security.application-groups</key>'
+        - '    <array>'
+        - '      <string>group.org.wikimedia.wikipedia</string>'
+        - '      <string>group.org.wikimedia.wikipedia.alpha</string>'
+        - '      <string>group.org.wikimedia.wikipedia.beta</string>'
+        - '    </array>'
+        - '    <key>get-task-allow</key>'
+        - '    <true />'
+        - '  </dict>'
+        - </plist>
+        cms: null
