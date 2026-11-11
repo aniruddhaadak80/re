@@ -1,0 +1,30 @@
+@revlens/extras
+Copyright (c) Aniruddha Adak and the RevLens contributors. Licensed under the MIT License,
+except for the files listed below.
+
+Swift demangler (src/demangle/swift/: demangler.ts, old.ts, printer.ts, nodes.ts, punycode.ts, index.ts)
+
+  These files are a TypeScript port of the Swift demangler from the Swift project,
+  release swift-6.0.3-RELEASE (https://github.com/swiftlang/swift/tree/swift-6.0.3-RELEASE):
+  lib/Demangling/Demangler.cpp, OldDemangler.cpp, NodePrinter.cpp, Punycode.cpp, Context.cpp,
+  ManglingUtils.cpp, and include/swift/Demangling/DemangleNodes.def, StandardTypesMangling.def,
+  ValueWitnessMangling.def, ManglingMacros.h.
+
+  Copyright (c) 2014 - 2024 Apple Inc. and the Swift project authors.
+  Licensed under the Apache License v2.0 with Runtime Library Exception.
+  See https://swift.org/LICENSE.txt for license information and
+  https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors.
+  The full license text, including the Runtime Library Exception, is in LICENSE-SWIFT.txt.
+
+  Changes from the original: translated from C++ to TypeScript; C++ out-parameters became
+  return values; node allocation uses plain objects; added limits on recursion depth, symbol
+  length, child count and printed output size so hostile input fails fast instead of
+  exhausting memory.
+
+Test data (samples/extras/swift/)
+
+  manglings-ref.json: mangled names from the Swift project's test/Demangle/Inputs/manglings.txt
+  (swift-6.0.3-RELEASE, Apache License v2.0 with Runtime Library Exception), with the output of
+  swift-demangle 6.0.3.
+  maccy-symbols-ref.json: symbol names from Maccy 2.8.0 (https://github.com/p0deje/Maccy, MIT),
+  with the output of swift-demangle 6.0.3.

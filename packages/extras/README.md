@@ -4,7 +4,7 @@ Format readers and agent tools that round out RevLens, in pure TypeScript. Every
 
 What it covers:
 
-- Demangling: Itanium C++, Rust legacy and v0, MSVC. One `demangle()` picks the scheme.
+- Demangling: Itanium C++, Rust legacy and v0, MSVC, and Swift (old Swift 1 to 3 `_T` mangling and the new `_T0`, `$S`, `$s` and `@__swiftmacro_` mangling, ported from swift-demangle 6.0.3). One `demangle()` picks the scheme.
 - Executables: one container model for ELF, PE and Mach-O (fat slices too), raw byte reads, wildcard byte search, address to offset mapping, checksec style hardening checks.
 - PE in depth: headers and checksum, rich header, resources, version info, manifest, string tables, debug and PDB path, TLS callbacks, load config, exports, delay imports, overlay, installer and packer detection, Authenticode (digest recomputed and compared, signer signature verified with WebCrypto).
 - ELF: notes (build-id, ABI tag, GNU properties), dynamic section, init and fini arrays resolved through relocations, unwind ranges from `.eh_frame_hdr` and `.eh_frame`, kernel modules and IKCONFIG.
@@ -31,6 +31,7 @@ import '@revlens/extras/node'; // Node only: lets tools read `path` inputs and p
 - Plain functions for every format, for example `parseGguf(bytes)`, `parseLnk(bytes)`, `elfUnwind(bytes)`, `goSymbols(bytes)`, `machoCodeSignature(bytes)`, `inspectGpu(bytes)`. They take a `Uint8Array`, check every read against bounds, and throw `ParseError` on malformed input.
 - `Ledger`: `claim()`, `unknown()`, `update()`, `verify(resolver)`, `items()`, `summary()`, `export()`, `Ledger.import()`, `toMarkdown()`.
 - `EVAL_TASKS`, `publicTasks()`, `scoreAnswers()`.
+- Swift: `demangleSwift(sym, { simplified })` returns the text swift-demangle prints, or null; `swiftDemangleCompat(sym)` returns the input unchanged on failure like swift-demangle does; `demangleSwiftTree(sym)` returns the node tree. Mach-O names with an extra leading underscore (`_$s...`, `__T...`) are accepted by `demangle()` and the tools.
 
 ## Agent tools (`TOOLS`)
 
@@ -38,7 +39,8 @@ Every tool takes `path` (or base64 `bytes`), returns JSON with file offsets and 
 
 | tool | what it does |
 |---|---|
-| x_demangle | Demangle names, or a binary symbol table with a filter |
+| x_demangle | Demangle C++, Rust, MSVC and Swift names, or a binary symbol table with a filter |
+| x_swift_demangle | Swift names like swift-demangle, with `simplified` and an optional node `tree`; with a path, the Swift symbols of a symbol table with addresses |
 | x_container | Sections and segments of ELF, PE or Mach-O, fat slices |
 | x_read_bytes | Up to 64 KiB at a file offset or a virtual address |
 | x_search_bytes | Hex pattern with `??` wildcards or text (ASCII and UTF-16LE), hits with address and section |
@@ -73,12 +75,13 @@ Ledger tools use an in-memory session ledger unless `ledgerPath` is given.
 
 ## CLI commands (`CLI_COMMANDS`)
 
-`x-demangle`, `x-container`, `x-read-bytes`, `x-search-bytes`, `x-address-map`, `x-checksec`, `x-go`, `x-rust`, `x-pe`, `x-pe-resources`, `x-authenticode`, `x-elf`, `x-unwind`, `x-kmod`, `x-macho`, `x-firmware`, `x-firmware-parse`, `x-v8`, `x-gpu`, `x-model`, `x-lnk`, `x-ips`, `x-claim`, `x-unknown`, `x-verify`, `x-ledger`, `x-ledger-export`, `x-eval-tasks`, `x-eval-score`.
+`x-demangle`, `x-swift-demangle`, `x-container`, `x-read-bytes`, `x-search-bytes`, `x-address-map`, `x-checksec`, `x-go`, `x-rust`, `x-pe`, `x-pe-resources`, `x-authenticode`, `x-elf`, `x-unwind`, `x-kmod`, `x-macho`, `x-firmware`, `x-firmware-parse`, `x-v8`, `x-gpu`, `x-model`, `x-lnk`, `x-ips`, `x-claim`, `x-unknown`, `x-verify`, `x-ledger`, `x-ledger-export`, `x-eval-tasks`, `x-eval-score`.
 
 The first bare argument is the file, `--name value` sets a tool input, `--json` prints JSON, and object inputs can come from a file with `@`:
 
 ```sh
 revlens x-authenticode setup.exe
+revlens x-swift-demangle '$sSaySiGSgD' --simplified      # [Int]?
 revlens x-claim sample.bin --statement "C2 host in .rdata" --ranges '[{"offset":4096,"length":24}]' --ledgerPath case.json
 revlens x-verify --ledgerPath case.json
 revlens x-eval-score --answers @answers.json --json
@@ -92,6 +95,7 @@ Fixtures live in `samples/extras` (see `SOURCES.md`), built with Zig 0.17.1, LLV
 |---|---|
 | Itanium demangling | GNU c++filt 2.44: all sampled symbols of a libc++ static binary identical; llvm-cxxfilt 19: identical apart from documented spelling differences |
 | MSVC demangling | llvm-undname 19 on every symbol of a COFF object |
+| Swift demangling | swift-demangle from the Swift 6.0.3 toolchain, each name passed as an argument: 470 of 470 names from swift's own test/Demangle/Inputs/manglings.txt (247 old mangling, 223 new) and 1947 of 1947 Swift symbols of the Maccy 2.8.0 Mach-O, identical for both `-compact` and `-compact -simplified` output. The test fails if any count drops. |
 | Rust demangling | rust-demangler (legacy, 400+ symbols from jiter), llvm-cxxfilt on the rustc-demangle v0 test vectors |
 | ELF | pyelftools (entry, DT_NEEDED, BIND_NOW, init_array, every FDE), readelf 2.44 (notes, FDE count on a stripped aarch64 binary) |
 | PE | pefile (version info, resources with offsets, checksum, exports, imports), lief (authentihash, Microsoft signed strings64.exe signature, signer serial) |
@@ -120,9 +124,13 @@ node --test --import tsx packages/extras/test/*.test.ts
 
 - CUDA fatbin and cubin readers follow the documented layout but were not checked against nvcc output (no CUDA toolchain was available). Compressed fatbin entries are listed, not decompressed.
 - Hermes support is the file header only and was not checked against a real hermesc file. No Hermes or V8 bytecode disassembly.
-- Swift demangling is not implemented; Swift names are detected only.
+- Swift demangling follows Swift 6.0.3. Newer manglings (for example the embedded `$e` prefix from Swift 6.1) are not recognized. Only the default and simplified print options are tested. Symbols over 16 KiB, demangler nesting over 1024 levels, or printed output over 1 MiB return null; the printer stops at 768 levels like swift-demangle.
 - Squashfs file listing needs gzip compression (the runtime DecompressionStream); xz, lzo, lz4 and zstd images report superblock facts only.
 - Authenticode checks do not build a chain to a trusted root and do not check revocation.
 - Byte reads are capped at 64 KiB, searches at 1000 hits per call, ledger evidence ranges at 16 MiB.
+
+## License
+
+MIT, except the Swift demangler in `src/demangle/swift/`, which is ported from the Swift project (swift-6.0.3-RELEASE, Copyright (c) 2014 - 2024 Apple Inc. and the Swift project authors) and stays under the Apache License v2.0 with Runtime Library Exception. See `NOTICE` and `LICENSE-SWIFT.txt`.
 
 See `GAP-MATRIX.md` for how this package and the rest of RevLens compare with rea.
