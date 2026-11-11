@@ -14,6 +14,9 @@ import {
   adbPmPath, adbPortMap, adbPs, adbPull, adbPush, adbResolveActivity, adbScreenrecord, adbScreenshot, adbSettings, adbStartActivity, adbStopApp, adbUninstall,
 } from './providers/adb.js';
 import { MCP_CLIENTS, setupClient, SetupError } from './setup.js';
+import { gdbSessionCmd, gdbSessionOpen, lldbSessionCmd, lldbSessionOpen, r2SessionCmd, r2SessionOpen, sessionClose, sessionList } from './sessions/debuggers.js';
+import { fridaSessionAttach, fridaSessionCollect, fridaSessionLoad, fridaSessionPost, fridaSessionResume, fridaSessionUnload } from './sessions/frida.js';
+import { SessionError } from './sessions/manager.js';
 import { UnsafeArgumentError } from './exec.js';
 import { HookParamError } from './hooks.js';
 import type { BridgeTool, ToolId, ToolInputField } from './types.js';
@@ -26,6 +29,8 @@ const FN = f('string', 'function name (main, sym.main, check_password) or 0x add
 const LIMIT = f('number', 'max items to return');
 const OFFSET = f('number', 'items to skip, for paging');
 const TIMEOUT = f('number', 'time limit in milliseconds');
+const SID = f('string', 'session id from the open call', false);
+const IDLE = f('number', 'close the session after this many ms without use (default 15 minutes)');
 const SERIAL = f('string', 'device serial when several are connected');
 const PKG = f('string', 'package name, for example com.example.app', false);
 const DEVICE = f('boolean', 'must be true: this changes the connected device', false);
@@ -37,6 +42,9 @@ const ALLOW = f('boolean', 'must be true: this runs or instruments code, only us
  */
 function requiredTool(name: string): ToolId | undefined {
   if (name.startsWith('bridge_adb_')) return 'adb';
+  if (name.startsWith('bridge_gdb_session_')) return 'gdb';
+  if (name.startsWith('bridge_lldb_session_')) return 'lldb';
+  if (name.startsWith('bridge_frida_session_')) return 'frida';
   return REQUIRES[name];
 }
 const REQUIRES: Record<string, ToolId> = {};
@@ -54,6 +62,7 @@ function safe(run: (input: any) => Promise<unknown>, requires?: ToolId): (input:
       if (e instanceof BridgeInputError || e instanceof UnsafeArgumentError || e instanceof SetupError || e instanceof HookParamError) {
         return { ok: false, inputError: true, error: e.message };
       }
+      if (e instanceof SessionError) return { ok: false, sessionError: true, error: e.message };
       throw e;
     }
   };
@@ -352,6 +361,91 @@ const RAW: BridgeTool[] = [
     description: 'List, add or remove device to host reverse port rules. Adding and removing change the device: need allowExecution: true.',
     inputSchema: { action: f('string', 'list (default), add, remove or remove-all'), local: f('string', 'device side, for example tcp:8081'), remote: f('string', 'host side, for example tcp:8081'), serial: SERIAL, allowExecution: f('boolean', 'must be true for add and remove') },
     run: (i) => adbPortMap({ ...i, direction: 'reverse' }),
+  },
+  // ---- persistent sessions ----
+  {
+    name: 'bridge_session_list',
+    description: 'List open radare2/rizin, gdb, lldb and Frida sessions with ids, targets, idle timeouts and command counts.',
+    inputSchema: {},
+    run: () => sessionList(),
+  },
+  {
+    name: 'bridge_session_close',
+    description: 'Close one session by id (or every session with all: true). Sessions also close after their idle timeout and when the server exits.',
+    inputSchema: { sessionId: f('string', 'session id'), all: f('boolean', 'close every session') },
+    run: (i) => sessionClose(i),
+  },
+  {
+    name: 'bridge_r2_session_open',
+    description: 'Open a radare2 (or rizin) session on a file and keep it alive across calls, so analysis runs once and names you set stay. Static only, sandboxed (cfg.sandbox), no shell.',
+    inputSchema: { path: PATH, engine: ENGINE, analysis: f('string', 'none (default), aa or aaa, run once at open'), idleTimeoutMs: IDLE, timeoutMs: TIMEOUT },
+    run: (i) => r2SessionOpen(i),
+  },
+  {
+    name: 'bridge_r2_session_cmd',
+    description: 'Run one radare2 or rizin command in an open session (afl, pdf @ main, afn name @ addr, axt, izj). JSON commands come back parsed. Shell, pipes, file writes, opening other files and scripts are refused.',
+    inputSchema: { sessionId: SID, command: f('string', 'one r2 command line', false), timeoutMs: TIMEOUT, maxChars: f('number', 'cap on returned characters') },
+    run: (i) => r2SessionCmd(i),
+  },
+  {
+    name: 'bridge_gdb_session_open',
+    description: 'Start gdb (MI) on a program with arguments, or attached to a pid, and keep it alive across calls. Program output goes to its own stream. Needs allowExecution: true.',
+    inputSchema: { path: f('string', 'program to debug'), args: f('array', 'program arguments (passed without a shell)'), pid: f('number', 'attach to this pid instead'), idleTimeoutMs: IDLE, allowExecution: ALLOW },
+    run: (i) => gdbSessionOpen(i),
+  },
+  {
+    name: 'bridge_gdb_session_cmd',
+    description: 'Run one gdb console command in a session (break, run, continue, stepi, info registers, bt, x/16gx $sp). Resuming commands wait for the next stop, then interrupt on timeout. shell, python, source, dump, file and similar are refused.',
+    inputSchema: { sessionId: SID, command: f('string', 'one gdb command', false), timeoutMs: TIMEOUT, maxChars: f('number', 'cap on returned characters') },
+    run: (i) => gdbSessionCmd(i),
+  },
+  {
+    name: 'bridge_lldb_session_open',
+    description: 'Start lldb on a program with arguments, or attached to a pid, and keep it alive across calls. Needs allowExecution: true.',
+    inputSchema: { path: f('string', 'program to debug'), args: f('array', 'program arguments'), pid: f('number', 'attach to this pid instead'), idleTimeoutMs: IDLE, allowExecution: ALLOW },
+    run: (i) => lldbSessionOpen(i),
+  },
+  {
+    name: 'bridge_lldb_session_cmd',
+    description: 'Run one lldb command in a session (b, run, continue, si, register read, bt, memory read). Waits until the program stops. platform shell, script, command script and similar are refused.',
+    inputSchema: { sessionId: SID, command: f('string', 'one lldb command', false), timeoutMs: TIMEOUT, maxChars: f('number', 'cap on returned characters') },
+    run: (i) => lldbSessionCmd(i),
+  },
+  {
+    name: 'bridge_frida_session_attach',
+    description: 'Attach Frida to a process (pid or name) or spawn a program and keep the session open for scripts and messages. Needs allowExecution: true.',
+    inputSchema: { pid: f('number', 'attach to this pid'), name: f('string', 'attach by process name'), spawn: f('string', 'spawn this program (stays suspended until a script loads or resume)'), args: f('array', 'arguments for a spawned program'), device: f('string', 'local (default), usb, remote or a device id'), maxEvents: f('number', 'event buffer size, default 10000'), idleTimeoutMs: IDLE, allowExecution: ALLOW },
+    run: (i) => fridaSessionAttach(i),
+  },
+  {
+    name: 'bridge_frida_session_load',
+    description: 'Load a script into a Frida session: a RevLens hook template (see bridge_frida_templates) or your own JavaScript source. Returns a script id. A spawned program is resumed after the first load unless resume: false.',
+    inputSchema: { sessionId: SID, template: f('string', 'hook template id'), params: f('object', 'template parameters'), source: f('string', 'JavaScript source instead of a template'), resume: f('boolean', 'resume a spawned program (default true)') },
+    run: (i) => fridaSessionLoad(i),
+  },
+  {
+    name: 'bridge_frida_session_post',
+    description: 'Post a JSON message to a loaded script (the script reads it with recv()).',
+    inputSchema: { sessionId: SID, script: f('number', 'script id from load', false), message: f('object', 'JSON message, usually { type: "...", ... }', false) },
+    run: (i) => fridaSessionPost(i),
+  },
+  {
+    name: 'bridge_frida_session_collect',
+    description: 'Take buffered events from a Frida session: send() payloads, console logs, parsed RevLens template events, script errors and detach notices. Can wait up to waitMs for minEvents.',
+    inputSchema: { sessionId: SID, script: f('number', 'only this script'), limit: LIMIT, waitMs: f('number', 'wait this long for events'), minEvents: f('number', 'how many events to wait for, default 1') },
+    run: (i) => fridaSessionCollect(i),
+  },
+  {
+    name: 'bridge_frida_session_unload',
+    description: 'Unload one script from a Frida session; the session stays attached.',
+    inputSchema: { sessionId: SID, script: f('number', 'script id', false) },
+    run: (i) => fridaSessionUnload(i),
+  },
+  {
+    name: 'bridge_frida_session_resume',
+    description: 'Resume a spawned program that is still suspended.',
+    inputSchema: { sessionId: SID },
+    run: (i) => fridaSessionResume(i),
   },
   {
     name: 'bridge_ida_run',

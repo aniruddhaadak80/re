@@ -18,6 +18,12 @@ export {
   adbScreenshot, adbScreenrecord, adbDisplay, adbInput, adbGetprop, adbSettings, adbPs, adbLs, adbLogcatFiltered, adbBugreport, adbBackup, adbPortMap,
   amStartArgs, shQuote, checkRemotePath, requireDeviceChange, deviceSummary, type StartActivityInput,
 } from './providers/adb.js';
+export { SESSIONS, SessionManager, SessionError, PipeProcess, SESSION_LIMITS, type SessionInfo, type SessionKind } from './sessions/manager.js';
+export { r2SessionOpen, r2SessionCmd, gdbSessionOpen, gdbSessionCmd, lldbSessionOpen, lldbSessionCmd, sessionList, sessionClose } from './sessions/debuggers.js';
+export {
+  fridaSessionAttach, fridaSessionLoad, fridaSessionPost, fridaSessionCollect, fridaSessionUnload, fridaSessionResume, findFridaPython, FRIDA_SESSION_HELPER,
+  type FridaEventRecord,
+} from './sessions/frida.js';
 export { TOOLS } from './tools.js';
 export { CLI_COMMANDS, parseArgv, toolInput, renderResult } from './cli.js';
 export { ANALYZERS, r2Analyzer, jadxAnalyzer, inventoryAnalyzer } from './analyzer.js';

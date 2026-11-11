@@ -1,0 +1,43 @@
+=thread-group-added,id="i1"
+=cmd-param-changed,param="startup-with-shell",value="off"
+~"Reading symbols from ./crackme-aarch64-static.elf...\n"
+~"(No debugging symbols found in ./crackme-aarch64-static.elf)\n"
+(gdb) 
+~"Breakpoint 1 at 0x101ae04\n"
+=breakpoint-created,bkpt={number="1",type="breakpoint",disp="keep",enabled="y",addr="0x000000000101ae04",at="<check_password+16>",thread-groups=["i1"],times="0",original-location="check_password"}
+1^done
+(gdb) 
+~"Starting program: /workspace/work/g-bridges/samples/bridges/crackme-aarch64-static.elf hunter2\n"
+=thread-group-started,id="i1",pid="18940"
+=thread-created,id="1",group-id="i1"
+2^running
+*running,thread-id="all"
+(gdb) 
+total=43
+=breakpoint-modified,bkpt={number="1",type="breakpoint",disp="keep",enabled="y",addr="0x000000000101ae04",at="<check_password+16>",thread-groups=["i1"],times="1",original-location="check_password"}
+~"\n"
+~"Breakpoint 1, 0x000000000101ae04 in check_password ()\n"
+*stopped,reason="breakpoint-hit",disp="keep",bkptno="1",frame={addr="0x000000000101ae04",func="check_password",args=[],arch="aarch64"},thread-id="1",stopped-threads="all",core="1"
+(gdb) 
+~"pc             0x101ae04           0x101ae04 <check_password+16>\n"
+3^done
+(gdb) 
+~"#0  0x000000000101ae04 in check_password ()\n"
+~"#1  0x000000000101af50 in main ()\n"
+4^done
+(gdb) 
+&"Undefined command: \"nosuchcommand\".  Try \"help\".\n"
+5^error,msg="Undefined command: \"nosuchcommand\".  Try \"help\"."
+(gdb) 
+~"Continuing.\n"
+6^running
+*running,thread-id="all"
+(gdb) 
+checksum=379752446
+access denied
+~"[Inferior 1 (process 18940) exited with code 01]\n"
+=thread-exited,id="1",group-id="i1"
+=thread-group-exited,id="i1",exit-code="01"
+*stopped,reason="exited",exit-code="01"
+(gdb) 
+7^exit

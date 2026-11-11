@@ -13,3 +13,5 @@ export * from './parsers/adb.js';
 export * from './parsers/ghidra.js';
 export { HOOK_TEMPLATES, buildHookScript, HookParamError, type HookTemplate, type HookTemplateId } from './hooks.js';
 export { GHIDRA_EXPORT_SCRIPT, GHIDRA_SCRIPT_NAME, IDA_EXPORT_SCRIPT } from './scripts.js';
+export * from './parsers/mi.js';
+export { checkR2Command, checkGdbCommand, checkLldbCommand, miQuote } from './sessions/guards.js';
