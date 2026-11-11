@@ -11,11 +11,12 @@ import { TOOLS, CLI_COMMANDS } from '../src/node.js';
 const S = join(dirname(fileURLToPath(import.meta.url)), '../../../samples/webrt');
 const tool = (n: string) => TOOLS.find((t) => t.name === n)!;
 
-const EXPECTED = ['web_js_beautify', 'web_js_deobfuscate', 'web_bundle_modules', 'web_js_endpoints', 'web_sourcemap_recover', 'web_asar_list', 'web_asar_extract', 'web_electron_audit', 'web_browser_capture', 'web_pcap_summary', 'web_pcap_flows', 'web_sqlite_tables', 'web_sqlite_query', 'web_har_summary'];
+const EXPECTED = ['web_js_beautify', 'web_js_deobfuscate', 'web_bundle_modules', 'web_js_endpoints', 'web_sourcemap_recover', 'web_asar_list', 'web_asar_extract', 'web_electron_audit', 'web_browser_capture', 'web_pcap_summary', 'web_pcap_flows', 'web_sqlite_tables', 'web_sqlite_query', 'web_har_summary', 'web_webmcp_scan', 'web_wellknown_classify', 'web_capture_compare', 'web_browser_scenario', 'web_trace_inspect', 'web_cdp_targets', 'web_webmcp_discover', 'web_node_inspect'];
+const NODE_ONLY = ['web_browser_capture', 'web_browser_scenario', 'web_trace_inspect', 'web_cdp_targets', 'web_webmcp_discover', 'web_node_inspect'];
 
 test('TOOLS: names, schemas and platform split', () => {
   assert.deepEqual(TOOLS.map((t) => t.name).sort(), [...EXPECTED].sort());
-  assert.deepEqual(WEB_TOOLS.map((t) => t.name).sort(), EXPECTED.filter((n) => n !== 'web_browser_capture').sort());
+  assert.deepEqual(WEB_TOOLS.map((t) => t.name).sort(), EXPECTED.filter((n) => !NODE_ONLY.includes(n)).sort());
   for (const t of TOOLS) {
     assert.match(t.name, /^web_[a-z0-9_]+$/);
     assert.ok(t.description.length > 40);
@@ -52,7 +53,7 @@ test('tools run on real files through paths (Node) and base64 (browser entry)', 
 });
 
 test('CLI commands print human text and JSON', () => {
-  assert.equal(CLI_COMMANDS.length, 14);
+  assert.equal(CLI_COMMANDS.length, 20);
   const runner = join(dirname(fileURLToPath(import.meta.url)), 'cli-runner.ts');
   const run = (...args: string[]) => spawnSync(process.execPath, ['--import', 'tsx', runner, ...args], { encoding: 'utf8', timeout: 60_000 });
   const a = run('pcap-summary', join(S, 'dns_udp.pcap'));

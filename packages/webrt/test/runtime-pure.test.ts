@@ -151,3 +151,15 @@ test('hostile inputs: random bytes never crash the PNG, zip and WebMCP parsers',
   // deep HTML and unterminated tags stay linear
   const t0 = Date.now(); scanHtmlForMcp('<form toolname=a '.repeat(50_000)); assert.ok(Date.now() - t0 < 3000);
 });
+
+test('capture-compare CLI prints a score for two HAR files', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const { fileURLToPath } = await import('node:url');
+  const runner = fileURLToPath(new URL('./cli-runner.ts', import.meta.url));
+  const S = fileURLToPath(new URL('../../../samples/webrt/', import.meta.url));
+  const r = spawnSync(process.execPath, ['--import', 'tsx', runner, 'capture-compare', S + 'har-redirect.har', S + 'har-fulfill.har'], { encoding: 'utf8', timeout: 60_000 });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /^similarity score 0(\.\d+)? \(endpoints=/);
+  const j = spawnSync(process.execPath, ['--import', 'tsx', runner, 'capture-compare', S + 'har-redirect.har', S + 'har-redirect.har', '--json'], { encoding: 'utf8', timeout: 60_000 });
+  assert.equal(JSON.parse(j.stdout).score, 1);
+});
