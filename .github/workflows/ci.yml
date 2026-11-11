@@ -54,6 +54,8 @@ jobs:
         run: node --test --import tsx packages/mobile/test/*.test.ts
       - name: Test disasm
         run: node --test --import tsx packages/disasm/test/*.test.ts
+      - name: Test extras
+        run: node --test --import tsx packages/extras/test/*.test.ts
       - name: Test bridges (tools that are not installed are skipped)
         run: node --test --import tsx packages/bridges/test/*.test.ts
       - name: Test engine, CLI and MCP over stdio
@@ -72,6 +74,7 @@ jobs:
           node packages/cli/dist/index.js mobile manifest samples/mobile/apk/org.rayg.streaktracker_12.apk
           node packages/cli/dist/index.js managed dotnet samples/managed/dotnet/System.IO.Compression.Brotli.dll
           node packages/cli/dist/index.js web pcap-summary samples/webrt/dns_udp.pcap
+          node packages/cli/dist/index.js extras x-checksec samples/ls-linux.elf
 
   web:
     name: Web app build and browser tests

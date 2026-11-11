@@ -20,6 +20,9 @@
       "path": "packages/bridges"
     },
     {
+      "path": "packages/extras"
+    },
+    {
       "path": "packages/engine"
     },
     {

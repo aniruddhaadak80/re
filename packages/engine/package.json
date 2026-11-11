@@ -27,6 +27,7 @@
     "@revlens/bridges": "1.0.0",
     "@revlens/core": "1.0.0",
     "@revlens/disasm": "1.0.0",
+    "@revlens/extras": "1.0.0",
     "@revlens/managed": "1.0.0",
     "@revlens/mobile": "1.0.0",
     "@revlens/webrt": "1.0.0"

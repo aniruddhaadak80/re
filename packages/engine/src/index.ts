@@ -5,6 +5,7 @@ import { ANALYZERS as MANAGED_ANALYZERS } from '@revlens/managed';
 import { ANALYZERS as WEBRT_ANALYZERS } from '@revlens/webrt';
 import { ANALYZERS as MOBILE_ANALYZERS } from '@revlens/mobile';
 import { ANALYZERS as DISASM_ANALYZERS, loadDecoders, type DecoderOptions } from '@revlens/disasm';
+import { ANALYZERS as EXTRAS_ANALYZERS } from '@revlens/extras';
 
 /** A RevLens package that adds analyzers to the combined report. */
 export interface PackageInfo {
@@ -21,6 +22,7 @@ export const PACKAGES: PackageInfo[] = [
   { id: 'mobile', npm: '@revlens/mobile', title: 'Android, Java and iOS', summary: 'APK manifests and signatures, DEX and smali, Java class files, IPA plists and entitlements, app frameworks, IL2CPP metadata.', analyzers: MOBILE_ANALYZERS as Analyzer[] },
   { id: 'managed', npm: '@revlens/managed', title: 'Managed and bytecode runtimes', summary: '.NET metadata and CIL, Python pyc and PyInstaller, Lua, Erlang BEAM and EVM bytecode.', analyzers: MANAGED_ANALYZERS as Analyzer[] },
   { id: 'web', npm: '@revlens/webrt', title: 'Web runtime', summary: 'JavaScript deobfuscation and bundles, endpoints, source maps, Electron ASAR audit, PCAP, SQLite and HAR.', analyzers: WEBRT_ANALYZERS as Analyzer[] },
+  { id: 'extras', npm: '@revlens/extras', title: 'Extras', summary: 'Demanglers, checksec, Go and Rust facts, deep PE with Authenticode, ELF notes and unwind, Mach-O code signatures, firmware containers, GPU code, V8 and Hermes headers, model files, LNK, crash reports, evidence ledger.', analyzers: EXTRAS_ANALYZERS as Analyzer[] },
   { id: 'disasm', npm: '@revlens/disasm', title: 'Native code', summary: 'x86, x86-64, AArch64 and ARM disassembly, functions, CFG, xrefs, call graph and pseudo code.', analyzers: DISASM_ANALYZERS as Analyzer[] },
 ];
 

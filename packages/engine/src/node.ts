@@ -6,6 +6,7 @@ import * as webrt from '@revlens/webrt/node';
 import * as mobile from '@revlens/mobile/node';
 import * as disasm from '@revlens/disasm/node';
 import * as bridges from '@revlens/bridges/node';
+import * as extras from '@revlens/extras/node';
 import { analyzeAll, ALL_ANALYZERS, type EngineOptions } from './index.js';
 import type { Analyzer, Report } from '@revlens/core';
 
@@ -43,6 +44,7 @@ export const TOOL_GROUPS: ToolGroup[] = [
   { id: 'mobile', npm: '@revlens/mobile', title: 'Android, Java and iOS', tools: mobile.TOOLS as unknown as PackageTool[], commands: mobile.CLI_COMMANDS as PackageCommand[] },
   { id: 'managed', npm: '@revlens/managed', title: 'Managed and bytecode runtimes', tools: managed.TOOLS as unknown as PackageTool[], commands: managed.CLI_COMMANDS as PackageCommand[] },
   { id: 'web', npm: '@revlens/webrt', title: 'Web runtime', tools: webrt.TOOLS as unknown as PackageTool[], commands: webrt.CLI_COMMANDS as PackageCommand[] },
+  { id: 'extras', npm: '@revlens/extras', title: 'Extras: demangling, deep PE, ELF, Mach-O, firmware and more', tools: extras.TOOLS as unknown as PackageTool[], commands: extras.CLI_COMMANDS as PackageCommand[] },
   { id: 'disasm', npm: '@revlens/disasm', title: 'Native code', tools: disasm.TOOLS as unknown as PackageTool[], commands: disasm.CLI_COMMANDS as PackageCommand[] },
   // bridges' own commands (doctor, setup, bridge) are top level CLI commands, see TOP_LEVEL_COMMANDS
   { id: 'bridges', npm: '@revlens/bridges', title: 'External tool bridges', tools: bridges.TOOLS as unknown as PackageTool[], commands: [] },
@@ -79,6 +81,10 @@ export const TOOL_EFFECTS: Record<string, { writes?: boolean; network?: boolean;
   bridge_adb_pull_apk: { writes: true },
   bridge_adb_logcat: { network: true },
   bridge_setup_mcp: { writes: true },
+  x_ledger_record: { writes: true },
+  x_ledger_unknown: { writes: true },
+  x_ledger_verify: { writes: true },
+  x_ledger_import: { writes: true },
 };
 
 const MAX_FILE = Number(process.env.REVLENS_MAX_FILE_MB ?? 256) * 1024 * 1024;

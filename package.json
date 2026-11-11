@@ -18,7 +18,7 @@
     "typecheck": "tsc -b tsconfig.json",
     "test": "node --test --import tsx packages/*/test/*.test.ts",
     "cli": "node --import tsx packages/cli/src/index.ts",
-    "fetch-fixtures": "node samples/fetch-samples.mjs && node packages/managed/scripts/fetch-fixtures.mjs && node packages/webrt/scripts/fetch-fixtures.mjs && node packages/mobile/scripts/fetch-fixtures.mjs && node packages/disasm/scripts/fetch-fixtures.mjs"
+    "fetch-fixtures": "node samples/fetch-samples.mjs && node packages/managed/scripts/fetch-fixtures.mjs && node packages/webrt/scripts/fetch-fixtures.mjs && node packages/mobile/scripts/fetch-fixtures.mjs && node packages/disasm/scripts/fetch-fixtures.mjs && node packages/extras/scripts/fetch-fixtures.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
