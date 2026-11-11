@@ -39,6 +39,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends binutils gdb lldb llvm binwalk adb unzip python3-pip pipx
+          # Frida attaches to a process it did not start
+          sudo sysctl -w kernel.yama.ptrace_scope=0
 
       - name: radare2 and r2ghidra from GitHub releases
         run: |
@@ -75,7 +77,8 @@ jobs:
           npx tsc -p packages/bridges --noEmit
 
       - name: Doctor
-        run: node --import tsx -e "const m = await import('./packages/bridges/src/node.ts'); const inv = await m.inventory(); console.log(m.formatInventory(inv, { verbose: true }));" --input-type=module
+        run: |
+          node --import tsx --input-type=module -e "const m = await import('./packages/bridges/src/node.ts'); const inv = await m.inventory(); console.log(m.formatInventory(inv, { verbose: true }));"
 
       - name: Unit, safety and setup tests
         run: node --test --import tsx packages/bridges/test/parsers.test.ts packages/bridges/test/safety.test.ts packages/bridges/test/setup.test.ts
