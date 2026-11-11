@@ -488,7 +488,7 @@ function decodeMsvcString(body: string): string | null {
   let str = '';
   if (wide) { for (let i = 0; i + 1 < bytes.length; i += 2) str += String.fromCharCode((bytes[i] as number) | ((bytes[i + 1] as number) << 8)); }
   else str = String.fromCharCode(...bytes);
-  str = str.replace(/\0+$/, '');
+  str = stripNul(str);
   const esc = str.replace(/[\\"]/g, (x) => '\\' + x).replace(/\n/g, '\\n').replace(/\t/g, '\\t').replace(/[\x00-\x1f]/g, (x) => '\\x' + x.charCodeAt(0).toString(16).padStart(2, '0'));
   return (wide ? 'L"' : '"') + esc + '"';
 }
@@ -551,3 +551,6 @@ export function demangleMsvc(sym: string): string | null {
     return null;
   }
 }
+
+/** Drop trailing NUL characters without a regex (linear on any input). */
+function stripNul(s: string): string { let e = s.length; while (e > 0 && s.charCodeAt(e - 1) === 0) e--; return s.slice(0, e); }

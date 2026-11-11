@@ -215,7 +215,7 @@ export async function disasmTraceValues(input: BinaryInput & {
       const q = String(input.call).toLowerCase();
       sites = af.calls.filter((c) => {
         const n = (c.name ?? (c.target !== undefined ? p.nameOf(c.target) : undefined) ?? '').toLowerCase();
-        return n === q || n.replace(/^_+/, '').replace(/@.*$/, '') === q.replace(/^_+/, '');
+        return n === q || n.replace(/^_+/, '').split('@')[0] === q.replace(/^_+/, '');
       });
       if (input.occurrence !== undefined) sites = sites.slice(clampInt(input.occurrence, 1, 1, 10000) - 1, clampInt(input.occurrence, 1, 1, 10000));
     }

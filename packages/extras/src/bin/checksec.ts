@@ -25,7 +25,7 @@ function elfChecks(img: BinImage): Check[] {
   const pie = type === 3 && (hasInterp || (dyn.flags1 & 0x08000000) !== 0);
   checks.push({ name: 'PIE', value: type === 2 ? false : pie ? true : type === 3 ? 'shared object' : false, evidence: `e_type ${type === 2 ? 'EXEC' : type === 3 ? 'DYN' : type}${dyn.flags1 & 0x08000000 ? ', DF_1_PIE' : ''}` });
   let syms: string[] = [];
-  try { syms = [...elfSymbols(img, 'dynsym'), ...elfSymbols(img, 'symtab')].map((s) => s.name.replace(/@.*$/, '')); } catch { syms = []; }
+  try { syms = [...elfSymbols(img, 'dynsym'), ...elfSymbols(img, 'symtab')].map((s) => s.name.split('@')[0]!); } catch { syms = []; }
   const set = new Set(syms);
   const canary = set.has('__stack_chk_fail') || set.has('__stack_chk_guard') || set.has('__intel_security_cookie');
   checks.push({ name: 'Stack canary', value: canary, evidence: canary ? 'references __stack_chk_fail' : 'no __stack_chk_fail reference' });
@@ -80,7 +80,7 @@ function peChecks(bytes: Uint8Array): Check[] {
 
 function machoChecks(bytes: Uint8Array): Check[] {
   const info = machoInfo(bytes);
-  let syms = new Set<string>();
+  let syms: Set<string>;
   try { syms = new Set(machoSymbols(bytes).filter((s) => s.undefined).map((s) => s.name)); } catch { syms = new Set(); }
   let sig: CodeSignature | null = null;
   try { sig = machoCodeSignature(bytes); } catch { sig = null; }

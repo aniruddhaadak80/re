@@ -1,17 +1,21 @@
 // Node entry: installs a file loader for `path` inputs and file persistence for ledgerPath.
-import { readFile, writeFile, rename, mkdir, stat } from 'node:fs/promises';
+import { readFile, writeFile, rename, mkdir, open } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { setFileLoader } from './util.js';
 import { setLedgerStore } from './tools.js';
 
 const MAX_FILE = 2 * 1024 * 1024 * 1024;
 setFileLoader(async (p) => {
-  const st = await stat(p);
-  if (!st.isFile()) throw new Error(`${p} is not a regular file`);
-  if (st.size > MAX_FILE) throw new Error('file larger than 2 GiB');
-  const b = await readFile(p);
-  if (b.length > MAX_FILE) throw new Error('file larger than 2 GiB');
-  return new Uint8Array(b.buffer, b.byteOffset, b.byteLength);
+  // One descriptor for the check and the read, so the file cannot be swapped in between.
+  const fh = await open(p, 'r');
+  try {
+    const st = await fh.stat();
+    if (!st.isFile()) throw new Error(`${p} is not a regular file`);
+    if (st.size > MAX_FILE) throw new Error('file larger than 2 GiB');
+    const b = await fh.readFile();
+    if (b.length > MAX_FILE) throw new Error('file larger than 2 GiB');
+    return new Uint8Array(b.buffer, b.byteOffset, b.byteLength);
+  } finally { await fh.close(); }
 });
 setLedgerStore({
   async load(p) { try { return await readFile(p, 'utf8'); } catch (e) { if ((e as NodeJS.ErrnoException).code === 'ENOENT') return undefined; throw e; } },

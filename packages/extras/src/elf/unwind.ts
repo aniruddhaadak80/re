@@ -95,9 +95,9 @@ export function elfUnwind(bytes: Uint8Array, opts: { limit?: number; offset?: nu
   const ehEnd = eh.offset + eh.size;
   const fdeAt = (fileOff: number): UnwindRange | null => {
     let p = fileOff;
-    let len = v.u32(p); p += 4;
+    const len = v.u32(p); p += 4;
     if (len === 0) return null;
-    if (len === 0xffffffff) { len = v.u64n(p); p += 8; }
+    if (len === 0xffffffff) p += 8;
     const idPos = p;
     const cieRel = v.u32(p); p += 4;
     if (cieRel === 0) return null; // a CIE

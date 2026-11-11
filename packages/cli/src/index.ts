@@ -35,7 +35,7 @@ const CORE_COMMANDS = new Set(['analyze', 'scan', 'diff', 'verify', 'rules', 'sb
 
 /** Argument text of a package usage line, without the leading "revlens" and command name. */
 function usageArgs(c: PackageCommand): string {
-  return c.usage.replace(/^usage:\s*/, '').replace(/^revlens\s+/, '').replace(new RegExp(`^${c.name.replace(/[-]/g, '\\-')}\\b\\s*`), '');
+  return c.usage.replace(/^usage:\s*/, '').replace(/^revlens\s+/, '').replace(/^\S+/, (w) => (w === c.name ? '' : w)).trimStart();
 }
 
 /** A package command can also be called without its area when its name is unique and not a core command. */

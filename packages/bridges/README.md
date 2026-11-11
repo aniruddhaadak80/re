@@ -237,8 +237,10 @@ comments, refuses to touch a file it cannot parse, and replaces only `[mcp_serve
   pathological lines and random input.
 - `REVLENS_BRIDGES_DISABLE=all` (or a list of tool ids) hides tools, for locked down hosts.
 
-Ghidra projects and jadx and apktool output are cached under `$REVLENS_CACHE_DIR` (default
-`<tmp>/revlens-cache`), keyed by the input's SHA-256.
+Ghidra projects and jadx and apktool output are cached under `$REVLENS_CACHE_DIR`, keyed by the input's
+SHA-256. The default is a per user folder (`$XDG_CACHE_HOME/revlens`, `~/.cache/revlens`,
+`~/Library/Caches/revlens` or `%LOCALAPPDATA%\revlens\cache`), created with owner only permissions, so other
+users on the machine cannot plant or read cached output.
 
 ## Verified against
 

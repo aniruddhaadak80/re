@@ -222,7 +222,7 @@ export function decodeFrame(data: Uint8Array, linkType: number, fileOffset = 0):
     }
     default: return d;
   }
-  let proto = -1, l4 = -1, l4end = len;
+  let proto = -1, l4 = -1, l4end: number;
   if (etherType === 0x0800) {
     if (off + 20 > len) return d;
     const ihl = ((data[off] as number) & 0x0f) * 4;

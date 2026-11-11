@@ -1,6 +1,6 @@
 // Node-only entry: file path inputs, writing recovered trees, full ASAR extraction, Electron app folders,
 // browser capture, and CLI commands. Import as '@revlens/webrt/node'.
-import { readFile, writeFile, mkdir, stat, lstat, readdir, realpath, copyFile, open } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, stat, lstat, readdir, realpath, open } from 'node:fs/promises';
 import { join, resolve, dirname, sep } from 'node:path';
 import { makeTools, type ToolDef, type ToolIO } from './tools.js';
 import { readAsar, readAsarFile, isAsar } from './asar.js';
@@ -14,6 +14,7 @@ import { cdpTargets } from './cdp.js';
 import { attachNodeInspector, type InspectorOptions } from './inspector.js';
 import { discoverWebMcp, type WebMcpDiscoveryOptions } from './webmcp-node.js';
 import { inflateSync } from 'node:zlib';
+import { constants as fsConstants } from 'node:fs';
 import { isAbsolute } from 'node:path';
 
 export { browserCapture } from './capture.js';
@@ -39,10 +40,14 @@ export type { CaptureOptions, CaptureResult } from './capture.js';
 
 /** Read a file with a size cap. */
 export async function readFileCapped(path: string, maxBytes = LIMITS.maxInputBytes): Promise<Uint8Array> {
-  const st = await stat(path);
-  if (!st.isFile()) throw new InputError(`${path} is not a regular file`);
-  if (st.size > maxBytes) throw new InputError(`${path} is ${st.size} bytes, over the ${maxBytes} byte limit`);
-  return new Uint8Array(await readFile(path));
+  // One descriptor for the check and the read, so the file cannot be swapped in between.
+  const fh = await open(path, 'r');
+  try {
+    const st = await fh.stat();
+    if (!st.isFile()) throw new InputError(`${path} is not a regular file`);
+    if (st.size > maxBytes) throw new InputError(`${path} is ${st.size} bytes, over the ${maxBytes} byte limit`);
+    return new Uint8Array(await fh.readFile());
+  } finally { await fh.close(); }
 }
 
 /** Resolve rel under root and refuse anything that would land outside it (including through symlinks). */
@@ -90,9 +95,13 @@ export async function extractAsar(asarPath: string, outDir: string, opts: { maxT
     if (e.unpacked) {
       const src = join(`${asarPath}.unpacked`, ...e.path.split('/').map((p) => safeRelPath(p)).filter(Boolean));
       try {
-        const st = await lstat(src);
-        if (!st.isFile()) { skipped.push(e.path); continue; }
-        await copyFile(src, await safeTarget(outDir, e.path)); unpackedCopied++;
+        // Open without following a final symlink, check and copy through the same descriptor.
+        const fh = await open(src, fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0));
+        try {
+          const st = await fh.stat();
+          if (!st.isFile()) { skipped.push(e.path); continue; }
+          await writeFile(await safeTarget(outDir, e.path), await fh.readFile()); unpackedCopied++;
+        } finally { await fh.close(); }
       } catch { skipped.push(e.path); }
       continue;
     }

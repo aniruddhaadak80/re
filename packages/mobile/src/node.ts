@@ -1,13 +1,17 @@
 // Node entry: registers a node:fs file reader so `path` inputs work, and re-exports everything.
 
-import { readFile, stat } from 'node:fs/promises';
+import { open } from 'node:fs/promises';
 import { setFileReader } from './input.js';
 
 setFileReader(async (path) => {
-  const st = await stat(path);
-  if (!st.isFile()) throw new Error(`${path} is not a file`);
-  if (st.size > 2 * 1024 * 1024 * 1024 - 1) throw new Error(`${path} is larger than 2 GB`);
-  return { bytes: new Uint8Array(await readFile(path)), key: `path:${path}:${st.size}:${st.mtimeMs}` };
+  // One descriptor for the check and the read, so the file cannot be swapped in between.
+  const fh = await open(path, 'r');
+  try {
+    const st = await fh.stat();
+    if (!st.isFile()) throw new Error(`${path} is not a file`);
+    if (st.size > 2 * 1024 * 1024 * 1024 - 1) throw new Error(`${path} is larger than 2 GB`);
+    return { bytes: new Uint8Array(await fh.readFile()), key: `path:${path}:${st.size}:${st.mtimeMs}` };
+  } finally { await fh.close(); }
 });
 
 export * from './index.js';

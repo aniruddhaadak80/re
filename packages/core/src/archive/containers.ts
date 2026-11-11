@@ -62,7 +62,7 @@ export function listTar(bytes: Uint8Array): Entry[] {
     const size = parseInt(str(124, 12).trim() || '0', 8) || 0;
     const type = String.fromCharCode(hdr[156] as number);
     const dataStart = off + 512;
-    if (type === 'L') { longName = decodeUtf8(bytes.subarray(dataStart, dataStart + size)).replace(/\0+$/, ''); }
+    if (type === 'L') { longName = stripNul(decodeUtf8(bytes.subarray(dataStart, dataStart + size))); }
     else if (type === '0' || type === '\0' || type === '') {
       const nm = longName || name; longName = '';
       const s = dataStart;
@@ -102,3 +102,6 @@ export function crxZipOffset(bytes: Uint8Array): number {
   if (version === 2) return 16 + r.u32(8) + r.u32(12);
   return -1;
 }
+
+/** Drop trailing NUL characters without a regex (linear on any input). */
+function stripNul(s: string): string { let e = s.length; while (e > 0 && s.charCodeAt(e - 1) === 0) e--; return s.slice(0, e); }

@@ -80,7 +80,7 @@ export async function jadxDecompile(input: JadxInput & { className?: string; lim
   const { files, truncated } = await listFiles(src, { filter: (p) => p.endsWith('.java'), maxFiles: 200_000 });
   const toClass = (p: string) => p.replace(/\.java$/, '').split('/').join('.');
   if (input.className !== undefined) {
-    const want = input.className.replace(/\//g, '.').replace(/\$.*$/, '');
+    const want = input.className.replace(/\//g, '.').split('$')[0]!;
     const hit = files.find((f) => toClass(f.path) === want);
     if (!hit) {
       const near = files.filter((f) => toClass(f.path).toLowerCase().includes(want.split('.').pop()!.toLowerCase())).slice(0, 10).map((f) => toClass(f.path));

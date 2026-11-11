@@ -45,7 +45,7 @@ export function parseNib(b: Uint8Array, opts: { maxItems?: number } = {}): NibAr
     if (extra > 64) throw new ParseError('too many class name extras', p);
     p += extra * 4;
     v.need(p, len);
-    classes.push(utf8(v.sub(p, len)).replace(/\0+$/, ''));
+    classes.push(stripNul(utf8(v.sub(p, len))));
     p += len;
   }
   const keys: string[] = [];
@@ -118,3 +118,6 @@ export function summarizeNib(n: NibArchive): { classHistogram: Record<string, nu
   }
   return { classHistogram: hist, strings, connections, customClasses: [...custom].sort() };
 }
+
+/** Drop trailing NUL characters without a regex (linear on any input). */
+function stripNul(s: string): string { let e = s.length; while (e > 0 && s.charCodeAt(e - 1) === 0) e--; return s.slice(0, e); }

@@ -41,7 +41,7 @@ const GROUPS = [
 const known = new Set(GROUPS.map((g) => g[0]));
 for (const t of tools) if (!known.has(group.get(t.name) ?? '')) GROUPS.push([group.get(t.name) ?? 'other', group.get(t.name) ?? 'Other', '']), known.add(group.get(t.name) ?? 'other');
 
-const esc = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').replace(/\u2014/g, ',');
+const esc = (s) => String(s ?? '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').replace(/\u2014/g, ',');
 const effect = (t) => {
   const an = t.annotations ?? {};
   const parts = [];

@@ -18,7 +18,7 @@ function decodeNote(owner: string, type: number, desc: Uint8Array, le: boolean, 
     const typeName = GNU_TYPES[type] ?? `GNU ${type}`;
     if (type === 3) return { typeName, decoded: { buildId: toHex(desc) } };
     if (type === 1 && desc.length >= 16) return { typeName, decoded: { os: ABI_OS[v.u32(0)] ?? v.u32(0), abi: `${v.u32(4)}.${v.u32(8)}.${v.u32(12)}` } };
-    if (type === 4) return { typeName, decoded: { gold: td.decode(desc).replace(/\0+$/, '') } };
+    if (type === 4) return { typeName, decoded: { gold: stripNul(td.decode(desc)) } };
     if (type === 5) {
       const props: Record<string, unknown>[] = [];
       const align = bits === 64 ? 8 : 4;
@@ -39,14 +39,14 @@ function decodeNote(owner: string, type: number, desc: Uint8Array, le: boolean, 
     }
     return { typeName };
   }
-  if (owner === 'Go' && type === 4) return { typeName: 'GO_BUILDID', decoded: { goBuildId: td.decode(desc).replace(/\0+$/, '') } };
+  if (owner === 'Go' && type === 4) return { typeName: 'GO_BUILDID', decoded: { goBuildId: stripNul(td.decode(desc)) } };
   if (owner === 'FDO' && type === 0xcafe1a7e) {
-    const text = td.decode(desc).replace(/\0+$/, '');
+    const text = stripNul(td.decode(desc));
     let json: unknown = null;
     try { json = JSON.parse(text); } catch { json = null; }
     return { typeName: 'FDO_PACKAGING_METADATA', decoded: { text, json } };
   }
-  if (owner === 'FDO' && type === 0x407c0c0a) return { typeName: 'FDO_DLOPEN_METADATA', decoded: { text: td.decode(desc).replace(/\0+$/, '') } };
+  if (owner === 'FDO' && type === 0x407c0c0a) return { typeName: 'FDO_DLOPEN_METADATA', decoded: { text: stripNul(td.decode(desc)) } };
   if (owner === 'stapsdt' && type === 3) {
     const ps = bits === 64 ? 8 : 4;
     try {
@@ -71,7 +71,7 @@ function parseNotes(v: View, off: number, size: number, le: boolean, bits: numbe
     const nameOff = p + 12;
     const descOff = nameOff + Math.ceil(namesz / a) * a;
     if (namesz > 4096 || descsz > (1 << 24) || descOff + descsz > end) break;
-    const owner = namesz ? new TextDecoder().decode(v.sub(nameOff, namesz)).replace(/\0+$/, '') : '';
+    const owner = namesz ? stripNul(new TextDecoder().decode(v.sub(nameOff, namesz))) : '';
     const d = decodeNote(owner, type, v.sub(descOff, descsz), le, bits);
     out.push({ owner, type, typeName: d.typeName, offset: p, descSize: descsz, ...(section ? { section } : {}), ...(d.decoded ? { decoded: d.decoded } : {}) });
     p = descOff + Math.ceil(descsz / a) * a;
@@ -272,3 +272,6 @@ export async function kernelConfig(bytes: Uint8Array): Promise<{ offset: number;
   }
   return { offset: st, options, text: text.slice(0, 200000), selected };
 }
+
+/** Drop trailing NUL characters without a regex (linear on any input). */
+function stripNul(s: string): string { let e = s.length; while (e > 0 && s.charCodeAt(e - 1) === 0) e--; return s.slice(0, e); }

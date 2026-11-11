@@ -62,7 +62,7 @@ export function parsePe(bytes: Uint8Array): PeImage {
   const sections: PeSection[] = [];
   let overlayOffset = 0;
   for (let i = 0; i < Math.min(nsec, 96); i++) {
-    const name = latin1(r.take(8)).replace(/\0+$/, '');
+    const name = stripNul(latin1(r.take(8)));
     const vsize = r.u32(); const vaddr = r.u32(); const rawSize = r.u32(); const rawOffset = r.u32();
     r.skip(12);
     const ch = r.u32();
@@ -91,3 +91,6 @@ export function sectionOf(pe: PeImage, rva: number): string | undefined {
   for (const s of pe.sections) if (rva >= s.vaddr && rva < s.vaddr + Math.max(s.vsize, s.rawSize)) return s.name;
   return undefined;
 }
+
+/** Drop trailing NUL characters without a regex (linear on any input). */
+function stripNul(s: string): string { let e = s.length; while (e > 0 && s.charCodeAt(e - 1) === 0) e--; return s.slice(0, e); }

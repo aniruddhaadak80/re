@@ -44,14 +44,14 @@ export function parseFatbin(b: Uint8Array, off = 0, maxEntries = 4096): Fatbin {
     const arch = v.u32(p + 24);
     const flags = v.u64(p + 40);
     const compressed = (flags & 0x2000n) !== 0n;
-    const uncompressed = eh >= 64 ? v.u64n(p + 56) : 0;
+    const uncompressed = v.u64n(p + 56);
     const kind: FatbinEntry['kind'] = kindId === 1 ? 'ptx' : kindId === 2 ? 'cubin' : `kind-${kindId}`;
     const e: FatbinEntry = {
       offset: p, kind, headerSize: eh, payloadOffset: p + eh, payloadSize: psize, arch: `sm_${arch}`, version: `${major}.${minor}`,
       compressed, flags: hexs(flags), ...(compressed ? { uncompressedSize: uncompressed } : {}),
     };
     const payload = b.subarray(p + eh, Math.min(b.length, p + eh + psize));
-    if (!compressed && kind === 'ptx') { try { e.ptx = parsePtx(utf8(payload).replace(/\0+$/, '')); } catch { /* not text */ } }
+    if (!compressed && kind === 'ptx') { try { e.ptx = parsePtx(stripNul(utf8(payload))); } catch { /* not text */ } }
     if (!compressed && kind === 'cubin') { try { e.cubin = parseCubin(payload); } catch { /* not ELF */ } }
     entries.push(e);
     p += eh + psize;
@@ -279,9 +279,26 @@ export function inspectGpu(b: Uint8Array): GpuObject | null {
     }
   }
   const head = utf8(b.subarray(0, Math.min(b.length, 1 << 16)));
-  if (/^\s*(\/\/[^\n]*\n\s*)*\.version\s+\d/.test(head) || /\n\s*\.target\s+sm_\d/.test(head)) return { kind: 'ptx', ptx: parsePtx(utf8(b)) };
+  if (ptxStartsWithVersion(head) || /\n\s*\.target\s+sm_\d/.test(head)) return { kind: 'ptx', ptx: parsePtx(utf8(b)) };
   const fatbins = findFatbins(b);
   const offloadBundles = findOffloadBundles(b);
   if (fatbins.length || offloadBundles.length) return { kind: 'host-binary', fatbins, offloadBundles };
   return null;
+}
+
+/** Drop trailing NUL characters without a regex (linear on any input). */
+function stripNul(s: string): string { let e = s.length; while (e > 0 && s.charCodeAt(e - 1) === 0) e--; return s.slice(0, e); }
+
+/** True when the text, after blank lines and // comment lines, starts with `.version <digit>`. Linear, no regex backtracking. */
+function ptxStartsWithVersion(head: string): boolean {
+  let i = 0;
+  for (;;) {
+    while (i < head.length && /\s/.test(head[i]!)) i++;
+    if (head.startsWith('//', i)) { const nl = head.indexOf('\n', i); if (nl < 0) return false; i = nl + 1; continue; }
+    break;
+  }
+  if (!head.startsWith('.version', i)) return false;
+  let j = i + 8, ws = 0;
+  while (j < head.length && /\s/.test(head[j]!)) { j++; ws++; }
+  return ws > 0 && j < head.length && head[j]! >= '0' && head[j]! <= '9';
 }

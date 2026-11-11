@@ -9,7 +9,7 @@ function readEncoded(r: BR, pos: number, enc: number, secAddr: number, bits: 32 
   if (enc === 0xff) return [0, pos];
   const fmt = enc & 0x0f;
   let v = 0;
-  let next = pos;
+  let next: number;
   switch (fmt) {
     case 0x00: v = bits === 64 ? r.u64(pos) : r.u32(pos); next = pos + bits / 8; break;
     case 0x01: [v, next] = uleb(r.b, pos); break;

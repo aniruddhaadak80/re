@@ -69,7 +69,7 @@ export function parseV8Snapshot(b: Uint8Array): V8Snapshot {
   const contexts = v.u32(0);
   const rehash = v.u32(4);
   const ver = latin1(v.sub(12, 64)).replace(/\0[\s\S]*$/, '');
-  if (contexts < 1 || contexts > 64 || rehash > 1 || !/^\d+\.\d+\.\d+(\.\d+)?[\w.\-]*$/.test(ver)) throw new ParseError('V8 snapshot header not found');
+  if (contexts < 1 || contexts > 64 || rehash > 1 || !/^\d+\.\d+\.\d+[\w.-]*$/.test(ver)) throw new ParseError('V8 snapshot header not found');
   return {
     kind: 'v8-snapshot', contexts, rehashability: rehash, checksum: hexs(v.u32(8), 8), versionString: ver,
     evidence: [{ field: 'contexts', offset: 0, size: 4 }, { field: 'checksum', offset: 8, size: 4 }, { field: 'versionString', offset: 12, size: 64 }],

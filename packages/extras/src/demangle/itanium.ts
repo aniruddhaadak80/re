@@ -323,8 +323,7 @@ class Parser {
 
   unnamedType(): N {
     if (this.eat('Ut')) {
-      let n = 1;
-      if (this.peek() !== '_') n = this.number() + 2; else n = 1;
+      const n = this.peek() !== '_' ? this.number() + 2 : 1;
       this.need('_');
       return this.mk({ k: 'name', s: `{unnamed type#${n}}` });
     }
@@ -885,7 +884,7 @@ export function demangleItanium(sym: string): string | null {
   // split clone suffixes like .cold or .isra.0
   let body = s.slice(2);
   let suffix = '';
-  const m = /^([^.]*)((?:\.[A-Za-z_]+(?:\.[0-9]+)*|\.[0-9]+)+)$/.exec(body);
+  const m = /^([^.]*)((?:\.(?:[A-Za-z_]+|[0-9]+))+)$/.exec(body);
   if (m && m[1]) {
     body = m[1];
     const parts = (m[2] as string).match(/\.[A-Za-z_]+(?:\.[0-9]+)*|\.[0-9]+/g) ?? [];

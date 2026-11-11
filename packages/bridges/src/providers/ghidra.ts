@@ -13,7 +13,7 @@ export interface GhidraInput {
   path: string;
   /** total wall clock limit, default 15 minutes */
   timeoutMs?: number;
-  /** folder for cached Ghidra projects, default <tmp>/revlens-cache */
+  /** folder for cached Ghidra projects, default the per user RevLens cache folder */
   cacheDir?: string;
   /** reuse the cached project for this file (default true) */
   useCache?: boolean;

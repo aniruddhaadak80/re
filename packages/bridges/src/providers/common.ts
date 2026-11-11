@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto';
 import { createReadStream, statSync } from 'node:fs';
 import { mkdir, readdir, rm, stat } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { homedir, tmpdir, userInfo } from 'node:os';
 import { join, relative, resolve, sep } from 'node:path';
 import { detect } from '../detect.js';
 import { installFor, TOOL_META } from '../catalog.js';
@@ -60,11 +60,28 @@ export function sha256File(path: string): Promise<string> {
 /** Root folder for reusable outputs (Ghidra projects, jadx and apktool output). */
 export function cacheRoot(custom?: unknown): string {
   if (typeof custom === 'string' && custom.trim()) return resolve(custom);
-  return process.env.REVLENS_CACHE_DIR ? resolve(process.env.REVLENS_CACHE_DIR) : join(tmpdir(), 'revlens-cache');
+  if (process.env.REVLENS_CACHE_DIR) return resolve(process.env.REVLENS_CACHE_DIR);
+  return defaultCacheRoot();
+}
+
+/**
+ * The per user cache folder: $XDG_CACHE_HOME/revlens, ~/.cache/revlens, %LOCALAPPDATA%\revlens\cache or
+ * ~/Library/Caches/revlens. A shared temp folder is used only when there is no home folder, and then with
+ * the user id in its name, so another user cannot plant files in it first.
+ */
+function defaultCacheRoot(): string {
+  if (process.platform === 'win32' && process.env.LOCALAPPDATA) return join(process.env.LOCALAPPDATA, 'revlens', 'cache');
+  if (process.env.XDG_CACHE_HOME) return join(process.env.XDG_CACHE_HOME, 'revlens');
+  let home = '';
+  try { home = homedir(); } catch { /* no home */ }
+  if (home) return process.platform === 'darwin' ? join(home, 'Library', 'Caches', 'revlens') : join(home, '.cache', 'revlens');
+  let uid = 'user';
+  try { uid = String(userInfo().uid); } catch { /* unknown */ }
+  return join(tmpdir(), `revlens-cache-${uid}`);
 }
 
 export async function ensureDir(d: string): Promise<string> {
-  await mkdir(d, { recursive: true });
+  await mkdir(d, { recursive: true, mode: 0o700 });
   return d;
 }
 

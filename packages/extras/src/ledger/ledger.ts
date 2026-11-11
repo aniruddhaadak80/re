@@ -231,7 +231,7 @@ export class Ledger {
     const lines = ['# RevLens evidence ledger', '', `Head ${s.head}. ${s.claims} claims, ${s.unknowns} unknowns (${s.openUnknowns} open), ${Math.round(s.verifiedShare * 100)}% of claims verified.`, '', '| id | kind | status | statement | evidence |', '|---|---|---|---|---|'];
     for (const it of this.items()) {
       const ev = it.evidence.map((e) => `${e.path ?? e.fileSha256.slice(0, 12)}@${e.offset}+${e.length}`).join('<br>') || (it.check ? `check ${it.check.kind}` : '');
-      lines.push(`| ${it.id} | ${it.kind} | ${it.status} | ${it.statement.replace(/\|/g, '\\|').replace(/\n/g, ' ')} | ${ev} |`);
+      lines.push(`| ${it.id} | ${it.kind} | ${it.status} | ${it.statement.replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\n/g, ' ')} | ${ev} |`);
     }
     return lines.join('\n') + '\n';
   }
