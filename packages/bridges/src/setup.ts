@@ -74,9 +74,9 @@ export function configPath(client: McpClient, scope: 'user' | 'project', o: { ho
   }
 }
 
-/** Remove // and /* *\/ comments and trailing commas outside strings, for JSONC files like VS Code's. Linear time. */
-export function stripJsonc(text: string): string {
-  let out = '';
+/** Walk text outside JSON strings. Linear time. */
+function scanJson(text: string, onChar: (c: string, i: number, out: string[]) => number): string {
+  const out: string[] = [];
   let i = 0;
   const n = text.length;
   while (i < n) {
@@ -84,21 +84,31 @@ export function stripJsonc(text: string): string {
     if (c === '"') {
       let j = i + 1;
       while (j < n && text[j] !== '"') j += text[j] === '\\' ? 2 : 1;
-      out += text.slice(i, j + 1);
+      out.push(text.slice(i, j + 1));
       i = j + 1;
-    } else if (c === '/' && text[i + 1] === '/') {
-      while (i < n && text[i] !== '\n') i++;
-    } else if (c === '/' && text[i + 1] === '*') {
-      const end = text.indexOf('*/', i + 2);
-      i = end < 0 ? n : end + 2;
-    } else if (c === ',') {
-      let j = i + 1;
-      while (j < n && (text[j] === ' ' || text[j] === '\t' || text[j] === '\r' || text[j] === '\n')) j++;
-      if (text[j] === '}' || text[j] === ']') { i++; continue; }
-      out += c; i++;
-    } else { out += c; i++; }
+    } else i = onChar(c, i, out);
   }
-  return out;
+  return out.join('');
+}
+
+/** Remove // and /* *\/ comments, then trailing commas, outside strings, for JSONC files like VS Code's. Linear time. */
+export function stripJsonc(text: string): string {
+  const noComments = scanJson(text, (c, i, out) => {
+    if (c === '/' && text[i + 1] === '/') { let j = i; while (j < text.length && text[j] !== '\n') j++; return j; }
+    if (c === '/' && text[i + 1] === '*') { const end = text.indexOf('*/', i + 2); return end < 0 ? text.length : end + 2; }
+    out.push(c);
+    return i + 1;
+  });
+  const t = noComments;
+  return scanJson(t, (c, i, out) => {
+    if (c === ',') {
+      let j = i + 1;
+      while (j < t.length && (t[j] === ' ' || t[j] === '\t' || t[j] === '\r' || t[j] === '\n')) j++;
+      if (t[j] === '}' || t[j] === ']') return i + 1;
+    }
+    out.push(c);
+    return i + 1;
+  });
 }
 
 /** Merge one server into a JSON config under `key`, keeping everything else. */
