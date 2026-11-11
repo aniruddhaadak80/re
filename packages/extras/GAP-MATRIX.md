@@ -1,7 +1,7 @@
 # RevLens vs rea gap matrix
 
 Compared against morluto/rea v6.8.0 (source clone, MCP catalog in docs, 174 contract tool names, 194 CLI command names, 60+ src/ provider folders). 
-Rows group related rea tools. Status: covered, partial, missing. "Before" is the state of all RevLens branches at feat/extras ce77aa5; "after" is the state at the head of feat/extras after this round of work, every after-change backed by tests against reference tools.
+Rows group related rea tools. Status: covered, partial, missing. "Before" is the state of all RevLens branches at feat/extras ce77aa5; "after" is the state at the head of feat/gaps-graphs (feat/extras plus the gaps-formats and gaps-graphs rounds, with feat/mobile and feat/managed merged), every after-change backed by tests against reference tools.
 Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/GAP-MATRIX.md`.
 
 
@@ -70,14 +70,14 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 |---|---|---|---|---|---|
 | inspect_android_package / decode_android_resources | src/android | mobile | covered | covered | AXML and manifest risk findings without apktool |
 | inspect_android_class / inspect_android_method / search_android_classes / trace_android_references | src/android | mobile | covered | covered | DEX and smali in TS, xrefs over all classes.dex |
-| inspect_android_jni_bindings | src/android | mobile | partial | partial | native libs listed with JNI_OnLoad and Java_ exports; left: RegisterNatives table recovery |
+| inspect_android_jni_bindings | src/android | mobile | partial | covered | mobile_jni_map matches DEX native methods to short and long Java_ exports and to JNINativeMethod tables recovered through RELATIVE, ABS and RELR relocations (what RegisterNatives receives), checked against llvm-readelf on arm64 and armv7 |
 | inspect_apk_signature | src/apkSignature | mobile | covered | covered | v1, v2, v3 blocks with certificate details |
 | inspect_apktool_client / apktool | src/apktool | bridges | covered | covered | optional, built-in AXML covers the common case |
 | JEB tools (open_jeb_project, list_jeb_units, decompile_jeb_item) | src/jeb | bridges | missing | missing | commercial tool; jadx bridge covers the same need |
-| project_android/apple/harmony/managed_application_graph | src/application | mobile + managed | missing | missing | left: component graphs |
+| project_android/apple/harmony/managed_application_graph | src/application | mobile + managed | missing | partial | mobile_app_graph (components, exported state, intent actions, deep links, providers, permissions, checked against androguard) and mobile_ipa_graph (executables, extensions, frameworks, entitlements, URL schemes) with Mermaid; left: HarmonyOS and managed application graphs |
 | identify_flutter_build / inspect_dart_aot | src/flutter | mobile | partial | partial | Flutter detection and snapshot hash; left: Dart AOT object pool |
 | inspect_il2cpp_metadata | src/il2cpp | mobile | covered | covered | global-metadata.dat types and methods |
-| inspect_plist / inspect_keyed_archive / decode_interface_builder / inspect_asset_catalog | src/native (Apple) | mobile | partial | partial | IPA Info.plist and entitlements; left: NSKeyedArchiver, NIB and Assets.car |
+| inspect_plist / inspect_keyed_archive / decode_interface_builder / inspect_asset_catalog | src/native (Apple) | mobile + extras | partial | covered | IPA Info.plist and entitlements in mobile; x_keyed_archive, x_nib (NIBArchive and keyed nibs) and x_asset_catalog (Assets.car renditions) in extras |
 | ADB: list_adb_devices, read_adb_logcat, list_adb_packages, pull_adb_package | src/adb | bridges | covered | covered | execFile argument arrays |
 | ADB: install/uninstall, push/pull file, start/stop app, activity, screen, bugreport, services, settings, window, display, processes, features, directory, resolve packages | src/adb | bridges | missing | missing | left: the rest of the ADB suite (about 18 tools) |
 
@@ -87,8 +87,8 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 |---|---|---|---|---|---|
 | inspect_managed_artifact / inspect_managed_members | src/dotnet | managed | covered | covered | .NET metadata tables and CIL in TS |
 | ilspycmd | src/dotnet | bridges | covered | covered | bridge_ilspy_decompile |
-| compare_managed_members / import_managed_reconstruction | src/dotnet | managed | missing | missing | left |
-| inspect/verify_managed_native_boundaries | src/dotnet | managed | missing | missing | left: P/Invoke to native export matching |
+| compare_managed_members / import_managed_reconstruction | src/dotnet | managed + mobile | missing | partial | managed_compare_members diffs types, methods (name, generic arity, parameter types), fields and IL bodies, member lists checked against dnfile on Newtonsoft.Json 12 vs 13; mobile_compare_members does the same for DEX; left: import_managed_reconstruction |
+| inspect/verify_managed_native_boundaries | src/dotnet | managed | missing | covered | managed_pinvoke_map matches ImplMap rows to ELF, PE and Mach-O exports with runtime probing names, A/W suffixes and ordinals, checked against dnfile and LLVM tools on the .NET 8 Brotli shim |
 | inspect_python_pyc / PyInstaller | src/python | managed | covered | covered | pyc 3.7 to 3.13 disassembly plus PyInstaller extraction |
 | inspect_erlang_beam | src/erlang | managed | covered | covered | chunks, atoms, exports |
 | inspect_evm_interface | src/evm | managed | covered | covered | selectors and disassembly |
@@ -112,7 +112,8 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | inspect_web_network_capture (HAR) | src/captures | webrt | covered | covered | HAR summary with endpoints and secrets scan |
 | inspect_pcap_capture / inspect_packet_capture / inspect_packet_fields / inspect_pcap_client | src/pcap | webrt | covered | covered | pcap and pcapng with DNS, HTTP, TLS SNI and JA3 in TS, no tshark |
 | inspect_playwright_trace | src/browser | webrt | missing | missing | left |
-| inspect_api_contract (OpenAPI/AsyncAPI) | src/application | webrt | missing | missing | left |
+| inspect_api_contract (OpenAPI/AsyncAPI) | src/application | extras | missing | partial | x_api_contracts finds OpenAPI 3 and Swagger 2 as JSON, YAML (Go embed), minified JS literals and JSON strings, checked against PyYAML; left: AsyncAPI |
+| protobuf descriptors and GraphQL contracts in binaries (beyond rea) | none | extras | missing | covered | x_api_contracts rebuilds .proto from Go, Python and JS descriptors (protoc recompiles it byte for byte) and lifts GraphQL SDL, introspection and operations (checked against graphql-js) |
 | inspect_sqlite_database | src/sqlite | webrt | covered | covered | read-only SQLite pages in TS |
 
 ## MCP tools: firmware, GPU, models, Windows, signals
@@ -126,9 +127,10 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | inspect_gpu_code_objects | src/gpu | extras | missing | partial | x_gpu_inspect: PTX, AMD HSA code objects and SPIR-V verified on real LLVM and glslang output; CUDA fatbin and cubin readers follow the documented layout but no nvcc output was available to verify them |
 | inspect_model_artifact | src/model | extras | missing | covered | x_model_inspect: GGUF metadata and tensors, safetensors header, with dtype size checks |
 | inspect_windows_shortcut | src/windows | extras | missing | covered | x_lnk_inspect: LNK header, target IDList, link info, string data |
-| Windows registry hive, Prefetch, Jump Lists (open requests) | issues #9865 #9423 #9866 | extras | missing | missing | left |
+| Windows registry hive, Prefetch, Jump Lists (open requests) | issues #9865 #9423 #9866 | extras | missing | covered | x_registry_hive, x_prefetch (including Windows 10+ MAM compression), x_jump_list and x_ole_compound |
 | inspect_signal_decoders / decode_signal_recording | src/signals | none | missing | missing | left: SDR recordings, out of scope for 1.0 |
-| godot pck, iNES, wxapkg, UnityFS, Node SEA, Bun/Deno standalone | docs/*.md | extras + mobile | missing | partial | x_firmware_scan names Node SEA and wxapkg; left: entry listing |
+| wxapkg, UnityFS, Node SEA, Bun/Deno standalone | docs/*.md | extras | missing | covered | x_wxapkg (with PC decryption), x_unity_bundle (LZ4 blocks, serialized files) and x_standalone_js (Node SEA blob, Bun module graph, Deno payload) list and read entries |
+| godot pck, iNES | docs/*.md | mobile | missing | partial | mobile_app_framework detects Godot; left: pck entry listing and iNES headers |
 
 ## MCP tools: dynamic, desktop, process
 
@@ -162,15 +164,17 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 
 ## Totals
 
-115 rows.
+117 rows.
 
 | state | covered | partial | missing |
 |---|---|---|---|
-| before | 49 | 26 | 40 |
-| after | 62 | 28 | 25 |
+| before | 49 | 26 | 42 |
+| after | 68 | 29 | 20 |
 
 ## Where RevLens already exceeds rea
 
+- API contracts lifted from binaries: .proto rebuilt from embedded descriptors recompiles with protoc to the identical descriptor bytes; GraphQL SDL, introspection and client operations come out of the same scan.
+- JNI RegisterNatives tables recovered statically from relocations, per ABI, and joined to DEX native methods.
 - Runs fully in the browser: the web app and every pure TS package work in a Web Worker, rea needs a local Node process plus native providers.
 - No JDK, Ghidra or Python required for core native analysis: built-in x86/x64/ARM64/ARM/Thumb disassembler with CFG, xrefs and pseudo code.
 - Security findings rea does not produce: secrets detection, SBOM (CycloneDX) with OSV vulnerability lookup, attack surface and ATT&CK capability mapping, yara-lite rules.
@@ -190,7 +194,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | #7993 MIPS support | disasm (proposed), extras container already parses MIPS ELF headers |
 | #1558 Java reverse engineering | mobile (javap-style class reader) + bridges (jadx) |
 | #3289 iOS applications | mobile (IPA) + extras (Mach-O code signature, entitlements) |
-| #8121 WeChat wxapkg | extras scan detection; entry listing left |
+| #8121 WeChat wxapkg | extras x_wxapkg: entries, app config, PC client decryption |
 | #1269 Codex plugin | mcp (left) |
 | #8543 V8 code cache (.jsc, bytenode) | extras x_v8_inspect |
 | #8911 SQLite with WAL state | webrt |
@@ -198,5 +202,5 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | #6333 auditable suppression rules | extras ledger status rejected with reason |
 | #8472 gadget search | disasm (proposed) |
 | #2298 WASM function pseudocode | disasm (proposed) |
-| #9866 Jump Lists, #9423 Prefetch, #9865 registry hive | extras (left) |
+| #9866 Jump Lists, #9423 Prefetch, #9865 registry hive | extras x_jump_list, x_prefetch, x_registry_hive |
 | #1316 portable install | web app needs no install at all |
