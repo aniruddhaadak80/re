@@ -25,7 +25,8 @@
     "fetch-fixtures": "node scripts/fetch-fixtures.mjs"
   },
   "dependencies": {
-    "@revlens/core": "*"
+    "@revlens/core": "*",
+    "yaml": "^2.9.1"
   },
   "engines": {
     "node": ">=20.10.0"
@@ -60,6 +61,7 @@
   },
   "devDependencies": {
     "fast-check": "^4.10.2",
+    "graphql": "^16.15.0",
     "tsx": "^4.23.15",
     "typescript": "^5.6.0"
   }

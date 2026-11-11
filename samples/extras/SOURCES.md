@@ -69,3 +69,16 @@ The Assets.car test checks the facet names against the asset catalog source of t
 `packages/extras/scripts/make_standalone_fixtures.sh` rebuilds the full 100 MB executables into
 `samples/.cache/extras/standalone/` (not committed); `fetch-fixtures.mjs` downloads the 1.2 MB
 `unity-cards.unity3d` bundle (CardExample-Unity, MIT).
+
+## API contracts (samples/extras/contracts)
+
+Built by RevLens from sources in samples/extras/src/proto and samples/extras/src/contracts-js (MIT, this repo) with real toolchains.
+
+| file | how it was made |
+|---|---|
+| revdemo-go.elf.gz | `src/proto/build.sh`: protoc 29.3 + protoc-gen-go v1.36.5 code for revdemo.proto, Go 1.23.4 linux/amd64 `-trimpath -ldflags "-s -w"`, embeds openapi.yaml and schema.graphql with go:embed, then gzip -9. Links google.golang.org/protobuf v1.36.5 (BSD-3-Clause). |
+| revdemo_pb2.py, revdemo_pb2.pyc | `protoc --python_out` (protobuf Python 5.29.3 gencode) and CPython 3.12 py_compile |
+| revdemo.desc | `protoc --descriptor_set_out`, the reference FileDescriptorSet |
+| introspection.json | graphql-js 16 `introspectionFromSchema(buildSchema(schema.graphql))` |
+| app.bundle.min.js | `src/contracts-js/make.mjs`: esbuild minified ESM bundle of app.js with gql templates, query strings, a precompiled GraphQL document from graphql-js `parse`, the introspection as a JSON.parse string, and petstore.json inlined as a JS object literal |
+| src/contracts-js/petstore.json | https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.0/petstore.json (OpenAPI Initiative, Apache-2.0) |
