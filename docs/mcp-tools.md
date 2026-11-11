@@ -1,7 +1,7 @@
 ---
 title: MCP tools reference
 description: Every tool the RevLens MCP server offers, generated from the code.
-order: 31
+order: 26
 ---
 
 # MCP tools reference
