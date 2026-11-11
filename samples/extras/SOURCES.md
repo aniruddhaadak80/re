@@ -104,3 +104,4 @@ These files are checked in because the tests read real binaries; their provenanc
 | `jiter-0.5.0.so` | `c18af484ce5a42352e9fdf8f36005872c70a98359a7df154c21a5d63c6894e1b` |
 | `kernels-gfx906.o` | `56d8ae53652d90a3982c4fb19564d918668ffacc284e50929ea7f785ff9c6710` |
 | `orjson-3.10.7.so` | `508d35f1f3ee70623d846836d717e38dacc3756ab897fa0d8e58da77f1d63993` |
+| `contracts/revdemo_pb2.pyc` | `02852625337a14041a91ac0780d5927fbab74deea35497f650c3a17e34eff542` |

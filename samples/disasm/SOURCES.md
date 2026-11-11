@@ -68,3 +68,13 @@ These files are checked in because the tests read real binaries; their provenanc
 | `hello-x64.exe` | `7b90fd885b7fb634a0c9b704d93463732502949d9b925ea941cb1afed83a7f89` |
 | `hello-x64.macho` | `1b912fe2f96ef11bd4cee5770ea83b85ad6211e9640fff986bee52d7ed32b769` |
 | `hello-x86.elf` | `74e2f2753e2469863f7e1e8f157a37b53d49c06542f51e35b7fb95d468dd1015` |
+| `lua-x64-stripped.elf` | `c3b06e731d284c9b5ae1a654635b867ba28654fa30477772423b8b6fd79c6e92` |
+| `lua-x64.elf` | `26e0a2da87bb488764eecaeeb4bbf8ac1ed461a1f3201fe18554d0f52780c3ca` |
+| `switch-arm64-O0.elf` | `7a899ec73b75205f46b0cd7612c7eb46ace83f994aceadefeca2c82eb87ad1d0` |
+| `switch-arm64.elf` | `dab49cbc8461fac6ea097e0ac3d1c31cafe3a659bcda4e7bd8bfca9871894f68` |
+| `switch-x64-O0.elf` | `d309328d5d635fb805a4eacce9bbc9cfee36dc660875f805e80d878921b5d72e` |
+| `switch-x64-nopie.elf` | `6672bab575621ea9afcd3bbe3ff3d06e952fe54eaeb027e062d369a4698b8028` |
+| `switch-x64.elf` | `77be4f8120b347c8137b6dea90227444e8c9f00629c07d7de983044c4c389d94` |
+| `virt-arm64.elf` | `1b1206df1b5e177a33cb4dda8ac627accebac6f51ea6d91a246b6608c2bccee2` |
+| `virt-x64-stripped.elf` | `a1871499792831f198b9ab767b3242c761b102ae70ad2842f9bf838cd44bdbfe` |
+| `virt-x64.elf` | `12a6fed29260551285e510d47cd3e1d9c4a295bc36979f434992f076b0c6dd32` |

@@ -84,3 +84,5 @@ These files are checked in because the tests read real binaries; their provenanc
 | `python/sample_mod.3.13.pyc` | `11dce6697e0a564984b60a95e9526ee900dc50818d88de6dc3491dfe73abffac` |
 | `python/sample_mod.3.8.pyc` | `9d2438acaa7e4b58c87f63dd05ea5d8accd601a88ff6b3fc67682ff26bb37a7b` |
 | `python/sample_mod.3.9.pyc` | `3a3d321b8d299c262363043f3c76364d79889b3ce38ee4f7b9e88aecfc2e7ae1` |
+| `dotnet/RevDemoLib-1.0.0.dll` | `3877825838585d17bff3b593f609634a96aa2b397eef1c6e50fd5f34a17b4cf8` |
+| `dotnet/RevDemoLib-2.0.0.dll` | `0b05f1c771e045cca201dbb0ddafc8f04d701d4542f157803dbaf620e454746c` |

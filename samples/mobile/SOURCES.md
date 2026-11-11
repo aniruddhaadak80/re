@@ -88,3 +88,5 @@ These files are checked in because the tests read real binaries; their provenanc
 | `java/hello-035.dex` | `7d4f612a893783ff52379a41a44f37212d24183c0b2e6f626cdcf884e2e4ccb3` |
 | `java/hello-039.dex` | `46e503bcc20b32c926b9b221fdf4bae97f5d0e0ae8ce0dfcef9d31b75cd24ffe` |
 | `java/hello.jar` | `5e1ce92569fea7d6bac616dea41dad217b9dfc927d6c00f49d097188193f4533` |
+| `jni/bridge-v1.dex` | `38c9a177b2fba10abafbc5b1a2b7476d4c1df8bdaecc8d1e1ff8f241c125d736` |
+| `jni/bridge-v2.dex` | `e724b6e1d089deb0763172a2e242ecdee346171fe43c888335387fb464459809` |
