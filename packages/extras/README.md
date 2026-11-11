@@ -1,6 +1,6 @@
 # @revlens/extras
 
-Format readers and agent tools that round out RevLens, in pure TypeScript. Everything runs in Node and in a browser Web Worker; only file paths and ledger files need the Node entry.
+Format readers and agent tools that round out RevLens, in pure TypeScript (one runtime dependency: `yaml`, ISC, for OpenAPI YAML documents). Everything runs in Node and in a browser Web Worker; only file paths and ledger files need the Node entry.
 
 What it covers:
 
@@ -16,6 +16,10 @@ What it covers:
 - GPU: CUDA fatbin and cubin, PTX, AMD HSA code objects, SPIR-V, clang offload bundles.
 - Model files: GGUF, safetensors, NumPy `.npy`.
 - Windows shortcuts (`.lnk`) and Apple `.ips` crash reports.
+- Windows offline artifacts: registry hives (regf), Prefetch files including Windows 10+ compressed ones (LZXPRESS Huffman), Jump Lists (automatic and custom) and OLE compound files.
+- Apple archives: NSKeyedArchiver plists (binary and XML), compiled nibs (NIBArchive and keyed), Assets.car asset catalogs.
+- App containers: WeChat mini program packages (wxapkg, with PC client decryption), Unity asset bundles (UnityFS with LZ4 blocks), JavaScript single-file executables (Node SEA, Bun, Deno).
+- API contracts inside binaries and bundles: protobuf descriptors rebuilt as `.proto`, OpenAPI and Swagger documents, GraphQL schemas, introspection results and operations.
 - An evidence and claims ledger: claims bound to byte ranges by SHA-256, open unknowns, re-verification, a hash chained export.
 - An agent eval harness: 31 tasks on the fixtures in `samples/extras` with ground truth from independent tools, and a scorer.
 
@@ -68,12 +72,23 @@ Every tool takes `path` (or base64 `bytes`), returns JSON with file offsets and 
 | x_ledger_import | Load an export after checking its chain |
 | x_eval_tasks | Eval tasks without answers |
 | x_eval_score | Score answers against ground truth |
+| x_registry_hive | Registry hive header, a key with subkeys and decoded values, or a paged recursive key list |
+| x_prefetch | Prefetch executable, hash, run count, last run times, loaded files and volumes, XP to 11 |
+| x_jump_list | Jump List DestList entries with embedded shell links, or custom destination links |
+| x_ole_compound | OLE compound file directory, or the hex of one stream |
+| x_keyed_archive | NSKeyedArchiver archive resolved to plain JSON with class names |
+| x_nib | Compiled nib: classes, strings, outlets and actions, custom classes, raw objects |
+| x_asset_catalog | Assets.car header, facets, appearances and renditions |
+| x_wxapkg | wxapkg member table, app config, pages; decrypts PC packages with the AppID; reads one member |
+| x_unity_bundle | UnityFS header, blocks, nodes and serialized file objects by class |
+| x_standalone_js | Node SEA, Bun and Deno single-file executables: entry, modules, assets; reads one embedded file |
+| x_api_contracts | Protobuf descriptors (with rebuilt `.proto`), OpenAPI / Swagger documents with operations, GraphQL SDL, introspection and operations, each with its offset |
 
 Ledger tools use an in-memory session ledger unless `ledgerPath` is given.
 
 ## CLI commands (`CLI_COMMANDS`)
 
-`x-demangle`, `x-container`, `x-read-bytes`, `x-search-bytes`, `x-address-map`, `x-checksec`, `x-go`, `x-rust`, `x-pe`, `x-pe-resources`, `x-authenticode`, `x-elf`, `x-unwind`, `x-kmod`, `x-macho`, `x-firmware`, `x-firmware-parse`, `x-v8`, `x-gpu`, `x-model`, `x-lnk`, `x-ips`, `x-claim`, `x-unknown`, `x-verify`, `x-ledger`, `x-ledger-export`, `x-eval-tasks`, `x-eval-score`.
+`x-demangle`, `x-container`, `x-read-bytes`, `x-search-bytes`, `x-address-map`, `x-checksec`, `x-go`, `x-rust`, `x-pe`, `x-pe-resources`, `x-authenticode`, `x-elf`, `x-unwind`, `x-kmod`, `x-macho`, `x-firmware`, `x-firmware-parse`, `x-v8`, `x-gpu`, `x-model`, `x-lnk`, `x-ips`, `x-claim`, `x-unknown`, `x-verify`, `x-ledger`, `x-ledger-export`, `x-eval-tasks`, `x-eval-score`, `x-registry`, `x-prefetch`, `x-jumplist`, `x-ole`, `x-keyed-archive`, `x-nib`, `x-assets-car`, `x-wxapkg`, `x-unity`, `x-standalone-js`, `x-api-contracts`.
 
 The first bare argument is the file, `--name value` sets a tool input, `--json` prints JSON, and object inputs can come from a file with `@`:
 
@@ -82,6 +97,8 @@ revlens x-authenticode setup.exe
 revlens x-claim sample.bin --statement "C2 host in .rdata" --ranges '[{"offset":4096,"length":24}]' --ledgerPath case.json
 revlens x-verify --ledgerPath case.json
 revlens x-eval-score --answers @answers.json --json
+revlens x-api-contracts service-binary --kind protobuf --proto
+revlens x-registry NTUSER.DAT --key 'Software\Microsoft\Windows\CurrentVersion\Run'
 ```
 
 ## How it was verified
@@ -105,6 +122,12 @@ Fixtures live in `samples/extras` (see `SOURCES.md`), built with Zig 0.17.1, LLV
 | LNK | pylnk3 |
 | Apple .ips | Python `json` on a real macOS 12 report |
 | Eval | an oracle agent that only calls `TOOLS` scores 1.0 on all 31 tasks |
+| Registry, Prefetch, Jump Lists | regipy 6.5.0 (key and value totals, decoded values), windowsprefetch 4.0.3 (XP, Vista, 7, 8, 10 files), dissect.util (LZXPRESS Huffman output byte identical), olefile 0.47 and LnkParse3 1.6.0 (DestList and embedded links) |
+| NSKeyedArchiver, nibs, Assets.car | swift-corelibs-foundation archives decoded by NSKeyedUnArchiver 1.5.2 and plistlib, Sparkle nibs from ibtool read by nibarchive 1.1.0, Maccy Assets.car against its asset catalog source and the CARHEADER rendition count |
+| wxapkg, UnityFS, single-file JS | KillWxapkg v2.4.1 (pack, extract, PC decryption), UnityPy 1.10.18 (Unity 5.5 bundle and an LZ4 repack), node 22 SEA blob, bun build 1.4.4 and deno compile 2.9.8 output against their sources |
+| Protobuf | a Go 1.23 binary with protoc-gen-go v1.36.5 code holds exactly the bytes of `protoc --descriptor_set_out`; Python `_pb2.py` and `.pyc` decode to the same descriptor; the rebuilt `.proto` recompiles with protoc 29.3 to an identical descriptor set |
+| OpenAPI | the YAML embedded in the Go binary equals PyYAML's load of the source; the petstore JSON esbuild inlined as a JS literal equals the original JSON |
+| GraphQL | SDL from the Go binary and introspection from the bundle give the same types, fields and arguments as graphql-js 16 `buildSchema`; every extracted operation parses with graphql-js |
 
 Hostile input tests feed random bytes, truncations, byte flipped real files, huge declared counts and deeply nested symbols to every parser with fast-check.
 
@@ -121,6 +144,8 @@ node --test --import tsx packages/extras/test/*.test.ts
 - CUDA fatbin and cubin readers follow the documented layout but were not checked against nvcc output (no CUDA toolchain was available). Compressed fatbin entries are listed, not decompressed.
 - Hermes support is the file header only and was not checked against a real hermesc file. No Hermes or V8 bytecode disassembly.
 - Swift demangling is not implemented; Swift names are detected only.
+- API contracts: AsyncAPI is not recognised; protobuf descriptors are found in raw, gzip, Python literal and protobuf-es base64 form (protobufjs JSON descriptors and Java lite descriptors are not); YAML documents must start at an `openapi:` or `swagger:` key or be preceded only by top level YAML lines; offsets are character offsets when a bundle is decoded as UTF-8 and byte offsets otherwise.
+- LZMA blocks in UnityFS bundles are listed but not decoded.
 - Squashfs file listing needs gzip compression (the runtime DecompressionStream); xz, lzo, lz4 and zstd images report superblock facts only.
 - Authenticode checks do not build a chain to a trusted root and do not check revocation.
 - Byte reads are capped at 64 KiB, searches at 1000 hits per call, ledger evidence ranges at 16 MiB.

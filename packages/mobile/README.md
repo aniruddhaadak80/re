@@ -38,6 +38,21 @@ What it reads:
 - **Unity IL2CPP `global-metadata.dat`** (versions 24 to 31): header sections, images, type names,
   method names with their declaring type, and string literals. Struct strides are inferred and
   checked against the data instead of being hardcoded per Unity release.
+- **Application graphs** with Mermaid output: for an APK, the app, every component with its
+  effective exported state and the reason (explicit or platform default), intent filter actions,
+  deep links, provider authorities, used, defined and required permissions, and an "other apps"
+  node joined to every exported component; for an IPA, the app, each Mach-O executable (CPU,
+  team id), app extensions with their extension point, embedded frameworks and dylibs with link
+  edges from the load commands, entitlements per executable, URL schemes, queried schemes,
+  associated domains, privacy usage keys and ATS exceptions.
+- **JNI map**: every DEX native method matched to its `Java_*` export (short name, or the long
+  overloaded name), to an entry of a `JNINativeMethod` table recovered from the library data
+  (name and signature pointers resolved through RELATIVE, ABS and RELR relocations, which is the
+  array `JNI_OnLoad` hands to `RegisterNatives`), or to class path and signature strings when no
+  table can be rebuilt. Unresolved methods and `Java_*` exports with no Java declaration are listed.
+- **Member diff** between two DEX sets (two APK versions, two JARs or `.dex` files): classes,
+  methods and fields added and removed, access flag, superclass and interface changes, and with
+  `bodies` the methods whose smali changed (index renumbering between builds is ignored).
 
 ## API
 
@@ -91,6 +106,10 @@ archive paths, offsets or DEX names as evidence, and pages long lists with `offs
 | `mobile_il2cpp_types` | IL2CPP images, types, methods or string literals |
 | `mobile_native_libs` | native libraries per ABI and JNI entry points |
 | `mobile_apk_report` | one-shot APK triage with findings |
+| `mobile_app_graph` | Android component graph (nodes, edges, Mermaid) |
+| `mobile_ipa_graph` | iOS bundle graph (nodes, edges, Mermaid) |
+| `mobile_jni_map` | DEX native methods to `Java_*` exports, `RegisterNatives` tables and string hints, per ABI |
+| `mobile_compare_members` | class, method and field diff between two DEX sets |
 
 ### CLI commands
 
@@ -99,7 +118,8 @@ Each prints text by default and JSON with `--json`.
 `apk`, `manifest [--xml]`, `apksig`, `dex [--filter]`, `smali --class C [--method M] [--lines]`,
 `dex-search --query Q [--kinds]`, `xrefs --target T [--kind] [--direction from --class C]`,
 `javap [--class] [--method]`, `ipa [--plist]`, `app-framework`,
-`il2cpp [--what types|methods|literals|images|summary] [--filter]`, `native-libs`.
+`il2cpp [--what types|methods|literals|images|summary] [--filter]`, `native-libs`, `app-graph [--no-mermaid]`,
+`ipa-graph [--no-mermaid]`, `jni-map [--abi A]`, `compare-members --other <file> [--bodies] [--filter X]`.
 
 ## Verified against
 
@@ -115,6 +135,15 @@ Each prints text by default and JSON with `--json`.
 - **readelf and nm** for native library needed lists and exports.
 - **Python plistlib** for binary and XML plists, **rcodesign 0.29.0** for the code signature
   identifier, digest type, flags and offset.
+- **androguard 4.1.4** again for the app graph: component kinds, the raw `android:exported`
+  attribute and intent filter actions and categories of all four F-Droid APKs
+  (`reference/androguard-graph.json`).
+- **llvm-readelf 19** for the JNI map: relocation addends and `.data.rel.ro` bytes give the
+  `JNINativeMethod` table addresses and function pointers on arm64 (RELA) and armv7 (REL), and the
+  dynamic symbols give the `Java_*` export addresses of a library built with zig cc from
+  `samples/mobile/src-jni`.
+- **javap (JDK 25)** member lists of two versions of a class against the DEX member diff of their
+  D8 output, and **baksmali** text of two hello.dex builds against the body change report.
 - `strings` for the Flutter Dart snapshot hash; real Daggerfall Unity metadata (v29: 59 images,
   12280 types) for IL2CPP.
 
@@ -132,6 +161,9 @@ Fixture sources and licenses are in `samples/mobile/SOURCES.md`. Run
   signatures and field names are not decoded.
 - Hermes bytecode is detected, not disassembled. Dart AOT code is not decompiled.
 - IPA: FairPlay encrypted executables are flagged; their code cannot be read.
+- JNI map: Android packed relocations (APS2) are not decoded, so tables in libraries that only use
+  them are found through string hints; tables built at run time are not visible statically.
+- App graphs cover manifest declared components; components registered in code are not shown.
 - Limits on input size, table counts, nesting depth, instruction counts and decompressed size
   protect against hostile files (see `ZIP_LIMITS`, `DEX_LIMITS`, `AXML_LIMITS`, `PLIST_LIMITS`).
 
