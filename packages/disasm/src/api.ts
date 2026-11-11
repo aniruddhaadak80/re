@@ -209,7 +209,7 @@ export async function disasmListFunctions(input: BinaryInput & { offset?: number
 export async function disasmFunction(input: BinaryInput & { function: string | number; offset?: number; limit?: number }) {
   const p = await openProgram(input);
   const f = need(resolveFunction(p, input.function), `function not found: ${input.function}`);
-  const af = need(p.analyze(f.addr), `cannot analyze ${f.name} (no decoder or not code)`);
+  const af = need(p.resolveIndirect(f.addr), `cannot analyze ${f.name} (no decoder or not code)`);
   const all = af.blocks.flatMap((b) => b.insns.map((i) => ({ b, i })));
   const pg = page(all, input.offset, input.limit, 400, 5000);
   const shown = new Set(pg.items.map((x) => x.i));
@@ -232,9 +232,13 @@ export async function disasmFunction(input: BinaryInput & { function: string | n
 export async function disasmPseudocode(input: BinaryInput & { function: string | number; maxLines?: number }) {
   const p = await openProgram(input);
   const f = need(resolveFunction(p, input.function), `function not found: ${input.function}`);
-  const af = need(p.analyze(f.addr), `cannot analyze ${f.name}`);
-  const lift = liftFunction(p, af, clampInt(input.maxLines, 300, 10, 5000));
-  return { function: fnJson(p, af), structured: lift.structured, gotos: lift.gotos, pseudocode: lift.text, summary: summarizeFunction(p, af) };
+  const af = need(p.resolveIndirect(f.addr), `cannot analyze ${f.name}`);
+  const fl = p.flow(f.addr);
+  const lift = liftFunction(p, af, clampInt(input.maxLines, 300, 10, 5000), fl);
+  return {
+    function: fnJson(p, af), structured: lift.structured, gotos: lift.gotos, pseudocode: lift.text, summary: summarizeFunction(p, af),
+    ...(fl ? { params: fl.params.map((r, i) => ({ name: 'a' + (i + 1), reg: r })), stackVars: fl.stackVars.filter((v) => v.kind !== 'saved-reg').map((v) => ({ name: v.name, offset: v.off, width: v.width, kind: v.kind, reads: v.reads, writes: v.writes, firstAt: hx(v.firstAt) })) } : {}),
+  };
 }
 
 /** Cross references to an address or function (direction "to") or made by a function ("from"). */

@@ -2,6 +2,7 @@
 import type { AnalyzedFunction, BasicBlock, BinaryImage, CallSite, DataRef, Decoder, Edge, FunctionInfo, ImportRef, Insn, Sym, SwitchTable } from '../types.js';
 import { resolveJumpTable, type JumpTableContext } from './jumptable.js';
 import { writes } from './regs.js';
+import { analyzeFlow, type FlowResult, type Val } from './dataflow.js';
 import { Memory } from '../loader/memory.js';
 import { loadImage, type LoadOptions } from '../loader/index.js';
 import { loadDecoders, type DecoderOptions } from '../backends/index.js';
@@ -438,6 +439,7 @@ export class Program {
         return fp ?? bi![0];
       },
       read: (a, w) => this.readUint(a, w),
+      isReadOnly: (a) => this.isReadOnly(a),
       defsOf: (reg) => {
         if (defsStamp !== insnAt.size) {
           defsStamp = insnAt.size;
@@ -583,7 +585,7 @@ export class Program {
       for (const ins of b.insns) {
         const jt = switches.get(ins.address);
         if (jt?.kind === 'call-table' && jt.bound === 'const') {
-          calls.push({ at: ins.address, target: jt.targets[0], name: this.nameOf(jt.targets[0]!), indirect: true, tail: ins.flow === 'ijump' || undefined, resolvedBy: 'constant' });
+          calls.push({ at: ins.address, target: jt.targets[0], name: this.nameOf(jt.targets[0]!), indirect: true, tail: ins.flow === 'ijump' || undefined, resolvedBy: jt.initialValue ? 'initial-value' : 'constant' });
         } else if (jt?.kind === 'call-table') {
           calls.push({ at: ins.address, indirect: true, tail: ins.flow === 'ijump' || undefined, candidates: [...new Set(jt.targets)], resolvedBy: 'table' });
         } else if (jt?.kind === 'switch') {
@@ -632,6 +634,148 @@ export class Program {
     if (m && two[1]?.flow === 'ret') r = m[1];
     this.thunkCache.set(target, r);
     return r;
+  }
+
+  // ---------- value flow ----------
+
+  private flowCache = new Map<number, FlowResult>();
+
+  /** Calling convention used by the value tracker: argument registers in order and the return register. */
+  abi(): { argRegs: string[]; retReg: string; name: string; win64: boolean } {
+    const arch = this.img.arch;
+    const go = !!this.img.goVersionHint;
+    if (arch === 'x86_64') {
+      if (go) return { argRegs: ['rax', 'rbx', 'rcx', 'rdi', 'rsi', 'r8', 'r9', 'r10', 'r11'], retReg: 'rax', name: 'go-regabi-amd64', win64: false };
+      if (this.img.format === 'pe') return { argRegs: ['rcx', 'rdx', 'r8', 'r9'], retReg: 'rax', name: 'win64', win64: true };
+      return { argRegs: ['rdi', 'rsi', 'rdx', 'rcx', 'r8', 'r9'], retReg: 'rax', name: 'sysv', win64: false };
+    }
+    if (arch === 'arm64') return { argRegs: Array.from({ length: go ? 16 : 8 }, (_, i) => 'x' + i), retReg: 'x0', name: go ? 'go-regabi-arm64' : 'aapcs64', win64: false };
+    if (arch === 'arm') return { argRegs: ['r0', 'r1', 'r2', 'r3'], retReg: 'r0', name: 'aapcs', win64: false };
+    return { argRegs: [], retReg: 'eax', name: 'cdecl', win64: false };
+  }
+
+  /** True when addr is in a section that is not writable at run time (.rodata, .data.rel.ro after relro, __const, .rdata). */
+  isReadOnly(addr: number): boolean {
+    const r = this.mem.find(addr);
+    if (!r) return false;
+    if (!r.write) return true;
+    return /^(\.data\.rel\.ro|__const|__DATA_CONST|\.got)/.test(r.name) || r.name === '__auth_got' || r.name === '__got';
+  }
+
+  /** Value flow facts for a function (cached, bounded). */
+  flow(addr: number): FlowResult | undefined {
+    const c = this.flowCache.get(addr);
+    if (c) return c;
+    const af = this.analyze(addr);
+    if (!af) return undefined;
+    const abi = this.abi();
+    const res = analyzeFlow(af, this.img.arch, {
+      argRegs: abi.argRegs, retReg: abi.retReg, win64: abi.win64,
+      readConst: (a, w) => (w === this.img.bits / 8 && this.isReadOnly(a) ? this.readPtr(a) : undefined),
+      maxIterations: Math.max(2000, af.blocks.length * 12),
+    });
+    this.flowCache.set(addr, res);
+    if (this.flowCache.size > 64) this.flowCache.delete(this.flowCache.keys().next().value as number);
+    return res;
+  }
+
+  private vtableList: { addr: number; slots: number[]; name?: string }[] | undefined;
+
+  /** Tables of code pointers in read only data: C++ vtables (named by _ZTV symbols when present) and similar dispatch tables. */
+  vtables(): { addr: number; slots: number[]; name?: string }[] {
+    if (this.vtableList) return this.vtableList;
+    const out: { addr: number; slots: number[]; name?: string }[] = [];
+    const ptr = this.img.bits / 8;
+    const isFn = (v: number | undefined) => v !== undefined && v !== 0 && this.mem.isExec(v) && (this.functions.has(v) || this.symAt.get(v)?.kind === 'func' || this.importByStub.has(v));
+    const named = this.img.symbols.filter((s) => s.name.startsWith('_ZTV') || s.name.startsWith('__ZTV') || s.name.startsWith('go:itab.') || s.name.startsWith('go.itab.'));
+    if (named.length) {
+      for (const s of named.slice(0, 20000)) {
+        const go = s.name.includes('itab');
+        const first = s.addr + (go ? 3 * ptr : 2 * ptr);
+        const slots: number[] = [];
+        const n = s.size ? Math.min(512, Math.floor((s.addr + s.size - first) / ptr)) : 512;
+        for (let i = 0; i < n; i++) { const v = this.readPtr(first + i * ptr); if (!v || !this.mem.isExec(v)) break; slots.push(v); }
+        if (slots.length) out.push({ addr: first, slots, name: s.name });
+      }
+    } else {
+      // unnamed: runs of function pointers in read only data
+      this.discover();
+      for (const r of this.mem.regions) {
+        if (r.exec || r.fsize === 0 || !this.isReadOnly(r.start) || !/rel\.ro|const|rodata|rdata/.test(r.name)) continue;
+        let run: number[] = [];
+        let runStart = 0;
+        const flush = () => { if (run.length >= 2) out.push({ addr: runStart, slots: run }); run = []; };
+        for (let a = r.start; a + ptr <= r.end && out.length < 20000; a += ptr) {
+          const v = this.readPtr(a);
+          if (isFn(v)) { if (!run.length) runStart = a; run.push(v!); } else flush();
+        }
+        flush();
+      }
+    }
+    this.vtableList = out;
+    return out;
+  }
+
+  private resolved = new Set<number>();
+
+  /** Resolve indirect calls of a function with the value tracker: constant targets, read only
+   * function pointers, initial values of writable pointers, and vtable/itab slot candidates. */
+  resolveIndirect(addr: number): AnalyzedFunction | undefined {
+    const af = this.analyze(addr);
+    if (!af || this.resolved.has(addr)) return af;
+    this.resolved.add(addr);
+    const tailBlocks = af.blocks.filter((b) => b.exit === 'indirect' && b.insns[b.insns.length - 1]!.flow === 'ijump');
+    if (!tailBlocks.length && !af.calls.some((c) => c.indirect && c.target === undefined && !c.candidates && !c.name)) return af;
+    const fl = this.flow(addr);
+    if (!fl) return af;
+    for (const b of tailBlocks) {
+      const at = b.insns[b.insns.length - 1]!.address;
+      const r = this.targetsOf(fl.calls.get(at)?.target, this.img.bits / 8);
+      if (!r || !r.targets.every((t) => this.functions.has(t) || this.importByStub.has(t) || !(b.start >= addr && t >= addr && t < addr + (af.size ?? af.codeSize)))) continue;
+      b.exit = 'tail';
+      if (r.targets.length === 1 && r.how !== 'vtable') af.calls.push({ at, target: r.targets[0], name: this.nameOf(r.targets[0]!), indirect: true, tail: true, resolvedBy: r.how });
+      else af.calls.push({ at, indirect: true, tail: true, candidates: r.targets, resolvedBy: r.how });
+      if (af.unresolvedIndirect > 0) af.unresolvedIndirect--;
+    }
+    af.calls.sort((x, y) => x.at - y.at);
+    const ptr = this.img.bits / 8;
+    for (const c of af.calls) {
+      if (!c.indirect || c.target !== undefined || c.candidates || c.name) continue;
+      const r = this.targetsOf(fl.calls.get(c.at)?.target, ptr);
+      if (!r) continue;
+      if (r.targets.length === 1 && r.how !== 'vtable') { c.target = r.targets[0]; c.name = this.nameOf(r.targets[0]!); c.resolvedBy = r.how; }
+      else { c.candidates = r.targets; c.resolvedBy = r.how; }
+      if (af.unresolvedIndirect > 0) af.unresolvedIndirect--;
+    }
+    return af;
+  }
+
+  private targetsOf(v: Val | undefined, ptr: number): { targets: number[]; how: 'constant' | 'initial-value' | 'vtable' } | undefined {
+    if (!v) return undefined;
+    const exec = (x: number) => this.mem.isExec(x);
+    if (v.t === 'const') return exec(v.v) ? { targets: [v.v], how: 'constant' } : undefined;
+    if (v.t === 'phi') {
+      const ts = v.vals.map((x) => (x.t === 'const' && exec(x.v) ? x.v : undefined));
+      return ts.every((x) => x !== undefined) ? { targets: [...new Set(ts as number[])], how: 'constant' } : undefined;
+    }
+    if (v.t !== 'load') return undefined;
+    const a = v.addr;
+    if (a.t === 'const') {
+      const p = this.readPtr(a.v);
+      if (p !== undefined && exec(p)) return { targets: [p], how: this.isReadOnly(a.v) ? 'constant' : 'initial-value' };
+      return undefined;
+    }
+    // load(load(obj) + off): a call through the object's vtable; every vtable's slot off / ptr is a candidate
+    let vptr: Val | undefined;
+    let off = 0;
+    if (a.t === 'load') { vptr = a; off = 0; }
+    else if (a.t === 'sum' && a.base.t === 'load') { vptr = a.base; off = a.k; }
+    if (!vptr || off < 0 || off % ptr !== 0) return undefined;
+    const slot = off / ptr;
+    const tables = this.vtables().filter((t) => t.name === undefined || /^_?_ZTV/.test(t.name));
+    const cands = [...new Set(tables.map((t) => t.slots[slot]).filter((x): x is number => x !== undefined))];
+    if (!cands.length || cands.length > 64) return undefined;
+    return { targets: cands, how: 'vtable' };
   }
 
   /** Reads a pointer sized value, applying load time relocations. */

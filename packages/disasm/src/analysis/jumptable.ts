@@ -35,6 +35,8 @@ export interface JumpTableContext {
   isFunction(addr: number): boolean;
   /** start of the function being analyzed */
   funcStart: number;
+  /** true when the address is not writable at run time */
+  isReadOnly?(addr: number): boolean;
   /** every instruction in the function (decoded so far) that writes a register, capped at 16 */
   defsOf?(reg: string): Insn[];
 }
@@ -90,7 +92,13 @@ export function resolveJumpTable(ctx: JumpTableContext, jmp: Insn): SwitchTable 
     if (t === undefined || !ctx.isExec(t)) return undefined;
     const tt = arch === 'arm' ? t & ~1 : t;
     const ld0 = firstLoad(e);
-    return { at: jmp.address, table: ld0 ? evaluate(ctx, ld0.a, 0) ?? 0 : 0, entrySize: ld0?.w ?? 0, count: 1, targets: [tt], bound: 'const', kind: ctx.isFunction(tt) || tt === ctx.funcStart ? 'call-table' : 'switch' };
+    const slot = ld0 ? evaluate(ctx, ld0.a, 0) : undefined;
+    const out: SwitchTable = { at: jmp.address, table: slot ?? 0, entrySize: ld0?.w ?? 0, count: 1, targets: [tt], bound: 'const', kind: ctx.isFunction(tt) || tt === ctx.funcStart ? 'call-table' : 'switch' };
+    // a pointer read from writable data is only its initial value
+    const slots: number[] = [];
+    allLoads(e, (l) => { const a = evaluate(ctx, l.a, 0); if (a !== undefined) slots.push(a); });
+    if (ctx.isReadOnly && slots.some((a) => !ctx.isReadOnly!(a))) { out.initialValue = true; out.kind = 'call-table'; }
+    return out;
   }
   if (leaves.size !== 1) return undefined;
   const idxReg = [...leaves][0]!;
@@ -382,6 +390,13 @@ function firstLoad(e: Ex): Extract<Ex, { k: 'ld' }> | undefined {
   if (e.k === 'add') return firstLoad(e.a) ?? firstLoad(e.b);
   if (e.k === 'c' || e.k === 'r') return undefined;
   return firstLoad(e.a);
+}
+
+function allLoads(e: Ex, f: (l: Extract<Ex, { k: 'ld' }>) => void): void {
+  if (e.k === 'ld') { f(e); allLoads(e.a, f); return; }
+  if (e.k === 'add') { allLoads(e.a, f); allLoads(e.b, f); return; }
+  if (e.k === 'c' || e.k === 'r') return;
+  allLoads(e.a, f);
 }
 
 function signExt(v: number, w: number): number {

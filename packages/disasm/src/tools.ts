@@ -3,6 +3,7 @@ import {
   disasmAt, disasmCallgraph, disasmCallPaths, disasmFindReferences, disasmFunction, disasmInfo,
   disasmListFunctions, disasmPseudocode, disasmSearch, disasmXrefs,
 } from './api.js';
+import { disasmTraceValues, disasmIndirectTargets } from './flowapi.js';
 
 export interface ToolParam { type: 'string' | 'number' | 'boolean' | 'array' | 'object'; description: string; optional?: boolean }
 export interface Tool { name: string; description: string; inputSchema: Record<string, ToolParam>; run: (input: any) => Promise<unknown> } // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -109,5 +110,31 @@ export const TOOLS: Tool[] = [
       thumb: { type: 'boolean', description: 'ARM only: decode as Thumb', optional: true },
     },
     run: (i) => disasmAt(i),
+  },
+  {
+    name: 'disasm_trace_values',
+    description: 'Native value flow. Backward: with function + call (address or callee name, optional occurrence and arg index from 0), shows the value reaching each argument (constant, string, stack address, incoming argument, return value of another call, load) with the instruction that produced it, and follows incoming arguments into callers up to depth. Forward: with value (string text, or a number/0x address) or function + param, lists where it flows: call arguments, stores, returns, and into callees up to depth.',
+    inputSchema: {
+      path, arch,
+      function: { ...fn, optional: true },
+      call: { type: 'string', description: 'Backward mode: call site address or callee name inside function', optional: true },
+      occurrence: { type: 'number', description: 'With a callee name: which call (1 = first)', optional: true },
+      arg: { type: 'number', description: 'Argument index from 0 (default: all register parameters of the callee)', optional: true },
+      value: { type: 'string', description: 'Forward mode: string text, or a number / 0x address to follow', optional: true },
+      param: { type: 'number', description: 'Forward mode: follow this parameter (index from 0) of function', optional: true },
+      depth: { type: 'number', description: 'Hops into callers (backward) or callees (forward), 0-3 (default 1)', optional: true },
+      limit: limit(100, 1000), budgetMs: budget,
+    },
+    run: (i) => disasmTraceValues(i),
+  },
+  {
+    name: 'disasm_indirect_targets',
+    description: 'Indirect calls and jumps of a function (or the whole program within a budget) with resolved targets: jump tables (switch), tables of code pointers, constants found by value tracking, initial values of writable function pointers, and C++ vtable slot candidates. unresolved:true lists only what is still unknown.',
+    inputSchema: {
+      path, arch, function: { ...fn, optional: true },
+      unresolved: { type: 'boolean', description: 'Only unresolved sites', optional: true },
+      offset, limit: limit(200, 5000), budgetMs: budget,
+    },
+    run: (i) => disasmIndirectTargets(i),
   },
 ];

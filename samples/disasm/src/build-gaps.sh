@@ -8,6 +8,9 @@ SRC=src
 $ZIG cc -target x86_64-linux-gnu -O2 -g0 -fPIE -pie -o switch-x64.elf $SRC/switch.c
 $ZIG cc -target x86_64-linux-gnu -O2 -g0 -fno-pie -no-pie -o switch-x64-nopie.elf $SRC/switch.c
 $ZIG cc -target aarch64-linux-gnu -O2 -g0 -o switch-arm64.elf $SRC/switch.c
+# switch.c at -O0 (stack variables, loops with for/break in pseudo code)
+$ZIG cc -target x86_64-linux-gnu -O0 -g0 -fno-sanitize=undefined -fno-omit-frame-pointer -o switch-x64-O0.elf $SRC/switch.c
+$ZIG cc -target aarch64-linux-gnu -O0 -g0 -fno-sanitize=undefined -o switch-arm64-O0.elf $SRC/switch.c
 # virt.cpp without the C++ standard library
 $ZIG c++ -target x86_64-linux-gnu -O1 -g0 -fno-exceptions -fno-rtti -nostdlib++ -o virt-x64.elf $SRC/virt.cpp
 $ZIG c++ -target aarch64-linux-gnu -O1 -g0 -fno-exceptions -fno-rtti -nostdlib++ -o virt-arm64.elf $SRC/virt.cpp

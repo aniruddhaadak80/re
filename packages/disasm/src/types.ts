@@ -143,6 +143,8 @@ export interface SwitchTable {
   indexReg?: string;
   /** address of the bounds check (cmp) */
   boundAt?: number;
+  /** the single target was read from writable data: it is the pointer's initial value, which may change at run time */
+  initialValue?: boolean;
   /** same table as the dispatch at this address (repeated interpreter dispatch with the same operand) */
   sharedWith?: number;
 }
