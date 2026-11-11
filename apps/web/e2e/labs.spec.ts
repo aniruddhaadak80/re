@@ -31,7 +31,7 @@ test.describe('tool routes', () => {
 });
 
 test.describe('new docs pages', () => {
-  for (const slug of ['disassembler', 'mobile', 'managed-runtimes', 'javascript-and-electron', 'network-and-data', 'extras', 'bridges', 'mcp-tools', 'agent-skills-and-plugins', 'comparison', 'stripped-elf-password-check', 'android-apk-review']) {
+  for (const slug of ['disassembler', 'mobile', 'managed-runtimes', 'javascript-and-electron', 'network-and-data', 'extras', 'bridges', 'mcp-tools', 'agent-skills-and-plugins', 'comparison', 'desktop', 'sessions-and-write-back', 'function-matching-and-value-flow', 'runtime-scenarios', 'windows-and-apple-artifacts', 'swift-demangling', 'stripped-elf-password-check', 'android-apk-review']) {
     test(`/docs/${slug} renders`, async ({ page }) => {
       const errors = watch(page);
       await page.goto(`docs/${slug}`);

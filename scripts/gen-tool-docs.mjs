@@ -103,6 +103,9 @@ const COUNT_RULES = [
   [/\b\d+ CLI commands\b/g, `${CLI_COMMAND_COUNT} CLI commands`],
   [/LOOP\[\d+ analyzers in order\]/g, `LOOP[${ALL_ANALYZERS.length} analyzers in order]`],
   [/S-->>C: \d+ tools with JSON schemas/g, `S-->>C: ${tools.length} tools with JSON schemas`],
+  [/\d+ 个 MCP 工具，\d+ 个 CLI 命令/g, `${tools.length} 个 MCP 工具，${CLI_COMMAND_COUNT} 个 CLI 命令`],
+  [/MCP ツール \d+ 個、CLI コマンド \d+ 個/g, `MCP ツール ${tools.length} 個、CLI コマンド ${CLI_COMMAND_COUNT} 個`],
+  [/\d+ herramientas MCP, \d+ comandos de CLI/g, `${tools.length} herramientas MCP, ${CLI_COMMAND_COUNT} comandos de CLI`],
   [/\(\d+ analyzers in the browser build, \d+ with the Node only ones\)/g, `(${ALL_ANALYZERS.length} analyzers in the browser build, ${ALL_ANALYZERS_NODE.length} with the Node only ones)`],
 ];
 const COUNTED = ['README.md', 'docs/comparison.md', 'docs/mcp.md', 'docs/agent-skills-and-plugins.md', 'docs/architecture.md', ...['bn', 'hi', 'zh', 'ja', 'es'].map((l) => `docs/readme/README.${l}.md`)];

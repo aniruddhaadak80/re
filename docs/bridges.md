@@ -58,3 +58,7 @@ Ghidra projects and jadx output are cached by file hash under `$REVLENS_CACHE_DI
 ## How it was checked
 
 The [bridges integration workflow](https://github.com/aniruddhaadak80/re/actions/workflows/bridges-integration.yml) installs radare2, Ghidra, jadx, ILSpy, gdb, lldb, llvm and binwalk on Ubuntu and runs the integration tests against real fixtures. Each test checks exact addresses (for example `add_numbers` at 0x828 and Ghidra's image base 0x100000). Tests skip with a reason when a tool is missing.
+
+## Sessions and write-back
+
+radare2, rizin, gdb, lldb and Frida can also stay open between calls, and names, signatures, comments, labels and types can be written back into Ghidra, IDA and radare2 projects. See [sessions and write-back](sessions-and-write-back.md).

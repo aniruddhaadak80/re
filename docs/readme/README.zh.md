@@ -16,7 +16,7 @@ RevLens 会给出你可以自己核对的证据来回答：字节偏移、虚拟
 
 - **浏览器里**，在 Web Worker 中运行。你的文件不会离开你的电脑。
 - **终端里**，通过 `npx revlens` 使用，可以输出 JSON、Markdown、HTML、SARIF 和 CycloneDX。
-- **智能体里**，作为 MCP 服务器运行（117 个 MCP 工具，83 个 CLI 命令），并附带给 Claude Code 和 Codex 用的现成技能和插件。
+- **智能体里**，作为 MCP 服务器运行（203 个 MCP 工具，117 个 CLI 命令），并附带给 Claude Code 和 Codex 用的现成技能和插件。
 
 如果你装了 Ghidra、radare2、jadx、ILSpy、Frida 或 gdb，RevLens 也能调用它们。`revlens doctor` 会告诉你缺了什么，以及怎么安装。
 
@@ -27,13 +27,14 @@ RevLens 的灵感来自 morluto 的 [REA, Reverse Engineer Anything](https://git
 | 领域 | 格式 | 你能得到什么 |
 | --- | --- | --- |
 | 任意文件的初步检查 | ELF、PE、Mach-O、WASM、ZIP、APK、npm tgz、ASAR、JS 打包文件 | 格式、哈希、节和熵、导入表、加固选项、加壳器、字符串、密钥、接口地址、ATT&CK 能力、yara-lite 规则、SBOM、结论核验 |
-| 原生代码 | x86、x86-64、AArch64、ARM、Thumb | 函数、控制流图、交叉引用、调用图、易读的伪代码 |
-| Android、Java、iOS | APK、DEX、JAR、class、IPA | 清单文件、签名、类似 baksmali 的 smali、javap 风格输出、IPA 的 plist 和 entitlements |
+| 原生代码 | x86、x86-64、AArch64、ARM、Thumb | 函数、控制流图、交叉引用、调用图、易读的伪代码、值流追踪、跳转表和虚表解析、跨版本函数匹配 |
+| Android、Java、iOS | APK、DEX、JAR、class、IPA | 清单文件、签名、类似 baksmali 的 smali、javap 风格输出、IPA 的 plist 和 entitlements、应用组件图、JNI 映射、成员对比 |
 | 托管运行时 | .NET、Python pyc、PyInstaller、Lua、BEAM、EVM | 元数据和 CIL、dis 输出、归档提取、EVM 函数选择器 |
-| JavaScript 和 Electron | JS、打包文件、source map、ASAR | 反混淆、把打包文件拆成模块、接口地址、Electron 安全审计 |
+| JavaScript 和 Electron | JS、打包文件、source map、ASAR、在线页面 | 反混淆、把打包文件拆成模块、接口地址、Electron 安全审计、带断言的浏览器场景脚本、两次运行的对比 |
 | 网络和数据 | PCAP、pcapng、HAR、SQLite | 会话流、DNS、HTTP、TLS SNI 和 JA3、只读 SELECT |
-| 扩展 | 固件、GPU 代码、模型文件、LNK、崩溃报告 | 符号还原、checksec、深入的 PE 和 Authenticode 分析、证据账本 |
-| 外部工具 | Ghidra、radare2、jadx、ILSpy、Frida、gdb 等 | 反编译出的 C、Java 和 C#，经你同意后的动态运行 |
+| 扩展 | 固件、GPU 代码、模型文件、LNK、崩溃报告、注册表、Prefetch、Jump List、nib、Assets.car、wxapkg、UnityFS | C++、Rust、MSVC 和 Swift 符号还原、checksec、深入的 PE 和 Authenticode 分析、protobuf、OpenAPI 和 GraphQL 接口契约、证据账本 |
+| 桌面 | 进程、已安装的应用、原生界面 | 模块、打开的文件和套接字、快照对比、Electron 应用识别、无障碍树 |
+| 外部工具 | Ghidra、radare2、jadx、ILSpy、Frida、gdb 等 | 反编译出的 C、Java 和 C#，经你同意后的动态运行，长时间保持的调试会话，把函数名写回 Ghidra、IDA 和 radare2 |
 
 ## 快速开始
 
@@ -62,5 +63,7 @@ MCP 服务器会引导智能体先运行 `analyze_file`，再根据格式选择�
 ## 延伸阅读
 
 [文档](https://aniruddhaadak80.github.io/re/docs) · [带真实输出的演练](../showcases/README.md) · [对比](../comparison.md) · [许可证：MIT](../../LICENSE)
+
+`@revlens/extras` 中的 Swift 符号还原代码移植自 Swift 项目（Apple Inc. 和 Swift 项目作者），使用带运行时库例外的 Apache License 2.0，详见 [NOTICE](../../NOTICE)。
 
 作者：Aniruddha Adak（[GitHub](https://github.com/aniruddhaadak80)）

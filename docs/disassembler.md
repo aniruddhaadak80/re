@@ -50,18 +50,18 @@ Every command takes `--json`.
 
 ## MCP tools
 
-`disasm_info`, `disasm_list_functions`, `disasm_function`, `disasm_pseudocode`, `disasm_xrefs`, `disasm_callgraph`, `disasm_search`, `disasm_find_references`, `disasm_call_paths`, `disasm_at`. See the [MCP tools reference](mcp-tools.md) for parameters.
+`disasm_info`, `disasm_list_functions`, `disasm_function`, `disasm_pseudocode`, `disasm_xrefs`, `disasm_callgraph`, `disasm_search`, `disasm_find_references`, `disasm_call_paths`, `disasm_at`, `disasm_trace_values`, `disasm_indirect_targets`, `disasm_match_functions`, `disasm_compare_functions`. The last four are explained in [function matching and value flow](function-matching-and-value-flow.md). See the [MCP tools reference](mcp-tools.md) for parameters.
 
 A good agent sequence is `disasm_list_functions`, then `disasm_pseudocode` on `main`, then `disasm_find_references` from an interesting string, then `verify_claim` on what you plan to say.
 
 ## When you need more
 
-The built in pseudo code does not track types or the stack and does not resolve jump tables. When you need real decompiled C, install Ghidra or radare2 and use the [bridges](bridges.md): `bridge_ghidra_decompile` and `bridge_r2_decompile` work on the same addresses.
+The built in pseudo code shows `switch` with case labels, loops, stack variables and parameters, but it does not recover types. When you need real decompiled C, install Ghidra or radare2 and use the [bridges](bridges.md): `bridge_ghidra_decompile` and `bridge_r2_decompile` work on the same addresses.
 
 ## Limits
 
 - 20000 instructions per function, files up to 512 MB.
-- No `switch` recovery, no types, SIMD shows as inline `__asm`.
+- No type recovery, SIMD shows as inline `__asm`. Jump tables are resolved only when the bounds check and table load sit on one predecessor chain.
 - Big endian targets load but are not decoded.
 
 ## How it was checked

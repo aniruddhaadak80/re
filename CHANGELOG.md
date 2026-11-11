@@ -23,43 +23,59 @@ The report keeps the `revlens/report@1` schema. New packages write their data un
 
 #### Engine (`@revlens/engine`)
 
-- `analyzeAll` and `analyzeAllNode`: the core pipeline plus every package analyzer on one report. 34 analyzers run in the browser build and 37 with the Node only bridge analyzers.
+- `analyzeAll` and `analyzeAllNode`: the core pipeline plus every package analyzer on one report. 36 analyzers run in the browser build and 39 with the Node only ones.
 - One registry of every agent tool, CLI command group and analyzer, used by the CLI, the MCP server, the web app and the docs generator, so the counts can never drift apart.
 
 #### Native code (`@revlens/disasm`)
 
 - x86, x86-64, AArch64, ARM and Thumb disassembly in TypeScript and WebAssembly, with ELF, PE and Mach-O loading.
-- Function discovery, control flow graphs, cross references, call graphs, call paths and readable pseudo code.
+- Function discovery, control flow graphs, cross references, call graphs, call paths and readable pseudo code with `switch`, loops, stack variables and parameters.
+- Value flow (`disasm_trace_values`): what reaches each argument of a call, and where a string, constant or parameter goes.
+- Indirect targets (`disasm_indirect_targets`): jump tables on x86-64, AArch64, Thumb and Go, code pointer tables, constants and Itanium C++ vtable slots, also in stripped files.
+- Function matching (`disasm_match_functions`) between two builds, stripped or not, and side by side function diffs with addresses normalized (`disasm_compare_functions`).
 
 #### Android, Java and iOS (`@revlens/mobile`)
 
 - Binary AXML manifests, APK v1, v2 and v3 signatures, DEX parsing with baksmali style smali, javap style class file output, native library listing, IPA plists and entitlements, app framework detection and IL2CPP metadata.
+- Android and iOS app graphs (`mobile_app_graph`, `mobile_ipa_graph`), JNI maps that recover `RegisterNatives` tables (`mobile_jni_map`) and member diffs between two versions (`mobile_compare_members`).
 
 #### Managed runtimes (`@revlens/managed`)
 
 - .NET metadata tables and CIL disassembly, Python pyc disassembly and PyInstaller archive extraction, Lua bytecode, Erlang BEAM chunks and EVM bytecode with function selectors.
+- P/Invoke declarations matched to the exports of shipped ELF, PE and Mach-O libraries (`managed_pinvoke_map`) and member level diffs of two .NET assemblies (`managed_compare_members`).
 
 #### JavaScript, Electron, network and data (`@revlens/webrt`)
 
 - JavaScript deobfuscation and bundle unpacking into modules, source map recovery, Electron ASAR listing and a security audit of Electron settings.
 - PCAP and pcapng flows with DNS, HTTP, TLS SNI and JA3, HAR summaries and read only SQLite queries.
+- Scripted browser scenarios with assertions that record network, console, DOM, ARIA, screenshots, trace chunks, V8 coverage, event listeners and WebMCP tools per step, and a capture compare with endpoint, header, script and pixel diffs and a score.
+- WebMCP and MCP over web discovery, DevTools target listing, Playwright trace reading and a Node inspector attach that records scripts, call counts and a CPU profile.
 
 #### Extras (`@revlens/extras`)
 
-- Itanium C++, Rust (legacy and v0) and MSVC demanglers.
+- Itanium C++, Rust (legacy and v0), MSVC and Swift demanglers. Swift is a TypeScript port of swift-demangle 6.0.3 and gives identical output on 470 of 470 Swift test names and 1947 of 1947 symbols of a real macOS app (`x_swift_demangle`, `revlens x-swift-demangle`).
 - Raw byte tools (read, search with wildcards, address to file offset), Go pclntab and Rust toolchain facts, deep PE inspection with resources, version info, manifest, rich header and Authenticode digest and signature checks, ELF notes, unwind ranges and kernel modules, Mach-O code signatures, one checksec for ELF, PE and Mach-O.
 - Firmware containers (including squashfs, cpio and UF2), GPU code objects, V8 and Hermes headers, model files, Windows shortcuts and Apple crash reports.
+- Windows registry hives, Prefetch (including Windows 10+ compressed files), Jump Lists and OLE compound files; NSKeyedArchiver archives, compiled nibs and Assets.car catalogs; WeChat wxapkg, Unity asset bundles and Node SEA, Bun and Deno single file executables.
+- API contracts found inside binaries and bundles (`x_api_contracts`): protobuf descriptors rebuilt as `.proto`, OpenAPI and Swagger documents, GraphQL schemas and operations.
 - An evidence ledger that binds every claim to a hashed byte range so anyone can check it again, and an agent eval harness with ground truth from repository fixtures.
 
 #### External tools (`@revlens/bridges`)
 
 - Bridges to radare2, rizin, Ghidra headless, jadx, apktool, ILSpy, Frida, gdb, lldb, objdump, binwalk, adb, IDA and Binary Ninja. They use `execFile` with argument arrays, timeouts and output caps, never a shell. Dynamic tools need explicit permission.
+- Long lived radare2, rizin, gdb, lldb and Frida sessions with ids, idle timeouts, a session cap, command guards and clean shutdown.
+- Names write-back: one `revlens/names@1` JSON moves function names, signatures, comments, labels and types into and out of Ghidra, IDA and radare2 projects.
+- 22 more adb tools, and Cutter detection with its bundled rizin.
 - `revlens doctor` lists which tools are installed and how to get the missing ones. `revlens setup <client>` writes MCP config for Claude Code, Codex, Cursor, VS Code and Windsurf, shows a dry run without `--write`, and backs up the old file before it writes.
+
+#### Desktop (`@revlens/desktop`)
+
+- Process lists and process snapshots with modules, open files and sockets, snapshot compare, installed app discovery with Electron detection, and native accessibility trees through AT-SPI, macOS System Events and Windows UIAutomation. Reading other processes needs consent.
 
 #### CLI and MCP
 
-- 83 CLI commands, each with human output by default and `--json`.
-- 117 MCP tools, 2 prompts (`triage_file`, `explain_function`) and 2 resources (`revlens://analyzers`, `revlens://tools`).
+- 117 CLI commands, each with human output by default and `--json`.
+- 203 MCP tools, 2 prompts (`triage_file`, `explain_function`) and 2 resources (`revlens://analyzers`, `revlens://tools`).
 - Streamable HTTP transport with `revlens mcp --http`. It listens on localhost by default, refuses other addresses unless `--allow-remote` and a token of at least 16 characters are given, checks Host and Origin headers, and caps body size and session count.
 
 #### Agents
@@ -76,7 +92,7 @@ The report keeps the `revlens/report@1` schema. New packages write their data un
 
 #### Docs
 
-- New pages for the disassembler, mobile, managed runtimes, JavaScript and Electron, network and data, bridges, extras, agent skills and plugins, and a generated reference of every MCP tool.
+- New pages for the disassembler, function matching and value flow, mobile, managed runtimes, JavaScript and Electron, runtime scenarios and capture compare, network and data, extras, Windows and Apple artifacts, Swift demangling, desktop apps and processes, bridges, sessions and write-back, agent skills and plugins, and a generated reference of every MCP tool.
 - A comparison with REA, GhidraMCP, ida-pro-mcp, r2mcp and jadx-mcp that says plainly where each one is stronger.
 - Five showcases made from real CLI runs on repository fixtures.
 - The README rewritten around what RevLens covers, with translations in Bengali, Hindi, Chinese, Japanese and Spanish.
@@ -92,8 +108,13 @@ The report keeps the `revlens/report@1` schema. New packages write their data un
 
 - Built-in pseudo code is readable but is not a full decompiler. Full C, Java and C# decompilation goes through the Ghidra, jadx and ILSpy bridges.
 - The bridges need the external tools to be installed, and their tests skip with a reason when a tool is missing.
-- No long lived debugger sessions yet. gdb and lldb run in one shot batches.
-- Swift demangling only detects the scheme.
+- Swift demangling follows Swift 6.0.3; newer manglings such as the embedded `$e` prefix are not recognized.
+- Desktop UI trees are read only. UI actions are not traced or replayed.
+- The macOS and Windows live process and UI paths are covered by parser tests and CI runs, not by a manual run on those systems.
+
+### Licensing
+
+- The Swift demangler in `packages/extras/src/demangle/swift/` is ported from the Swift project and stays under the Apache License 2.0 with Runtime Library Exception. `@revlens/extras` is published as `MIT AND Apache-2.0 WITH Swift-exception`, and the root `NOTICE` lists the third party code.
 
 ## [0.1.1] - 2026-11-10
 

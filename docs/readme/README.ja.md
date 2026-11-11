@@ -16,7 +16,7 @@ RevLens は、自分で確かめられる根拠を添えて答えます。バイ
 
 - **ブラウザ**では Web Worker の中で動きます。ファイルがあなたのマシンの外に出ることはありません。
 - **ターミナル**では `npx revlens` として動き、JSON、Markdown、HTML、SARIF、CycloneDX で出力できます。
-- **エージェント**では MCP サーバーとして動きます（MCP ツール 117 個、CLI コマンド 83 個）。Claude Code と Codex 向けのスキルとプラグインも用意しています。
+- **エージェント**では MCP サーバーとして動きます（MCP ツール 203 個、CLI コマンド 117 個）。Claude Code と Codex 向けのスキルとプラグインも用意しています。
 
 Ghidra、radare2、jadx、ILSpy、Frida、gdb が入っていれば、RevLens はそれらも呼び出します。足りないものとそのインストール方法は `revlens doctor` が教えてくれます。
 
@@ -27,13 +27,14 @@ RevLens は morluto の [REA, Reverse Engineer Anything](https://github.com/morl
 | 分野 | 形式 | 得られるもの |
 | --- | --- | --- |
 | どんなファイルでも最初の調査 | ELF、PE、Mach-O、WASM、ZIP、APK、npm tgz、ASAR、JS バンドル | 形式、ハッシュ、セクションとエントロピー、インポート、ハードニング、パッカー、文字列、シークレット、エンドポイント、ATT&CK の機能、yara-lite ルール、SBOM、主張の検証 |
-| ネイティブコード | x86、x86-64、AArch64、ARM、Thumb | 関数、制御フローグラフ、相互参照、コールグラフ、読みやすい疑似コード |
-| Android、Java、iOS | APK、DEX、JAR、class、IPA | マニフェスト、署名、baksmali 風の smali、javap 風の出力、IPA の plist と entitlements |
+| ネイティブコード | x86、x86-64、AArch64、ARM、Thumb | 関数、制御フローグラフ、相互参照、コールグラフ、読みやすい疑似コード、値の追跡、ジャンプテーブルと vtable の解決、ビルド間の関数対応付け |
+| Android、Java、iOS | APK、DEX、JAR、class、IPA | マニフェスト、署名、baksmali 風の smali、javap 風の出力、IPA の plist と entitlements、アプリのコンポーネント図、JNI の対応表、メンバーの差分 |
 | マネージドランタイム | .NET、Python pyc、PyInstaller、Lua、BEAM、EVM | メタデータと CIL、dis の出力、アーカイブの展開、EVM セレクタ |
-| JavaScript と Electron | JS、バンドル、ソースマップ、ASAR | 難読化の解除、バンドルのモジュール分割、エンドポイント、Electron のセキュリティ監査 |
+| JavaScript と Electron | JS、バンドル、ソースマップ、ASAR、実際のページ | 難読化の解除、バンドルのモジュール分割、エンドポイント、Electron のセキュリティ監査、アサーション付きのブラウザシナリオ、2 回の実行の比較 |
 | ネットワークとデータ | PCAP、pcapng、HAR、SQLite | フロー、DNS、HTTP、TLS SNI と JA3、読み取り専用の SELECT |
-| その他 | ファームウェア、GPU コード、モデルファイル、LNK、クラッシュレポート | デマングル、checksec、PE と Authenticode の詳しい解析、証拠の台帳 |
-| 外部ツール | Ghidra、radare2、jadx、ILSpy、Frida、gdb など | 逆コンパイルした C、Java、C#、許可を得たうえでの動的実行 |
+| その他 | ファームウェア、GPU コード、モデルファイル、LNK、クラッシュレポート、レジストリ、Prefetch、Jump List、nib、Assets.car、wxapkg、UnityFS | C++、Rust、MSVC、Swift のデマングル、checksec、PE と Authenticode の詳しい解析、protobuf、OpenAPI、GraphQL の API 定義、証拠の台帳 |
+| デスクトップ | プロセス、インストール済みアプリ、ネイティブ UI | モジュール、開いているファイルとソケット、スナップショットの比較、Electron アプリの検出、アクセシビリティツリー |
+| 外部ツール | Ghidra、radare2、jadx、ILSpy、Frida、gdb など | 逆コンパイルした C、Java、C#、許可を得たうえでの動的実行、続けて使えるデバッガのセッション、Ghidra、IDA、radare2 への名前の書き戻し |
 
 ## すぐに始める
 
@@ -62,5 +63,7 @@ MCP サーバーはエージェントに、まず `analyze_file` を実行し、
 ## もっと読む
 
 [ドキュメント](https://aniruddhaadak80.github.io/re/docs) · [実際の出力つきのウォークスルー](../showcases/README.md) · [比較](../comparison.md) · [ライセンス: MIT](../../LICENSE)
+
+`@revlens/extras` の Swift デマングラーは Swift プロジェクト（Apple Inc. と Swift プロジェクトの作者）のコードを移植したもので、Runtime Library Exception 付きの Apache License 2.0 のままです。詳しくは [NOTICE](../../NOTICE) を見てください。
 
 作者: Aniruddha Adak（[GitHub](https://github.com/aniruddhaadak80)）

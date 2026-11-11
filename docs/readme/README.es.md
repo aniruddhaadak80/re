@@ -16,7 +16,7 @@ RevLens responde con pruebas que puedes comprobar tú mismo: desplazamientos en 
 
 - **En el navegador**, dentro de un Web Worker. Tu archivo nunca sale de tu equipo.
 - **En la terminal**, como `npx revlens`, con salida en JSON, Markdown, HTML, SARIF y CycloneDX.
-- **En tu agente**, como servidor MCP (117 herramientas MCP, 83 comandos de CLI), con una skill y plugins listos para Claude Code y Codex.
+- **En tu agente**, como servidor MCP (203 herramientas MCP, 117 comandos de CLI), con una skill y plugins listos para Claude Code y Codex.
 
 Si tienes Ghidra, radare2, jadx, ILSpy, Frida o gdb, RevLens también los usa. `revlens doctor` te dice qué falta y cómo instalarlo.
 
@@ -27,13 +27,14 @@ RevLens está inspirado en [REA, Reverse Engineer Anything](https://github.com/m
 | Área | Formatos | Qué obtienes |
 | --- | --- | --- |
 | Primer vistazo a cualquier archivo | ELF, PE, Mach-O, WASM, ZIP, APK, npm tgz, ASAR, bundles de JS | Formato, hashes, secciones y entropía, importaciones, protecciones, empaquetadores, cadenas, secretos, endpoints, capacidades ATT&CK, reglas yara-lite, SBOM, verificación de afirmaciones |
-| Código nativo | x86, x86-64, AArch64, ARM, Thumb | Funciones, grafos de flujo de control, referencias cruzadas, grafo de llamadas, pseudocódigo legible |
-| Android, Java, iOS | APK, DEX, JAR, class, IPA | Manifiesto, firmas, smali al estilo de baksmali, salida al estilo de javap, plist y entitlements de IPA |
+| Código nativo | x86, x86-64, AArch64, ARM, Thumb | Funciones, grafos de flujo de control, referencias cruzadas, grafo de llamadas, pseudocódigo legible, flujo de valores, tablas de saltos y vtables resueltas, emparejamiento de funciones entre versiones |
+| Android, Java, iOS | APK, DEX, JAR, class, IPA | Manifiesto, firmas, smali al estilo de baksmali, salida al estilo de javap, plist y entitlements de IPA, grafo de componentes de la app, mapa JNI, diferencias de miembros |
 | Runtimes gestionados | .NET, Python pyc, PyInstaller, Lua, BEAM, EVM | Metadatos y CIL, salida de dis, extracción de archivos, selectores EVM |
-| JavaScript y Electron | JS, bundles, source maps, ASAR | Desofuscación, división del bundle en módulos, endpoints, auditoría de seguridad de Electron |
+| JavaScript y Electron | JS, bundles, source maps, ASAR, páginas en vivo | Desofuscación, división del bundle en módulos, endpoints, auditoría de seguridad de Electron, escenarios de navegador con aserciones, comparación de dos ejecuciones |
 | Red y datos | PCAP, pcapng, HAR, SQLite | Flujos, DNS, HTTP, TLS SNI y JA3, SELECT de solo lectura |
-| Extras | Firmware, código de GPU, archivos de modelos, LNK, informes de fallos | Demangling, checksec, análisis profundo de PE y Authenticode, registro de pruebas |
-| Herramientas externas | Ghidra, radare2, jadx, ILSpy, Frida, gdb y más | C, Java y C# descompilados, ejecución dinámica con tu permiso |
+| Extras | Firmware, código de GPU, archivos de modelos, LNK, informes de fallos, registro de Windows, Prefetch, Jump Lists, nibs, Assets.car, wxapkg, UnityFS | Demangling de C++, Rust, MSVC y Swift, checksec, análisis profundo de PE y Authenticode, contratos de API protobuf, OpenAPI y GraphQL, registro de pruebas |
+| Escritorio | Procesos, apps instaladas, interfaz nativa | Módulos, archivos y sockets abiertos, comparación de instantáneas, detección de apps Electron, árbol de accesibilidad |
+| Herramientas externas | Ghidra, radare2, jadx, ILSpy, Frida, gdb y más | C, Java y C# descompilados, ejecución dinámica con tu permiso, sesiones de depuración que siguen abiertas, nombres que se escriben de vuelta en Ghidra, IDA y radare2 |
 
 ## Empezar rápido
 
@@ -62,5 +63,7 @@ El servidor MCP le indica al agente que empiece con `analyze_file`, que pase des
 ## Para leer más
 
 [Documentación](https://aniruddhaadak80.github.io/re/docs) · [Recorridos con salida real](../showcases/README.md) · [Comparación](../comparison.md) · [Licencia: MIT](../../LICENSE)
+
+El demangler de Swift de `@revlens/extras` es un port del código del proyecto Swift (Apple Inc. y los autores del proyecto Swift) y mantiene la Apache License 2.0 con Runtime Library Exception. Más detalles en [NOTICE](../../NOTICE).
 
 Autor: Aniruddha Adak ([GitHub](https://github.com/aniruddhaadak80))

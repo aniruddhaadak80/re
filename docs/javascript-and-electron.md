@@ -48,3 +48,7 @@ revlens electron-audit app.asar
 ## How it was checked
 
 javascript-obfuscator 5 output from known inputs, webpack 5 stats for module ids and paths, byte for byte source recovery, `@electron/asar` and `@electron/fuses` on the real Electron 33 binary. See the [package README](https://github.com/aniruddhaadak80/re/tree/main/packages/webrt).
+
+## Runtime scenarios
+
+To watch an app while it runs, with scripted steps, assertions, per step network, screenshots, coverage and listeners, and to compare two runs or two releases, see [runtime scenarios and capture compare](runtime-scenarios.md).

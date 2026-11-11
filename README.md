@@ -48,16 +48,17 @@ RevLens is inspired by [REA, Reverse Engineer Anything](https://github.com/morlu
 | Area | Formats | What you get | Package |
 | --- | --- | --- | --- |
 | Triage, any file | ELF, PE, Mach-O, WASM, ZIP, JAR, APK, CRX, XPI, VSIX, npm tgz, ASAR, JS bundles, source maps | format, hashes (MD5, SHA, TLSH, CTPH), sections and entropy, imports with imphash, hardening, packers, strings, secrets, endpoints, ATT&CK capabilities, yara-lite rules, SBOM, OSV lookups, diffs, claim checks | `@revlens/core` |
-| Native code | ELF, PE, Mach-O on x86, x86-64, AArch64, ARM, Thumb, Go pclntab | functions, control flow graphs, xrefs, call graph, call paths, byte and instruction search, readable pseudo code | `@revlens/disasm` |
-| Android, Java, iOS | APK, DEX, JAR, class, IPA, IL2CPP metadata | manifest, signatures v1 to v3.1, smali matching baksmali, javap output, cross references, native libraries and JNI, IPA plist and entitlements, app frameworks | `@revlens/mobile` |
-| Managed runtimes | .NET, Python pyc and PyInstaller, Lua and LuaJIT, BEAM, EVM | metadata and CIL, dis output for 3.7 to 3.13, PyInstaller extraction, luac listings, BEAM chunks, EVM selectors and proxies | `@revlens/managed` |
-| JavaScript and Electron | JS, bundles, source maps, ASAR, live pages | beautify, deobfuscate, split bundles, endpoints, source recovery, Electron security audit, Playwright capture | `@revlens/webrt` |
+| Native code | ELF, PE, Mach-O on x86, x86-64, AArch64, ARM, Thumb, Go pclntab | functions, control flow graphs, xrefs, call graph, call paths, byte and instruction search, readable pseudo code with `switch`, value flow to call arguments, jump tables, pointer tables and C++ vtable slots, function matching and diffs across builds | `@revlens/disasm` |
+| Android, Java, iOS | APK, DEX, JAR, class, IPA, IL2CPP metadata | manifest, signatures v1 to v3.1, smali matching baksmali, javap output, cross references, native libraries and JNI with RegisterNatives tables, IPA plist and entitlements, app frameworks, Android and iOS app graphs, member diffs between versions | `@revlens/mobile` |
+| Managed runtimes | .NET, Python pyc and PyInstaller, Lua and LuaJIT, BEAM, EVM | metadata and CIL, dis output for 3.7 to 3.13, PyInstaller extraction, luac listings, BEAM chunks, EVM selectors and proxies, P/Invoke to native export maps, .NET member diffs | `@revlens/managed` |
+| JavaScript and Electron | JS, bundles, source maps, ASAR, live pages, Node processes | beautify, deobfuscate, split bundles, endpoints, source recovery, Electron security audit, Playwright capture, scripted scenarios with assertions, capture compare with pixel diffs, WebMCP discovery, CDP targets, Node inspector | `@revlens/webrt` |
 | Network and data | PCAP, pcapng, HAR, SQLite | flows, DNS, HTTP, TLS SNI and JA3, HAR review, schema and read only SELECT | `@revlens/webrt` |
-| Extras | ELF, PE, Mach-O, kernel modules, firmware (uImage, FIT, TRX, SquashFS, cpio, UEFI, UF2), GPU code, V8 and Hermes, GGUF and safetensors, LNK, Apple crash reports | C++, Rust and MSVC demangling, checksec, Go and Rust toolchain facts, deep PE (resources, version info, rich header, Authenticode), ELF notes and unwind ranges, Mach-O code signatures, an evidence and claims ledger, an agent eval harness | `@revlens/extras` |
-| External tools | radare2, rizin, Ghidra, jadx, apktool, ILSpy, Frida, gdb, lldb, objdump, binwalk, adb, IDA, Binary Ninja | decompiled C, Java and C#, dynamic runs with consent, doctor and client setup | `@revlens/bridges` |
+| Extras | ELF, PE, Mach-O, kernel modules, firmware (uImage, FIT, TRX, SquashFS, cpio, UEFI, UF2), GPU code, V8 and Hermes, GGUF and safetensors, LNK, Apple crash reports, registry hives, Prefetch, Jump Lists, OLE, NSKeyedArchiver, nibs, Assets.car, wxapkg, UnityFS, Node SEA, Bun and Deno executables | C++, Rust, MSVC and Swift demangling, protobuf, OpenAPI and GraphQL contracts found in binaries and bundles, checksec, Go and Rust toolchain facts, deep PE (resources, version info, rich header, Authenticode), ELF notes and unwind ranges, Mach-O code signatures, an evidence and claims ledger, an agent eval harness | `@revlens/extras` |
+| Desktop | running processes, installed apps, native UI on Linux, macOS and Windows | modules, open files and sockets, snapshot compare, Electron app detection, accessibility trees | `@revlens/desktop` |
+| External tools | radare2, rizin, Ghidra, jadx, apktool, ILSpy, Frida, gdb, lldb, objdump, binwalk, adb, IDA, Binary Ninja, Cutter | decompiled C, Java and C#, dynamic runs with consent, long lived r2, gdb, lldb and Frida sessions, names written back to Ghidra, IDA and radare2, doctor and client setup | `@revlens/bridges` |
 | One entry point | all of the above | `analyzeAll()` runs 36 analyzers into one report | `@revlens/engine` |
 
-Each area has a docs page: [disassembler](docs/disassembler.md), [mobile](docs/mobile.md), [managed runtimes](docs/managed-runtimes.md), [JavaScript and Electron](docs/javascript-and-electron.md), [network and data](docs/network-and-data.md), [bridges, doctor and setup](docs/bridges.md), [MCP tools reference](docs/mcp-tools.md) and [agent skills and plugins](docs/agent-skills-and-plugins.md).
+Each area has a docs page: [disassembler](docs/disassembler.md), [mobile](docs/mobile.md), [managed runtimes](docs/managed-runtimes.md), [JavaScript and Electron](docs/javascript-and-electron.md), [network and data](docs/network-and-data.md), [extras](docs/extras.md), [Swift demangling](docs/swift-demangling.md), [Windows and Apple artifacts](docs/windows-and-apple-artifacts.md), [function matching and value flow](docs/function-matching-and-value-flow.md), [runtime scenarios and capture compare](docs/runtime-scenarios.md), [desktop apps and processes](docs/desktop.md), [bridges, doctor and setup](docs/bridges.md), [sessions and write-back](docs/sessions-and-write-back.md), [MCP tools reference](docs/mcp-tools.md) and [agent skills and plugins](docs/agent-skills-and-plugins.md).
 
 ## Quick start
 
@@ -252,14 +253,16 @@ The full, honest table is in [docs/comparison.md](docs/comparison.md). The short
 | --- | --- | --- | --- | --- | --- | --- |
 | What you install | Node, or nothing (browser) | Node plus engines you choose | Ghidra, Java, plugin | IDA Pro | radare2 | jadx plugin, Python |
 | Runs in the browser | Yes | No | No | No | No | No |
-| Built in disassembler and pseudo code | Yes, light | Through engines | Yes, Ghidra | Yes, Hex-Rays | Yes | Android only |
+| Built in disassembler and pseudo code | Yes, light, with value flow and function matching | Through engines | Yes, Ghidra | Yes, Hex-Rays | Yes | Android only |
 | Full decompiler | Through bridges (Ghidra, r2ghidra, jadx, ILSpy) | Yes, through engines | Yes | Yes | Yes, with plugins | Yes, Java |
 | Android, .NET, Python, Lua, BEAM, EVM without installs | Yes | Partial, most need engines | No | No | No | Android with jadx |
 | JS bundles, Electron, PCAP, HAR, SQLite | Yes | Yes | No | No | No | No |
 | Supply chain: SBOM, OSV, SARIF, rules, diff | Yes | Partial | No | No | No | No |
 | Claim checks against bytes | Yes | Partial, evidence first | No | No | No | No |
-| Runtime hooking | Through Frida and gdb bridges, with consent | Yes | No | Debugger plugin | Partial | No |
-| License | MIT | MIT | Apache-2.0 | MIT | MIT | Apache-2.0 |
+| Rename and annotate in Ghidra, IDA, radare2 | Yes, names write-back | Yes |
+| Runtime hooking and debug sessions | Frida, gdb and lldb sessions, with consent | Yes |
+| Browser scenarios and capture compare | Yes | Yes | No | Debugger plugin | Partial | No |
+| License | MIT (Swift demangler Apache-2.0) | MIT | Apache-2.0 | MIT | MIT | Apache-2.0 |
 
 If you live in Ghidra or IDA and want to rename and annotate a database, use their MCP servers. If you want one toolkit that answers first with nothing installed, works in CI and in a browser tab, and uses the big engines when they are there, RevLens is built for that.
 
