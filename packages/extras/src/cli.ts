@@ -115,4 +115,7 @@ export const CLI_COMMANDS: CliCommand[] = [
   command('x-prefetch', 'x_prefetch', 'Windows Prefetch files, compressed or not'),
   command('x-jumplist', 'x_jump_list', 'Windows Jump Lists with embedded shell links'),
   command('x-ole', 'x_ole_compound', 'OLE compound file directory and streams'),
+  command('x-keyed-archive', 'x_keyed_archive', 'Decode NSKeyedArchiver plists'),
+  command('x-nib', 'x_nib', 'Compiled Interface Builder nib files'),
+  command('x-assets-car', 'x_asset_catalog', 'Assets.car renditions and asset names'),
 ];

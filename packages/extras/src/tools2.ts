@@ -7,6 +7,11 @@ import { inspectRegf } from './windows/regf.js';
 import { parsePrefetch } from './windows/prefetch.js';
 import { parseJumpList } from './windows/jumplist.js';
 import { Cfb } from './windows/cfb.js';
+import { parsePlistAny } from './apple/plist.js';
+import { decodeKeyedArchive, isKeyedArchive } from './apple/keyedarchive.js';
+import { parseNib, summarizeNib, isNibArchive } from './apple/nib.js';
+import { parseAssetCatalog } from './apple/car.js';
+import { jsonSafe } from './tools.js';
 
 const P = PATH_INPUT;
 const LIMIT: Record<string, InputSpec> = {
@@ -75,4 +80,44 @@ export const WINDOWS_TOOLS: ToolDef[] = [
   },
 ];
 
-export const GAP_TOOLS: ToolDef[] = [...WINDOWS_TOOLS];
+export const APPLE_TOOLS: ToolDef[] = [
+  {
+    name: 'x_keyed_archive',
+    description: 'Decode an NSKeyedArchiver archive (binary or XML plist, for example .nib keyed archives, NSUserDefaults blobs, iOS backups, saved state): resolves CF$UID references from $top into plain JSON, maps Foundation classes, lists the archived classes. Plain plists are returned as parsed.',
+    inputSchema: { ...P, maxDepth: { type: 'number', description: 'Maximum object nesting to resolve, default 64', optional: true } },
+    async run(i) {
+      const p = parsePlistAny(await inputBytes(i));
+      if (!isKeyedArchive(p)) return jsonSafe({ keyedArchive: false, plist: p });
+      return jsonSafe({ keyedArchive: true, ...decodeKeyedArchive(p, { maxDepth: num(i.maxDepth, 64) }) });
+    },
+  },
+  {
+    name: 'x_nib',
+    description: 'Compiled Interface Builder file (.nib from ibtool, NIBArchive format; keyed-archive nibs are decoded too): class histogram, user visible strings, outlet and action connections, custom classes, and the raw objects with typed values (paged).',
+    inputSchema: { ...P, objects: { type: 'boolean', description: 'Include raw objects with their values', optional: true }, ...LIMIT },
+    async run(i) {
+      const b = await inputBytes(i);
+      if (!isNibArchive(b)) {
+        const p = parsePlistAny(b);
+        if (isKeyedArchive(p)) return jsonSafe({ format: 'keyed-archive', ...decodeKeyedArchive(p) });
+        throw new ParseError('not a NIBArchive or keyed archive nib');
+      }
+      const n = parseNib(b);
+      const s = summarizeNib(n);
+      return jsonSafe({ format: 'NIBArchive', formatVersion: n.formatVersion, coderVersion: n.coderVersion, counts: n.counts, offsets: n.offsets, ...s, objects: i.objects ? page(n.objects, num(i.offset, 0), num(i.limit, 200)) : undefined });
+    },
+  },
+  {
+    name: 'x_asset_catalog',
+    description: 'Compiled asset catalog (Assets.car, a BOM store): CoreUI header and authoring tool, deployment target, key format, facets (asset names), appearances, and every rendition with name, asset, size, scale, pixel format, layout, idiom and appearance (paged).',
+    inputSchema: { ...P, filter: { type: 'string', description: 'Keep renditions whose name or asset contains this text', optional: true }, ...LIMIT },
+    async run(i) {
+      const c = parseAssetCatalog(await inputBytes(i));
+      const f = i.filter ? String(i.filter) : '';
+      const rs = f ? c.renditions.filter((r) => r.name.includes(f) || (r.facet ?? '').includes(f)) : c.renditions;
+      return { ...c, renditions: page(rs, num(i.offset, 0), num(i.limit, 200)) };
+    },
+  },
+];
+
+export const GAP_TOOLS: ToolDef[] = [...WINDOWS_TOOLS, ...APPLE_TOOLS];

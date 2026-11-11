@@ -41,3 +41,15 @@ Expected values for these and the other gap formats live in `reference-gaps.json
 `packages/extras/scripts/gen_reference_gaps.py` from regipy 6.5.0, windowsprefetch 4.0.3 (with
 dissect.util 3.24 LZXPRESS Huffman standing in for the Windows-only RtlDecompressBufferEx),
 olefile 0.47 and LnkParse3 1.6.0.
+
+## apple/ (NSKeyedArchiver, compiled nibs)
+
+| File | Source | License |
+| --- | --- | --- |
+| `SUUpdateAlert.nib`, `SUUpdatePermissionPrompt.nib` | Sparkle 2.10.1 `Sparkle-for-Swift-Package-Manager.zip`, `Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework/Versions/B/Resources/`, https://github.com/sparkle-project/Sparkle/releases/tag/2.10.1 (compiled by Xcode ibtool) | MIT |
+| `dict.keyedarchive`, `array-xml.keyedarchive` | written by `src/swift/keyedarchive.swift` built with the Swift 6.0.3 toolchain for Linux (swift-corelibs-foundation NSKeyedArchiver), see `packages/extras/scripts/make_swift_fixtures.sh` | MIT (this repo) |
+
+Fetched by `fetch-fixtures.mjs` (not committed, 1.7 MB and 5 MB): `maccy-Assets.car` and
+`maccy-Maccy.macho` from Maccy 2.8.0 `Maccy.app.zip` (MIT, https://github.com/p0deje/Maccy/releases/tag/2.8.0).
+The Assets.car test checks the facet names against the asset catalog source of that release
+(https://github.com/p0deje/Maccy/tree/2.8.0/Maccy/Assets.xcassets).

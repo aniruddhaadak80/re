@@ -43,7 +43,12 @@ const jobs = [
   ['strings64.exe', async () => unzipMember(await get('https://download.sysinternals.com/files/Strings.zip'), 'strings64.exe')],
   // real macOS 12 crash report with a trailing System Profile section, posted publicly as a gist
   ['WindowServer.ips', async () => get('https://gist.githubusercontent.com/luckman212/5b645096c44936ba8530071fa6a23efd/raw/WindowServer-2021-10-27-175344.ips')],
+  // Maccy 2.8.0 (MIT, https://github.com/p0deje/Maccy): a real Xcode-built Assets.car and a Swift Mach-O
+  ['maccy-Assets.car', async () => unzipMember(await maccy(), 'Maccy.app/Contents/Resources/Assets.car')],
+  ['maccy-Maccy.macho', async () => unzipMember(await maccy(), 'Maccy.app/Contents/MacOS/Maccy')],
 ];
+let maccyZip;
+async function maccy() { return (maccyZip ??= await get('https://github.com/p0deje/Maccy/releases/download/2.8.0/Maccy.app.zip')); }
 for (const [out, f] of jobs) {
   const dest = join(cache, out);
   if (existsSync(dest)) continue;

@@ -140,7 +140,70 @@ def jumplists():
     return out
 
 
-SECTIONS = {'registry': registry, 'prefetch': prefetch, 'jumplists': jumplists}
+def apple():
+    import plistlib
+    import nibarchive
+    from NSKeyedUnArchiver import unserializeNSKeyedArchiver
+    A = os.path.join(S, 'apple')
+    out = {'nib': {}, 'keyed': {}}
+    for f in sorted(os.listdir(A)):
+        b = open(os.path.join(A, f), 'rb').read()
+        if f.endswith('.nib'):
+            a = nibarchive.NIBArchiveParser(verify=True).parse(io.BytesIO(b))
+            h = a.header
+            vals = []
+            for v in a.values:
+                t = int(v.type)
+                d = v.data
+                if t == 8:
+                    d = bytes(d)
+                    try:
+                        d = d.decode('utf-8')
+                    except Exception:
+                        d = {'len': len(d)}
+                elif t in (6, 7):
+                    d = float(d)
+                vals.append([a.keys[v.key_index].name, t, d])
+            out['nib'][f] = {'header': [h.unknown_1, h.unknown_2, h.object_count, h.offset_objects, h.key_count, h.offset_keys, h.value_count, h.offset_values, h.class_name_count, h.offset_class_names],
+                             'classes': [c.name.rstrip('\0') for c in a.class_names], 'keys': [k.name for k in a.keys],
+                             'objects': [[o.class_name_index, o.values_index, o.value_count] for o in a.objects], 'values': vals}
+        elif f.endswith('.keyedarchive'):
+            def uids(x):
+                if isinstance(x, dict):
+                    if list(x) == ['CF$UID']:
+                        return plistlib.UID(x['CF$UID'])
+                    return {k: uids(v) for k, v in x.items()}
+                if isinstance(x, list):
+                    return [uids(y) for y in x]
+                return x
+            p = uids(plistlib.loads(b))
+            bin_ = plistlib.dumps(p, fmt=plistlib.FMT_BINARY)
+            def norm(x):
+                import datetime, uuid
+                if isinstance(x, dict):
+                    if set(x) == {'NS.relative', 'NS.base'}:
+                        return {'$url': x['NS.relative']}
+                    if set(x) == {'NS.uuidbytes'}:
+                        return {'$uuid': str(uuid.UUID(bytes=x['NS.uuidbytes'])).upper()}
+                    if set(x) == {'NS.objects'}:
+                        return {'$set': [norm(y) for y in x['NS.objects']]}
+                    if x == {}:
+                        return None
+                    return {k: norm(v) for k, v in x.items()}
+                if isinstance(x, list):
+                    return [norm(y) for y in x]
+                if isinstance(x, bytes):
+                    return {'$data': x.hex(), 'length': len(x)}
+                if isinstance(x, datetime.datetime):
+                    return {'$date': x.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'}
+                return x
+            out['keyed'][f] = {'objects': len(p['$objects']), 'root': norm(unserializeNSKeyedArchiver(bin_))}
+    # Assets.car ground truth: the asset catalog source of the same Maccy release
+    out['maccyXcassets'] = {'source': 'https://github.com/p0deje/Maccy/tree/2.8.0/Maccy/Assets.xcassets', 'names': ['AppIcon', 'StatusBarMenuImage', 'clipboard.fill', 'paperclip', 'scissors']}
+    return out
+
+
+SECTIONS = {'apple': apple, 'registry': registry, 'prefetch': prefetch, 'jumplists': jumplists}
 
 if __name__ == '__main__':
     ref = json.load(open(OUT)) if os.path.exists(OUT) else {}
