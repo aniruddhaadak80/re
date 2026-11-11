@@ -2882,9 +2882,9 @@ export class NodePrinter {
     /* assert */ void 0;
     let layout = Node.getChild(0);
     /* assert */ void 0;
-    let signature = NONE, genericArgs = NONE;
+    let genericArgs = NONE;
     if (Node.getNumChildren() == 3) {
-      signature = Node.getChild(1);
+      const signature = Node.getChild(1);
       /* assert */ void 0;
       genericArgs = Node.getChild(2);
       /* assert */ void 0;
@@ -3142,7 +3142,7 @@ export class NodePrinter {
     let savedDisplayWhereClauses = this.Options.DisplayWhereClauses;
     this.Options.DisplayWhereClauses = true;
 
-    let genSig = NONE, type = NONE;
+    let genSig = NONE, type: Node;
     if (Node.getNumChildren() == 2) {
       genSig = Node.getChild(1);
       type = Node.getChild(2);

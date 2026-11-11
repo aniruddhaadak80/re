@@ -169,7 +169,7 @@ function findBound(arch: Arch, chain: Step[]): Bound | undefined {
         const bm = B.mnemonic.replace(/\.[wn]$/, '');
         const bo = splitOperands(B.operands);
         if (!writes(arch, B).includes(reg)) continue;
-        const imm32 = (v: number | undefined) => (v !== undefined && (arch === 'x86' || /^e|d$/.test(bo[0] ?? '') || (bo[0] ?? '').startsWith('w')) && v >= 2 ** 31 && v < 2 ** 32 ? v - 2 ** 32 : v);
+        const imm32 = (v: number | undefined) => (v !== undefined && (arch === 'x86' || ((bo[0] ?? '').startsWith('e') || (bo[0] ?? '').endsWith('d')) || (bo[0] ?? '').startsWith('w')) && v >= 2 ** 31 && v < 2 ** 32 ? v - 2 ** 32 : v);
         if ((bm === 'add' || bm === 'sub') && bo.length === 2 && canon(arch, bo[0]!) === reg) { const v = imm32(parseImm(bo[1])); if (v !== undefined) bias = bm === 'add' ? -v : v; }
         else if ((bm === 'sub' || bm === 'add') && bo.length === 3 && canon(arch, bo[0]!) === reg) { const v = imm32(parseImm(bo[2])); if (v !== undefined) bias = bm === 'sub' ? v : -v; }
         else if (bm === 'lea' && canon(arch, bo[0]!) === reg) { const lm = /^\[([a-z0-9]+)([+-])(0x[0-9a-f]+|\d+)\]$/.exec((bo[1] ?? '').replace(/\s+/g, '')); if (lm) { const v = parseImm(lm[3]); if (v !== undefined) bias = lm[2] === '-' ? v : -v; } }
@@ -433,7 +433,7 @@ function wrap(ctx: JumpTableContext, v: number): number {
 
 function thumbTable(ctx: JumpTableContext, jmp: Insn, w: 1 | 2, bound: Bound | undefined): SwitchTable | undefined {
   if (!bound) return undefined;
-  const ops = (jmp.operands.match(/\[([^\]]*)\]/)?.[1] ?? '').split(',').map((s) => s.trim());
+  const ops = bracketed(jmp.operands).split(',').map((s) => s.trim());
   if (ops[0] !== 'pc') return undefined;
   const r = canon('arm', ops[1] ?? '');
   if (r !== bound.reg) return undefined;
@@ -447,4 +447,12 @@ function thumbTable(ctx: JumpTableContext, jmp: Insn, w: 1 | 2, bound: Bound | u
     targets.push(t);
   }
   return { at: jmp.address, table, entrySize: w, count: targets.length, targets, bound: 'cmp', kind: 'switch', indexReg: r, boundAt: bound.at, ...(bound.bias ? { bias: bound.bias } : {}) };
+}
+
+/** Text inside the first [...] of an operand string, or '' (indexOf scan instead of an unanchored regex). */
+function bracketed(s: string): string {
+  const i = s.indexOf('[');
+  if (i < 0) return '';
+  const j = s.indexOf(']', i + 1);
+  return j < 0 ? '' : s.slice(i + 1, j);
 }

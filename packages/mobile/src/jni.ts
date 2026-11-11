@@ -166,7 +166,9 @@ export function scanJniLibrary(bytes: Uint8Array): JniLibScan {
     // allocated, non-executable data: .data.rel.ro, .data, .rodata and friends
     if (s.type !== 1 || !(s.flags & 2) || s.flags & 4 || !s.addr || s.size < ps * 3) continue;
     let cur: JniTable | undefined;
-    for (let va = s.addr; va + ps * 3 <= s.addr + s.size && total < JNI_LIMITS.maxTableEntries;) {
+    // PROGBITS data lives in the file: never walk past the bytes the file holds, whatever size the header claims
+    const end = s.addr + Math.min(s.size, Math.max(0, L.r.bytes.length - s.offset));
+    for (let va = s.addr; va + ps * 3 <= end && total < JNI_LIMITS.maxTableEntries;) {
       const n = ptr(va), g = ptr(va + ps), f = ptr(va + 2 * ps);
       const name = n !== undefined ? strVa(L, n, 256) : undefined;
       const sig = name && ID.test(name) && g !== undefined ? strVa(L, g, 1024) : undefined;

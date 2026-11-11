@@ -1,6 +1,6 @@
 // Node entry for @revlens/desktop: live process inspection and comparison, installed app discovery and
 // native UI tree capture on Linux, macOS and Windows. Import as '@revlens/desktop/node'.
-import { readFile, readdir, readlink, stat, writeFile, realpath, access } from 'node:fs/promises';
+import { open, readFile, readdir, readlink, stat, writeFile, realpath, access } from 'node:fs/promises';
 import { constants as FS } from 'node:fs';
 import { join, delimiter, isAbsolute, basename } from 'node:path';
 import { homedir } from 'node:os';
@@ -201,9 +201,7 @@ export async function inspectApp(path: string): Promise<AppRecord & { resolvedEx
     const asar = join(bundle, 'Contents', 'Resources', 'app.asar');
     return { ...app, resolvedExecutable: app.executable, electron, asar: (await exists(asar)) ? asar : undefined };
   }
-  if (!st.isFile()) throw new InputError(`${path} is not a file or .app bundle`);
-  if (st.size > 16 * 1024 * 1024) throw new InputError('file too large');
-  const bytes = new Uint8Array(await readFile(path));
+  const bytes = await readRegularFile(path, 16 * 1024 * 1024, `${path} is not a file or .app bundle`);
   if (/\.desktop$/.test(path)) {
     app = desktopEntryToApp(parseDesktopFile(new TextDecoder().decode(bytes)), path);
     if (!app) throw new InputError(`${path} is not an Application desktop entry`);
@@ -409,7 +407,18 @@ const NODE_TOOLS: ToolDef[] = [
   },
 ];
 
-const readerIO = async (path: string, max: number) => { const st = await stat(path); if (st.size > max) throw new InputError('file too large'); return new Uint8Array(await readFile(path)); };
+/** Read a regular file of at most max bytes; the type and size checks and the read use one descriptor. */
+async function readRegularFile(path: string, max: number, notFile = `${path} is not a regular file`): Promise<Uint8Array> {
+  const fh = await open(path, 'r');
+  try {
+    const st = await fh.stat();
+    if (!st.isFile()) throw new InputError(notFile);
+    if (st.size > max) throw new InputError('file too large');
+    return new Uint8Array(await fh.readFile());
+  } finally { await fh.close(); }
+}
+
+const readerIO = (path: string, max: number) => readRegularFile(path, max);
 
 /** All desktop tools for Node (file paths supported). */
 export const TOOLS: ToolDef[] = [...BROWSER_TOOLS(readerIO), ...NODE_TOOLS];

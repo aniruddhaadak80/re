@@ -95,7 +95,7 @@ function javapMembers(file: string): Map<string, Set<string>> {
   const out = new Map<string, Set<string>>();
   let cls = '', pending = '';
   for (const line of readFileSync(sample('jni', file), 'utf8').split('\n')) {
-    const c = /^(?:public |final |abstract |\w+ )*(?:class|interface) ([\w.$]+)/.exec(line);
+    const c = /^(?:\w+ )*(?:class|interface) ([\w.$]+)/.exec(line);
     if (c) { cls = c[1]!; out.set(cls, new Set()); continue; }
     const d = /^\s+descriptor: (\S+)/.exec(line);
     if (d && pending) { out.get(cls)!.add(`${pending}${d[1]!.startsWith('(') ? '' : ':'}${d[1]}`); pending = ''; continue; }

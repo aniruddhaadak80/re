@@ -113,14 +113,15 @@ function toBase64(b: Uint8Array): string {
 
 /** Only plain values from the page reach a tool: no paths (there is no file system here) and no output folders. */
 function cleanArgs(args: Record<string, unknown>): Record<string, unknown> {
-  // A null prototype object, and prototype keys are never copied, so page input cannot reach Object.prototype.
-  const out: Record<string, unknown> = Object.create(null) as Record<string, unknown>;
+  // Prototype keys are never copied, and the result is built from entries (own data properties only),
+  // so page input cannot reach Object.prototype.
+  const out: [string, unknown][] = [];
   for (const [k, v] of Object.entries(args)) {
     if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
     if (k === 'path' || k === 'outDir' || k === 'sourceMapPath' || k === 'binaryPath' || k === 'bytes' || k === 'base64' || k === 'bytesBase64') continue;
-    if (typeof v === 'string' ? v.length <= 1_000_000 : typeof v === 'number' || typeof v === 'boolean' || (Array.isArray(v) && v.length <= 64 && v.every((x) => typeof x === 'string'))) out[k] = v;
+    if (typeof v === 'string' ? v.length <= 1_000_000 : typeof v === 'number' || typeof v === 'boolean' || (Array.isArray(v) && v.length <= 64 && v.every((x) => typeof x === 'string'))) out.push([k, v]);
   }
-  return out;
+  return Object.fromEntries(out);
 }
 
 function runTool(msg: Extract<WorkerRequest, { type: 'tool' }>): void {

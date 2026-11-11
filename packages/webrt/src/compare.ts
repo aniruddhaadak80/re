@@ -64,7 +64,13 @@ function endpointIndex(c: CaptureLike): Map<string, EndpointKey & { req: Map<str
   return idx;
 }
 
-const stripQuery = (u: string) => u.replace(/[?#].*$/, '');
+/** Drop the query and fragment: everything from the first ? or # after the last line break. */
+const stripQuery = (u: string) => {
+  let from = 0;
+  for (let i = u.length - 1; i >= 0; i--) { const c = u[i]; if (c === '\n' || c === '\r' || c === '\u2028' || c === '\u2029') { from = i + 1; break; } }
+  const q = u.slice(from).search(/[?#]/);
+  return q < 0 ? u : u.slice(0, from + q);
+};
 const jaccard = (a: number, b: number, common: number) => (a + b - common === 0 ? 1 : common / (a + b - common));
 const pub = (e: EndpointKey): EndpointKey => ({ key: e.key, method: e.method, host: e.host, path: e.path, count: e.count, statuses: e.statuses });
 

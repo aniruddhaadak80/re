@@ -431,7 +431,7 @@ class OldDemangler {
   parent.addChild(this.Factory.createNode(K.FunctionSignatureSpecializationParamPayload, name.getText()));
 
   // Then demangle types until we fail.
-  let type = NONE;
+  let type: Node;
   while (this.Mangled.peek() != '_' && (type = this.demangleType(depth + 1))) {
     parent.addChild(type);
   }
@@ -1229,7 +1229,7 @@ class OldDemangler {
 
   demangleDependentMemberTypeName(base: Node, depth: number): Node {
   /* assert */ void 0;
-  let assocTy = NONE;
+  let assocTy: Node;
 
   if (this.Mangled.nextIf('S')) {
     assocTy = this.demangleSubstitutionIndex(depth + 1);
@@ -1485,7 +1485,7 @@ class OldDemangler {
   // will begin with either 'C' or 'S'.
   if (this.Mangled.isEmpty())
     return NONE;
-  let constraint = NONE;
+  let constraint: Node;
 
   let next = this.Mangled.peek();
 
@@ -1495,7 +1495,7 @@ class OldDemangler {
   } else if (next == 'S') {
     // A substitution may be either the module name of a protocol or a full
     // type name.
-    let typeName = NONE;
+    let typeName: Node;
     this.Mangled.next();
     let sub = this.demangleSubstitutionIndex(depth + 1);
     if (!sub) return NONE;

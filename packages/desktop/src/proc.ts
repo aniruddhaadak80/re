@@ -44,14 +44,18 @@ export function parseCmdline(text: string): string[] {
   return text.split('\0').filter((x, i, a) => !(x === '' && i === a.length - 1)).slice(0, 1000).map((x) => x.slice(0, 4000));
 }
 
+const LINE_BREAK = /[\n\r\u2028\u2029]/;
+
 /** Parse /proc/<pid>/maps into the list of mapped files with lowest address and total mapped size. */
 export function parseProcMaps(text: string, exePath?: string): ModuleInfo[] {
   const mods = new Map<string, { lo: bigint; hi: bigint; size: bigint }>();
   for (const l of lines(text)) {
     // addr-addr perms offset dev inode path
-    const m = /^([0-9a-f]+)-([0-9a-f]+)\s+\S{4}\s+[0-9a-f]+\s+[0-9a-f]+:[0-9a-f]+\s+(\d+)\s*(.*)$/i.exec(l);
+    const m = /^([0-9a-f]+)-([0-9a-f]+)\s+\S{4}\s+[0-9a-f]+\s+[0-9a-f]+:[0-9a-f]+\s+(\d+)/i.exec(l);
     if (!m) continue;
-    const path = (m[4] ?? '').trim();
+    const rest = l.slice(m[0].length);
+    if (LINE_BREAK.test(rest)) continue;
+    const path = rest.trim();
     if (!path || m[3] === '0' || path.startsWith('[')) continue;
     const lo = BigInt('0x' + m[1]), hi = BigInt('0x' + m[2]);
     const cur = mods.get(path);
@@ -181,9 +185,13 @@ export function parseLsofF(text: string): { pid: number; command?: string; uid?:
 export function parsePs(text: string): ProcessInfo[] {
   const out: ProcessInfo[] = [];
   for (const l of lines(text)) {
-    const m = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d.]+)\s+(.+)$/.exec(l);
+    // fixed numeric columns by regex (no overlapping quantifiers), the command is the rest of the line
+    const m = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d.]+)(\s+)/.exec(l);
     if (!m) continue;
-    const comm = m[7]!.trim();
+    const rest = l.slice(m[0].length);
+    const ws = m[7]!;
+    if (LINE_BREAK.test(rest) || (!rest && (ws.length < 2 || LINE_BREAK.test(ws[ws.length - 1]!)))) continue;
+    const comm = rest.trim();
     out.push({ pid: Number(m[1]), ppid: Number(m[2]), uid: Number(m[3]), rssKb: Number(m[4]), vszKb: Number(m[5]), cpuPercent: Number(m[6]), name: comm.split('/').pop()!.slice(0, 256), exe: comm.startsWith('/') ? comm : undefined });
     if (out.length >= 100_000) break;
   }

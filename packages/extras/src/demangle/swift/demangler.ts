@@ -291,7 +291,7 @@ export class Demangler {
   changeKind(Node: Node, NewKind: Kind): Node {
   if (!Node)
     return NONE;
-  let NewNode = NONE;
+  let NewNode: Node;
   if (Node.hasText()) {
     NewNode = this.createNodeWithAllocatedText(NewKind, Node.getText());
   } else if (Node.hasIndex()) {
@@ -761,7 +761,7 @@ export class Demangler {
 }
 
   demangleBuiltinType(): Node {
-  let Ty = NONE;
+  let Ty: Node;
   let maxTypeSize = 4096; // a very conservative upper bound
   switch (this.nextChar()) {
     case 'b':
@@ -952,7 +952,7 @@ export class Demangler {
 }
 
   popFunctionParams(kind: Kind): Node {
-  let ParamsType = NONE;
+  let ParamsType: Node;
   if (this.popNode(K.EmptyList)) {
     ParamsType = this.createType(this.createNode(K.Tuple));
   } else {
@@ -1439,7 +1439,7 @@ export class Demangler {
     ++TypeListIdx;
 
   if (TypeListIdx < TypeLists.length) {
-    let BoundParent = NONE;
+    let BoundParent: Node;
     if (Context.getKind() == K.Extension) {
       BoundParent = this.demangleBoundGenericArgs(Context.getChild(1), TypeLists,
                                              TypeListIdx);
@@ -1694,10 +1694,10 @@ export class Demangler {
     type = this.addChild(type, Param);
     const Diff = this.demangleImplParameterResultDifferentiability();
     if (Diff)
-      Param = this.addChild(Param, Diff);
+      this.addChild(Param, Diff);
     const Sending = this.demangleImplParameterSending();
     if (Sending)
-      Param = this.addChild(Param, Sending);
+      this.addChild(Param, Sending);
     ++NumTypesToAdd;
   }
 
@@ -1711,7 +1711,7 @@ export class Demangler {
     type = this.addChild(type, Result);
     const Diff = this.demangleImplParameterResultDifferentiability();
     if (Diff)
-      Result = this.addChild(Result, Diff);
+      this.addChild(Result, Diff);
     ++NumTypesToAdd;
   }
   while (this.nextIf('Y')) {
@@ -3282,7 +3282,7 @@ export class Demangler {
   demangleFunctionEntity(): Node {
   let Args = '';
 
-  let Kind: Kind = K.EmptyList;
+  let Kind: Kind;
 
   switch (this.nextChar()) {
     case 'D': Args = 'None'; Kind = K.Deallocator; break;

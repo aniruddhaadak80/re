@@ -1,6 +1,6 @@
 // Finds external tools on PATH, in well known install folders, and through env vars,
 // and reads their versions. Node only.
-import { accessSync, constants, existsSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs';
+import { accessSync, closeSync, constants, existsSync, fstatSync, openSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { delimiter, dirname, join } from 'node:path';
 import { runTool } from './exec.js';
@@ -420,11 +420,14 @@ export function appdataVersion(xml: string): string | undefined {
 }
 
 function readText(p: string, max = 512 * 1024): string | undefined {
+  let fd: number | undefined;
   try {
-    const st = statSync(p);
+    // one descriptor for the checks and the read
+    fd = openSync(p, 'r');
+    const st = fstatSync(fd);
     if (!st.isFile() || st.size > max) return undefined;
-    return readFileSync(p, 'utf8');
-  } catch { return undefined; }
+    return readFileSync(fd, 'utf8');
+  } catch { return undefined; } finally { if (fd !== undefined) closeSync(fd); }
 }
 
 /**

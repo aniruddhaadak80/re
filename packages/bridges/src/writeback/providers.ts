@@ -193,7 +193,7 @@ export async function idaExportNames(input: { path: string; all?: boolean; outPa
   const timeoutMs = int(input.timeoutMs, 15 * 60_000, 10_000, 7_200_000);
   return withTempDir(async (dir) => {
     const out = join(dir, 'names.json');
-    let target = path;
+    let target: string;
     if (isIdaDb(path)) { target = join(dir, `db${extname(path)}`); await copyFile(path, target); }
     else { target = join(dir, 'input.bin'); await copyFile(path, target); }
     const r = await runIda(n.det, IDA_NAMES_EXPORT_SCRIPT, { out, all: input.all === true }, target, dir, timeoutMs);

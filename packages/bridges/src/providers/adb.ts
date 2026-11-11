@@ -11,7 +11,7 @@
 //   reverse changes) needs allowExecution: true.
 import { createHash, randomBytes } from 'node:crypto';
 import { existsSync, statSync } from 'node:fs';
-import { open, readFile, rm, stat } from 'node:fs/promises';
+import { open, readFile, rm, stat, type FileHandle } from 'node:fs/promises';
 import { basename, join, resolve } from 'node:path';
 import { describeFailure, runTool } from '../exec.js';
 import {
@@ -541,13 +541,17 @@ export async function adbBugreport(input: { serial?: string; outDir?: string; ti
   const dir = await localOut(input.outDir, 'bugreports');
   const local = join(dir, `bugreport-${Date.now()}.zip`);
   const res = await runTool(r.adb, [...r.s, 'bugreport', local], { timeoutMs: int(input.timeoutMs, 600_000, 30_000, 1_800_000), maxOutputBytes: 4 * 1024 * 1024 });
-  if (!existsSync(local)) return { ...head(r.det), ok: false, timedOut: res.timedOut, error: describeFailure(res) };
-  const size = statSync(local).size;
   const maxBytes = int(input.maxBytes, 1024 * 1024 * 1024, 1024, 16 * 1024 * 1024 * 1024);
-  if (size > maxBytes) { await rm(local, { force: true }); return { ...head(r.det), ok: false, error: `bugreport is ${size} bytes, above maxBytes ${maxBytes}; deleted` }; }
-  const fh = await open(local, 'r');
+  // One descriptor for the size check and the signature read (owner only mode, never creates the file).
+  let fh: FileHandle;
+  try { fh = await open(local, 'r', 0o600); } catch { return { ...head(r.det), ok: false, timedOut: res.timedOut, error: describeFailure(res) }; }
   const sig = Buffer.alloc(4);
-  try { await fh.read(sig, 0, 4, 0); } finally { await fh.close(); }
+  let size: number;
+  try {
+    size = (await fh.stat()).size;
+    if (size <= maxBytes) await fh.read(sig, 0, 4, 0);
+  } finally { await fh.close(); }
+  if (size > maxBytes) { await rm(local, { force: true }); return { ...head(r.det), ok: false, error: `bugreport is ${size} bytes, above maxBytes ${maxBytes}; deleted` }; }
   return { ...head(r.det), ok: sig.readUInt32BE(0) === 0x504b0304, local, bytes: size, sha256: await sha256Local(local) };
 }
 

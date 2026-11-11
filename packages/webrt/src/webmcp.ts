@@ -80,12 +80,12 @@ export function scanWebMcpScript(code: string, opts: { source?: string; maxItems
       const prop = !node.computed && t.isIdentifier(node.property) ? node.property.name : staticString(node.property as t.Node);
       if (prop) out.uses.push({ api: `modelContext.${prop}`, line: site(node).line, offset: site(node).offset });
     }
-    if (t.isImportDeclaration(node) && /^@mcp-b\/|webmcp/i.test(node.source.value)) out.polyfills.push({ name: node.source.value.slice(0, 200), line: site(node).line });
+    if (t.isImportDeclaration(node) && isWebMcpPackage(node.source.value)) out.polyfills.push({ name: node.source.value.slice(0, 200), line: site(node).line });
     if (t.isCallExpression(node) || t.isOptionalCallExpression(node)) {
       const callee = node.callee as t.Node;
       if (t.isIdentifier(callee, { name: 'require' }) && node.arguments[0]) {
         const s = staticString(node.arguments[0] as t.Node);
-        if (s && /^@mcp-b\/|webmcp/i.test(s)) out.polyfills.push({ name: s.slice(0, 200), line: site(node).line });
+        if (s && isWebMcpPackage(s)) out.polyfills.push({ name: s.slice(0, 200), line: site(node).line });
       }
       if (!(t.isMemberExpression(callee) || t.isOptionalMemberExpression(callee)) || !isMc(callee.object as t.Node)) return;
       const method = !callee.computed && t.isIdentifier(callee.property) ? callee.property.name : staticString(callee.property as t.Node);
@@ -245,4 +245,10 @@ export function agentHeaderHints(headers: Record<string, string>): { name: strin
     else if ((AGENT_HEADERS as readonly string[]).includes(n)) out.push({ name: n, value: n === 'mcp-session-id' ? '[present]' : v.slice(0, 2000) });
   }
   return out;
+}
+
+/** A WebMCP polyfill or helper package: any @mcp-b/ package, or a name that mentions webmcp. */
+function isWebMcpPackage(name: string): boolean {
+  const n = name.toLowerCase();
+  return n.startsWith('@mcp-b/') || n.includes('webmcp');
 }

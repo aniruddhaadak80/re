@@ -1,6 +1,6 @@
 // Playwright trace reader (trace.zip from context.tracing). Lists actions with timing and errors,
 // network requests, console messages, pages and screencast frames. Node only (uses zlib).
-import { readFile, stat } from 'node:fs/promises';
+import { open } from 'node:fs/promises';
 import { inflateRawSync } from 'node:zlib';
 import { InputError } from './util.js';
 
@@ -70,10 +70,15 @@ function ndjson(text: string, cb: (o: any) => void, max = 500_000): number {
 
 /** Summarize a Playwright trace.zip: actions with timing and errors, network, console, pages and frames. */
 export async function inspectPlaywrightTrace(path: string, opts: { limit?: number; maxBytes?: number } = {}): Promise<TraceSummary> {
-  const st = await stat(path);
   const maxBytes = opts.maxBytes ?? 512 * 1024 * 1024;
-  if (st.size > maxBytes) throw new InputError(`trace is ${st.size} bytes, over the limit`);
-  const buf = new Uint8Array(await readFile(path));
+  // one descriptor for the size check and the read
+  const fh = await open(path, 'r');
+  let buf: Uint8Array;
+  try {
+    const st = await fh.stat();
+    if (st.size > maxBytes) throw new InputError(`trace is ${st.size} bytes, over the limit`);
+    buf = new Uint8Array(await fh.readFile());
+  } finally { await fh.close(); }
   const entries = listZip(buf);
   const lim = Math.max(1, Math.min(opts.limit ?? 500, 10_000));
   const r: TraceSummary = { path, files: entries.length, actions: { total: 0, failed: 0, items: [] }, network: { total: 0, items: [] }, console: { total: 0, items: [] }, pages: [], screencastFrames: 0, resources: entries.filter((e) => e.name.startsWith('resources/')).length, errors: [], warnings: [] };
