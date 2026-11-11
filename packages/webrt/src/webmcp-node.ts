@@ -98,7 +98,7 @@ export async function discoverWebMcp(url: string, opts: WebMcpDiscoveryOptions =
     out.runtime = { supported: false, tools: [] };
     try {
       const pw: any = await import('playwright' as string);
-      const b = await pw.chromium.launch({ executablePath: opts.executablePath, timeout: to, args: ['--enable-blink-features=WebMCP', '--disable-dev-shm-usage'] });
+      const b = await pw.chromium.launch({ executablePath: opts.executablePath, timeout: to, args: ['--enable-blink-features=WebMCP', '--enable-features=WebMCPTesting', '--disable-dev-shm-usage'] });
       try {
         out.runtime.browserVersion = b.version();
         const ctx = await b.newContext({ acceptDownloads: false, serviceWorkers: 'block' });
@@ -108,6 +108,7 @@ export async function discoverWebMcp(url: string, opts: WebMcpDiscoveryOptions =
         await cdp.send('WebMCP.enable').then(() => { out.runtime!.supported = true; }).catch(() => undefined);
         await p.goto(url, { waitUntil: 'load', timeout: to }).catch((e: Error) => { out.runtime!.error = e.message.slice(0, 200); });
         await p.waitForTimeout(Math.min(1_500, to));
+        if (!out.runtime.tools.length) for (const t of await pageWebMcpTools(p)) out.runtime.tools.push(t);
       } finally { await b.close().catch(() => undefined); }
     } catch (e) { out.runtime.error = (e as Error).message.split('\n')[0]!.slice(0, 300); }
   }
@@ -119,4 +120,18 @@ export async function discoverWebMcp(url: string, opts: WebMcpDiscoveryOptions =
     discoveryDocs: out.wellKnown.map((d) => `${d.path} (${d.kind})`),
   };
   return out;
+}
+
+/** Page side fallback for Chromium builds that accept WebMCP.enable but send no toolsAdded events: the testing API lists registered tools. */
+export async function pageWebMcpTools(page: any): Promise<{ name: string; description?: string; inputSchema?: unknown }[]> {
+  const raw = await page.evaluate(async () => {
+    const n: any = (globalThis as any).navigator;
+    const api = n?.modelContextTesting ?? n?.modelContext;
+    if (!api) return [];
+    const fn = api.listTools ?? api.getTools;
+    if (typeof fn !== 'function') return [];
+    const list = await fn.call(api);
+    return (Array.isArray(list) ? list : []).slice(0, 500).map((t: any) => ({ name: String(t?.name ?? ''), description: t?.description == null ? undefined : String(t.description), inputSchema: typeof t?.inputSchema === 'string' ? (() => { try { return JSON.parse(t.inputSchema); } catch { return t.inputSchema; } })() : t?.inputSchema }));
+  }).catch(() => []);
+  return (raw as any[]).filter((t) => t.name).map((t) => ({ name: t.name.slice(0, 200), description: t.description?.slice(0, 1000), inputSchema: t.inputSchema }));
 }

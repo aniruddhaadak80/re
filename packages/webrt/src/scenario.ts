@@ -10,6 +10,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { InputError } from './util.js';
 import { redactHeaders } from './capture.js';
+import { pageWebMcpTools } from './webmcp-node.js';
 
 export type ScenarioAssertion =
   | { selector: string; exists?: boolean; visible?: boolean; count?: number; text?: string; textEquals?: string; value?: string }
@@ -171,7 +172,7 @@ export async function runScenario(specIn: unknown, opts: ScenarioOptions = {}): 
   const hard = setTimeout(() => { cap.warnings.push('hard timeout reached, closing browser'); browser?.close().catch(() => undefined); }, budget + 10_000);
   const traces = opts.traces !== false, shots = opts.screenshots !== false, dom = opts.dom !== false;
   try {
-    const args = [...(kind === 'chromium' ? ['--disable-dev-shm-usage', '--no-first-run', '--enable-blink-features=WebMCP'] : []), ...(opts.launchArgs ?? [])];
+    const args = [...(kind === 'chromium' ? ['--disable-dev-shm-usage', '--no-first-run', '--enable-blink-features=WebMCP', '--enable-features=WebMCPTesting'] : []), ...(opts.launchArgs ?? [])];
     browser = await pw[kind].launch({ headless: opts.headless ?? true, executablePath: opts.executablePath, timeout: left(), args: args.length ? args : undefined });
     cap.browserVersion = browser.version();
     const context = await browser.newContext({ acceptDownloads: false, viewport: spec.viewport ?? { width: 1280, height: 800 }, userAgent: spec.userAgent, serviceWorkers: 'block', deviceScaleFactor: 1 });
@@ -275,6 +276,7 @@ export async function runScenario(specIn: unknown, opts: ScenarioOptions = {}): 
       r.durationMs = Date.now() - ts;
       if (Date.now() - t0 > budget) { cap.warnings.push(`time budget used up after step ${i}`); break; }
     }
+    if (cap.webmcp && !cap.webmcp.tools.length) for (const t of await pageWebMcpTools(page)) cap.webmcp.tools.push({ ...t, step: stepNo });
     if (cdp) {
       if (opts.coverage !== false) {
         try {
