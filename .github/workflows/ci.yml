@@ -60,6 +60,9 @@ jobs:
         run: node --test --import tsx packages/bridges/test/*.test.ts
       - name: Test engine, CLI and MCP over stdio
         run: node --test --import tsx packages/engine/test/*.test.ts packages/cli/test/*.test.ts packages/mcp/test/*.test.ts
+      - name: Generated docs and counts are in step with the code
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 22
+        run: node scripts/gen-tool-docs.mjs --check
       - name: CLI smoke test
         shell: bash
         run: |
