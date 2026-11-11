@@ -26,10 +26,10 @@ const firstPara = (src) => {
 };
 const mdIn = (dir) => (existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.md')) : []);
 
-for (const f of mdIn(join(repo, 'docs'))) {
+for (const f of [...mdIn(join(repo, 'docs')), ...mdIn(join(repo, 'docs', 'showcases')).filter((x) => x !== 'README.md').map((x) => `showcases/${x}`)]) {
   const src = readFileSync(join(repo, 'docs', f), 'utf8');
   const meta = fm(src);
-  routes[`/docs/${f.replace(/\.md$/, '')}`] = { title: `${meta.title ?? f} | RevLens docs`, description: meta.description ?? (firstPara(src) || routes['/docs'].description) };
+  routes[`/docs/${f.replace(/^showcases\//, '').replace(/\.md$/, '')}`] = { title: `${meta.title ?? f} | RevLens docs`, description: meta.description ?? (firstPara(src) || routes['/docs'].description) };
 }
 for (const f of mdIn(join(repo, 'content', 'blog'))) {
   const src = readFileSync(join(repo, 'content', 'blog', f), 'utf8');

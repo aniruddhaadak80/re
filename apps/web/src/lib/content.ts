@@ -2,7 +2,7 @@
 // If a folder is empty the globs return nothing and the pages show an empty state.
 import { slugify } from './util';
 
-const docFiles = import.meta.glob('../../../../docs/*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const docFiles = import.meta.glob(['../../../../docs/*.md', '../../../../docs/showcases/*.md', '!../../../../docs/showcases/README.md'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const blogFiles = import.meta.glob('../../../../content/blog/*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const changelogFiles = import.meta.glob('../../../../CHANGELOG.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
@@ -54,7 +54,9 @@ function toDoc(path: string, raw: string): Doc {
   const h1 = /^#\s+(.+)$/m.exec(body);
   const title = str(data.title) ?? h1?.[1]?.trim() ?? file.replace(/[-_]/g, ' ');
   const orderMatch = /^(\d+)[-_]/.exec(file);
-  const order = Number(str(data.order) ?? orderMatch?.[1] ?? (file === 'index' || file === 'getting-started' ? -1 : 500));
+  // Showcases sit after the reference pages.
+  const base = path.includes('/showcases/') ? 40 : 0;
+  const order = base + Number(str(data.order) ?? orderMatch?.[1] ?? (file === 'index' || file === 'getting-started' ? -1 : 500));
   const words = body.split(/\s+/).filter(Boolean).length;
   return { slug: file, title, description: str(data.description) ?? firstParagraph(body.replace(/^#\s+.+$/m, '')), body, order, headings: extractHeadings(body), words };
 }

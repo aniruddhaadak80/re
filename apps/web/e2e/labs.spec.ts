@@ -30,6 +30,18 @@ test.describe('tool routes', () => {
   });
 });
 
+test.describe('new docs pages', () => {
+  for (const slug of ['disassembler', 'mobile', 'managed-runtimes', 'javascript-and-electron', 'network-and-data', 'extras', 'bridges', 'mcp-tools', 'agent-skills-and-plugins', 'comparison', 'stripped-elf-password-check', 'android-apk-review']) {
+    test(`/docs/${slug} renders`, async ({ page }) => {
+      const errors = watch(page);
+      await page.goto(`docs/${slug}`);
+      await expect(page.locator('h1').first()).toBeVisible();
+      await expect(page.locator('h1').first()).not.toHaveText(/not found/i);
+      expect(errors).toEqual([]);
+    });
+  }
+});
+
 // [route, sample button id, text the result must show]
 const SAMPLES: [string, string, string][] = [
   ['labs/mobile', 'apk', 'classes.dex'],

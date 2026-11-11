@@ -60,7 +60,7 @@ export function Markdown({ source, from }: { source: string; from: 'docs' | 'blo
       return <CodeBlock code={code} lang={lang} />;
     },
     a: ({ href = '', children }) => {
-      const md = /^(?:\.\/)?(?:\.\.\/docs\/|docs\/)?([\w-]+)\.md(#.*)?$/.exec(href);
+      const md = /^(?:\.\/)?(?:\.\.\/docs\/|docs\/|\.\.\/)?([\w-]+)\.md(#.*)?$/.exec(href);
       if (md && from !== 'root') return <Link to={`/${from === 'blog' && !href.includes('docs') ? 'blog' : 'docs'}/${md[1]}${md[2] ?? ''}`}>{children}</Link>;
       if (href.startsWith('#')) return <a href={href}>{children}</a>;
       return <a href={href} target="_blank" rel="noreferrer">{children}</a>;
