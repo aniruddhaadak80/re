@@ -7,7 +7,7 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-F5B301?style=flat-square&labelColor=0A0A0B" /></a>
   <img alt="Node 22.12 or newer" src="https://img.shields.io/badge/node-%E2%89%A522.12-14B8A6?style=flat-square&logo=nodedotjs&logoColor=white&labelColor=0A0A0B" />
   <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-38BDF8?style=flat-square&logo=typescript&logoColor=white&labelColor=0A0A0B" />
-  <a href="docs/mcp-tools.md"><img alt="MCP tools" src="https://img.shields.io/badge/MCP-165_tools-10B981?style=flat-square&labelColor=0A0A0B" /></a>
+  <a href="docs/mcp-tools.md"><img alt="MCP tools" src="https://img.shields.io/badge/MCP-185_tools-10B981?style=flat-square&labelColor=0A0A0B" /></a>
   <a href="CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-FFD166?style=flat-square&labelColor=0A0A0B" /></a>
 </p>
 
@@ -36,8 +36,8 @@ You have a file and a question. Is this binary packed? What does `main` do? Whic
 RevLens answers with evidence you can check: byte offsets, virtual addresses, section names and archive paths. The engine is TypeScript plus two WebAssembly decoders. It needs nothing native, so the same code runs in three places:
 
 - **In the browser**, inside a Web Worker. Your file never leaves your machine.
-- **In the terminal**, as `npx revlens`, with 87 commands and JSON, Markdown, HTML, SARIF and CycloneDX output.
-- **In your agent**, as an MCP server with 165 tools, 2 prompts and 2 resources, plus a ready made skill and plugins for Claude Code and Codex.
+- **In the terminal**, as `npx revlens`, with 99 commands and JSON, Markdown, HTML, SARIF and CycloneDX output.
+- **In your agent**, as an MCP server with 185 tools, 2 prompts and 2 resources, plus a ready made skill and plugins for Claude Code and Codex.
 
 When you do have Ghidra, radare2, jadx, ILSpy, Frida or gdb installed, RevLens drives them too, and `revlens doctor` tells you what is missing and how to install it.
 
@@ -55,7 +55,7 @@ RevLens is inspired by [REA, Reverse Engineer Anything](https://github.com/morlu
 | Network and data | PCAP, pcapng, HAR, SQLite | flows, DNS, HTTP, TLS SNI and JA3, HAR review, schema and read only SELECT | `@revlens/webrt` |
 | Extras | ELF, PE, Mach-O, kernel modules, firmware (uImage, FIT, TRX, SquashFS, cpio, UEFI, UF2), GPU code, V8 and Hermes, GGUF and safetensors, LNK, Apple crash reports | C++, Rust and MSVC demangling, checksec, Go and Rust toolchain facts, deep PE (resources, version info, rich header, Authenticode), ELF notes and unwind ranges, Mach-O code signatures, an evidence and claims ledger, an agent eval harness | `@revlens/extras` |
 | External tools | radare2, rizin, Ghidra, jadx, apktool, ILSpy, Frida, gdb, lldb, objdump, binwalk, adb, IDA, Binary Ninja | decompiled C, Java and C#, dynamic runs with consent, doctor and client setup | `@revlens/bridges` |
-| One entry point | all of the above | `analyzeAll()` runs 34 analyzers into one report | `@revlens/engine` |
+| One entry point | all of the above | `analyzeAll()` runs 36 analyzers into one report | `@revlens/engine` |
 
 Each area has a docs page: [disassembler](docs/disassembler.md), [mobile](docs/mobile.md), [managed runtimes](docs/managed-runtimes.md), [JavaScript and Electron](docs/javascript-and-electron.md), [network and data](docs/network-and-data.md), [bridges, doctor and setup](docs/bridges.md), [MCP tools reference](docs/mcp-tools.md) and [agent skills and plugins](docs/agent-skills-and-plugins.md).
 

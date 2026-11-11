@@ -35,6 +35,9 @@
     },
     {
       "path": "../extras"
+    },
+    {
+      "path": "../desktop"
     }
   ]
 }

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync, readdirSync, mkdtempSync, writeFileSync, realpathSync } from 'node:fs';
 import { spawn, spawnSync, execFileSync, type ChildProcess } from 'node:child_process';
 import { tmpdir } from 'node:os';
-import { join, dirname } from 'node:path';
+import { join, dirname, basename, delimiter } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fc from 'fast-check';
 import { parsePlist, parseDesktopFile, desktopEntryToApp, splitExec, parseRegQuery, uninstallKeysToApps, parseGVariant, parseAccessibleRefs, parseLsofF, parseProcNet, parseProcMaps, compareSnapshots, ANALYZERS, TOOLS as WEB_TOOLS, InputError } from '../src/index.js';
@@ -78,9 +78,10 @@ test('listApps scans a folder and inspectApp resolves executables on PATH', asyn
   const r = await listApps({ dirs: [S], includeHidden: true });
   assert.deepEqual(r.apps.map((a) => a.name), ['Tricky Viewer', 'Updater']);
   const dir = mkdtempSync(join(tmpdir(), 'rl-apps-'));
-  writeFileSync(join(dir, 'node.desktop'), `[Desktop Entry]\nType=Application\nName=Node REPL\nExec=${process.execPath.split('/').pop()} %F\n`);
-  const prev = process.env.PATH; process.env.PATH = `${dirname(process.execPath)}:${prev}`;
-  try { const a = await inspectApp(join(dir, 'node.desktop')); assert.equal(a.resolvedExecutable, realpathSync(process.execPath)); assert.equal(a.electron, false); }
+  writeFileSync(join(dir, 'node.desktop'), `[Desktop Entry]\nType=Application\nName=Node REPL\nExec=${basename(process.execPath)} %F\n`);
+  const prev = process.env.PATH; process.env.PATH = `${dirname(process.execPath)}${delimiter}${prev}`;
+  const norm = (p?: string) => (p && process.platform === 'win32' ? realpathSync(p).toLowerCase() : p && realpathSync(p));
+  try { const a = await inspectApp(join(dir, 'node.desktop')); assert.equal(norm(a.resolvedExecutable), norm(process.execPath)); assert.equal(a.electron, false); }
   finally { process.env.PATH = prev; }
 });
 
@@ -109,8 +110,9 @@ let child: ChildProcess | undefined;
 let info: { pid: number; fileA: string; fdA: number; tcpPort: number; udpPort: number; unixPath: string; dir: string } | undefined;
 const lineReader = (c: ChildProcess) => { let buf = ''; const waiters: ((l: string) => void)[] = []; c.stdout!.on('data', (d) => { buf += d; let i; while ((i = buf.indexOf('\n')) >= 0) { const l = buf.slice(0, i); buf = buf.slice(i + 1); waiters.shift()?.(l); } }); return () => new Promise<string>((r, j) => { const t = setTimeout(() => j(new Error('no output')), 15_000); waiters.push((l) => { clearTimeout(t); r(l); }); }); };
 let nextLine: () => Promise<string>;
+const live = linux || process.platform === 'darwin' || process.platform === 'win32';
 before(async () => {
-  if (!linux) return;
+  if (!live) return;
   child = spawn(process.execPath, [join(S, 'proc-target.mjs'), '120000'], { stdio: ['pipe', 'pipe', 'inherit'] });
   nextLine = lineReader(child);
   info = JSON.parse(await nextLine());
@@ -194,6 +196,83 @@ test('snapshot comparison shows the file and connection opened between two snaps
   const r = spawnSync(process.execPath, ['--import', 'tsx', runner, 'proc-compare', join(dir, 'a.json'), join(dir, 'b.json')], { encoding: 'utf8', timeout: 60_000 });
   assert.equal(r.status, 0, r.stderr);
   assert.ok(r.stdout.includes(`+ file ${more.fileB}`));
+});
+
+// ---------------- live process tests on macOS (ps, lsof, vmmap) and Windows (PowerShell, CIM, reg) ----------------
+
+const mac = process.platform === 'darwin';
+const win = process.platform === 'win32';
+const real = (p: string) => { const r = realpathSync(p); return win ? r.toLowerCase() : r; };
+
+test('macOS and Windows: process list finds the target with its parent', async (t) => {
+  if ((!mac && !win) || !info) { t.skip('macOS and Windows only (Linux has its own tests)'); return; }
+  const r = await listProcesses({ allowExecution: true, limit: 100_000 });
+  assert.ok(r.total > 5, `only ${r.total} processes`);
+  const p = r.processes.find((x) => x.pid === info!.pid);
+  assert.ok(p, `target pid ${info.pid} not listed`);
+  assert.equal(p!.ppid, process.pid);
+  assert.match(p!.name, /^node(\.exe)?$/i);
+  if (win) {
+    assert.ok((p!.cmdline ?? []).join(' ').includes('proc-target.mjs'), JSON.stringify(p));
+    const byCmd = await listProcesses({ allowExecution: true, filter: 'proc-target.mjs' });
+    assert.ok(byCmd.processes.some((x) => x.pid === info!.pid));
+  }
+  if (mac) {
+    // ps itself agrees on the parent and the command
+    const [ppid, comm] = execFileSync('ps', ['-o', 'ppid=,comm=', '-p', String(info.pid)], { encoding: 'utf8' }).trim().split(/\s+/);
+    assert.equal(p!.ppid, Number(ppid));
+    assert.equal(p!.name, comm!.split('/').pop());
+  }
+});
+
+test('macOS and Windows: process snapshot has the executable, libraries and the TCP and UDP sockets', async (t) => {
+  if ((!mac && !win) || !info) { t.skip('macOS and Windows only'); return; }
+  const s = await snapshotProcess(info.pid, { allowExecution: true });
+  assert.equal(s.process.pid, info.pid);
+  assert.equal(s.process.ppid, process.pid);
+  const exe = s.modules.find((m) => m.kind === 'executable');
+  assert.ok(exe, `no executable module: ${JSON.stringify(s.modules.slice(0, 5))} ${JSON.stringify(s.warnings)}`);
+  assert.equal(real(exe!.path), real(process.execPath));
+  assert.ok(s.modules.some((m) => m.kind === 'library'), 'at least one library');
+  if (win) {
+    assert.equal(real(s.process.exe!), real(process.execPath));
+    assert.ok(s.modules.some((m) => /\\ntdll\.dll$/i.test(m.path) && m.base?.startsWith('0x')), 'ntdll.dll with a base address');
+  }
+  if (mac) {
+    assert.ok(s.modules.some((m) => /\/usr\/lib\/(dyld|libSystem\.B\.dylib)$/.test(m.path)), `dyld or libSystem: ${JSON.stringify(s.modules.map((m) => m.path).slice(0, 40))}`);
+    assert.ok(s.files.some((f) => f.fd === String(info!.fdA) && real(f.path) === real(info!.fileA)), JSON.stringify(s.files));
+    assert.ok(s.sockets.some((x) => x.proto === 'unix'), 'unix socket listed');
+  }
+  assert.ok(s.sockets.some((x) => x.proto === 'tcp' && x.localPort === info!.tcpPort && x.state === 'LISTEN' && x.local === '127.0.0.1'), JSON.stringify(s.sockets));
+  assert.ok(s.sockets.some((x) => x.proto === 'udp' && x.localPort === info!.udpPort && x.local === '127.0.0.1'), JSON.stringify(s.sockets));
+  const me = await snapshotProcess(process.pid, { modules: false, files: false, sockets: false });
+  assert.ok(me.children?.includes(info.pid), `children of this process ${JSON.stringify(me.children)}`);
+});
+
+test('macOS and Windows: comparing two snapshots shows the new connection', async (t) => {
+  if ((!mac && !win) || !info || !child) { t.skip('macOS and Windows only'); return; }
+  const dir = mkdtempSync(join(tmpdir(), 'rl-snap-'));
+  const tool = TOOLS.find((x) => x.name === 'desktop_process_inspect')!;
+  await tool.run({ pid: info.pid, allowExecution: true, saveTo: join(dir, 'a.json') });
+  child.stdin!.write('more\n');
+  const more = JSON.parse(await nextLine());
+  await tool.run({ pid: info.pid, allowExecution: true, saveTo: join(dir, 'b.json') });
+  const d = await compareProcessSnapshots(join(dir, 'a.json'), join(dir, 'b.json'));
+  assert.ok(d.pidSame);
+  assert.ok(d.sockets.added.some((x) => x.includes(`:${more.clientPort}`) && x.includes(`:${info!.tcpPort}`) && /ESTABLISHED/.test(x)), JSON.stringify(d.sockets.added));
+  if (mac) assert.ok(d.files.added.some((x) => x.endsWith('held-b.txt')), JSON.stringify(d.files.added));
+});
+
+test('macOS and Windows: installed apps are discovered from the system', async (t) => {
+  if (!mac && !win) { t.skip('macOS and Windows only'); return; }
+  const r = await listApps({ limit: 5000 });
+  assert.ok(r.total > 0, `no apps found: ${JSON.stringify(r.warnings.slice(0, 5))}`);
+  if (mac) {
+    const safari = r.apps.find((a) => a.id === 'com.apple.Safari');
+    assert.ok(safari, `Safari not found in ${r.dirs.join(', ')}`);
+    assert.ok(safari!.version && /^\d+/.test(safari!.version));
+  }
+  if (win) assert.ok(r.apps.every((a) => a.name.length > 0));
 });
 
 test('/proc/net parsers decode IPv4 and IPv6 addresses', () => {

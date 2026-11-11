@@ -22,7 +22,7 @@ async function canLaunch(): Promise<boolean> {
   try { pw = await import('playwright' as string); const b = await pw.chromium.launch({ executablePath: exe, timeout: 20_000 }); await b.close(); return true; } catch { return false; }
 }
 
-const page = (v: 1 | 2) => `<!doctype html><html><head><title>Counter v${v}</title><style>body{margin:0;font:16px sans-serif}#box{position:absolute;left:20px;top:200px;width:120px;height:60px;background:${v === 1 ? '#c33' : '#36c'}}</style></head><body>
+const page = (v: 1 | 2) => `<!doctype html><html><head><title>Counter v${v}</title><style>body{margin:0;font:16px sans-serif}input{caret-color:transparent}#box{position:absolute;left:20px;top:200px;width:120px;height:60px;background:${v === 1 ? '#c33' : '#36c'}}</style></head><body>
 <h1>Counter</h1><button id="inc">Increment</button> <span id="count">0</span>
 <input id="name" aria-label="Name"><div id="box"></div>
 <form toolname="search_todos" tooldescription="Search the todo list by text"><input name="q"></form>
@@ -132,7 +132,7 @@ test('capture compare: same app twice is identical, v1 vs v2 shows the endpoint,
   assert.deepEqual(d.endpoints.removed.map((e) => e.key).sort(), [`GET ${host}/v1/`, `GET ${host}/v1/app.js`]);
   assert.deepEqual(d.scripts.added, [`${base}/v2/app.js`]);
   assert.ok(d.console.added.includes('log: ready v2'));
-  // last step: only the 120x60 box at (20,200) changed colour
+  // last step: only the 120x60 box at (20,200) changed colour (the input caret is hidden, it blinks)
   const last = d.screenshots.find((s) => s.step === 4)!;
   assert.deepEqual(last.diff!.bbox, { x: 20, y: 200, width: 120, height: 60 });
   assert.equal(last.diff!.diffPixels, 120 * 60);

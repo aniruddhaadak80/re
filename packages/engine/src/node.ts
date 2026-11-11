@@ -7,6 +7,7 @@ import * as mobile from '@revlens/mobile/node';
 import * as disasm from '@revlens/disasm/node';
 import * as bridges from '@revlens/bridges/node';
 import * as extras from '@revlens/extras/node';
+import * as desktop from '@revlens/desktop/node';
 import { analyzeAll, ALL_ANALYZERS, type EngineOptions } from './index.js';
 import type { Analyzer, Report } from '@revlens/core';
 
@@ -45,6 +46,7 @@ export const TOOL_GROUPS: ToolGroup[] = [
   { id: 'managed', npm: '@revlens/managed', title: 'Managed and bytecode runtimes', tools: managed.TOOLS as unknown as PackageTool[], commands: managed.CLI_COMMANDS as PackageCommand[] },
   { id: 'web', npm: '@revlens/webrt', title: 'Web runtime', tools: webrt.TOOLS as unknown as PackageTool[], commands: webrt.CLI_COMMANDS as PackageCommand[] },
   { id: 'extras', npm: '@revlens/extras', title: 'Extras: demangling, deep PE, ELF, Mach-O, firmware and more', tools: extras.TOOLS as unknown as PackageTool[], commands: extras.CLI_COMMANDS as PackageCommand[] },
+  { id: 'desktop', npm: '@revlens/desktop', title: 'Desktop apps, processes and UI trees', tools: desktop.TOOLS as unknown as PackageTool[], commands: desktop.CLI_COMMANDS as PackageCommand[] },
   { id: 'disasm', npm: '@revlens/disasm', title: 'Native code', tools: disasm.TOOLS as unknown as PackageTool[], commands: disasm.CLI_COMMANDS as PackageCommand[] },
   // bridges' own commands (doctor, setup, bridge) are top level CLI commands, see TOP_LEVEL_COMMANDS
   { id: 'bridges', npm: '@revlens/bridges', title: 'External tool bridges', tools: bridges.TOOLS as unknown as PackageTool[], commands: [] },
@@ -76,6 +78,15 @@ export const TOOL_EFFECTS: Record<string, { writes?: boolean; network?: boolean;
   web_asar_extract: { writes: true },
   web_sourcemap_recover: { writes: true },
   web_browser_capture: { network: true, executes: true },
+  web_browser_scenario: { network: true, executes: true, writes: true },
+  web_webmcp_discover: { network: true, executes: true },
+  web_cdp_targets: { network: true },
+  web_node_inspect: { network: true, executes: true },
+  desktop_process_list: { executes: true },
+  desktop_process_inspect: { executes: true, writes: true },
+  desktop_apps_list: { executes: true },
+  desktop_app_inspect: { executes: true },
+  desktop_ui_tree: { executes: true },
   bridge_frida_run: { executes: true },
   bridge_gdb_run: { executes: true },
   bridge_adb_pull_apk: { writes: true },

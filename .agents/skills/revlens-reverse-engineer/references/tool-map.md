@@ -1,6 +1,6 @@
 # RevLens tool map
 
-Generated from the server by scripts/gen-tool-docs.mjs. 165 tools.
+Generated from the server by scripts/gen-tool-docs.mjs. 185 tools.
 
 ## Core triage and evidence
 
@@ -79,7 +79,15 @@ Generated from the server by scripts/gen-tool-docs.mjs. 165 tools.
 - `web_sqlite_tables` (reads only): Read a SQLite 3 database file with a pure TypeScript page parser: header, tables with columns, primary keys, row counts, indexes, views and triggers, and sample rows.
 - `web_sqlite_query` (reads only): Run one read-only SELECT on a SQLite file: SELECT cols\|*\|COUNT(*) FROM table [WHERE ...] [ORDER BY col [DESC]] [LIMIT n [OFFSET m]]. WHERE supports comparisons, AND/OR/NOT, LIKE, GLOB, IN, BETWEEN and IS NULL. Anything
 - `web_har_summary` (reads only): Summarize a HAR file: hosts (third-party marked), API endpoint patterns, methods, statuses, MIME types, redirects, slowest requests, auth header schemes and cookie names (values never returned), missing security headers,
+- `web_webmcp_scan` (reads only): Static WebMCP scan of one HTML page or script: navigator.modelContext provideContext and registerTool calls with tool names, descriptions and input schema fields, declarative tool forms (toolname and tooldescription), MC
+- `web_wellknown_classify` (reads only): Classify a fetched well-known discovery document (MCP server card, MCP endpoint list, AI plugin manifest, A2A agent card, OAuth protected resource metadata, llms.txt) and pull out its name, endpoints and tool names.
+- `web_capture_compare` (reads only): Compare two captures (RevLens scenario capture.json, web_browser_capture output, or HAR): endpoints added and removed with id-normalized paths, status changes, request and response header changes, scripts added, removed 
 - `web_browser_capture` (network): Open a URL in a headless browser (Playwright, optional dependency, Node only) and record network requests as HAR entries, loaded and inline scripts with source, console messages, cookie names and flags, storage keys, Web
+- `web_browser_scenario` (writes files, network): Run a scripted browser scenario with Playwright (Node only): steps goto, click, type, fill, press, select, check, hover, scroll, wait, reload, back and assert, with evaluate-free assertions (selector exists, count, text,
+- `web_trace_inspect` (reads only): Read a Playwright trace.zip: actions with API name, selector, timing and errors, network requests with status, console messages, pages and screencast frame count.
+- `web_cdp_targets` (reads only, network): List debuggable targets on a Chrome DevTools Protocol endpoint (a browser or Electron app started with --remote-debugging-port, or a Node --inspect port): pages, iframes, workers, service workers, Node contexts, with pro
+- `web_webmcp_discover` (network): Discover WebMCP tools and MCP-over-web endpoints for a URL: agent response headers, MCP link and meta tags, declarative tool forms, navigator.modelContext registrations in inline and same-origin scripts, well-known docum
+- `web_node_inspect` (network): Attach to a local Node.js process through its inspector (by pid, port or ws URL) and observe it without evaluating code: loaded scripts with hashes and source maps, function call counts from precise coverage, a CPU sampl
 
 ## Extras
 
@@ -113,6 +121,21 @@ Generated from the server by scripts/gen-tool-docs.mjs. 165 tools.
 - `x_ledger_import` (writes files): Import an exported ledger after checking its schema and hash chain. Replaces the session ledger, or writes ledgerPath.
 - `x_eval_tasks` (reads only): Reverse engineering eval tasks with hidden ground truth on the RevLens sample fixtures. Answer them with any tools, then score with x_eval_score.
 - `x_eval_score` (reads only): Score answers to x_eval_tasks against ground truth verified with reference tools. Pass answers as {taskId: answer}.
+
+## Desktop apps, processes and UI trees
+
+- `desktop_plist_parse` (reads only): Parse an XML or binary (bplist00) property list. Data values come back as base64, dates as ISO strings, UIDs as {$uid}. With bundle=true, also summarise it as an app Info.plist (id, version, executable, URL schemes).
+- `desktop_entry_parse` (reads only): Parse a freedesktop .desktop file: groups and keys, plus an app record with the executable split from Exec per the spec quoting rules, packaging (Flatpak, Snap, AppImage), categories and MIME types.
+- `desktop_reg_uninstall_parse` (reads only): Parse `reg query ...\Uninstall /s` output into installed app records (name, version, publisher, install location, executable, MSI flag, uninstall command).
+- `desktop_proc_parse` (reads only): Parse Linux /proc text that was copied off a machine: kind=maps (modules with base and size), status, tcp, tcp6, udp, udp6, unix (sockets with decoded addresses and states), or lsof (lsof -F output).
+- `desktop_gvariant_parse` (reads only): Parse GVariant text as printed by gdbus call (tuples, arrays, dicts, variants, object paths, typed numbers) into JSON.
+- `desktop_snapshot_compare` (reads only): Compare two process snapshot objects (as JSON text) without touching the system: modules, files, sockets, children, memory and thread changes.
+- `desktop_process_list` (runs programs): List running processes with pid, parent pid, name, executable, command line, user, threads and memory (Linux /proc, macOS ps, Windows Win32_Process). Needs allowExecution.
+- `desktop_process_inspect` (writes files): Inspect one process: identity, command line, loaded modules and libraries with base addresses (Linux /proc maps, macOS lsof and vmmap, Windows Get-Process modules), open files (Linux /proc fd, macOS lsof), and TCP, UDP a
+- `desktop_process_compare` (reads only): Compare two process snapshots (JSON files from desktop_process_inspect saveTo): changed process fields, modules loaded or unloaded, files opened or closed, sockets opened or closed, child processes, memory and thread del
+- `desktop_apps_list` (runs programs): Discover installed applications: Linux .desktop entries in the XDG, Flatpak and Snap folders, macOS .app bundles in /Applications with Info.plist details, Windows uninstall registry keys (reg query). Gives name, id, vers
+- `desktop_app_inspect` (runs programs): Read one installed app: a .desktop file, an .app bundle or an Info.plist. Resolves the executable on PATH and flags Electron apps with the app.asar path, ready for web_electron_audit.
+- `desktop_ui_tree` (runs programs): Capture the native accessibility tree of a running app: AT-SPI over gdbus on Linux, System Events (osascript JXA) on macOS, UIAutomation through PowerShell on Windows. Gives role, name, description, value, automation id 
 
 ## External tool bridges
 

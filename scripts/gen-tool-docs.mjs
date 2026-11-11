@@ -33,9 +33,10 @@ const GROUPS = [
   ['disasm', 'Native code (disassembler)', 'x86, x86-64, AArch64 and ARM in ELF, PE and Mach-O.'],
   ['mobile', 'Android, Java and iOS', 'APK, DEX, JAR, class files and IPA.'],
   ['managed', 'Managed runtimes', '.NET, Python, Lua, Erlang BEAM and EVM.'],
-  ['web', 'JavaScript, Electron, network and data', 'Bundles, source maps, ASAR, PCAP, HAR and SQLite.'],
+  ['web', 'JavaScript, Electron, network and data', 'Bundles, source maps, ASAR, PCAP, HAR and SQLite, plus browser scenarios, capture comparison, WebMCP discovery, CDP targets, Playwright traces and the Node inspector.'],
   ['extras', 'Extras', 'Demanglers, raw bytes, checksec, Go and Rust facts, deep PE with Authenticode, ELF notes and unwind, kernel modules, Mach-O code signatures, firmware, GPU code, V8 and Hermes, model files, LNK, crash reports, the evidence ledger and the eval harness.'],
-  ['bridges', 'External tool bridges', 'radare2, Ghidra, jadx, apktool, ILSpy, Frida, gdb, objdump, binwalk, adb, IDA and Binary Ninja when installed.'],
+  ['desktop', 'Desktop apps, processes and UI trees', 'Running processes with modules, files and sockets, snapshot comparison, installed apps, native accessibility trees (AT-SPI, AX, UIA), property lists and .desktop files.'],
+  ['bridges', 'External tool bridges', 'radare2, rizin, Ghidra, jadx, apktool, ILSpy, Frida, gdb, lldb, objdump, binwalk, adb, IDA, Binary Ninja and Cutter when installed, with persistent sessions and names write-back.'],
 ];
 const known = new Set(GROUPS.map((g) => g[0]));
 for (const t of tools) if (!known.has(group.get(t.name) ?? '')) GROUPS.push([group.get(t.name) ?? 'other', group.get(t.name) ?? 'Other', '']), known.add(group.get(t.name) ?? 'other');

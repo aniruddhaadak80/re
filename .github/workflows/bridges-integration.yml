@@ -103,4 +103,6 @@ jobs:
         run: node --test --test-concurrency=1 --import tsx packages/bridges/test/writeback.test.ts
 
       - name: MCP server closes bridge sessions on exit
-        run: node --test --test-concurrency=1 --import tsx packages/mcp/test/sessions.test.ts
+        run: |
+          npx tsc -b tsconfig.json
+          node --test --test-concurrency=1 --import tsx packages/mcp/test/sessions.test.ts

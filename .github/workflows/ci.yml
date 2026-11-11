@@ -44,12 +44,22 @@ jobs:
         run: npm run fetch-fixtures
       - run: npm run build
       - run: npm run typecheck
+      - name: Desktop test tools on Linux (D-Bus, AT-SPI registry, lsof)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends dbus dbus-bin dbus-daemon at-spi2-core libglib2.0-bin lsof
+      - name: Playwright Chromium for the web runtime browser tests
+        if: runner.os == 'Linux'
+        run: npx playwright install --with-deps chromium
       - name: Test core
         run: node --test --import tsx packages/core/test/*.test.ts
       - name: Test managed
         run: node --test --import tsx packages/managed/test/*.test.ts
       - name: Test webrt
         run: node --test --import tsx packages/webrt/test/*.test.ts
+      - name: Test desktop (live process, app and UI tree paths on each OS)
+        run: node --test --test-concurrency=1 --import tsx packages/desktop/test/*.test.ts
       - name: Test mobile
         run: node --test --import tsx packages/mobile/test/*.test.ts
       - name: Test disasm
@@ -78,6 +88,9 @@ jobs:
           node packages/cli/dist/index.js managed dotnet samples/managed/dotnet/System.IO.Compression.Brotli.dll
           node packages/cli/dist/index.js web pcap-summary samples/webrt/dns_udp.pcap
           node packages/cli/dist/index.js extras x-checksec samples/ls-linux.elf
+          node packages/cli/dist/index.js desktop ps --allow-execution --filter node --limit 5
+          node packages/cli/dist/index.js desktop apps --limit 5
+          node packages/cli/dist/index.js disasm match-functions samples/disasm/virt-x64.elf samples/disasm/virt-x64-stripped.elf --limit 3
 
   web:
     name: Web app build and browser tests

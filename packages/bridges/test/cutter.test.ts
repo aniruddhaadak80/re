@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { detect, detectCutter, cutterVersionFromName, plistVersion, appdataVersion } from '../src/detect.ts';
 import { TOOLS } from '../src/tools.ts';
 import { runTool } from '../src/exec.ts';
@@ -107,7 +107,7 @@ test('override and missing: REVLENS_CUTTER_PATH, then nothing at all', () => {
 });
 
 test('bridge_cutter_info: available:false with install commands when Cutter is missing', async () => {
-  const code = `const { TOOLS } = await import(${JSON.stringify(join(repo, 'packages/bridges/src/tools.ts'))});
+  const code = `const { TOOLS } = await import(${JSON.stringify(pathToFileURL(join(repo, 'packages/bridges/src/tools.ts')).href)});
 process.stdout.write(JSON.stringify(await TOOLS.find((t) => t.name === 'bridge_cutter_info').run({ path: '/tmp/x.bin' })));`;
   const h = fresh();
   const r = await runTool(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', code], { cwd: repo, env: { ...process.env, HOME: h, PATH: dirname(process.execPath) }, timeoutMs: 60_000 });
@@ -120,7 +120,7 @@ process.stdout.write(JSON.stringify(await TOOLS.find((t) => t.name === 'bridge_c
 test('bridge_cutter_info: reports the open command for a found AppImage', async () => {
   const h = fresh();
   touch(join(h, 'Applications', 'Cutter-v2.5.0-Linux-x86_64.AppImage'));
-  const code = `const { TOOLS } = await import(${JSON.stringify(join(repo, 'packages/bridges/src/tools.ts'))});
+  const code = `const { TOOLS } = await import(${JSON.stringify(pathToFileURL(join(repo, 'packages/bridges/src/tools.ts')).href)});
 process.stdout.write(JSON.stringify(await TOOLS.find((t) => t.name === 'bridge_cutter_info').run({ path: '/tmp/x.bin' })));`;
   if (process.platform !== 'linux') return;
   const r = await runTool(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', code], { cwd: repo, env: { ...process.env, HOME: h, PATH: dirname(process.execPath) }, timeoutMs: 60_000 });

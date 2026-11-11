@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkGdbCommand, checkLldbCommand, checkR2Command, miQuote } from '../src/sessions/guards.ts';
 import { parseMiLines, miUnquote, miFields } from '../src/parsers/mi.ts';
 import { PipeProcess, SessionManager, SESSIONS } from '../src/sessions/manager.ts';
@@ -201,7 +201,7 @@ test('r2 session: analysis once, names persist across calls, refused commands ne
 });
 
 test('sessions are killed when the owning process exits without closing them', { skip: skipUnless('radare2') }, async () => {
-  const code = `const { TOOLS } = await import(${JSON.stringify(join(repo, 'packages/bridges/src/tools.ts'))});
+  const code = `const { TOOLS } = await import(${JSON.stringify(pathToFileURL(join(repo, 'packages/bridges/src/tools.ts')).href)});
 const o = await TOOLS.find((t) => t.name === 'bridge_r2_session_open').run({ path: ${JSON.stringify(ELF)} });
 process.stdout.write(String(o.session.pid));
 process.exit(0);`;
@@ -331,7 +331,7 @@ test('Frida session: attach, load, post and collect, template events, unload, de
 });
 
 test('session open tools report the program missing first', async () => {
-  const code = `const { TOOLS } = await import(${JSON.stringify(join(repo, 'packages/bridges/src/tools.ts'))});
+  const code = `const { TOOLS } = await import(${JSON.stringify(pathToFileURL(join(repo, 'packages/bridges/src/tools.ts')).href)});
 const out = {};
 for (const n of ['bridge_r2_session_open', 'bridge_gdb_session_open', 'bridge_lldb_session_open', 'bridge_frida_session_attach', 'bridge_gdb_session_cmd', 'bridge_frida_session_load']) {
   out[n] = await TOOLS.find((t) => t.name === n).run({ path: ${JSON.stringify(ELF)}, pid: 1, allowExecution: true, sessionId: 'x', command: 'bt' });

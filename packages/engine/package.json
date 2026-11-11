@@ -1,7 +1,7 @@
 {
   "name": "@revlens/engine",
   "version": "1.0.0",
-  "description": "RevLens engine: runs the core analyzers plus every RevLens package (managed runtimes, web runtime, mobile, disassembler) on one combined report, and collects all agent tools and CLI commands.",
+  "description": "RevLens engine: runs the core analyzers plus every RevLens package (managed runtimes, web runtime, mobile, disassembler, desktop) on one combined report, and collects all agent tools and CLI commands.",
   "license": "MIT",
   "author": "Aniruddha Adak",
   "type": "module",
@@ -26,6 +26,7 @@
   "dependencies": {
     "@revlens/bridges": "1.0.0",
     "@revlens/core": "1.0.0",
+    "@revlens/desktop": "1.0.0",
     "@revlens/disasm": "1.0.0",
     "@revlens/extras": "1.0.0",
     "@revlens/managed": "1.0.0",

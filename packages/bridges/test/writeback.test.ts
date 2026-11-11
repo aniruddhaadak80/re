@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import fc from 'fast-check';
 import { validateNames, declaredImageBase, mapAddress, NamesError } from '../src/names.ts';
 import { namesToR2Script, r2Name } from '../src/writeback/providers.ts';
@@ -247,7 +247,7 @@ test('write-back tools refuse bad names before running anything', async () => {
 });
 
 test('write-back tools answer {available:false, install} when the tool is missing', async () => {
-  const code = `const { TOOLS } = await import(${JSON.stringify(join(repo, 'packages/bridges/src/tools.ts'))});
+  const code = `const { TOOLS } = await import(${JSON.stringify(pathToFileURL(join(repo, 'packages/bridges/src/tools.ts')).href)});
 const out = {};
 for (const n of ['bridge_ghidra_apply_names', 'bridge_ghidra_export_names', 'bridge_ida_apply_names', 'bridge_ida_export_names', 'bridge_r2_apply_names', 'bridge_r2_export_names']) {
   out[n] = await TOOLS.find((t) => t.name === n).run({ path: ${JSON.stringify(ELF)}, names: ${JSON.stringify(NAMES)}, outDatabase: '/tmp/x.i64' });

@@ -11,7 +11,8 @@ const fileA = join(dir, 'held-a.txt'); writeFileSync(fileA, 'a');
 const fdA = openSync(fileA, 'r');
 const tcp = createServer(() => {}).listen(0, '127.0.0.1');
 const udp = createSocket('udp4'); udp.bind(0, '127.0.0.1');
-const unixPath = join(dir, 'rl.sock');
+// Windows has no Unix socket files for net.Server; a named pipe plays the same role there
+const unixPath = process.platform === 'win32' ? `\\\\.\\pipe\\rl-proc-${process.pid}` : join(dir, 'rl.sock');
 const unix = createServer(() => {}).listen(unixPath);
 let ready = 0;
 const done = () => { if (++ready === 3) process.stdout.write(JSON.stringify({ pid: process.pid, fileA, fdA, tcpPort: tcp.address().port, udpPort: udp.address().port, unixPath, dir }) + '\n'); };
