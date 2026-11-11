@@ -28,3 +28,44 @@ Fetched at test time, not committed (`packages/extras/scripts/fetch-fixtures.mjs
 |---|---|---|
 | strings64.exe | https://download.sysinternals.com/files/Strings.zip (Microsoft signed) | Sysinternals license does not allow redistribution |
 | WindowServer.ips | https://gist.github.com/luckman212/5b645096c44936ba8530071fa6a23efd (a public macOS 12 crash report) | no license stated, so it is not redistributed |
+
+## windows/ (registry hives, Prefetch, Jump Lists)
+
+| File | Source | License |
+| --- | --- | --- |
+| `SAM.gz`, `BCD`, `SECURITY`, `NTUSER.DAT.gz` | regipy test data, https://github.com/mkorman90/regipy/tree/master/regipy_tests/data (xz there, recompressed with gzip or stored raw here) | MIT |
+| `*-*.pf` (XP, Vista, 7, 8.x, 10 compressed) | Eric Zimmerman Prefetch test files, https://github.com/EricZimmerman/Prefetch/tree/master/Prefetch.Test/TestFiles | MIT |
+| `win10-*.automaticDestinations-ms`, `win7-*.automaticDestinations-ms`, `dtformats-*.customDestinations-ms` | Eric Zimmerman JumpList test files, https://github.com/EricZimmerman/JumpList/tree/master/JumpList.Test/TestFiles | MIT |
+
+Expected values for these and the other gap formats live in `reference-gaps.json`, written by
+`packages/extras/scripts/gen_reference_gaps.py` from regipy 6.5.0, windowsprefetch 4.0.3 (with
+dissect.util 3.24 LZXPRESS Huffman standing in for the Windows-only RtlDecompressBufferEx),
+olefile 0.47 and LnkParse3 1.6.0.
+
+## apple/ (NSKeyedArchiver, compiled nibs)
+
+| File | Source | License |
+| --- | --- | --- |
+| `SUUpdateAlert.nib`, `SUUpdatePermissionPrompt.nib` | Sparkle 2.10.1 `Sparkle-for-Swift-Package-Manager.zip`, `Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework/Versions/B/Resources/`, https://github.com/sparkle-project/Sparkle/releases/tag/2.10.1 (compiled by Xcode ibtool) | MIT |
+| `dict.keyedarchive`, `array-xml.keyedarchive` | written by `src/swift/keyedarchive.swift` built with the Swift 6.0.3 toolchain for Linux (swift-corelibs-foundation NSKeyedArchiver), see `packages/extras/scripts/make_swift_fixtures.sh` | MIT (this repo) |
+
+Fetched by `fetch-fixtures.mjs` (not committed, 1.7 MB and 5 MB): `maccy-Assets.car` and
+`maccy-Maccy.macho` from Maccy 2.8.0 `Maccy.app.zip` (MIT, https://github.com/p0deje/Maccy/releases/tag/2.8.0).
+The Assets.car test checks the facet names against the asset catalog source of that release
+(https://github.com/p0deje/Maccy/tree/2.8.0/Maccy/Assets.xcassets).
+
+## containers/ (wxapkg, UnityFS, single-file JavaScript executables)
+
+| File | Source | License |
+| --- | --- | --- |
+| `demo.wxapkg` | `src/wxapkg/` packed with KillWxapkg v2.4.1 `-repack` (https://github.com/Ackites/KillWxapkg, built with Go 1.23.4) | MIT (this repo) |
+| `demo-pc-encrypted.wxapkg` | `demo.wxapkg` encrypted the way the WeChat PC client does (PBKDF2-SHA1 AppID key, AES-CBC first 1024 bytes, XOR rest) for AppID `wx1234567890abcdef`; KillWxapkg decrypts it back byte for byte | MIT (this repo) |
+| `ExternalAssets.unity3d` | Unity 5.5.0f3 asset bundle from https://github.com/rygo6/CardExample-Unity/blob/master/ExternalAssets/ExternalAssets | MIT |
+| `ExternalAssets-lz4.unity3d` | the same bundle rewritten by UnityPy 1.10.18 `BundleFile.save(packer="lz4")` (LZ4 data block, blocks info at the end) | MIT |
+| `node-sea-prep.blob` | `node --experimental-sea-config src/standalone/sea-config.json` with node 22.23.3 | MIT (this repo) |
+| `bun-1.4.4-graph.bin` | the module graph section (length, graph, offsets, trailer) cut from `bun build --compile src/standalone/app.ts` with Bun 1.4.4 linux-aarch64 | MIT (this repo) |
+| `deno-2.9.8-payload.bin` | the d3n0l4nd payload cut from `deno compile --no-check src/standalone/app.ts` with Deno 2.9.8 linux-aarch64 | MIT (this repo) |
+
+`packages/extras/scripts/make_standalone_fixtures.sh` rebuilds the full 100 MB executables into
+`samples/.cache/extras/standalone/` (not committed); `fetch-fixtures.mjs` downloads the 1.2 MB
+`unity-cards.unity3d` bundle (CardExample-Unity, MIT).
