@@ -16,7 +16,7 @@ RevLens প্রমাণসহ উত্তর দেয়: বাইট অ�
 
 - **ব্রাউজারে**, একটি Web Worker-এর ভেতরে। আপনার ফাইল আপনার কম্পিউটার ছেড়ে কোথাও যায় না।
 - **টার্মিনালে**, `npx revlens` হিসেবে, JSON, Markdown, HTML, SARIF আর CycloneDX আউটপুটসহ।
-- **আপনার এজেন্টে**, একটি MCP সার্ভার হিসেবে (196 MCP tools, 110 CLI commands), সাথে Claude Code আর Codex-এর জন্য তৈরি স্কিল ও প্লাগইন।
+- **আপনার এজেন্টে**, একটি MCP সার্ভার হিসেবে (203 MCP tools, 117 CLI commands), সাথে Claude Code আর Codex-এর জন্য তৈরি স্কিল ও প্লাগইন।
 
 আপনার কম্পিউটারে Ghidra, radare2, jadx, ILSpy, Frida বা gdb থাকলে RevLens সেগুলোও চালাতে পারে। `revlens doctor` বলে দেয় কী নেই আর কীভাবে ইনস্টল করবেন।
 

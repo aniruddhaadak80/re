@@ -1,0 +1,116 @@
+{
+ "linux-x64/libSystem.IO.Compression.Native.so": {
+  "BrotliDecoderCreateInstance": "0x739b0",
+  "BrotliDecoderDecompress": "0x73aa0",
+  "BrotliDecoderDecompressStream": "0x73b80",
+  "BrotliDecoderDestroyInstance": "0x73a60",
+  "BrotliDecoderIsFinished": "0x785e0",
+  "BrotliEncoderCompress": "0xc1940",
+  "BrotliEncoderCompressStream": "0xc3d60",
+  "BrotliEncoderCreateInstance": "0xc16b0",
+  "BrotliEncoderDestroyInstance": "0xc1810",
+  "BrotliEncoderHasMoreOutput": "0xc9650",
+  "BrotliEncoderSetParameter": "0xc1600",
+  "CompressionNative_Crc32": "0x72f10",
+  "CompressionNative_Deflate": "0x72d10",
+  "CompressionNative_DeflateEnd": "0x72d70",
+  "CompressionNative_DeflateInit2_": "0x72c50",
+  "CompressionNative_Inflate": "0x72e60",
+  "CompressionNative_InflateEnd": "0x72ec0",
+  "CompressionNative_InflateInit2_": "0x72dc0"
+ },
+ "osx-arm64/libSystem.IO.Compression.Native.dylib": {
+  "BrotliDecoderCreateInstance": "0x3720",
+  "BrotliDecoderDecompress": "0x3858",
+  "BrotliDecoderDecompressStream": "0x3928",
+  "BrotliDecoderDestroyInstance": "0x380c",
+  "BrotliDecoderIsFinished": "0x85f4",
+  "BrotliEncoderCompress": "0x4a8c4",
+  "BrotliEncoderCompressStream": "0x4c634",
+  "BrotliEncoderCreateInstance": "0x4a6b8",
+  "BrotliEncoderDestroyInstance": "0x4a7d8",
+  "BrotliEncoderHasMoreOutput": "0x50b60",
+  "BrotliEncoderSetParameter": "0x4a5e0",
+  "CompressionNative_Crc32": "0x2f30",
+  "CompressionNative_Deflate": "0x2d28",
+  "CompressionNative_DeflateEnd": "0x2d88",
+  "CompressionNative_DeflateInit2_": "0x2c50",
+  "CompressionNative_Inflate": "0x2e7c",
+  "CompressionNative_InflateEnd": "0x2edc",
+  "CompressionNative_InflateInit2_": "0x2ddc"
+ },
+ "win-x64/System.IO.Compression.Native.dll": {
+  "BrotliDecoderCreateInstance": {
+   "address": "0xa840",
+   "ordinal": 1
+  },
+  "BrotliDecoderDecompress": {
+   "address": "0xf210",
+   "ordinal": 2
+  },
+  "BrotliDecoderDecompressStream": {
+   "address": "0xf3e0",
+   "ordinal": 3
+  },
+  "BrotliDecoderDestroyInstance": {
+   "address": "0xa9f0",
+   "ordinal": 4
+  },
+  "BrotliDecoderIsFinished": {
+   "address": "0x10870",
+   "ordinal": 5
+  },
+  "BrotliEncoderCompress": {
+   "address": "0x43a40",
+   "ordinal": 6
+  },
+  "BrotliEncoderCompressStream": {
+   "address": "0x44d90",
+   "ordinal": 7
+  },
+  "BrotliEncoderCreateInstance": {
+   "address": "0x3fd20",
+   "ordinal": 8
+  },
+  "BrotliEncoderDestroyInstance": {
+   "address": "0x3ff50",
+   "ordinal": 9
+  },
+  "BrotliEncoderHasMoreOutput": {
+   "address": "0x450b0",
+   "ordinal": 10
+  },
+  "BrotliEncoderSetParameter": {
+   "address": "0x3dfc0",
+   "ordinal": 11
+  },
+  "CompressionNative_Crc32": {
+   "address": "0xa3f0",
+   "ordinal": 12
+  },
+  "CompressionNative_Deflate": {
+   "address": "0xa170",
+   "ordinal": 13
+  },
+  "CompressionNative_DeflateEnd": {
+   "address": "0xa1d0",
+   "ordinal": 14
+  },
+  "CompressionNative_DeflateInit2_": {
+   "address": "0xa0a0",
+   "ordinal": 15
+  },
+  "CompressionNative_Inflate": {
+   "address": "0xa2d0",
+   "ordinal": 16
+  },
+  "CompressionNative_InflateEnd": {
+   "address": "0xa330",
+   "ordinal": 17
+  },
+  "CompressionNative_InflateInit2_": {
+   "address": "0xa230",
+   "ordinal": 18
+  }
+ }
+}

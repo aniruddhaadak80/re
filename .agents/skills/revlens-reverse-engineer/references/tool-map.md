@@ -1,6 +1,6 @@
 # RevLens tool map
 
-Generated from the server by scripts/gen-tool-docs.mjs. 196 tools.
+Generated from the server by scripts/gen-tool-docs.mjs. 203 tools.
 
 ## Core triage and evidence
 
@@ -48,6 +48,10 @@ Generated from the server by scripts/gen-tool-docs.mjs. 196 tools.
 - `mobile_app_framework` (reads only): Detect the app framework of an APK or IPA: Flutter (with Dart snapshot hash), React Native (Hermes or JS bundle), Xamarin/.NET MAUI, Unity IL2CPP or Mono, Cordova, Capacitor, Godot, Qt, Cocos2d-x, Unreal, libGDX, NativeA
 - `mobile_il2cpp_types` (reads only): Unity IL2CPP global-metadata.dat (bare file or inside an APK/IPA): metadata version, images, and paged type names, method names (with declaring type) or string literals. what = summary, images, types, methods or literals
 - `mobile_native_libs` (reads only): Native libraries in an APK per ABI (lib/<abi>/*.so) with soname, needed libraries, JNI_OnLoad and Java_* exports, plus DEX native methods and how many lack a static JNI export. Also accepts a single .so.
+- `mobile_app_graph` (reads only): Android application graph from an APK: the app, activities, aliases, services, receivers and providers with exported state and why, intent filter actions, deep links, provider authorities, used, defined and required perm
+- `mobile_ipa_graph` (reads only): iOS bundle graph from an IPA: app, main and nested executables (CPU, team id), app extensions with extension points, embedded frameworks and dylibs with link edges from load commands, system libraries, entitlements per e
+- `mobile_jni_map` (reads only): Map DEX native methods to native code: Java_* exports (short and overloaded long names), JNINativeMethod tables recovered from .so data through RELATIVE, ABS and RELR relocations (what JNI_OnLoad passes to RegisterNative
+- `mobile_compare_members` (reads only): Diff classes, methods and fields between two DEX sets (two APK versions, JARs or .dex files): added and removed classes and members, access flag changes, superclass and interface changes, and with bodies=true methods who
 - `mobile_apk_report` (reads only): One-shot APK triage: manifest, signing, DEX stats, libraries, frameworks, native libs, sensitive API calls with callers, hardcoded URLs and keys, and security findings.
 
 ## Managed runtimes
@@ -63,6 +67,8 @@ Generated from the server by scripts/gen-tool-docs.mjs. 196 tools.
 - `managed_beam_info` (reads only): Parse an Erlang or Elixir .beam file: chunk table with offsets, atoms, exports, imports, locals, attributes, compile info and literal count.
 - `managed_evm_disasm` (reads only): Disassemble EVM bytecode (raw bytes or hex text) into instructions with program counters; Solidity CBOR metadata is split off.
 - `managed_evm_selectors` (reads only): Extract function selectors from an EVM dispatcher with known names (ERC-20, ERC-721, Ownable, proxies), plus EIP-1967 and EIP-1167 proxy patterns, event topics, risky opcodes and solc version.
+- `managed_pinvoke_map` (reads only): Map .NET P/Invoke declarations (ImplMap: module, entry point, charset, calling convention, SetLastError) to exports of the native libraries shipped with the app (ELF .so, PE .dll, Mach-O .dylib), using the runtime probin
+- `managed_compare_members` (reads only): Diff two .NET assemblies (for example two versions of a library): added and removed types, kind, visibility, base type and interface changes, added, removed and changed methods (keyed by name, generic arity and parameter
 
 ## JavaScript, Electron, network and data
 
@@ -132,6 +138,7 @@ Generated from the server by scripts/gen-tool-docs.mjs. 196 tools.
 - `x_unity_bundle` (reads only): Unity asset bundle (UnityFS): header, Unity version, blocks (compression), node table; each serialized file summarised with target platform, types and objects by class (path id, offset, size). LZ4/LZ4HC and uncompressed 
 - `x_standalone_js` (reads only): JavaScript apps packed into one executable: Node.js SEA (fuse state, NODE_SEA_BLOB with entry script, code cache, assets, exec argv), Bun --compile (embedded module graph with sources) and Deno compile (metadata JSON, en
 - `x_swift_demangle` (reads only): Demangle Swift symbols (Swift 1 to 3 _T, Swift 4 _T0, Swift 4.x $S, Swift 5+ $s, macro @__swiftmacro_), matching swift-demangle 6.0.3 text. Optional simplified form and node tree. With a binary path, lists the Swift symb
+- `x_api_contracts` (reads only): API contracts shipped inside binaries and JS bundles: protobuf FileDescriptorProto blobs (Go protoc-gen-go raw or gzip, C++, Java, Python _pb2 literals and .pyc, protobuf-es base64) rebuilt as .proto text; OpenAPI 3 / Sw
 
 ## Desktop apps, processes and UI trees
 

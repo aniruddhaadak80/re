@@ -1,6 +1,7 @@
 // High level APK / AAB / XAPK analysis that ties manifest, signatures, DEX, native libs and frameworks together.
 
 import type { Finding, Severity } from '@revlens/core';
+import { ParseError } from './bytes.js';
 import { axmlToXml, isAxml, parseAxml, parseResourceTable, type ResourceTable } from './axml.js';
 import { detectFrameworks, dartSnapshotInfo, reactNativeBundleInfo, type FrameworkHit } from './framework.js';
 import { interpretManifest, interpretNetworkSecurityConfig, type ManifestInfo, type NetworkSecurityConfig } from './manifest.js';
@@ -70,11 +71,11 @@ export async function readResources(zip: ZipArchive): Promise<ResourceTable | un
 export async function readManifest(zip: ZipArchive, table?: ResourceTable): Promise<ManifestInfo> {
   const e = zip.byName.get('AndroidManifest.xml');
   if (!e) {
-    if (zip.byName.has('base/manifest/AndroidManifest.xml')) throw new Error('AAB manifests are protobuf encoded (aapt2 proto format), which this version does not decode');
-    throw new Error('AndroidManifest.xml not found');
+    if (zip.byName.has('base/manifest/AndroidManifest.xml')) throw new ParseError('AAB manifests are protobuf encoded (aapt2 proto format), which this version does not decode');
+    throw new ParseError('AndroidManifest.xml not found');
   }
   const bytes = await readEntry(zip, e, 32 * 1024 * 1024);
-  if (!isAxml(bytes)) throw new Error('AndroidManifest.xml is not binary XML');
+  if (!isAxml(bytes)) throw new ParseError('AndroidManifest.xml is not binary XML');
   return interpretManifest(parseAxml(bytes), table);
 }
 

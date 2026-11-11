@@ -1,0 +1,92 @@
+openapi: 3.0.3
+info:
+  title: RevDemo Users API
+  version: 1.4.0
+  description: |
+    Test contract embedded in the RevLens Go fixture.
+    Mirrors revdemo.proto over HTTP.
+servers:
+  - url: https://api.revdemo.example/v1
+  - url: http://localhost:8080/v1
+    description: local dev
+paths:
+  /users:
+    get:
+      operationId: listUsers
+      summary: List users
+      parameters:
+        - name: page_size
+          in: query
+          schema: { type: integer, format: int32 }
+        - name: page_token
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A page of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListUsersResponse"
+    post:
+      operationId: createUser
+      summary: Create a user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "201": { description: Created }
+  /users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getUser
+      responses:
+        "200":
+          description: The user
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteUser
+      deprecated: true
+      responses:
+        "204": { description: Deleted }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-RevDemo-Key
+  schemas:
+    Role:
+      type: string
+      enum: [ROLE_UNSPECIFIED, ROLE_ADMIN, ROLE_VIEWER]
+    User:
+      type: object
+      required: [id, email]
+      properties:
+        id: { type: string }
+        email: { type: string, format: email }
+        role: { $ref: '#/components/schemas/Role' }
+        tags:
+          type: array
+          items: { type: string }
+    ListUsersResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items: { $ref: '#/components/schemas/User' }
+        next_page_token: { type: string }

@@ -1,0 +1,57 @@
+"""RevDemo GraphQL schema embedded in the RevLens Go fixture."""
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+scalar Time
+
+enum Role {
+  ROLE_UNSPECIFIED
+  ROLE_ADMIN
+  ROLE_VIEWER
+}
+
+interface Node {
+  id: ID!
+}
+
+type User implements Node {
+  id: ID!
+  email: String!
+  role: Role
+  tags: [String!]!
+  createdAt: Time
+  "Optional display name"
+  nickname: String @deprecated(reason: "use displayName")
+}
+
+type UserPage {
+  users: [User!]!
+  nextPageToken: String
+}
+
+input CreateUserInput {
+  email: String!
+  role: Role = ROLE_VIEWER
+}
+
+union SearchResult = User | UserPage
+
+type Query {
+  user(id: ID!): User
+  users(pageSize: Int = 20, pageToken: String): UserPage!
+  search(text: String!): [SearchResult!]!
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+}
+
+type Subscription {
+  userEvents(id: ID!): User
+}
+
+directive @auth(role: Role!) on FIELD_DEFINITION | OBJECT

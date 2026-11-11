@@ -12,7 +12,7 @@ const tool = (n: string) => { const t = TOOLS.find((x) => x.name === n); assert.
 const BROTLI = sample('dotnet', 'System.IO.Compression.Brotli.dll');
 
 test('tools: names, schemas and descriptions', () => {
-  assert.deepEqual(TOOLS.map((t) => t.name), ['managed_dotnet_info', 'managed_dotnet_types', 'managed_dotnet_method_il', 'managed_dotnet_search', 'managed_pyc_disasm', 'managed_pyinstaller_list', 'managed_pyinstaller_extract', 'managed_lua_info', 'managed_beam_info', 'managed_evm_disasm', 'managed_evm_selectors']);
+  assert.deepEqual(TOOLS.map((t) => t.name), ['managed_dotnet_info', 'managed_dotnet_types', 'managed_dotnet_method_il', 'managed_dotnet_search', 'managed_pyc_disasm', 'managed_pyinstaller_list', 'managed_pyinstaller_extract', 'managed_lua_info', 'managed_beam_info', 'managed_evm_disasm', 'managed_evm_selectors', 'managed_pinvoke_map', 'managed_compare_members']);
   for (const t of TOOLS) {
     assert.match(t.name, /^managed_[a-z_]+$/);
     assert.ok(t.description.length > 30);
@@ -71,7 +71,7 @@ async function cli(name: string, argv: string[]): Promise<{ code: number; out: s
 }
 
 test('cli: commands print text and JSON', async () => {
-  assert.deepEqual(CLI_COMMANDS.map((c) => c.name), ['dotnet', 'pyc', 'pyinstaller', 'lua', 'beam', 'evm']);
+  assert.deepEqual(CLI_COMMANDS.map((c) => c.name), ['dotnet', 'pyc', 'pyinstaller', 'lua', 'beam', 'evm', 'pinvoke-map', 'compare-members']);
   let r = await cli('dotnet', [BROTLI]);
   assert.equal(r.code, 0); assert.match(r.out, /targetFramework: \.NETCoreApp,Version=v8\.0/);
   r = await cli('dotnet', [BROTLI, 'il', '0x06000001', '--json']);

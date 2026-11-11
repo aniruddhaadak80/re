@@ -106,4 +106,28 @@ export const TOOLS: Tool[] = [
     inputSchema: { ...src, hex: { type: 'string', description: 'Bytecode as hex, instead of a file', optional: true } },
     run: (i) => api.evmSelectorsTool(i),
   },
+  {
+    name: 'managed_pinvoke_map',
+    description: 'Map .NET P/Invoke declarations (ImplMap: module, entry point, charset, calling convention, SetLastError) to exports of the native libraries shipped with the app (ELF .so, PE .dll, Mach-O .dylib), using the runtime probing names (lib prefix, extensions, A/W suffixes on Windows). Reports resolved, missing-export and library-not-shipped, with export addresses and ordinals.',
+    inputSchema: {
+      ...src, ...paging,
+      libraries: { type: 'array', description: 'Paths of native libraries to match against (Node)', optional: true },
+      librariesBase64: { type: 'array', description: 'Native libraries as [{name, base64}]', optional: true },
+      status: { type: 'string', description: 'Only bindings with this status: resolved, missing-export or library-not-shipped', optional: true },
+    },
+    run: (i) => api.pinvokeMapTool(i),
+  },
+  {
+    name: 'managed_compare_members',
+    description: 'Diff two .NET assemblies (for example two versions of a library): added and removed types, kind, visibility, base type and interface changes, added, removed and changed methods (keyed by name, generic arity and parameter types) and fields, and with bodies=true methods whose IL changed with tokens resolved to names.',
+    inputSchema: {
+      ...src, ...paging,
+      otherPath: { type: 'string', description: 'Second assembly path (the newer version)', optional: true },
+      otherBytesBase64: { type: 'string', description: 'Second assembly as base64', optional: true },
+      bodies: { type: 'boolean', description: 'Also compare IL bodies', optional: true },
+      filter: { type: 'string', description: 'Only types whose full name contains this text', optional: true },
+      publicOnly: { type: 'boolean', description: 'Only public and protected API surface', optional: true },
+    },
+    run: (i) => api.compareMembersTool(i),
+  },
 ];

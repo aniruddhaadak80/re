@@ -2,6 +2,7 @@
 
 import { attr, attrValue, parseAxml, resolveRef, resourceName, type AxmlDocument, type ResourceTable, type XmlNode } from './axml.js';
 import { permissionInfo, type ProtectionLevel } from './permissions.js';
+import { ParseError } from './bytes.js';
 
 export interface IntentFilter {
   actions: string[];
@@ -166,7 +167,7 @@ function deepLinksOf(component: string, f: IntentFilter): DeepLink[] {
 /** Interpret an AndroidManifest AXML document. Pass the resource table to resolve labels and xml paths. */
 export function interpretManifest(doc: AxmlDocument, table?: ResourceTable): ManifestInfo {
   const root = doc.root;
-  if (!root || root.tag !== 'manifest') throw new Error('AXML root is not <manifest>');
+  if (!root || root.tag !== 'manifest') throw new ParseError('AXML root is not <manifest>');
   const pkg = attr(root, 'package') ?? '';
   const info: ManifestInfo = {
     package: pkg,

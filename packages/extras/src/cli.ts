@@ -122,4 +122,5 @@ export const CLI_COMMANDS: CliCommand[] = [
   command('x-wxapkg', 'x_wxapkg', 'WeChat mini program packages, with PC decryption'),
   command('x-unity', 'x_unity_bundle', 'Unity UnityFS asset bundles'),
   command('x-standalone-js', 'x_standalone_js', 'Node SEA, Bun and Deno single-file executables'),
+  command('x-api-contracts', 'x_api_contracts', 'Protobuf, OpenAPI and GraphQL contracts inside binaries and bundles'),
 ];

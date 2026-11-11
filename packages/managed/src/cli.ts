@@ -13,7 +13,7 @@ function parse(argv: string[]): Parsed {
     if (a.startsWith('--')) {
       const [k, v] = a.slice(2).split('=', 2) as [string, string | undefined];
       if (v !== undefined) flags[k] = v;
-      else if (k === 'json' || k === 'members' || k === 'binaries' || k === 'no-listing') flags[k] = true;
+      else if (k === 'json' || k === 'members' || k === 'binaries' || k === 'no-listing' || k === 'bodies' || k === 'public') flags[k] = true;
       else if (i + 1 < argv.length && !(argv[i + 1] as string).startsWith('--')) flags[k] = argv[++i] as string;
       else flags[k] = true;
     } else pos.push(a);
@@ -156,6 +156,49 @@ export const CLI_COMMANDS: CliCommand[] = [
           ...r.proxy.map((p: any) => `proxy ${p.kind}: ${p.evidence}`),
           ...r.events.map((e: any) => `event ${e.signature}`),
         ].join('\n'),
+      };
+    }),
+  },
+  {
+    name: 'pinvoke-map',
+    usage: 'revlens pinvoke-map <assembly.dll> <native lib>... [--status resolved|missing-export|library-not-shipped] [--json]',
+    summary: 'Match .NET DllImports to exports of shipped native libraries',
+    run: (argv) => wrap(argv, 'revlens pinvoke-map <assembly.dll> <native lib>... [--status s] [--json]', async ({ pos, flags }) => {
+      const [file, ...libs] = pos as [string, ...string[]];
+      const r = await api.pinvokeMapTool({ ...input(file), libraries: libs, status: str(flags.status), limit: 2000 }) as Record<string, any>;
+      return {
+        json: r,
+        text: () => [
+          `${r.summary.total} P/Invoke: ${r.summary.resolved} resolved, ${r.summary['missing-export']} missing export, ${r.summary['library-not-shipped']} library not shipped`,
+          ...r.libraries.map((l: any) => `lib ${l.file} (${l.format} ${l.arch ?? ''}) ${l.exports} exports, ${l.referenced} referenced${l.error ? ' error: ' + l.error : ''}`),
+          ...r.bindings.items.map((b: any) => `${b.status.padEnd(19)} ${b.library}!${b.entry} <- ${b.member}${b.matches.length ? '  ' + b.matches.map((m: any) => `${m.platform}:${m.address ?? m.forwarder}`).join(' ') : ''}`),
+        ].join('\n'),
+      };
+    }),
+  },
+  {
+    name: 'compare-members',
+    usage: 'revlens compare-members <old.dll> <new.dll> [--bodies] [--public] [--filter s] [--json]',
+    summary: 'Diff types, methods, fields and signatures between two .NET assemblies',
+    run: (argv) => wrap(argv, 'revlens compare-members <old.dll> <new.dll> [--bodies] [--public] [--filter s] [--json]', async ({ pos, flags }) => {
+      const [a, b] = pos as [string, string?];
+      const r = await api.compareMembersTool({ path: a, otherPath: b, bodies: !!flags.bodies, publicOnly: !!flags.public, filter: str(flags.filter), limit: 2000 }) as Record<string, any>;
+      return {
+        json: r,
+        text: () => {
+          const out = [`types ${r.types.a} -> ${r.types.b}: +${r.types.added.length} -${r.types.removed.length} changed ${r.types.changed}; methods +${r.methods.added} -${r.methods.removed} ~${r.methods.changed}; fields +${r.fields.added} -${r.fields.removed}`];
+          for (const t of r.types.added) out.push(`+ type ${t}`);
+          for (const t of r.types.removed) out.push(`- type ${t}`);
+          for (const c of r.changes.items) {
+            out.push(`~ ${c.type}`);
+            for (const m of c.methods.added) out.push(`  + ${m}`);
+            for (const m of c.methods.removed) out.push(`  - ${m}`);
+            for (const m of c.methods.changed) out.push(`  * ${m.from} -> ${m.to}`);
+            for (const f of c.fields.added) out.push(`  + field ${f}`);
+            for (const f of c.fields.removed) out.push(`  - field ${f}`);
+          }
+          return out.join('\n');
+        },
       };
     }),
   },

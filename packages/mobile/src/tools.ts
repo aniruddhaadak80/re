@@ -19,6 +19,11 @@ import { isIl2cppMetadata, parseIl2cppMetadata, type Il2cppParsed } from './il2c
 import { isElf, parseElfDynamic } from './native.js';
 import { loadInput, Lru, type LoadedInput } from './input.js';
 import { isZip, openZip, readEntry, type ZipArchive } from './zip.js';
+import { androidAppGraph, iosAppGraph, graphToMermaid, type AppGraph } from './graph.js';
+import { scanJniLibrary, mapJni, type JniLibScan } from './jni.js';
+import { compareDex } from './dex/compare.js';
+import { nativeMethods } from './dex/analysis.js';
+import { ABIS } from './native.js';
 
 export interface ToolInputSpec { type: 'string' | 'number' | 'boolean' | 'array' | 'object'; description: string; optional?: boolean }
 export interface Tool { name: string; description: string; inputSchema: Record<string, ToolInputSpec>; run: (input: any) => Promise<unknown> }
@@ -335,6 +340,64 @@ export async function mobileApkReport(input: { path?: string; base64?: string; d
   };
 }
 
+function pageGraph(g: AppGraph, input: { mermaid?: boolean; offset?: number; limit?: number; maxMermaidNodes?: number }) {
+  return {
+    platform: g.platform, app: g.app, stats: g.stats, truncated: g.truncated,
+    nodes: page(g.nodes, input.offset, input.limit, 500), edges: page(g.edges, input.offset, input.limit, 500),
+    mermaid: input.mermaid === false ? undefined : graphToMermaid(g, { maxNodes: clampInt(input.maxMermaidNodes, 300, 10, 5000) }),
+  };
+}
+
+/** Android application graph: components, intent filters, exported state, deep links, providers and permissions as nodes and edges, plus Mermaid. */
+export async function mobileAppGraph(input: { path?: string; base64?: string; mermaid?: boolean; dex?: boolean; offset?: number; limit?: number; maxMermaidNodes?: number }) {
+  const o = await open(input);
+  if (!o.zip) throw new ParseError('input is not an APK archive');
+  const table = await readResources(o.zip);
+  const manifest = await readManifest(o.zip, table);
+  let dexes: DexFile[] = [];
+  if (input.dex !== false && dexEntries(o.zip).length) { try { dexes = await dexesOf(input); } catch { dexes = []; } }
+  return { file: o.input.name, ...pageGraph(androidAppGraph(manifest, dexes), input) };
+}
+
+/** iOS bundle graph: app, executables, extensions, frameworks, linked libraries, entitlements, URL schemes and associated domains, plus Mermaid. */
+export async function mobileIpaGraph(input: { path?: string; base64?: string; mermaid?: boolean; offset?: number; limit?: number; maxMermaidNodes?: number }) {
+  const o = await open(input);
+  if (!o.zip || !findAppRoot(o.zip)) throw new ParseError('input is not an IPA archive');
+  return { file: o.input.name, ...pageGraph(await iosAppGraph(o.zip), input) };
+}
+
+/** JNI map: DEX native methods to Java_* exports, RegisterNatives JNINativeMethod tables and string hints in each lib/<abi>/*.so. */
+export async function mobileJniMap(input: { path?: string; base64?: string; abi?: string; limit?: number; offset?: number }) {
+  const o = await open(input);
+  if (!o.zip) {
+    if (!isElf(o.input.bytes)) throw new ParseError('input is not an APK or ELF file');
+    const scan = scanJniLibrary(o.input.bytes);
+    return { file: o.input.name, library: { ...scan, tables: scan.tables.slice(0, 200), classHints: scan.classHints.slice(0, 500), signatureHints: scan.signatureHints.slice(0, 500) } };
+  }
+  const methods = dexEntries(o.zip).length ? (await dexesOf(input)).flatMap((d) => nativeMethods(d, 20000)) : [];
+  const libs: { abi: string; path: string; scan: JniLibScan }[] = [];
+  const errors: { path: string; error: string }[] = [];
+  for (const e of o.zip.entries) {
+    const m = /^lib\/([^/]+)\/([^/]+\.so)$/.exec(e.name);
+    if (!m || (input.abi && m[1] !== input.abi) || !ABIS.includes(m[1]!) || libs.length >= 400) continue;
+    try { libs.push({ abi: m[1]!, path: e.name, scan: scanJniLibrary(await readEntry(o.zip, e, 256 * 1024 * 1024)) }); } catch (err) { errors.push({ path: e.name, error: (err as Error).message }); }
+  }
+  const map = mapJni(methods, libs);
+  return {
+    file: o.input.name, nativeMethods: methods.length, libraries: libs.map((l) => ({ abi: l.abi, path: l.path, machine: l.scan.machine, bits: l.scan.bits, jniOnLoad: l.scan.jniOnLoad, javaExports: l.scan.javaExports.length, tables: l.scan.tables.slice(0, 50), classHints: l.scan.classHints.slice(0, 100), signatureHints: l.scan.signatureHints.slice(0, 100) })),
+    methods: page(map.methods, input.offset, input.limit, 200), unresolved: map.unresolved.map((x) => `${x.class}.${x.method}${x.signature}`), orphanExports: map.orphanExports.slice(0, 500), errors,
+  };
+}
+
+/** Member diff between two DEX sets (APK, JAR or .dex): classes, methods, fields, access flags, hierarchy, optional smali body changes. */
+export async function mobileCompareMembers(input: { path?: string; base64?: string; otherPath?: string; otherBase64?: string; bodies?: boolean; filter?: string; offset?: number; limit?: number }) {
+  if (!input.otherPath && !input.otherBase64) throw new ParseError('otherPath or otherBase64 is required');
+  const a = await dexesOf(input);
+  const b = await dexesOf({ path: input.otherPath, base64: input.otherBase64 });
+  const d = compareDex(a, b, { bodies: input.bodies, filter: input.filter });
+  return { ...d, changes: page(d.changes, input.offset, input.limit, 100) };
+}
+
 const PATH: ToolInputSpec = { type: 'string', description: 'File path (Node only). Use base64 instead in a browser.', optional: true };
 const B64: ToolInputSpec = { type: 'string', description: 'File bytes as base64, instead of path.', optional: true };
 const OFFSET: ToolInputSpec = { type: 'number', description: 'Paging offset, default 0.', optional: true };
@@ -352,6 +415,10 @@ export const TOOLS: Tool[] = [
   { name: 'mobile_app_framework', description: 'Detect the app framework of an APK or IPA: Flutter (with Dart snapshot hash), React Native (Hermes or JS bundle), Xamarin/.NET MAUI, Unity IL2CPP or Mono, Cordova, Capacitor, Godot, Qt, Cocos2d-x, Unreal, libGDX, NativeActivity.', inputSchema: { path: PATH, base64: B64 }, run: mobileAppFramework },
   { name: 'mobile_il2cpp_types', description: 'Unity IL2CPP global-metadata.dat (bare file or inside an APK/IPA): metadata version, images, and paged type names, method names (with declaring type) or string literals. what = summary, images, types, methods or literals.', inputSchema: { path: PATH, base64: B64, what: { type: 'string', description: 'summary, images, types (default), methods or literals.', optional: true }, filter: { type: 'string', description: 'Case-insensitive substring filter.', optional: true }, offset: OFFSET, limit: LIMIT }, run: mobileIl2cppTypes },
   { name: 'mobile_native_libs', description: 'Native libraries in an APK per ABI (lib/<abi>/*.so) with soname, needed libraries, JNI_OnLoad and Java_* exports, plus DEX native methods and how many lack a static JNI export. Also accepts a single .so.', inputSchema: { path: PATH, base64: B64, exports: { type: 'boolean', description: 'For a single .so, list all exported symbols.', optional: true }, limit: LIMIT }, run: mobileNativeLibs },
+  { name: 'mobile_app_graph', description: 'Android application graph from an APK: the app, activities, aliases, services, receivers and providers with exported state and why, intent filter actions, deep links, provider authorities, used, defined and required permissions, and an external caller node for the exported attack surface. Nodes and edges (paged) plus a Mermaid flowchart.', inputSchema: { path: PATH, base64: B64, mermaid: { type: 'boolean', description: 'Include Mermaid text (default true).', optional: true }, dex: { type: 'boolean', description: 'Check that component classes exist in DEX (default true).', optional: true }, maxMermaidNodes: { type: 'number', description: 'Node cap for the Mermaid text, default 300.', optional: true }, offset: OFFSET, limit: LIMIT }, run: mobileAppGraph },
+  { name: 'mobile_ipa_graph', description: 'iOS bundle graph from an IPA: app, main and nested executables (CPU, team id), app extensions with extension points, embedded frameworks and dylibs with link edges from load commands, system libraries, entitlements per executable, URL schemes, queried schemes, associated domains, privacy usage keys and ATS exceptions. Nodes and edges plus Mermaid.', inputSchema: { path: PATH, base64: B64, mermaid: { type: 'boolean', description: 'Include Mermaid text (default true).', optional: true }, maxMermaidNodes: { type: 'number', description: 'Node cap for the Mermaid text, default 300.', optional: true }, offset: OFFSET, limit: LIMIT }, run: mobileIpaGraph },
+  { name: 'mobile_jni_map', description: 'Map DEX native methods to native code: Java_* exports (short and overloaded long names), JNINativeMethod tables recovered from .so data through RELATIVE, ABS and RELR relocations (what JNI_OnLoad passes to RegisterNatives) with function addresses, and FindClass class path and JNI signature string hints. Lists unresolved methods and Java_* exports with no Java declaration. Accepts an APK or one .so.', inputSchema: { path: PATH, base64: B64, abi: { type: 'string', description: 'Only this ABI, like arm64-v8a.', optional: true }, offset: OFFSET, limit: LIMIT }, run: mobileJniMap },
+  { name: 'mobile_compare_members', description: 'Diff classes, methods and fields between two DEX sets (two APK versions, JARs or .dex files): added and removed classes and members, access flag changes, superclass and interface changes, and with bodies=true methods whose smali changed (index renumbering ignored).', inputSchema: { path: PATH, base64: B64, otherPath: { type: 'string', description: 'Second file path (the newer version).', optional: true }, otherBase64: { type: 'string', description: 'Second file as base64.', optional: true }, bodies: { type: 'boolean', description: 'Also compare method bodies as rendered smali.', optional: true }, filter: { type: 'string', description: 'Only classes whose name contains this text.', optional: true }, offset: OFFSET, limit: LIMIT }, run: mobileCompareMembers },
   { name: 'mobile_apk_report', description: 'One-shot APK triage: manifest, signing, DEX stats, libraries, frameworks, native libs, sensitive API calls with callers, hardcoded URLs and keys, and security findings.', inputSchema: { path: PATH, base64: B64, deep: { type: 'boolean', description: 'Build DEX cross references for API, URL and key findings (default true).', optional: true }, limit: LIMIT }, run: mobileApkReport },
 ];
 

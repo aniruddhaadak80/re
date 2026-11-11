@@ -159,13 +159,18 @@ export function protoToText(fd: ProtoFile): string {
   for (const d of fd.dependencies) out.push(`import "${d}";`);
   if (fd.goPackage) out.push(`option go_package = "${fd.goPackage}";`);
   out.push('');
-  const tn = (f: ProtoField): string => (f.typeName ? f.typeName.replace(fd.package ? new RegExp(`^\\.${fd.package.replace(/\./g, '\\.')}\\.`) : /^\./, '').replace(/^\./, '') : f.type);
+  const pfx = fd.package ? `.${fd.package}.` : '.';
+  const rel = (t: string): string => (t.startsWith(pfx) ? t.slice(pfx.length) : t.replace(/^\./, ''));
+  const tn = (f: ProtoField): string => (f.typeName ? rel(f.typeName) : f.type);
   const en = (e: ProtoEnum, ind: string): void => { out.push(`${ind}enum ${e.name} {`); for (const v of e.values) out.push(`${ind}  ${v.name} = ${v.number};`); out.push(`${ind}}`); };
   const msg = (m: ProtoMessage, ind: string): void => {
     out.push(`${ind}message ${m.name} {`);
     const maps = new Map(m.nested.filter((n) => n.mapEntry).map((n) => [n.name, n]));
-    for (const n of m.nested) if (!n.mapEntry) msg(n, ind + '  ');
     for (const e of m.enums) en(e, ind + '  ');
+    // nested messages keep their descriptor order relative to synthesized map entries
+    let nextNested = 0;
+    const nestedUpTo = (k: number): void => { for (; nextNested < Math.min(k, m.nested.length); nextNested++) if (!m.nested[nextNested]!.mapEntry) msg(m.nested[nextNested]!, ind + '  '); };
+    const entryIndex = (f: ProtoField): number => (f.label === 'repeated' && f.typeName ? m.nested.findIndex((n) => n.mapEntry && n.name === f.typeName!.split('.').pop()) : -1);
     const inOneof = new Map<number, ProtoField[]>();
     for (const f of m.fields) if (f.oneofIndex !== undefined && !f.proto3Optional) { const a = inOneof.get(f.oneofIndex) ?? []; a.push(f); inOneof.set(f.oneofIndex, a); }
     const line = (f: ProtoField, i2: string, oneof = false): string => {
@@ -174,15 +179,27 @@ export function protoToText(fd: ProtoFile): string {
       const label = oneof ? '' : f.label === 'repeated' ? 'repeated ' : f.label === 'required' ? 'required ' : fd.syntax === 'proto2' || f.proto3Optional ? 'optional ' : '';
       return `${i2}${label}${tn(f)} ${f.name} = ${f.number};`;
     };
-    for (const f of m.fields) if (f.oneofIndex === undefined || f.proto3Optional) out.push(line(f, ind + '  '));
-    for (const [i, fs] of inOneof) { out.push(`${ind}  oneof ${m.oneofs[i] ?? `oneof_${i}`} {`); for (const f of fs) out.push(line(f, ind + '    ', true)); out.push(`${ind}  }`); }
+    // fields in descriptor order; a oneof block goes where its first field is
+    const done = new Set<number>();
+    for (const f of m.fields) {
+      const ei = entryIndex(f);
+      if (ei >= 0) { nestedUpTo(ei); nextNested = Math.max(nextNested, ei + 1); }
+      if (f.oneofIndex === undefined || f.proto3Optional) { out.push(line(f, ind + '  ')); continue; }
+      const i = f.oneofIndex;
+      if (done.has(i)) continue;
+      done.add(i);
+      out.push(`${ind}  oneof ${m.oneofs[i] ?? `oneof_${i}`} {`);
+      for (const g of inOneof.get(i) ?? []) out.push(line(g, ind + '    ', true));
+      out.push(`${ind}  }`);
+    }
+    nestedUpTo(m.nested.length);
     out.push(`${ind}}`);
   };
   for (const e of fd.enums) en(e, '');
   for (const m of fd.messages) msg(m, '');
   for (const s of fd.services) {
     out.push(`service ${s.name} {`);
-    for (const m of s.methods) out.push(`  rpc ${m.name}(${m.clientStreaming ? 'stream ' : ''}${m.inputType.replace(/^\./, '')}) returns (${m.serverStreaming ? 'stream ' : ''}${m.outputType.replace(/^\./, '')});${m.httpRule ? ` // ${m.httpRule}` : ''}`);
+    for (const m of s.methods) out.push(`  rpc ${m.name}(${m.clientStreaming ? 'stream ' : ''}${rel(m.inputType)}) returns (${m.serverStreaming ? 'stream ' : ''}${rel(m.outputType)});${m.httpRule ? ` // ${m.httpRule}` : ''}`);
     out.push('}');
   }
   return out.join('\n') + '\n';

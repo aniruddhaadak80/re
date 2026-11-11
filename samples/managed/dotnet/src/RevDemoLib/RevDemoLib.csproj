@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>disable</Nullable>
+    <Deterministic>true</Deterministic>
+    <DebugType>none</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Version>$(RevDemoVersion)</Version>
+    <DefineConstants Condition="'$(RevDemoVersion)' == '2.0.0'">$(DefineConstants);V2</DefineConstants>
+  </PropertyGroup>
+</Project>

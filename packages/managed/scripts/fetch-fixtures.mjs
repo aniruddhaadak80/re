@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Fetch or build the larger real fixtures for @revlens/managed into samples/.cache/managed/.
-//  1. Newtonsoft.Json 13.0.3 (MIT) from nuget.org: lib/netstandard2.0/Newtonsoft.Json.dll
+//  1. Newtonsoft.Json 13.0.3 and 12.0.3 (MIT) from nuget.org: lib/netstandard2.0/Newtonsoft.Json.dll
 //  2. A PyInstaller onefile app built from samples/managed/pyinstaller/hello_revlens.py, when
 //     `python3 -m PyInstaller` is available (pip install pyinstaller). Its TOC reference is
 //     written with PyInstaller's own archive reader.
@@ -22,10 +22,10 @@ function run(cmd, args, opts = {}) {
   });
 }
 
-async function newtonsoft() {
-  const out = join(cache, 'Newtonsoft.Json.dll');
+async function newtonsoft(version = '13.0.3', file = 'Newtonsoft.Json.dll') {
+  const out = join(cache, file);
   if (existsSync(out)) { console.log('have', out); return; }
-  const url = 'https://api.nuget.org/v3-flatcontainer/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg';
+  const url = `https://api.nuget.org/v3-flatcontainer/newtonsoft.json/${version}/newtonsoft.json.${version}.nupkg`;
   console.log('fetch', url);
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
@@ -62,4 +62,6 @@ async function pyinstaller() {
 }
 
 await newtonsoft();
+// an older release for managed_compare_members
+await newtonsoft('12.0.3', 'Newtonsoft.Json-12.0.3.dll');
 await pyinstaller();

@@ -5,6 +5,7 @@ export { ANALYZERS, mobileApkAnalyzer, mobileDexAnalyzer, mobileClassAnalyzer, m
 export {
   TOOLS, dexesOf, mobileManifest, mobileSigning, mobileDexClasses, mobileDexMethod, mobileDexSearch, mobileDexXrefs,
   mobileJavaClass, mobileIpaInfo, mobileAppFramework, mobileIl2cppTypes, mobileNativeLibs, mobileApkReport,
+  mobileAppGraph, mobileIpaGraph, mobileJniMap, mobileCompareMembers,
   type Tool, type ToolInputSpec,
 } from './tools.js';
 export { CLI_COMMANDS, setCliOutput, type CliCommand } from './cli.js';
@@ -30,4 +31,7 @@ export { parseMachoSlices, isMacho, type MachoSlice, type CodeSignature } from '
 export { analyzeIpa, findAppRoot, machoEntitlements, provisioningPlist, type IpaInfo } from './ios/ipa.js';
 export { detectFrameworks, dartSnapshotInfo, reactNativeBundleInfo, type FrameworkHit } from './framework.js';
 export { parseIl2cppMetadata, isIl2cppMetadata, type Il2cppParsed } from './il2cpp.js';
+export { androidAppGraph, iosAppGraph, graphToMermaid, type AppGraph, type GraphNode, type GraphEdge } from './graph.js';
+export { scanJniLibrary, mapJni, JNI_SIG, type JniLibScan, type JniTable, type JniMethodMap, type JniBinding } from './jni.js';
+export { compareDex, snapshotDex, type DexDiff, type ClassChange } from './dex/compare.js';
 export { ParseError } from './bytes.js';

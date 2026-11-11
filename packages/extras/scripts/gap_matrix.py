@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate GAP-MATRIX.md: rea (morluto/rea v6.8.0) capabilities vs RevLens owners.
-Status codes: C covered, P partial, M missing. Column 'after' is the state after the
-feat/extras work in this branch; 'before' is the state at ce77aa5 across all branches."""
+Status codes: C covered, P partial, M missing. Column 'after' is the state at the head of
+feat/gaps-graphs; 'before' is the state at ce77aa5 across all branches."""
 import sys
 # (feature, where in rea, owner, before, after, how RevLens is better or what is left)
 R = []
@@ -65,11 +65,11 @@ add('MCP tools: evidence, investigation, guidance', [
 add('MCP tools: Android, iOS, mobile', [
  ('inspect_android_package / decode_android_resources', 'src/android', 'mobile', 'C', 'C', 'AXML and manifest risk findings without apktool'),
  ('inspect_android_class / inspect_android_method / search_android_classes / trace_android_references', 'src/android', 'mobile', 'C', 'C', 'DEX and smali in TS, xrefs over all classes.dex'),
- ('inspect_android_jni_bindings', 'src/android', 'mobile', 'P', 'P', 'native libs listed with JNI_OnLoad and Java_ exports; left: RegisterNatives table recovery'),
+ ('inspect_android_jni_bindings', 'src/android', 'mobile', 'P', 'C', 'mobile_jni_map matches DEX native methods to short and long Java_ exports and to JNINativeMethod tables recovered through RELATIVE, ABS and RELR relocations (what RegisterNatives receives), checked against llvm-readelf on arm64 and armv7'),
  ('inspect_apk_signature', 'src/apkSignature', 'mobile', 'C', 'C', 'v1, v2, v3 blocks with certificate details'),
  ('inspect_apktool_client / apktool', 'src/apktool', 'bridges', 'C', 'C', 'optional, built-in AXML covers the common case'),
  ('JEB tools (open_jeb_project, list_jeb_units, decompile_jeb_item)', 'src/jeb', 'bridges', 'M', 'M', 'commercial tool; jadx bridge covers the same need'),
- ('project_android/apple/harmony/managed_application_graph', 'src/application', 'mobile + managed', 'M', 'M', 'left: component graphs'),
+ ('project_android/apple/harmony/managed_application_graph', 'src/application', 'mobile + managed', 'M', 'P', 'mobile_app_graph (components, exported state, intent actions, deep links, providers, permissions, checked against androguard) and mobile_ipa_graph (executables, extensions, frameworks, entitlements, URL schemes) with Mermaid; left: HarmonyOS and managed application graphs'),
  ('identify_flutter_build / inspect_dart_aot', 'src/flutter', 'mobile', 'P', 'P', 'Flutter detection and snapshot hash; left: Dart AOT object pool'),
  ('inspect_il2cpp_metadata', 'src/il2cpp', 'mobile', 'C', 'C', 'global-metadata.dat types and methods'),
  ('inspect_plist / inspect_keyed_archive / decode_interface_builder / inspect_asset_catalog', 'src/native (Apple)', 'mobile + extras + desktop', 'P', 'C', 'IPA Info.plist and entitlements, x_keyed_archive (NSKeyedArchiver), x_nib (NIBArchive), x_asset_catalog (Assets.car BOM) and desktop_plist_parse, checked against plistlib, NSKeyedUnArchiver and nibarchive'),
@@ -79,8 +79,8 @@ add('MCP tools: Android, iOS, mobile', [
 add('MCP tools: managed runtimes', [
  ('inspect_managed_artifact / inspect_managed_members', 'src/dotnet', 'managed', 'C', 'C', '.NET metadata tables and CIL in TS'),
  ('ilspycmd', 'src/dotnet', 'bridges', 'C', 'C', 'bridge_ilspy_decompile'),
- ('compare_managed_members / import_managed_reconstruction', 'src/dotnet', 'managed', 'M', 'M', 'left'),
- ('inspect/verify_managed_native_boundaries', 'src/dotnet', 'managed', 'M', 'M', 'left: P/Invoke to native export matching'),
+ ('compare_managed_members / import_managed_reconstruction', 'src/dotnet', 'managed + mobile', 'M', 'P', 'managed_compare_members diffs types, methods (name, generic arity, parameter types), fields and IL bodies, member lists checked against dnfile on Newtonsoft.Json 12 vs 13; mobile_compare_members does the same for DEX; left: import_managed_reconstruction'),
+ ('inspect/verify_managed_native_boundaries', 'src/dotnet', 'managed', 'M', 'C', 'managed_pinvoke_map matches ImplMap rows to ELF, PE and Mach-O exports with runtime probing names, A/W suffixes and ordinals, checked against dnfile and LLVM tools on the .NET 8 Brotli shim'),
  ('inspect_python_pyc / PyInstaller', 'src/python', 'managed', 'C', 'C', 'pyc 3.7 to 3.13 disassembly plus PyInstaller extraction'),
  ('inspect_erlang_beam', 'src/erlang', 'managed', 'C', 'C', 'chunks, atoms, exports'),
  ('inspect_evm_interface', 'src/evm', 'managed', 'C', 'C', 'selectors and disassembly'),
@@ -101,7 +101,8 @@ add('MCP tools: web, browser, Electron, network', [
  ('inspect_web_network_capture (HAR)', 'src/captures', 'webrt', 'C', 'C', 'HAR summary with endpoints and secrets scan'),
  ('inspect_pcap_capture / inspect_packet_capture / inspect_packet_fields / inspect_pcap_client', 'src/pcap', 'webrt', 'C', 'C', 'pcap and pcapng with DNS, HTTP, TLS SNI and JA3 in TS, no tshark'),
  ('inspect_playwright_trace', 'src/browser', 'webrt', 'M', 'C', 'web_trace_inspect reads trace.zip actions, network, console and pages'),
- ('inspect_api_contract (OpenAPI/AsyncAPI)', 'src/application', 'webrt', 'M', 'M', 'left'),
+ ('inspect_api_contract (OpenAPI/AsyncAPI)', 'src/application', 'extras', 'M', 'P', 'x_api_contracts finds OpenAPI 3 and Swagger 2 as JSON, YAML (Go embed), minified JS literals and JSON strings, checked against PyYAML; left: AsyncAPI'),
+ ('protobuf descriptors and GraphQL contracts in binaries (beyond rea)', 'none', 'extras', 'M', 'C', 'x_api_contracts rebuilds .proto from Go, Python and JS descriptors (protoc recompiles it byte for byte) and lifts GraphQL SDL, introspection and operations (checked against graphql-js)'),
  ('inspect_sqlite_database', 'src/sqlite', 'webrt', 'C', 'C', 'read-only SQLite pages in TS'),
 ])
 add('MCP tools: firmware, GPU, models, Windows, signals', [
@@ -114,7 +115,8 @@ add('MCP tools: firmware, GPU, models, Windows, signals', [
  ('inspect_windows_shortcut', 'src/windows', 'extras', 'M', 'C', 'x_lnk_inspect: LNK header, target IDList, link info, string data'),
  ('Windows registry hive, Prefetch, Jump Lists (open requests)', 'issues #9865 #9423 #9866', 'extras', 'M', 'C', 'x_registry_hive, x_prefetch (with MAM LZXPRESS Huffman), x_jump_list and x_ole_compound, checked against regipy, windowsprefetch, dissect.util, olefile and LnkParse3'),
  ('inspect_signal_decoders / decode_signal_recording', 'src/signals', 'none', 'M', 'M', 'left: SDR recordings, out of scope for 1.0'),
- ('godot pck, iNES, wxapkg, UnityFS, Node SEA, Bun/Deno standalone', 'docs/*.md', 'extras + mobile', 'M', 'P', 'x_wxapkg (with PC decryption), x_unity_bundle (LZ4) and x_standalone_js (Node SEA, Bun, Deno) list and read entries; left: Godot pck and iNES'),
+ ('wxapkg, UnityFS, Node SEA, Bun/Deno standalone', 'docs/*.md', 'extras', 'M', 'C', 'x_wxapkg (with PC decryption), x_unity_bundle (LZ4 blocks, serialized files) and x_standalone_js (Node SEA blob, Bun module graph, Deno payload) list and read entries'),
+ ('godot pck, iNES', 'docs/*.md', 'mobile', 'M', 'P', 'mobile_app_framework detects Godot; left: pck entry listing and iNES headers'),
 ])
 add('MCP tools: dynamic, desktop, process', [
  ('Frida: list devices/processes, instrument, load/unload script, sessions', 'src/frida', 'bridges', 'P', 'C', 'persistent Frida sessions: attach or spawn, load templates or scripts, post, collect events, unload, resume'),
@@ -142,6 +144,8 @@ add('Platform, packaging and process', [
 ])
 
 EXCEEDS = [
+ 'API contracts lifted from binaries: .proto rebuilt from embedded descriptors recompiles with protoc to the identical descriptor bytes; GraphQL SDL, introspection and client operations come out of the same scan.',
+ 'JNI RegisterNatives tables recovered statically from relocations, per ABI, and joined to DEX native methods.',
  'Runs fully in the browser: the web app and every pure TS package work in a Web Worker, rea needs a local Node process plus native providers.',
  'No JDK, Ghidra or Python required for core native analysis: built-in x86/x64/ARM64/ARM/Thumb disassembler with CFG, xrefs and pseudo code.',
  'Security findings rea does not produce: secrets detection, SBOM (CycloneDX) with OSV vulnerability lookup, attack surface and ATT&CK capability mapping, yara-lite rules.',
