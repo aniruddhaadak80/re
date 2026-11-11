@@ -53,7 +53,8 @@ export interface CaptureResult {
 }
 
 const SENSITIVE = /^(authorization|proxy-authorization|cookie|set-cookie|x-api-key|x-auth-token|x-csrf-token|x-xsrf-token)$/i;
-const redact = (headers: Record<string, string>) => Object.entries(headers).slice(0, 200).map(([name, value]) => ({ name, value: SENSITIVE.test(name) ? '[redacted]' : String(value).slice(0, 2000) }));
+/** Header list with credentials replaced by [redacted]. */
+export const redactHeaders = (headers: Record<string, string>) => Object.entries(headers).slice(0, 200).map(([name, value]) => ({ name, value: SENSITIVE.test(name) ? '[redacted]' : String(value).slice(0, 2000) }));
 
 async function sha256Hex(s: string): Promise<string> {
   const { createHash } = await import('node:crypto');
@@ -112,8 +113,8 @@ export async function browserCapture(url: string, opts: CaptureOptions = {}): Pr
         const timing = rq.timing?.() ?? {};
         res.har.log.entries.push({
           startedDateTime: new Date(started).toISOString(), time: Math.max(0, Date.now() - started), _resourceType: rtype,
-          request: { method: rq.method(), url: rq.url(), httpVersion: 'HTTP/1.1', headers: redact(reqHeaders), cookies: [], queryString: [], headersSize: -1, bodySize: rq.postDataBuffer()?.length ?? 0, postData: rq.postData() ? { mimeType: reqHeaders['content-type'] ?? '', text: String(rq.postData()).slice(0, 10_000) } : undefined },
-          response: { status: resp.status(), statusText: resp.statusText(), httpVersion: 'HTTP/1.1', headers: redact(headers), cookies: [], content: { size, mimeType: mime, text: isScript ? text : undefined }, redirectURL: headers.location ?? '', headersSize: -1, bodySize: size },
+          request: { method: rq.method(), url: rq.url(), httpVersion: 'HTTP/1.1', headers: redactHeaders(reqHeaders), cookies: [], queryString: [], headersSize: -1, bodySize: rq.postDataBuffer()?.length ?? 0, postData: rq.postData() ? { mimeType: reqHeaders['content-type'] ?? '', text: String(rq.postData()).slice(0, 10_000) } : undefined },
+          response: { status: resp.status(), statusText: resp.statusText(), httpVersion: 'HTTP/1.1', headers: redactHeaders(headers), cookies: [], content: { size, mimeType: mime, text: isScript ? text : undefined }, redirectURL: headers.location ?? '', headersSize: -1, bodySize: size },
           serverIPAddress: (await resp.serverAddr().catch(() => null))?.ipAddress, cache: {},
           timings: { blocked: -1, dns: timing.domainLookupEnd >= 0 ? timing.domainLookupEnd - timing.domainLookupStart : -1, connect: timing.connectEnd >= 0 ? timing.connectEnd - timing.connectStart : -1, ssl: timing.secureConnectionStart >= 0 ? timing.connectEnd - timing.secureConnectionStart : -1, send: 0, wait: timing.responseStart >= 0 ? timing.responseStart - timing.requestStart : -1, receive: timing.responseEnd >= 0 ? timing.responseEnd - timing.responseStart : -1 },
         });

@@ -1,0 +1,1 @@
+{ "name": "Todo agent", "description": "Manages todos", "url": "https://todo.example/a2a", "version": "1.0.0", "capabilities": { "streaming": true }, "skills": [{ "id": "todos", "name": "manage_todos" }] }

@@ -42,3 +42,8 @@ Fixtures used by `packages/webrt/test`. Generated files can be rebuilt with
 https://github.com/electron/electron/releases/download/v33.2.1/electron-v33.2.1-linux-x64.zip (MIT)
 and extracts the `electron` executable and `version` file to `samples/.cache/webrt/`. The fuse and
 version test is skipped when it is missing.
+
+## runtime/ (scenario, compare and WebMCP fixtures)
+
+- `a-rgb.png`, `b-rgb.png`, `a-rgba.png`, `a-palette.png` (2-bit palette), `a-grey.png`, `a-greyalpha.png`, `a-grey16.png`: drawn and saved with Pillow 13.0.0 in the sandbox (generated, no license needed). `png-reference.json` holds Pillow's decoded RGBA sha256, sizes, sample pixels and the `ImageChops.difference` pixel count (256) and bbox (10,25,26,41) for a-rgb vs b-rgb.
+- `webmcp-page.html`, `webmcp-app.js`, `mcp.json`, `agent-card.json`: written for these tests (MIT, part of this repo). They follow the WebMCP explainer (navigator.modelContext provideContext, registerTool, unregisterTool and the declarative `toolname` / `tooldescription` form attributes), the MCP server card idea and the A2A agent card shape.
