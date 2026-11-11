@@ -4,6 +4,7 @@ import {
   disasmListFunctions, disasmPseudocode, disasmSearch, disasmXrefs,
 } from './api.js';
 import { disasmTraceValues, disasmIndirectTargets } from './flowapi.js';
+import { disasmMatchFunctions, disasmCompareFunctions } from './matchapi.js';
 
 export interface ToolParam { type: 'string' | 'number' | 'boolean' | 'array' | 'object'; description: string; optional?: boolean }
 export interface Tool { name: string; description: string; inputSchema: Record<string, ToolParam>; run: (input: any) => Promise<unknown> } // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -136,5 +137,30 @@ export const TOOLS: Tool[] = [
       offset, limit: limit(200, 5000), budgetMs: budget,
     },
     run: (i) => disasmIndirectTargets(i),
+  },
+  {
+    name: 'disasm_match_functions',
+    description: 'Map functions between two binaries (two versions, or a stripped and an unstripped build) without relying on addresses: equal names (optional), identical normalized instructions, strings, imports and constants, CFG shape, call graph and address order propagation, then similarity. Each match has a confidence, method and similarity; lists identical vs changed functions and functions only in one side.',
+    inputSchema: {
+      path, path2: { type: 'string', description: 'Second binary' }, arch, arch2: { type: 'string', description: 'Fat Mach-O slice of the second binary', optional: true },
+      useNames: { type: 'boolean', description: 'Match equal symbol names first (default true); false matches by code alone', optional: true },
+      minConfidence: { type: 'number', description: 'Only return matches at or above this confidence (0..1)', optional: true },
+      filter: { type: 'string', description: 'Substring of a function name on either side', optional: true },
+      offset, limit: limit(200, 20000), budgetMs: { type: 'number', description: 'Time budget in ms (default 60000)', optional: true },
+    },
+    run: (i) => disasmMatchFunctions(i),
+  },
+  {
+    name: 'disasm_compare_functions',
+    description: 'Side by side diff of two functions (same binary, or function in path vs function2 in path2): overall similarity, per dimension (instructions, CFG, strings, calls, constants), identical/changed basic blocks, and a unified diff of the disassembly with addresses normalized so relocation alone is not a change.',
+    inputSchema: {
+      path, arch, function: fn,
+      path2: { type: 'string', description: 'Second binary (default: same as path)', optional: true },
+      arch2: { type: 'string', description: 'Fat Mach-O slice of the second binary', optional: true },
+      function2: { type: 'string', description: 'Function in the second binary (default: same name or address as function)', optional: true },
+      context: { type: 'number', description: 'Unchanged lines of context around changes (default 2)', optional: true },
+      limit: limit(400, 5000),
+    },
+    run: (i) => disasmCompareFunctions(i),
   },
 ];

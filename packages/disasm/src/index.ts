@@ -14,6 +14,8 @@ export {
 export { disasmTraceValues, disasmIndirectTargets, describeVal, type ValueDesc } from './flowapi.js';
 export { analyzeFlow, valKey, type FlowResult, type Val, type StackVar, type CallFacts } from './analysis/dataflow.js';
 export { resolveJumpTable } from './analysis/jumptable.js';
+export { disasmMatchFunctions, disasmCompareFunctions } from './matchapi.js';
+export { fingerprint, fingerprintAll, matchFunctions, similarity, type Fingerprint, type FunctionMatch, type MatchOptions } from './analysis/match.js';
 export { TOOLS, type Tool, type ToolParam } from './tools.js';
 export { CLI_COMMANDS, type CliCommand } from './cli.js';
 export { disasmAnalyzer } from './analyzer.js';

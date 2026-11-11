@@ -397,6 +397,19 @@ export class Program {
     return af;
   }
 
+  /** Analysis without touching the cache (whole program passes that must not grow memory). */
+  analyzeTransient(addr: number): AnalyzedFunction | undefined {
+    const cached = this.cache.get(addr);
+    if (cached) return cached;
+    if (!this.decoder || !this.mem.isExec(addr)) return undefined;
+    let info = this.functions.get(addr);
+    if (!info) {
+      const s = this.symAt.get(addr);
+      info = { addr, name: s?.name ?? `sub_${addr.toString(16)}`, source: 'call', thumb: this.img.arch === 'arm' ? this.isThumb(addr) : undefined };
+    }
+    return this.buildCfg(info);
+  }
+
   private isNoReturn(target: number | undefined, slot?: number): boolean {
     let n: string | undefined;
     if (slot !== undefined) n = this.importBySlot.get(slot)?.name;
