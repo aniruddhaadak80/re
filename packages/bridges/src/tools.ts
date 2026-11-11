@@ -19,6 +19,8 @@ import { fridaSessionAttach, fridaSessionCollect, fridaSessionLoad, fridaSession
 import { SessionError } from './sessions/manager.js';
 import { ghidraApplyNames, ghidraExportNames, idaApplyNames, idaExportNames, r2ApplyNames, r2ExportNames } from './writeback/providers.js';
 import { NamesError } from './names.js';
+import { detect } from './detect.js';
+import { installFor } from './catalog.js';
 import { UnsafeArgumentError } from './exec.js';
 import { HookParamError } from './hooks.js';
 import type { BridgeTool, ToolId, ToolInputField } from './types.js';
@@ -44,11 +46,12 @@ const ALLOW = f('boolean', 'must be true: this runs or instruments code, only us
  * Tools that need exactly one program. For these the program is looked up before the input is
  * checked, so a missing program always answers { available: false, install } whatever the input.
  */
-function requiredTool(name: string): ToolId | undefined {
+function requiredTool(name: string): ToolId | ToolId[] | undefined {
   if (name.startsWith('bridge_adb_')) return 'adb';
   if (name.startsWith('bridge_gdb_session_')) return 'gdb';
   if (name.startsWith('bridge_lldb_session_')) return 'lldb';
   if (name.startsWith('bridge_frida_session_')) return 'frida';
+  if (name.startsWith('bridge_r2_session_') || name === 'bridge_r2_apply_names' || name === 'bridge_r2_export_names') return ['radare2', 'rizin'];
   return REQUIRES[name];
 }
 const REQUIRES: Record<string, ToolId> = {
@@ -56,11 +59,17 @@ const REQUIRES: Record<string, ToolId> = {
 };
 
 /** Wrap a run function so bad input comes back as { ok: false, error } instead of throwing. */
-function safe(run: (input: any) => Promise<unknown>, requires?: ToolId): (input: any) => Promise<unknown> {
+function safe(run: (input: any) => Promise<unknown>, requires?: ToolId | ToolId[]): (input: any) => Promise<unknown> {
   return async (input: any) => {
     if (requires) {
-      const n = await need(requires);
-      if ('missing' in n) return n.missing;
+      // any one of the listed programs is enough
+      let missing: unknown;
+      for (const id of Array.isArray(requires) ? requires : [requires]) {
+        const n = await need(id);
+        if (!('missing' in n)) { missing = undefined; break; }
+        missing ??= n.missing;
+      }
+      if (missing) return missing;
     }
     try {
       return await run(input ?? {});
@@ -490,6 +499,25 @@ const RAW: BridgeTool[] = [
     description: 'Export what was added to a radare2 or rizin project (names and comments that differ from a fresh analysis, plus RevLens labels) as a RevLens names JSON.',
     inputSchema: { path: PATH, engine: ENGINE, project: f('string', 'project name'), projectsDir: f('string', 'projects folder'), all: f('boolean', 'every function name'), outPath: f('string', 'also save the JSON here'), timeoutMs: TIMEOUT },
     run: (i) => r2ExportNames(i),
+  },
+  {
+    name: 'bridge_cutter_info',
+    description: 'Find Cutter (the rizin GUI) without starting it: AppImage, macOS app, Windows release or Scoop, Flatpak, distro package. Reports version, install kind, a rizin bundled with it, and how to open a file in it.',
+    inputSchema: { path: f('string', 'file you want to open in Cutter (only used to build the command line)') },
+    run: async (i) => {
+      const d = await detect('cutter');
+      if (!d.available) return { available: false, tool: 'cutter', reason: 'Cutter was not found on this machine.', install: installFor('cutter') };
+      const rz = await detect('rizin');
+      const bundled = typeof d.details?.bundledRizin === 'string' ? d.details.bundledRizin : null;
+      const launch = d.details?.kind === 'flatpak' ? ['flatpak', 'run', 're.rizin.cutter'] : [d.path!];
+      const file = typeof i.path === 'string' && i.path ? [i.path] : [];
+      return {
+        available: true, tool: 'cutter', version: d.version ?? null, path: d.path, via: d.via, kind: d.details?.kind ?? null, bundledRizin: bundled,
+        rizin: rz.available ? { path: rz.path, version: rz.version ?? null } : bundled ? { path: bundled, version: null, note: 'set REVLENS_RIZIN_PATH to this file to use it for bridge_r2_* with engine: rizin' } : null,
+        openCommand: [...launch, ...file],
+        note: 'RevLens does not drive the Cutter GUI. Use rizin directly (bridge_r2_* with engine: rizin, or bridge_r2_session_open) and write names into a rizin project with bridge_r2_apply_names, then open that project in Cutter.',
+      };
+    },
   },
   {
     name: 'bridge_ida_run',

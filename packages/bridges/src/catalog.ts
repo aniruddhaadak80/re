@@ -42,7 +42,7 @@ export const TOOL_META: Record<ToolId, ToolMeta> = {
   },
   cutter: {
     id: 'cutter', name: 'Cutter',
-    description: 'Graphical front end for rizin. Detected only, RevLens drives rizin directly.',
+    description: 'Graphical front end for rizin. Detected without starting it (AppImage, app bundle, Windows release, Scoop, Flatpak, distro package); RevLens drives rizin directly, including the rizin bundled with Cutter.',
     capabilities: ['gui'],
     requires: [],
     install: {

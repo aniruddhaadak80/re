@@ -107,7 +107,8 @@ function wellKnownDirs(id: ToolId, platform: NodeJS.Platform, env: NodeJS.Proces
     case 'radare2':
       return platform === 'win32' ? [...common, 'C:/radare2/bin', join(local, 'Programs', 'radare2', 'bin'), 'C:/radare2-*/bin'] : common;
     case 'rizin':
-      return platform === 'win32' ? [...common, join(pf, 'rizin', 'bin'), 'C:/rizin*/bin'] : common;
+      // Cutter's Windows release ships rizin.exe next to cutter.exe
+      return platform === 'win32' ? [...common, join(pf, 'rizin', 'bin'), 'C:/rizin*/bin', join(h, 'scoop', 'apps', 'cutter', 'current'), join(pf, 'Cutter*'), 'C:/Cutter*'] : common;
     case 'cutter':
       return platform === 'darwin' ? ['/Applications/Cutter.app/Contents/MacOS'] : platform === 'win32' ? [...common, 'C:/Cutter*'] : [...common, '/opt/cutter*'];
     case 'java':
@@ -374,6 +375,112 @@ function detectBinja(opts: DetectOptions): Detection {
   return base;
 }
 
+// ---------- Cutter ----------
+
+/** Version from a Cutter release name: Cutter-v2.5.0-Linux-x86_64.AppImage, Cutter-v2.5.0-Windows-x86_64, cutter-2.3.4. */
+export function cutterVersionFromName(name: string): string | undefined {
+  return /cutter[-_ ]?v?(\d+\.\d+\.\d+(?:-rc\d+)?)/i.exec(name)?.[1];
+}
+
+/** CFBundleShortVersionString (or CFBundleVersion) from an XML Info.plist. */
+export function plistVersion(xml: string): string | undefined {
+  const t = xml.slice(0, 256 * 1024);
+  return /<key>CFBundleShortVersionString<\/key>\s*<string>([^<]{1,64})<\/string>/.exec(t)?.[1]
+    ?? /<key>CFBundleVersion<\/key>\s*<string>([^<]{1,64})<\/string>/.exec(t)?.[1];
+}
+
+/** Newest <release version="..."> in an AppStream metainfo file (distro and Flatpak installs). */
+export function appdataVersion(xml: string): string | undefined {
+  return /<release\b[^>]*\bversion="([0-9][^"]{0,63})"/.exec(xml.slice(0, 512 * 1024))?.[1];
+}
+
+function readText(p: string, max = 512 * 1024): string | undefined {
+  try {
+    const st = statSync(p);
+    if (!st.isFile() || st.size > max) return undefined;
+    return readFileSync(p, 'utf8');
+  } catch { return undefined; }
+}
+
+/**
+ * Find Cutter without starting it (it is a GUI): override, PATH, AppImage downloads, the macOS app
+ * bundle, the Windows release folder or Scoop, distro packages and Flatpak. The version comes
+ * from the release name, Info.plist or AppStream metadata. A rizin shipped next to Cutter (the
+ * Windows release has rizin.exe beside cutter.exe) is reported as details.bundledRizin.
+ */
+export function detectCutter(opts: DetectOptions = {}): Detection {
+  const env = opts.env ?? process.env;
+  const platform = opts.platform ?? process.platform;
+  const h = home(env);
+  const base: Detection = { id: 'cutter', name: TOOL_META.cutter.name, available: false };
+  const done = (path: string, via: Detection['via'], kind: string, version: string | undefined, extra: Record<string, string | boolean | null> = {}): Detection => {
+    const dir = dirname(path);
+    const rz = ['rizin', 'rizin.exe'].map((n) => join(dir, n)).find((p) => isFile(p)) ?? null;
+    return { ...base, available: true, path, via, ...(version ? { version } : {}), details: { kind, bundledRizin: rz, ...extra } };
+  };
+  const appimageIn = (dir: string): string | undefined => {
+    let names: string[] = [];
+    try { names = readdirSync(dir); } catch { return undefined; }
+    const hits = names.filter((n) => /^cutter.*\.appimage$/i.test(n)).sort().reverse();
+    for (const n of hits) { const p = join(dir, n); if (isFile(p)) return p; }
+    return undefined;
+  };
+  const ov = env.REVLENS_CUTTER_PATH;
+  if (ov && isFile(ov)) return done(ov, 'override', /\.appimage$/i.test(ov) ? 'appimage' : 'binary', cutterVersionFromName(ov) ?? cutterVersionFromName(dirname(ov)));
+  if (platform === 'darwin') {
+    for (const app of ['/Applications/Cutter.app', join(h, 'Applications', 'Cutter.app')]) {
+      const exe = ['cutter', 'Cutter'].map((n) => join(app, 'Contents', 'MacOS', n)).find((p) => isFile(p));
+      if (!exe) continue;
+      const plist = readText(join(app, 'Contents', 'Info.plist'));
+      return done(exe, 'dir', 'app-bundle', plist ? plistVersion(plist) : undefined);
+    }
+  }
+  const onPath = findExecutable(['cutter', 'Cutter'], [], opts);
+  if (onPath) {
+    let real = onPath.path;
+    try { real = realpathSync(onPath.path); } catch { /* keep */ }
+    let version = cutterVersionFromName(real) ?? cutterVersionFromName(dirname(real));
+    if (!version && platform === 'linux') {
+      for (const m of ['/usr/share/metainfo/re.rizin.cutter.appdata.xml', '/usr/share/metainfo/re.rizin.cutter.metainfo.xml', '/usr/local/share/metainfo/re.rizin.cutter.appdata.xml']) {
+        const x = readText(m);
+        if (x) { version = appdataVersion(x); break; }
+      }
+    }
+    return done(onPath.path, 'path', /\.appimage$/i.test(real) ? 'appimage' : 'binary', version);
+  }
+  if (platform === 'win32') {
+    const pf = env.ProgramFiles || 'C:/Program Files';
+    const pats = [join(h, 'scoop', 'apps', 'cutter', 'current'), join(pf, 'Cutter*'), 'C:/Cutter*', 'C:/tools/cutter*', join(h, 'Downloads', 'Cutter*'), join(env.LOCALAPPDATA || join(h, 'AppData', 'Local'), 'Programs', 'Cutter*')];
+    for (const pat of pats) {
+      for (const d of expandPattern(pat)) {
+        for (const sub of [d, ...expandPattern(join(d, 'Cutter*'))]) {
+          const exe = join(sub, 'cutter.exe');
+          if (isFile(exe)) {
+            let real = sub;
+            try { real = realpathSync(sub); } catch { /* keep */ }
+            return done(exe, 'dir', 'binary', cutterVersionFromName(real) ?? cutterVersionFromName(sub));
+          }
+        }
+      }
+    }
+    return base;
+  }
+  // Linux and other POSIX: AppImage downloads, /opt, then Flatpak.
+  for (const d of [join(h, 'Applications'), join(h, 'Downloads'), join(h, '.local', 'bin'), join(h, 'bin'), join(h, 'Apps'), '/opt', ...expandPattern('/opt/cutter*')]) {
+    const p = appimageIn(d);
+    if (p) return done(p, 'dir', 'appimage', cutterVersionFromName(p));
+    const exe = join(d, 'cutter');
+    if (d.includes('cutter') && isFile(exe)) return done(exe, 'dir', 'binary', cutterVersionFromName(d));
+  }
+  for (const root of [join(h, '.local', 'share', 'flatpak'), '/var/lib/flatpak']) {
+    const app = join(root, 'app', 're.rizin.cutter', 'current', 'active');
+    if (!isDir(app)) continue;
+    const x = readText(join(app, 'files', 'share', 'metainfo', 're.rizin.cutter.appdata.xml')) ?? readText(join(app, 'files', 'share', 'metainfo', 're.rizin.cutter.metainfo.xml'));
+    return { ...base, available: true, path: app, via: 'dir', ...(x && appdataVersion(x) ? { version: appdataVersion(x)! } : {}), details: { kind: 'flatpak', launch: 'flatpak run re.rizin.cutter', bundledRizin: null } };
+  }
+  return base;
+}
+
 async function detectGeneric(id: ToolId, opts: DetectOptions): Promise<Detection> {
   const env = opts.env ?? process.env;
   const platform = opts.platform ?? process.platform;
@@ -447,6 +554,7 @@ export async function detectAll(opts: DetectOptions = {}): Promise<Map<ToolId, D
     if (id === 'ghidra') return detectGhidra(opts, java);
     if (id === 'ida') return detectIda(opts);
     if (id === 'binja') return detectBinja(opts);
+    if (id === 'cutter') return detectCutter(opts);
     return detectGeneric(id, opts);
   }));
   for (const d of results) out.set(d.id, d);
@@ -462,6 +570,7 @@ export async function detect(id: ToolId, opts: DetectOptions = {}): Promise<Dete
   if (id === 'ghidra') return detectGhidra(opts, await detectJava(opts));
   if (id === 'ida') return detectIda(opts);
   if (id === 'binja') return detectBinja(opts);
+  if (id === 'cutter') return detectCutter(opts);
   return detectGeneric(id, opts);
 }
 

@@ -42,7 +42,7 @@ test('every tool reports {available:false, install} when its program is missing'
   const code = `const { TOOLS } = await import(${JSON.stringify(join(repo, 'packages/bridges/src/tools.ts'))});
 const out = {};
 for (const t of TOOLS) {
-  if (t.name === 'bridge_doctor' || t.name === 'bridge_setup_mcp' || t.name === 'bridge_frida_templates') continue;
+  if (t.name === 'bridge_doctor' || t.name === 'bridge_setup_mcp' || t.name === 'bridge_frida_templates' || t.name === 'bridge_session_list' || t.name === 'bridge_session_close') continue;
   out[t.name] = await t.run({ path: ${JSON.stringify(ELF)}, function: 'main', functions: ['main'], query: 'x', package: 'com.example.app', breakpoints: ['main'], template: 'module-list', pid: 1, allowExecution: true });
 }
 process.stdout.write(JSON.stringify(out));`;

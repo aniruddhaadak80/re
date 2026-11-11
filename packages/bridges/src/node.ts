@@ -2,6 +2,7 @@
 // CLI_COMMANDS and the opt in Analyzers. Node only.
 export * from './index.js';
 export { runTool, withTempDir, checkArgs, spawnPlan, describeFailure, EXEC_LIMITS, UnsafeArgumentError, type RunOptions } from './exec.js';
+export { detectCutter, cutterVersionFromName, plistVersion, appdataVersion } from './detect.js';
 export { detect, detectAll, clearDetectionCache, findExecutable, expandPattern, parseVersion, javaMajor, readProperties, ghidraOsDir, type DetectOptions } from './detect.js';
 export { inventory, formatInventory, primaryInstall } from './doctor.js';
 export * from './setup.js';

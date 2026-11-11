@@ -27,6 +27,8 @@ Real output captured from the tools on the fixtures above, used by `test/parsers
 - `frida-ps.json`, `frida-ls-devices.txt`: frida-tools 17.26.2 in the sandbox.
 - `ilspy-l.txt`: ilspycmd 9.1.0.7988 `-l cisde hello-dotnet.dll`.
 - `adb-devices-empty.txt`: adb 1.0.41 `devices -l` with no device attached.
+- `gdb-mi-session-aarch64.txt`: gdb 16.3 `--interpreter=mi3` session on `crackme-aarch64-static.elf hunter2` (break, run, info registers pc, bt, an unknown command, continue, exit), used by `test/sessions.test.ts`.
+- `cutter/windows-release-v2.5.0-toplevel.txt`: the top level file names of the official `Cutter-v2.5.0-Windows-x86_64.zip` (github.com/rizinorg/cutter releases), read from the zip central directory with HTTP range requests. Only names, no Cutter files. Used by `test/cutter.test.ts` to rebuild the install layout.
 
 ## recorded/adb/
 
