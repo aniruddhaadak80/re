@@ -69,6 +69,9 @@ function head(tool: string, det: Detection, file: string) {
  * decompiled classes (paged). With `className` it returns that class's Java source.
  */
 export async function jadxDecompile(input: JadxInput & { className?: string; limit?: number; offset?: number; maxChars?: number }) {
+  if (input.className !== undefined && (typeof input.className !== 'string' || !CLASS_RE.test(input.className))) {
+    throw new BridgeInputError('className must be a Java class name like com.example.Foo');
+  }
   const r = await jadxRun(input);
   if ('missing' in r) return r.missing;
   const file = requireFile(input.path).path;
@@ -77,7 +80,6 @@ export async function jadxDecompile(input: JadxInput & { className?: string; lim
   const { files, truncated } = await listFiles(src, { filter: (p) => p.endsWith('.java'), maxFiles: 200_000 });
   const toClass = (p: string) => p.replace(/\.java$/, '').split('/').join('.');
   if (input.className !== undefined) {
-    if (typeof input.className !== 'string' || !CLASS_RE.test(input.className)) throw new BridgeInputError('className must be a Java class name like com.example.Foo');
     const want = input.className.replace(/\//g, '.').replace(/\$.*$/, '');
     const hit = files.find((f) => toClass(f.path) === want);
     if (!hit) {
