@@ -71,7 +71,7 @@ const LEDGER_PATH: Record<string, InputSpec> = { ledgerPath: { type: 'string', d
 export const TOOLS: ToolDef[] = [
   {
     name: 'x_demangle',
-    description: 'Demangle C++ (Itanium), Rust (legacy and v0) and MSVC symbols. Pass symbols, or a binary path to demangle its symbol table.',
+    description: 'Demangle C++ (Itanium), Rust (legacy and v0), MSVC and Swift (old _T and new $s/$S/_T0 mangling) symbols. Pass symbols, or a binary path to demangle its symbol table.',
     inputSchema: { symbols: { type: 'array', description: 'Mangled names', optional: true }, ...P, filter: { type: 'string', description: 'Keep demangled names containing this text', optional: true }, ...LIMIT },
     async run(i) {
       if (Array.isArray(i.symbols) || typeof i.symbols === 'string') {
@@ -82,7 +82,7 @@ export const TOOLS: ToolDef[] = [
       const img = parseBin(b);
       let names: { name: string; value: number }[] = [];
       if (img.format === 'elf') names = [...elfSymbols(img, 'symtab'), ...elfSymbols(img, 'dynsym')];
-      else if (img.format === 'macho') names = machoSymbols(b).map((s) => ({ name: s.name.startsWith('__Z') || s.name.startsWith('__R') ? s.name.slice(1) : s.name, value: s.value }));
+      else if (img.format === 'macho') names = machoSymbols(b).map((s) => ({ name: s.name.startsWith('__Z') || s.name.startsWith('__R') || s.name.startsWith('__T') ? s.name.slice(1) : s.name, value: s.value }));
       else { names = (peExports(b)?.functions ?? []).filter((f) => f.name).map((f) => ({ name: f.name as string, value: f.rva })); }
       const seen = new Set<string>();
       const rows: { mangled: string; demangled: string; scheme: string; address: string }[] = [];
