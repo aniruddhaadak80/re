@@ -1,27 +1,27 @@
 <div align="center">
 
-<img src="docs/assets/banner.svg" alt="RevLens: look inside any binary, bundle or package" width="100%" />
+<img src="docs/assets/banner.svg" alt="RevLens: look inside any binary, app, bundle or package" width="100%" />
 
 <p>
   <a href="https://github.com/aniruddhaadak80/re/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/aniruddhaadak80/re/ci.yml?branch=main&label=CI&style=flat-square&labelColor=0A0A0B&color=F5B301" /></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-F5B301?style=flat-square&labelColor=0A0A0B" /></a>
   <img alt="Node 22.12 or newer" src="https://img.shields.io/badge/node-%E2%89%A522.12-14B8A6?style=flat-square&logo=nodedotjs&logoColor=white&labelColor=0A0A0B" />
   <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-38BDF8?style=flat-square&logo=typescript&logoColor=white&labelColor=0A0A0B" />
-  <a href="docs/mcp.md"><img alt="MCP server" src="https://img.shields.io/badge/MCP-12_tools-10B981?style=flat-square&labelColor=0A0A0B" /></a>
+  <a href="docs/mcp-tools.md"><img alt="MCP tools" src="https://img.shields.io/badge/MCP-117_tools-10B981?style=flat-square&labelColor=0A0A0B" /></a>
   <a href="CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-FFD166?style=flat-square&labelColor=0A0A0B" /></a>
 </p>
 
-<h3>Look inside any binary, bundle or package. In your browser, your terminal, or your agent.</h3>
+<h3>Reverse engineer anything you can put in a file. In your browser, your terminal, or your agent.</h3>
 
 <p>
   <a href="https://aniruddhaadak80.github.io/re/"><b>Open the web app</b></a> ·
+  <a href="https://aniruddhaadak80.github.io/re/labs">Tools</a> ·
   <a href="https://aniruddhaadak80.github.io/re/docs">Docs</a> ·
-  <a href="https://aniruddhaadak80.github.io/re/blog">Blog</a> ·
   <a href="docs/getting-started.md">Getting started</a> ·
   <a href="docs/comparison.md">How it compares</a>
 </p>
 
-<code>npx revlens analyze ./your-file</code>
+<code>npx revlens setup claude-code --write</code>
 
 </div>
 
@@ -29,144 +29,104 @@
 
 ## Why RevLens
 
-Most reverse engineering tools ask you to install something large before you can ask a small question. Is this binary packed? Which npm packages are inside this bundle, and are any of them vulnerable? What can this browser extension actually do? Did the new release add a network endpoint?
+You have a file and a question. Is this binary packed? What does `main` do? Which permissions does this APK ask for, and who signed it? What is inside this Electron app, this PyInstaller build, this .NET assembly? Which hosts does this capture talk to?
 
-RevLens answers those questions in about a second, with no install beyond Node or a browser tab. The whole engine is pure TypeScript with zero native dependencies. It takes a `Uint8Array` and gives back one structured report, so the same code runs in three places:
+RevLens answers with evidence you can check: byte offsets, virtual addresses, section names and archive paths. The engine is TypeScript plus two WebAssembly decoders. It needs nothing native, so the same code runs in three places:
 
 - **In the browser**, inside a Web Worker. Your file never leaves your machine.
-- **In the terminal**, as `npx revlens`, with JSON, Markdown, HTML, SARIF and CycloneDX output.
-- **In your agent**, as an MCP stdio server with 12 small tools for Claude Code, Codex, Cursor, Gemini CLI and anything else that speaks MCP.
+- **In the terminal**, as `npx revlens`, with 83 commands and JSON, Markdown, HTML, SARIF and CycloneDX output.
+- **In your agent**, as an MCP server with 117 tools, 2 prompts and 2 resources, plus a ready made skill and plugins for Claude Code and Codex.
 
-We are not trying to replace Ghidra, IDA or radare2. RevLens is the fast triage and supply chain layer that runs first. When a file needs real decompilation, we tell you, and you hand it to REA, GhidraMCP, ida-pro-mcp or r2mcp with a clear head start.
+When you do have Ghidra, radare2, jadx, ILSpy, Frida or gdb installed, RevLens drives them too, and `revlens doctor` tells you what is missing and how to install it.
+
+RevLens is inspired by [REA, Reverse Engineer Anything](https://github.com/morluto/rea) by morluto. It is written from scratch and is not an official REA project.
+
+## What it covers
+
+| Area | Formats | What you get | Package |
+| --- | --- | --- | --- |
+| Triage, any file | ELF, PE, Mach-O, WASM, ZIP, JAR, APK, CRX, XPI, VSIX, npm tgz, ASAR, JS bundles, source maps | format, hashes (MD5, SHA, TLSH, CTPH), sections and entropy, imports with imphash, hardening, packers, strings, secrets, endpoints, ATT&CK capabilities, yara-lite rules, SBOM, OSV lookups, diffs, claim checks | `@revlens/core` |
+| Native code | ELF, PE, Mach-O on x86, x86-64, AArch64, ARM, Thumb, Go pclntab | functions, control flow graphs, xrefs, call graph, call paths, byte and instruction search, readable pseudo code | `@revlens/disasm` |
+| Android, Java, iOS | APK, DEX, JAR, class, IPA, IL2CPP metadata | manifest, signatures v1 to v3.1, smali matching baksmali, javap output, cross references, native libraries and JNI, IPA plist and entitlements, app frameworks | `@revlens/mobile` |
+| Managed runtimes | .NET, Python pyc and PyInstaller, Lua and LuaJIT, BEAM, EVM | metadata and CIL, dis output for 3.7 to 3.13, PyInstaller extraction, luac listings, BEAM chunks, EVM selectors and proxies | `@revlens/managed` |
+| JavaScript and Electron | JS, bundles, source maps, ASAR, live pages | beautify, deobfuscate, split bundles, endpoints, source recovery, Electron security audit, Playwright capture | `@revlens/webrt` |
+| Network and data | PCAP, pcapng, HAR, SQLite | flows, DNS, HTTP, TLS SNI and JA3, HAR review, schema and read only SELECT | `@revlens/webrt` |
+| Extras | ELF, PE, Mach-O, kernel modules, firmware (uImage, FIT, TRX, SquashFS, cpio, UEFI, UF2), GPU code, V8 and Hermes, GGUF and safetensors, LNK, Apple crash reports | C++, Rust and MSVC demangling, checksec, Go and Rust toolchain facts, deep PE (resources, version info, rich header, Authenticode), ELF notes and unwind ranges, Mach-O code signatures, an evidence and claims ledger, an agent eval harness | `@revlens/extras` |
+| External tools | radare2, rizin, Ghidra, jadx, apktool, ILSpy, Frida, gdb, lldb, objdump, binwalk, adb, IDA, Binary Ninja | decompiled C, Java and C#, dynamic runs with consent, doctor and client setup | `@revlens/bridges` |
+| One entry point | all of the above | `analyzeAll()` runs 34 analyzers into one report | `@revlens/engine` |
+
+Each area has a docs page: [disassembler](docs/disassembler.md), [mobile](docs/mobile.md), [managed runtimes](docs/managed-runtimes.md), [JavaScript and Electron](docs/javascript-and-electron.md), [network and data](docs/network-and-data.md), [bridges, doctor and setup](docs/bridges.md), [MCP tools reference](docs/mcp-tools.md) and [agent skills and plugins](docs/agent-skills-and-plugins.md).
 
 ## Quick start
 
+### Give your agent RevLens
+
+```bash
+npx revlens setup claude-code --write   # or codex, cursor, vscode, windsurf
+npx revlens doctor                      # optional: see which external tools you have
+```
+
+Setup shows the change first and backs up your config before it writes. Restart the client and ask something like "Use RevLens to triage ./app.apk and tell me what it does". Prefer to edit configs by hand? Copy one from [examples/mcp](examples/mcp).
+
+As a Claude Code plugin, with the skill included:
+
+```
+/plugin marketplace add aniruddhaadak80/re
+/plugin install revlens@revlens
+```
+
 ### In the browser
 
-Open **[aniruddhaadak80.github.io/re](https://aniruddhaadak80.github.io/re/)** and drop a file on the page, or press one of the "Try a sample" buttons. Analysis runs in a Web Worker on your device. Nothing is uploaded.
+Open **[aniruddhaadak80.github.io/re](https://aniruddhaadak80.github.io/re/)** and drop a file, or open the [tools](https://aniruddhaadak80.github.io/re/labs) and press "Try a sample". Analysis runs in a Web Worker on your device. Nothing is uploaded.
 
 ### In the terminal
 
 ```bash
-# analyze a file and print a readable summary
-npx revlens analyze ./esbuild.exe
-
-# write machine readable output
-npx revlens analyze ./ublock.xpi --json --out report.json
-npx revlens analyze ./dist/app.js --md --out report.md
-npx revlens analyze ./dist/app.js --html --out report.html
-
-# supply chain
-npx revlens sbom ./dist/app.js --cyclonedx --out bom.json
-npx revlens sbom ./dist/app.js --osv            # opt in network lookup on OSV.dev
-
-# code scanning
-npx revlens sarif ./build/app.exe --out revlens.sarif
-
-# compare two releases
-npx revlens diff ./esbuild-0.23.0.exe ./esbuild-0.24.0.exe
-
-# your own rules
-npx revlens rules ./suspicious.bin --rules ./my-rules.yar
-
-# check a claim against the bytes
-npx revlens verify ./esbuild.exe --claim '{"kind":"imports-symbol","symbol":"CreateRemoteThread"}'
+npx revlens analyze ./app.elf                 # every analyzer, readable summary
+npx revlens decompile ./app.elf main          # pseudo code for one function
+npx revlens apk ./app.apk                     # manifest, signatures, DEX, findings
+npx revlens dotnet ./App.dll il "App.License::Check"
+npx revlens pyinstaller ./tool.exe list
+npx revlens electron-audit ./app.asar
+npx revlens pcap-summary ./capture.pcap
+npx revlens sqlite-query ./app.db "SELECT * FROM users LIMIT 5"
+npx revlens verify ./app.elf string=api.example.com
+npx revlens sarif ./dist/app.js --out revlens.sarif
+npx revlens bridge ghidra_decompile ./app.elf --functions main
 ```
 
-The full reference lives in [docs/cli.md](docs/cli.md).
-
-### In your agent (MCP)
-
-RevLens ships a stdio MCP server, `@revlens/mcp`. Pick your client:
-
-<details open>
-<summary><b>Claude Code</b></summary>
-
-```bash
-claude mcp add revlens -- npx -y @revlens/mcp
-```
-
-Or commit a project scoped `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "revlens": {
-      "command": "npx",
-      "args": ["-y", "@revlens/mcp"]
-    }
-  }
-}
-```
-</details>
-
-<details>
-<summary><b>OpenAI Codex CLI</b></summary>
-
-Codex reads TOML from `~/.codex/config.toml`:
-
-```toml
-[mcp_servers.revlens]
-command = "npx"
-args = ["-y", "@revlens/mcp"]
-```
-</details>
-
-<details>
-<summary><b>Cursor</b></summary>
-
-Add this to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per project):
-
-```json
-{
-  "mcpServers": {
-    "revlens": {
-      "command": "npx",
-      "args": ["-y", "@revlens/mcp"]
-    }
-  }
-}
-```
-</details>
-
-<details>
-<summary><b>Gemini CLI</b></summary>
-
-Add this to `~/.gemini/settings.json`:
-
-```json
-{
-  "mcpServers": {
-    "revlens": {
-      "command": "npx",
-      "args": ["-y", "@revlens/mcp"]
-    }
-  }
-}
-```
-</details>
-
-The server exposes 12 tools: `analyze_file`, `list_findings`, `get_strings`, `get_sections`, `get_imports`, `sbom`, `check_vulns`, `scan_rules`, `diff_files`, `verify_claim`, `hexdump` and `list_analyzers`. See [docs/mcp.md](docs/mcp.md) for what each one returns.
+Every command takes `--json`. Run `npx revlens --help` for the full list, or see [docs/cli.md](docs/cli.md).
 
 ### As a library
 
 ```ts
 import { readFile } from 'node:fs/promises';
-import { analyze, toSARIF, verifyClaim } from '@revlens/core';
+import { analyzeAll } from '@revlens/engine';
+import { verifyClaim } from '@revlens/core';
+import { disasmPseudocode } from '@revlens/disasm';
 
-const bytes = new Uint8Array(await readFile('esbuild.exe'));
-const report = await analyze(bytes, { name: 'esbuild.exe' });
-
-console.log(report.file.format, report.file.arch);   // pe x86-64
-console.log(report.hardening?.imphash);              // b196866f0bf37f1f128fa153413b744f
-console.log(verifyClaim(bytes, { kind: 'imports-symbol', symbol: 'CreateRemoteThread' }, report).verdict); // REFUTED
+const bytes = new Uint8Array(await readFile('app.elf'));
+const report = await analyzeAll(bytes, { name: 'app.elf' });
+console.log(report.file.format, report.meta.disasm);
+console.log((await disasmPseudocode({ bytes, function: 'main' })).pseudocode);
+console.log(verifyClaim(bytes, { kind: 'contains-string', value: 'api.example.com' }, report).verdict);
 ```
+
+### In CI
+
+[examples/github-actions/revlens-scan.yml](examples/github-actions/revlens-scan.yml) scans what you ship and sends findings to GitHub code scanning. This repository scans its own build the same way on every push.
+
+## How agents use it
+
+The MCP server tells the agent to start with `analyze_file`, follow its `next` hint to the tools for the format, and check claims with `verify_claim` before reporting them. The [revlens-reverse-engineer skill](.agents/skills/revlens-reverse-engineer/SKILL.md) spells out the full workflow: triage, the right tool family per format, decompiling through bridges when they are installed, citing byte evidence, and verifying before stating facts. Tools that write files, start programs or reach the network say so in their MCP annotations, and anything that runs the target needs an explicit `allowExecution` flag.
+
+Registry and plugin files: [server.json](server.json) for the official MCP registry (`io.github.aniruddhaadak80/revlens`), [.claude-plugin](.claude-plugin) and [.codex-plugin](.codex-plugin).
 
 <img src="docs/assets/divider.svg" alt="" width="100%" />
 
-## What it finds
+## Core analyzers
 
-RevLens runs 15 analyzers in a fixed order: structure first, then content, then rules. Each one decides for itself whether it applies to the file. Full details, including limits, are in [docs/analyzers.md](docs/analyzers.md).
+The core runs 15 analyzers on every file, before the package analyzers. They run in a fixed order: structure first, then content, then rules. Each one decides for itself whether it applies to the file. Full details, including limits, are in [docs/analyzers.md](docs/analyzers.md).
 
 | Analyzer | Reads | Reports |
 | --- | --- | --- |
@@ -192,7 +152,7 @@ Every file also gets MD5, SHA-1, SHA-256, a TLSH-like locality digest and a CTPH
 
 ## Real example output
 
-Everything below is real output from RevLens 0.1.0 on public files. Nothing is edited except for trimming long lists.
+Everything below is real output from RevLens on public files. Nothing is edited except for trimming long lists.
 
 ### A Go binary for Windows: `esbuild.exe` 0.24.0
 
@@ -284,29 +244,22 @@ An agent says "this binary injects code with CreateRemoteThread". RevLens checks
 
 ## How it compares
 
-We read every project's README and docs on 2026-11-10. If we got something wrong, please open a pull request and we will fix it fast. "Partial" means the feature exists through an external tool or in a narrow form.
+The full, honest table is in [docs/comparison.md](docs/comparison.md). The short version:
 
-| | **RevLens** | [REA](https://github.com/morluto/rea) | [GhidraMCP](https://github.com/LaurieWired/GhidraMCP) | [ida-pro-mcp](https://github.com/mrexodia/ida-pro-mcp) | [r2mcp](https://github.com/radareorg/radare2-mcp) | [jshookmcp](https://github.com/vmoranv/jshookmcp) |
+| | **RevLens** | [REA](https://github.com/morluto/rea) | [GhidraMCP](https://github.com/LaurieWired/GhidraMCP) | [ida-pro-mcp](https://github.com/mrexodia/ida-pro-mcp) | [r2mcp](https://github.com/radareorg/radare2-mcp) | [jadx-mcp](https://github.com/zinja-coder/jadx-mcp-server) |
 | --- | --- | --- | --- | --- | --- | --- |
-| What you install | Node, or nothing (browser) | Node plus engines you choose | Ghidra, Java, plugin | IDA Pro license | radare2 | Node, browser automation |
+| What you install | Node, or nothing (browser) | Node plus engines you choose | Ghidra, Java, plugin | IDA Pro | radare2 | jadx plugin, Python |
 | Runs in the browser | Yes | No | No | No | No | No |
-| Deep decompilation | No, hands off | Yes, through engines | Yes | Yes | Yes | Partial, through bridges |
-| ELF, PE, Mach-O headers and imports | Yes | Yes | Yes | Yes | Yes | Partial |
-| Entropy and packer detection | Yes | No | No | No | Partial | Partial |
-| YARA style rules, no native yara | Yes | No | No | No | Partial | No |
-| Capabilities mapped to ATT&CK | Yes | No | No | No | No | No |
-| SBOM from JS bundles | Yes | No | No | No | No | No |
-| OSV vulnerability lookup | Yes, opt in | No | No | No | No | No |
-| Source map detection | Yes | Partial | No | No | No | Yes, with rebuild |
-| Secrets scanning | Yes | Partial | No | No | No | Partial |
-| Extension, VSIX and npm tarball audit | Yes | No | No | No | No | No |
-| Release to release diff | Yes | Partial | No | No | Partial | No |
-| SARIF for code scanning | Yes | No | No | No | No | No |
-| Claim verification against bytes | Yes | Partial, evidence first | No | No | No | No |
-| Runtime hooking (Frida) | No | Yes | No | No | No | Yes |
-| License | MIT | MIT | Apache-2.0 | MIT | MIT | AGPL-3.0 |
+| Built in disassembler and pseudo code | Yes, light | Through engines | Yes, Ghidra | Yes, Hex-Rays | Yes | Android only |
+| Full decompiler | Through bridges (Ghidra, r2ghidra, jadx, ILSpy) | Yes, through engines | Yes | Yes | Yes, with plugins | Yes, Java |
+| Android, .NET, Python, Lua, BEAM, EVM without installs | Yes | Partial, most need engines | No | No | No | Android with jadx |
+| JS bundles, Electron, PCAP, HAR, SQLite | Yes | Yes | No | No | No | No |
+| Supply chain: SBOM, OSV, SARIF, rules, diff | Yes | Partial | No | No | No | No |
+| Claim checks against bytes | Yes | Partial, evidence first | No | No | No | No |
+| Runtime hooking | Through Frida and gdb bridges, with consent | Yes | No | Debugger plugin | Partial | No |
+| License | MIT | MIT | Apache-2.0 | MIT | MIT | Apache-2.0 |
 
-The honest summary: if you need to read decompiled functions, rename variables or hook a running process, use one of the others. If you need answers about a file in seconds, in CI, in a browser tab or inside an agent loop with a small context budget, RevLens is built for that. They work well together. More in [docs/comparison.md](docs/comparison.md).
+If you live in Ghidra or IDA and want to rename and annotate a database, use their MCP servers. If you want one toolkit that answers first with nothing installed, works in CI and in a browser tab, and uses the big engines when they are there, RevLens is built for that.
 
 <img src="docs/assets/divider.svg" alt="" width="100%" />
 
@@ -491,31 +444,6 @@ flowchart LR
   classDef sky fill:#38BDF8,stroke:#0284C7,color:#0A0A0B
 ```
 
-### 7. Roadmap
-
-```mermaid
-%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#F5B301", "primaryTextColor": "#0A0A0B", "primaryBorderColor": "#FFD166", "lineColor": "#14B8A6", "taskBkgColor": "#14B8A6", "taskBorderColor": "#0F766E", "taskTextColor": "#0A0A0B", "activeTaskBkgColor": "#F5B301", "activeTaskBorderColor": "#FFD166", "doneTaskBkgColor": "#10B981", "doneTaskBorderColor": "#047857", "sectionBkgColor": "#1A1608", "altSectionBkgColor": "#101012", "gridColor": "#2A2A30", "todayLineColor": "#38BDF8"}}}%%
-gantt
-  title RevLens roadmap
-  dateFormat YYYY-MM-DD
-  axisFormat %b %Y
-  section 0.1 Launch
-  Core, 15 analyzers, CLI, MCP, web app  :done, a1, 2026-10-20, 2026-11-10
-  section 0.2 Depth
-  PE rich header and resources           :active, b1, 2026-11-11, 30d
-  DEX and Java class parsing             :b2, after b1, 30d
-  Source map tree export as zip          :b3, 2026-11-20, 25d
-  section 0.3 Supply chain
-  SPDX 2.3 output                        :c1, 2026-12-15, 20d
-  cargo-auditable dependency decoding    :c2, after c1, 25d
-  AST fingerprints for unbannered bundles :c3, 2027-01-10, 40d
-  section 0.4 Agents
-  MCP resources and pagination           :d1, 2027-02-01, 25d
-  Handoff packets for REA and Ghidra MCP :d2, after d1, 30d
-```
-
-<img src="docs/assets/divider.svg" alt="" width="100%" />
-
 ## yara-lite in one minute
 
 RevLens includes a pure TypeScript engine for a practical subset of the YARA language. No native `yara` binary, no WASM blob. Rules you already have for strings and hex patterns usually work as they are.
@@ -595,14 +523,16 @@ More recipes, including several artifacts per run and failing the job on high fi
 
 ## Roadmap
 
-These are the things we want to build next, roughly in order. Ideas and pull requests are welcome on every one of them.
+1.0 shipped the disassembler, mobile, managed runtime, web runtime, extras and bridges packages, the combined engine, the tools pages, MCP over HTTP and the agent plugins. Next, roughly in order. Ideas and pull requests are welcome on every one of them.
 
-- **Deeper PE:** rich header, version resources, overlay detection and certificate parsing.
-- **More formats:** DEX and Java class files, Python `.pyc`, PDF objects.
-- **Source map recovery:** export the rebuilt source tree as a zip from the web app.
-- **SBOM depth:** SPDX 2.3 output, cargo-auditable decoding, and AST fingerprints for bundles that strip banners.
-- **yara-lite:** hex alternations, `for` loops and a small `pe` module.
-- **Agents:** MCP resources with pagination, and handoff packets that give REA, GhidraMCP or ida-pro-mcp a ready list of addresses to look at.
+- **Native depth:** jump table and `switch` recovery, stack variables and simple types in the pseudo code, constant propagation for indirect calls.
+- **Mobile:** AAB protobuf manifests, Hermes bytecode disassembly, app component graphs.
+- **Managed:** BEAM code disassembly, Python 3.14 opcodes, P/Invoke to native export matching.
+- **Bridges:** writing names back to Ghidra and IDA projects, the rest of the adb suite.
+- **Network:** HTTP/2 and QUIC summaries, TCP reassembly past gaps.
+- **Supply chain:** SPDX 2.3 output and AST fingerprints for bundles without banners.
+
+Translations of this page: [বাংলা](docs/readme/README.bn.md), [हिन्दी](docs/readme/README.hi.md), [中文](docs/readme/README.zh.md), [日本語](docs/readme/README.ja.md), [Español](docs/readme/README.es.md). Walkthroughs with real output: [docs/showcases](docs/showcases).
 
 ## Contributing
 

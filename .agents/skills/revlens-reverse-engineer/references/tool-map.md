@@ -1,6 +1,6 @@
 # RevLens tool map
 
-Generated from the server by scripts/gen-tool-docs.mjs. 87 tools.
+Generated from the server by scripts/gen-tool-docs.mjs. 117 tools.
 
 ## Core triage and evidence
 
@@ -76,6 +76,39 @@ Generated from the server by scripts/gen-tool-docs.mjs. 87 tools.
 - `web_sqlite_query` (reads only): Run one read-only SELECT on a SQLite file: SELECT cols\|*\|COUNT(*) FROM table [WHERE ...] [ORDER BY col [DESC]] [LIMIT n [OFFSET m]]. WHERE supports comparisons, AND/OR/NOT, LIKE, GLOB, IN, BETWEEN and IS NULL. Anything
 - `web_har_summary` (reads only): Summarize a HAR file: hosts (third-party marked), API endpoint patterns, methods, statuses, MIME types, redirects, slowest requests, auth header schemes and cookie names (values never returned), missing security headers,
 - `web_browser_capture` (network): Open a URL in a headless browser (Playwright, optional dependency, Node only) and record network requests as HAR entries, loaded and inline scripts with source, console messages, cookie names and flags, storage keys, Web
+
+## Extras
+
+- `x_demangle` (reads only): Demangle C++ (Itanium), Rust (legacy and v0) and MSVC symbols. Pass symbols, or a binary path to demangle its symbol table.
+- `x_container` (reads only): Unified container view of ELF, PE or Mach-O (fat slices too): machine, entry, sections and segments with file offsets and addresses.
+- `x_read_bytes` (reads only): Read up to 64 KiB of raw bytes at a file offset or at a virtual address, as hex and printable text.
+- `x_search_bytes` (reads only): Search a file for a hex pattern with ?? wildcards (for example "48 8b ?? 24") or a text string (ASCII and UTF-16LE). Hits include offset, address and section.
+- `x_address_map` (reads only): Convert a virtual address to a file offset, or a file offset to a virtual address, with the section and segment it falls in.
+- `x_checksec` (reads only): Hardening checks for ELF, PE and Mach-O: RELRO, NX, PIE, canary, FORTIFY, CET, BTI and PAC, ASLR, CFG, SafeSEH, code signing, with byte evidence and a score.
+- `x_go_symbols` (reads only): Recover Go function names, source files and packages from pclntab, also on stripped binaries (Go 1.2 to 1.24).
+- `x_rust_info` (reads only): Rust toolchain and crate evidence: rustc version and commit, crates with versions from registry paths, symbol schemes, panic strings.
+- `x_pe_inspect` (reads only): Deep PE view: headers and checksum, rich header, resources, version info, manifest, debug and PDB path, TLS callbacks, load config, exports, delay imports, overlay, installer detection (NSIS, Inno, MSI, WiX, InstallShiel
+- `x_pe_resources` (reads only): PE resources with type, name, language, file offset, size and sniffed content type, plus version info, manifest and string tables.
+- `x_pe_authenticode` (reads only): Authenticode signatures of a PE: recomputes the image digest, compares it with the signed digest, verifies the signer signature, lists certificates, signing time and countersignature.
+- `x_elf_inspect` (reads only): ELF notes (build-id, ABI tag, GNU properties, Go and package notes), dynamic section (NEEDED, SONAME, RPATH, RUNPATH, flags) and init/fini array targets.
+- `x_elf_unwind` (reads only): Function ranges from .eh_frame_hdr and .eh_frame FDEs (start, end, size, FDE and CIE offsets). Useful function boundaries for stripped binaries.
+- `x_kernel_module` (reads only): Linux kernel module (.ko) facts: modinfo, vermagic, dependencies, signature trailer, plus IKCONFIG kernel build config recovery from a kernel image.
+- `x_macho_inspect` (reads only): Mach-O load commands, UUID, build version, dylibs with @rpath resolution, rpaths, encryption info and code signature (code directories, cdhash, entitlements, CMS signer, hardened runtime).
+- `x_firmware_scan` (reads only): Find embedded images at any offset (binwalk style, headers validated): uImage, FIT/DTB, squashfs, cpio, UEFI volumes, TRX, UF2, Android boot and sparse, UBI, JFFS2, CramFS, ext, ELF, PEM, gzip, xz, zstd, lz4, lzma, bzip2
+- `x_firmware_parse` (reads only): Parse one firmware structure at an offset: uimage, fdt (device tree or FIT), ihex, srec, uf2, dfu, esp, android-boot, squashfs (with file listing), cpio, uefi (firmware volume and files), trx.
+- `x_v8_inspect` (reads only): JavaScript engine artifacts: V8 code cache and bytenode .jsc (magic, version hash, flag hash, source length, payload length), V8 startup snapshot blobs (version string), Hermes bytecode headers.
+- `x_gpu_inspect` (reads only): GPU code objects: CUDA fatbin entries (PTX or cubin, sm_ target, compression), cubin kernels, PTX entries, AMD HSA code objects (gfx target, kernels), SPIR-V (version, capabilities, entry points), clang offload bundles i
+- `x_model_inspect` (reads only): Model files: GGUF metadata and tensor table, safetensors header, NumPy .npy header. Checks tensor sizes against dtypes and file bounds.
+- `x_lnk_inspect` (reads only): Windows shortcut (.lnk): target path, arguments, working dir, icon, timestamps, volume serial and label, tracker machine id, extra data blocks.
+- `x_apple_ips` (reads only): Apple .ips crash and diagnostic reports: process, OS, exception, termination reason, crashed thread frames joined to their images with absolute addresses.
+- `x_ledger_record` (writes files): Record a claim about a file in the evidence ledger, bound to byte ranges by SHA-256. Optional check is a RevLens claim (contains-string, bytes-at, format-is, sha256-is) run on verify.
+- `x_ledger_unknown` (writes files): Record an open question (unknown) in the ledger, or resolve, reject or reopen a claim or unknown by id.
+- `x_ledger_verify` (writes files): Re-read the files behind ledger claims and check every evidence hash and structured check. Claims become verified, refuted (bytes changed) or stale (file missing).
+- `x_ledger_list` (reads only): Current claims and unknowns with status, evidence and history, plus a summary (verified share, open unknowns, chain head).
+- `x_ledger_export` (reads only): Export the ledger as hash-chained JSON (revlens/ledger@1) or as a Markdown table for a report.
+- `x_ledger_import` (writes files): Import an exported ledger after checking its schema and hash chain. Replaces the session ledger, or writes ledgerPath.
+- `x_eval_tasks` (reads only): Reverse engineering eval tasks with hidden ground truth on the RevLens sample fixtures. Answer them with any tools, then score with x_eval_score.
+- `x_eval_score` (reads only): Score answers to x_eval_tasks against ground truth verified with reference tools. Pass answers as {taskId: answer}.
 
 ## External tool bridges
 

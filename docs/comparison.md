@@ -47,7 +47,7 @@ We built this page from each project's README and docs as of 2026-11-10. Project
 | Runtime hooking with Frida | No | Yes | No | No | No | Yes |
 | Live website and network capture | No | Yes | No | No | No | Yes |
 | Android APK deep analysis | Partial, listing and manifest | Yes | No | No | No | Partial |
-| Number of MCP tools | 12 | About 200 | A focused set | A focused set | A focused set | 736, with a search profile |
+| Number of MCP tools | 117 | About 200 | A focused set | A focused set | A focused set | 736, with a search profile |
 
 ## When to use which
 
