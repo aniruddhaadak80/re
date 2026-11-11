@@ -198,6 +198,20 @@ if os.path.exists(ips):
     ft = b['threads'][b['faultingThread']]; fr = ft['frames'][0]; im = b['usedImages'][fr['imageIndex']]
     ref['ips'] = {'proc': b['procName'], 'exception': b['exception']['type'], 'signal': b['exception']['signal'], 'threads': len(b['threads']), 'images': len(b['usedImages']), 'frame0': {'symbol': fr['symbol'], 'image': im['name'], 'address': hex(im['base'] + fr['imageOffset'])}}
 
+
+# squashfs and cpio: unsquashfs 4.6.1 and GNU cpio 2.15 (Debian arm64 debs, set SQ_BIN)
+SQ = os.environ.get('SQ_BIN', '/tmp/sq/usr/bin')
+env = dict(os.environ, LD_LIBRARY_PATH=os.path.join(os.path.dirname(SQ), 'lib', 'aarch64-linux-gnu') + ':' + os.environ.get('LD_LIBRARY_PATH', ''))
+if os.path.exists(os.path.join(SQ, 'unsquashfs')):
+    out = subprocess.run([os.path.join(SQ, 'unsquashfs'), '-lls', p('rootfs.squashfs')], capture_output=True, text=True, env=env, check=True).stdout
+    ents = []
+    for l in out.splitlines():
+        m = re.match(r'^([dl-])([rwx-]{9}) \S+\s+(\d+) \S+ \S+ squashfs-root(\S*)(?: -> (\S+))?$', l)
+        if m and m.group(4): ents.append({'path': m.group(4), 'type': {'d': 'dir', 'l': 'symlink', '-': 'file'}[m.group(1)], 'size': int(m.group(3)) if m.group(1) == '-' else None, 'target': m.group(5)})
+    ref['squashfs'] = ents
+    out = subprocess.run([os.path.join(SQ, 'cpio'), '-tv'], stdin=open(p('rootfs.cpio'), 'rb'), capture_output=True, env=env, check=True).stdout.decode()
+    ref['cpio'] = [{'name': l.split()[-3] if '->' in l else l.split()[-1], 'mode': l.split()[0], 'size': int(l.split()[4])} for l in out.splitlines() if l and l[0] in 'dl-']
+
 json.dump(ref, open(p('reference.json'), 'w'), indent=1, sort_keys=True)
 print('reference.json written,', len(ref), 'groups')
 
@@ -228,6 +242,7 @@ task('macho-cdhash', 'What is the cdhash (first 20 bytes, hex) of the code direc
 task('macho-dylibs', 'Which dylibs does this Mach-O load?', 'hello-arm64.macho', ['macho'], 'set', ref['macho_hello']['dylibs'], 'lief libraries', ['x_macho_inspect'])
 task('fw-dtb-offset', 'At what file offset does the flattened device tree start in this blob?', 'fw-blob.bin', ['firmware'], 'int', [x for x in ref['binwalk'] if 'device tree' in x['desc']][0]['offset'], 'binwalk 2.4.3 signature scan', ['x_firmware_scan'])
 task('fw-uimage-name', 'What image name does the uImage header carry?', 'fw-blob.bin', ['firmware'], 'exact', ref['uimage']['name'], 'uboot parse_img', ['x_firmware_scan', 'x_firmware_parse'])
+task('squashfs-files', 'Which regular files does this squashfs image contain (full paths)?', 'rootfs.squashfs', ['firmware'], 'set', [e['path'] for e in ref.get('squashfs', []) if e['type'] == 'file'], 'unsquashfs -lls', ['x_firmware_parse'])
 task('dtb-model', 'What is the model property of the device tree root node?', 'board.dtb', ['firmware'], 'exact', ref['dtb']['model'], 'fdt parse_dtb', ['x_firmware_parse'])
 task('ihex-start', 'What is the lowest address with data in this Intel HEX file?', 'fw.hex', ['firmware'], 'hex', hex(ref['ihex']['min']), 'intelhex minaddr', ['x_firmware_parse'])
 task('gguf-arch', 'What architecture does this GGUF model declare?', 'tiny.gguf', ['model'], 'exact', ref['gguf']['arch'], 'gguf-py GGUFReader', ['x_model_inspect'])

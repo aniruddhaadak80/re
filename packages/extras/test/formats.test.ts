@@ -157,3 +157,20 @@ test('Apple .ips: real macOS 12 report with a trailing System Profile matches Py
   assert.equal(r.crashedFrames[0]!.address, REF.ips.frame0.address);
   assert.match(r.trailer ?? '', /^System Profile:/);
 });
+
+test('squashfs listing (gzip) matches unsquashfs -lls 4.6.1', async () => {
+  const sq = await X.parseSquashfs(fx('rootfs.squashfs'), 0, { list: true });
+  assert.equal(sq.compression, 'gzip');
+  const got = sq.entries!.map((e) => ({ path: e.path, type: e.type, size: e.type === 'file' ? e.size : null, target: e.type === 'symlink' ? e.target : null }));
+  assert.deepEqual(got, REF.squashfs.map((e: { path: string; type: string; size: number | null; target: string | null }) => ({ path: e.path, type: e.type, size: e.size, target: e.target })));
+  assert.ok(X.scanFirmware(fx('rootfs.squashfs')).some((h) => h.type === 'squashfs' && h.offset === 0));
+});
+
+test('cpio newc listing matches GNU cpio 2.15 -tv', () => {
+  const c = X.parseCpio(fx('rootfs.cpio'));
+  assert.equal(c.format, 'newc');
+  assert.equal(c.trailer, true);
+  const mode = (m: string, t: string) => (t === 'dir' ? 'd' : t === 'symlink' ? 'l' : '-') + [...Number.parseInt(m, 8).toString(2).padStart(9, '0')].map((b, i) => (b === '1' ? 'rwx'[i % 3] : '-')).join('');
+  assert.deepEqual(c.entries.map((e) => ({ name: e.name, mode: mode(e.mode, e.type), size: e.size })), REF.cpio);
+  assert.equal(c.entries.find((e) => e.name === 'bin/sh')!.target, 'busybox');
+});

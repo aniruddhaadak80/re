@@ -27,6 +27,58 @@
    "offset": 17664
   }
  ],
+ "cpio": [
+  {
+   "mode": "drwxr-xr-x",
+   "name": ".",
+   "size": 0
+  },
+  {
+   "mode": "drwxr-xr-x",
+   "name": "bin",
+   "size": 0
+  },
+  {
+   "mode": "-rw-r--r--",
+   "name": "bin/busybox",
+   "size": 5000
+  },
+  {
+   "mode": "lrwxrwxrwx",
+   "name": "bin/sh",
+   "size": 7
+  },
+  {
+   "mode": "drwxr-xr-x",
+   "name": "etc",
+   "size": 0
+  },
+  {
+   "mode": "-rw-r--r--",
+   "name": "etc/hostname",
+   "size": 14
+  },
+  {
+   "mode": "-rw-r--r--",
+   "name": "etc/passwd",
+   "size": 30
+  },
+  {
+   "mode": "drwxr-xr-x",
+   "name": "usr",
+   "size": 0
+  },
+  {
+   "mode": "drwxr-xr-x",
+   "name": "usr/lib",
+   "size": 0
+  },
+  {
+   "mode": "-rw-r--r--",
+   "name": "usr/lib/data.txt",
+   "size": 8893
+  }
+ ],
  "dtb": {
   "compatible": [
    "revlens,test-board",
@@ -6336,6 +6388,62 @@
    "version": "1.0"
   }
  },
+ "squashfs": [
+  {
+   "path": "/bin",
+   "size": null,
+   "target": null,
+   "type": "dir"
+  },
+  {
+   "path": "/bin/busybox",
+   "size": 5000,
+   "target": null,
+   "type": "file"
+  },
+  {
+   "path": "/bin/sh",
+   "size": null,
+   "target": "busybox",
+   "type": "symlink"
+  },
+  {
+   "path": "/etc",
+   "size": null,
+   "target": null,
+   "type": "dir"
+  },
+  {
+   "path": "/etc/hostname",
+   "size": 14,
+   "target": null,
+   "type": "file"
+  },
+  {
+   "path": "/etc/passwd",
+   "size": 30,
+   "target": null,
+   "type": "file"
+  },
+  {
+   "path": "/usr",
+   "size": null,
+   "target": null,
+   "type": "dir"
+  },
+  {
+   "path": "/usr/lib",
+   "size": null,
+   "target": null,
+   "type": "dir"
+  },
+  {
+   "path": "/usr/lib/data.txt",
+   "size": 8893,
+   "target": null,
+   "type": "file"
+  }
+ ],
  "uimage": {
   "arch": "2",
   "dataCrc": 3893830384,

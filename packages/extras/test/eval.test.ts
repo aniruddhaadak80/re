@@ -30,6 +30,7 @@ async function oracle(id: string, file: string): Promise<unknown> {
     case 'macho-dylibs': return (await run('x_macho_inspect', { path })).dylibs.map((d: { name: string }) => d.name);
     case 'fw-dtb-offset': return (await run('x_firmware_scan', { path })).items.find((h: { type: string }) => h.type === 'fdt').offset;
     case 'fw-uimage-name': { const h = (await run('x_firmware_scan', { path })).items.find((x: { type: string }) => x.type === 'uimage'); return (await run('x_firmware_parse', { path, kind: 'uimage', at: h.offset })).name; }
+    case 'squashfs-files': return (await run('x_firmware_parse', { path, kind: 'squashfs' })).entries.items.filter((e: { type: string }) => e.type === 'file').map((e: { path: string }) => e.path);
     case 'dtb-model': return (await run('x_firmware_parse', { path, kind: 'fdt' })).root.props.model.text;
     case 'ihex-start': return (await run('x_firmware_parse', { path, kind: 'ihex' })).regions[0].start;
     case 'gguf-arch': return (await run('x_model_inspect', { path })).architecture;

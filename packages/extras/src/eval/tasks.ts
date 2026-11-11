@@ -301,6 +301,25 @@ export const TASKS: EvalTask[] = [
   ]
  },
  {
+  "id": "squashfs-files",
+  "question": "Which regular files does this squashfs image contain (full paths)?",
+  "file": "samples/extras/rootfs.squashfs",
+  "tags": [
+   "firmware"
+  ],
+  "answerType": "set",
+  "answer": [
+   "/bin/busybox",
+   "/etc/hostname",
+   "/etc/passwd",
+   "/usr/lib/data.txt"
+  ],
+  "reference": "unsquashfs -lls",
+  "hint": [
+   "x_firmware_parse"
+  ]
+ },
+ {
   "id": "dtb-model",
   "question": "What is the model property of the device tree root node?",
   "file": "samples/extras/board.dtb",

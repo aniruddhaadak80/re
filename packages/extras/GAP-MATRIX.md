@@ -1,7 +1,7 @@
 # RevLens vs rea gap matrix
 
 Compared against morluto/rea v6.8.0 (source clone, MCP catalog in docs, 174 contract tool names, 194 CLI command names, 60+ src/ provider folders). 
-Rows group related rea tools. Status: covered, partial, missing. "Before" is the state of all RevLens branches at feat/extras ce77aa5; "after" is the state once this branch's planned extras work lands (updated when it is built).
+Rows group related rea tools. Status: covered, partial, missing. "Before" is the state of all RevLens branches at feat/extras ce77aa5; "after" is the state at the head of feat/extras after this round of work, every after-change backed by tests against reference tools.
 Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/GAP-MATRIX.md`.
 
 
@@ -94,7 +94,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | inspect_evm_interface | src/evm | managed | covered | covered | selectors and disassembly |
 | inspect_wasm_artifact / compare_wasm_interfaces | src/wasm | core | covered | covered | WASM sections and imports in core; diff_files for interfaces |
 | inspect_v8_code_cache | src/v8 | extras | missing | covered | x_v8_inspect: code cache header, version hash, flags hash, source hash, bytenode detection and snapshot blob |
-| Hermes bytecode | src/javascript | extras | missing | covered | x_v8_inspect also reads Hermes HBC header (version, counts) |
+| Hermes bytecode | src/javascript | extras | missing | partial | x_v8_inspect reads the Hermes HBC header (version, counts); not yet checked against a real hermesc output, no bytecode disassembly |
 
 ## MCP tools: web, browser, Electron, network
 
@@ -123,7 +123,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | inspect_firmware_regions | src/firmware | extras | covered | covered | uImage, FIT, TRX, UF2, DfuSe, ESP32, Android boot, UEFI volumes |
 | inspect_devicetree | src/firmware | extras | covered | covered | full FDT tree with typed props |
 | hex records (Intel HEX, SREC) | src/firmware | extras | covered | covered | checksum per record, regions, optional binary image |
-| inspect_gpu_code_objects | src/gpu | extras | missing | covered | x_gpu_inspect: CUDA fatbin entries, cubin sm_ targets and kernels, PTX entries, SPIR-V header, capabilities and entry points, AMD HSA code objects |
+| inspect_gpu_code_objects | src/gpu | extras | missing | partial | x_gpu_inspect: PTX, AMD HSA code objects and SPIR-V verified on real LLVM and glslang output; CUDA fatbin and cubin readers follow the documented layout but no nvcc output was available to verify them |
 | inspect_model_artifact | src/model | extras | missing | covered | x_model_inspect: GGUF metadata and tensors, safetensors header, with dtype size checks |
 | inspect_windows_shortcut | src/windows | extras | missing | covered | x_lnk_inspect: LNK header, target IDList, link info, string data |
 | Windows registry hive, Prefetch, Jump Lists (open requests) | issues #9865 #9423 #9866 | extras | missing | missing | left |
@@ -167,7 +167,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | state | covered | partial | missing |
 |---|---|---|---|
 | before | 49 | 26 | 40 |
-| after | 64 | 26 | 25 |
+| after | 62 | 28 | 25 |
 
 ## Where RevLens already exceeds rea
 

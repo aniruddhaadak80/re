@@ -17,11 +17,13 @@ Small real files used by the @revlens/extras tests. Generators live in `src/`.
 | fw-blob.bin, uimage.bin | `src/make_firmware_fixture.py`: uImage written by the `uboot` PyPI package, gzip, board.dtb and an ELF header at fixed offsets | MIT (this repo) |
 | jiter-0.5.0.so | the Rust extension from `jiter-0.5.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl` on PyPI (pydantic/jiter) | MIT |
 | orjson-3.10.7.so | the Rust extension from `orjson-3.10.7-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl` on PyPI | Apache-2.0 or MIT |
-| sample.ips | see `src/make_ips_fixture.py` | MIT (this repo) |
+| go-hello-stripped.elf | `src/hello.go`, Go 1.23.4 `GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-s -w"` (reference addresses come from `go tool nm` on the same build without -s -w) | BSD-3-Clause (Go runtime), MIT (this repo) |
+| rootfs.squashfs, rootfs.cpio | a 9 entry tree packed with mksquashfs 4.6.1 (`-comp gzip -all-root -mkfs-time 0 -all-time 0`) and GNU cpio 2.15 (`-o -H newc --owner=0:0 --reproducible`) from the Debian arm64 packages | MIT (this repo) |
+| reference.json | `packages/extras/scripts/gen_reference.py`: answers from the independent tools listed in the package README | MIT (this repo) |
 
 Fetched at test time, not committed (`packages/extras/scripts/fetch-fixtures.mjs` writes `samples/.cache/extras/`):
 
 | file | source | why not committed |
 |---|---|---|
 | strings64.exe | https://download.sysinternals.com/files/Strings.zip (Microsoft signed) | Sysinternals license does not allow redistribution |
-| go-hello | built locally with Go when available, see the script | toolchain dependent |
+| WindowServer.ips | https://gist.github.com/luckman212/5b645096c44936ba8530071fa6a23efd (a public macOS 12 crash report) | no license stated, so it is not redistributed |

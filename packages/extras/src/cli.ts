@@ -1,7 +1,7 @@
 // CLI commands for @revlens/extras. Each wraps one agent tool: the first bare argument is
 // the file path, --key value pairs become tool inputs, and --json prints raw JSON.
 
-import type { CliCommand, ToolDef } from './util.js';
+import { inputBytes, utf8, type CliCommand, type ToolDef } from './util.js';
 import { TOOLS } from './tools.js';
 
 function parseArgs(argv: string[], tool: ToolDef): { input: Record<string, unknown>; json: boolean } {
@@ -65,6 +65,11 @@ function command(cmd: string, toolName: string, summary: string): CliCommand {
       if (argv.includes('--help') || argv.includes('-h')) { console.log(`${this.usage}\n${tool.description}`); return 0; }
       const { input, json } = parseArgs(argv, tool);
       try {
+        // --answers @answers.json style: load JSON object and array inputs from a file
+        for (const [k, v] of Object.entries(input)) {
+          const t = tool.inputSchema[k]?.type;
+          if ((t === 'object' || t === 'array') && typeof v === 'string' && v.startsWith('@')) input[k] = JSON.parse(utf8(await inputBytes({ path: v.slice(1) })));
+        }
         const out = await tool.run(input);
         console.log(json ? JSON.stringify(out, null, 2) : renderText(out));
         return 0;
