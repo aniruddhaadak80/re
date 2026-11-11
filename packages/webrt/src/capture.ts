@@ -147,12 +147,13 @@ export async function browserCapture(url: string, opts: CaptureOptions = {}): Pr
       if (!s.trim() || res.scripts.length >= maxScripts) continue;
       res.scripts.push({ url: `${res.finalUrl}#inline-${res.scripts.length}`, inline: true, size: s.length, sha256: await sha256Hex(s), truncated: s.length > maxScriptBytes, source: s.slice(0, maxScriptBytes) });
     }
-    const storage = await pageObj.evaluate(async () => {
-      const keys = (st: Storage | undefined) => { try { return st ? Object.keys(st).slice(0, 500) : []; } catch { return []; } };
-      let idb: string[] = [];
-      try { const dbs = await (indexedDB as unknown as { databases?: () => Promise<{ name?: string }[]> }).databases?.(); idb = (dbs ?? []).map((d) => String(d.name ?? '')).slice(0, 200); } catch { /* not supported */ }
+    // passed as a string so transpilers cannot inject helpers (such as __name) that do not exist in the page
+    const storage = await pageObj.evaluate(`(async () => {
+      const keys = (st) => { try { return st ? Object.keys(st).slice(0, 500) : []; } catch { return []; } };
+      let idb = [];
+      try { const dbs = await (indexedDB.databases ? indexedDB.databases() : []); idb = (dbs || []).map((d) => String(d.name || '')).slice(0, 200); } catch { /* not supported */ }
       return { localStorage: keys(window.localStorage), sessionStorage: keys(window.sessionStorage), indexedDB: idb };
-    }).catch(() => ({ localStorage: [], sessionStorage: [], indexedDB: [] }));
+    })()`).catch(() => ({ localStorage: [], sessionStorage: [], indexedDB: [] }));
     res.storage = storage;
     const cookies = await context.cookies().catch(() => []);
     res.cookies = cookies.slice(0, 500).map((c: any) => ({ name: c.name, domain: c.domain, path: c.path, secure: c.secure, httpOnly: c.httpOnly, sameSite: c.sameSite, session: c.expires === -1 }));
