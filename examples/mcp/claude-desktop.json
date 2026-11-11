@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "revlens": {
+      "command": "npx",
+      "args": ["-y", "@revlens/mcp"]
+    }
+  }
+}

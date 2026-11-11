@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "revlens",
+  "description": "RevLens plugins for Claude Code: the MCP server plus the reverse engineering skill.",
+  "owner": {
+    "name": "Aniruddha Adak",
+    "url": "https://github.com/aniruddhaadak80"
+  },
+  "plugins": [
+    {
+      "name": "revlens",
+      "description": "Reverse engineer binaries, apps, bytecode, bundles, captures and databases with evidence you can check.",
+      "version": "1.0.0",
+      "source": "./",
+      "category": "development",
+      "homepage": "https://aniruddhaadak80.github.io/re/"
+    }
+  ]
+}

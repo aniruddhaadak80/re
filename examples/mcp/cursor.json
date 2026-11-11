@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "revlens": {
+      "command": "npx",
+      "args": ["-y", "@revlens/mcp"],
+      "env": { "REVLENS_MAX_FILE_MB": "256" }
+    }
+  }
+}

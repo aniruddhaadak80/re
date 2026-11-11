@@ -1,6 +1,7 @@
 {
   "name": "@revlens/mcp",
   "version": "1.0.0",
+  "mcpName": "io.github.aniruddhaadak80/revlens",
   "description": "RevLens MCP server: give Claude Code, Codex, Cursor, VS Code and other agents a zero-install reverse engineering toolkit with disassembly, pseudo code, mobile, .NET, Python, JavaScript, Electron, PCAP and SQLite tools.",
   "license": "MIT",
   "type": "module",
@@ -48,5 +49,6 @@
       "types": "./dist/server.d.ts",
       "default": "./dist/server.js"
     }
-  }
+  },
+  "homepage": "https://aniruddhaadak80.github.io/re/"
 }

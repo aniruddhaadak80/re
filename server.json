@@ -1,0 +1,54 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.aniruddhaadak80/revlens",
+  "title": "RevLens",
+  "description": "Reverse engineer binaries, apps, bytecode, bundles, captures and databases from any agent.",
+  "websiteUrl": "https://aniruddhaadak80.github.io/re/",
+  "repository": {
+    "url": "https://github.com/aniruddhaadak80/re",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@revlens/mcp",
+      "version": "1.0.0",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "REVLENS_MAX_FILE_MB",
+          "description": "Largest file the tools will read, in MB. Default 256.",
+          "isRequired": false,
+          "format": "number"
+        },
+        {
+          "name": "REVLENS_BRIDGES_DISABLE",
+          "description": "Comma list of external tool bridges to turn off, or all.",
+          "isRequired": false,
+          "format": "string"
+        }
+      ]
+    },
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "revlens",
+      "version": "1.0.0",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp"
+        }
+      ]
+    }
+  ]
+}

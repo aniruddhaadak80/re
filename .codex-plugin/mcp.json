@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "revlens": {
+      "command": "npx",
+      "args": ["-y", "@revlens/mcp@1.0.0"],
+      "startup_timeout_sec": 60
+    }
+  }
+}

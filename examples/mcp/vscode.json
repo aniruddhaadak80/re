@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "revlens": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@revlens/mcp"]
+    }
+  }
+}

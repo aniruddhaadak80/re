@@ -1,0 +1,29 @@
+{
+  "name": "revlens",
+  "version": "1.0.0",
+  "description": "Reverse engineer binaries, apps, bytecode, bundles, captures and databases with evidence you can check.",
+  "author": {
+    "name": "Aniruddha Adak",
+    "url": "https://github.com/aniruddhaadak80"
+  },
+  "homepage": "https://aniruddhaadak80.github.io/re/",
+  "repository": "https://github.com/aniruddhaadak80/re",
+  "license": "MIT",
+  "keywords": ["reverse-engineering", "binary-analysis", "disassembler", "android", "dotnet", "mcp-server"],
+  "skills": "./.agents/skills",
+  "mcpServers": "./.codex-plugin/mcp.json",
+  "interface": {
+    "displayName": "RevLens",
+    "shortDescription": "Reverse engineering with evidence",
+    "longDescription": "Triage any file, disassemble native code, read APK, DEX, .NET, Python, Lua, BEAM and EVM bytecode, unpack JavaScript bundles and Electron apps, summarize packet captures and SQLite files, and check every claim against the bytes. Uses Ghidra, radare2, jadx and ILSpy when they are installed.",
+    "developerName": "Aniruddha Adak",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read"],
+    "websiteURL": "https://aniruddhaadak80.github.io/re/",
+    "defaultPrompt": [
+      "Use RevLens to triage this file and tell me what it is and what it does.",
+      "Use RevLens to explain what main does in this binary, with addresses.",
+      "Use RevLens to list the endpoints and permissions of this APK."
+    ]
+  }
+}

@@ -1,6 +1,7 @@
 {
   "name": "revlens",
   "version": "1.0.0",
+  "mcpName": "io.github.aniruddhaadak80/revlens",
   "description": "RevLens CLI: reverse engineer binaries, bundles, apps, bytecode, captures and databases. Triage, disassembly, pseudo code, SBOM, secrets, rules and diffs. Zero native dependencies.",
   "license": "MIT",
   "type": "module",
@@ -38,5 +39,6 @@
     "url": "https://github.com/aniruddhaadak80/re.git",
     "directory": "packages/cli"
   },
-  "author": "Aniruddha Adak"
+  "author": "Aniruddha Adak",
+  "homepage": "https://aniruddhaadak80.github.io/re/"
 }

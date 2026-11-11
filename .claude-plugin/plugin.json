@@ -1,0 +1,20 @@
+{
+  "name": "revlens",
+  "version": "1.0.0",
+  "description": "Reverse engineer binaries, apps, bytecode, bundles, captures and databases with evidence you can check.",
+  "author": {
+    "name": "Aniruddha Adak",
+    "url": "https://github.com/aniruddhaadak80"
+  },
+  "homepage": "https://aniruddhaadak80.github.io/re/",
+  "repository": "https://github.com/aniruddhaadak80/re",
+  "license": "MIT",
+  "keywords": ["reverse-engineering", "binary-analysis", "disassembler", "android", "dotnet", "mcp-server"],
+  "skills": "./.agents/skills",
+  "mcpServers": {
+    "revlens": {
+      "command": "npx",
+      "args": ["-y", "@revlens/mcp@1.0.0"]
+    }
+  }
+}
