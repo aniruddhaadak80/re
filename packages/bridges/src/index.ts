@@ -13,3 +13,7 @@ export * from './parsers/adb.js';
 export * from './parsers/ghidra.js';
 export { HOOK_TEMPLATES, buildHookScript, HookParamError, type HookTemplate, type HookTemplateId } from './hooks.js';
 export { GHIDRA_EXPORT_SCRIPT, GHIDRA_SCRIPT_NAME, IDA_EXPORT_SCRIPT } from './scripts.js';
+export * from './parsers/mi.js';
+export { checkR2Command, checkGdbCommand, checkLldbCommand, miQuote } from './sessions/guards.js';
+export * from './names.js';
+export { GHIDRA_APPLY_SCRIPT, GHIDRA_APPLY_SCRIPT_NAME, GHIDRA_NAMES_EXPORT_SCRIPT, GHIDRA_NAMES_EXPORT_SCRIPT_NAME, IDA_APPLY_SCRIPT, IDA_NAMES_EXPORT_SCRIPT } from './writeback/scripts.js';

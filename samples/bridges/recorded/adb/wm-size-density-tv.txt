@@ -1,0 +1,2 @@
+Physical size: 1280x720
+Physical density: 213

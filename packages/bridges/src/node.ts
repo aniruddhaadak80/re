@@ -2,6 +2,7 @@
 // CLI_COMMANDS and the opt in Analyzers. Node only.
 export * from './index.js';
 export { runTool, withTempDir, checkArgs, spawnPlan, describeFailure, EXEC_LIMITS, UnsafeArgumentError, type RunOptions } from './exec.js';
+export { detectCutter, cutterVersionFromName, plistVersion, appdataVersion } from './detect.js';
 export { detect, detectAll, clearDetectionCache, findExecutable, expandPattern, parseVersion, javaMajor, readProperties, ghidraOsDir, type DetectOptions } from './detect.js';
 export { inventory, formatInventory, primaryInstall } from './doctor.js';
 export * from './setup.js';
@@ -13,6 +14,19 @@ export { ghidraFunctions, ghidraDecompile, ghidraExport, type GhidraInput } from
 export { jadxDecompile, jadxSearch, apktoolDecode, ilspyDecompile, parseIlspyTypes, type JadxInput } from './providers/jvm.js';
 export { fridaPs, fridaDevices, fridaRun, gdbRun, lldbRun, debugRun, gdbArgs, lldbArgs, type FridaRunInput, type DebugRunInput } from './providers/dynamic.js';
 export { objdump, binwalkScan, adbDevices, adbPackages, adbPullApk, adbLogcat, idaRun, binjaFunctions, BINJA_EXPORT_SCRIPT, type ObjdumpInput } from './providers/static.js';
+export {
+  adbInstall, adbUninstall, adbPush, adbPull, adbStartActivity, adbStopApp, adbDumpsysPackage, adbListComponents, adbResolveActivity, adbPmPath,
+  adbScreenshot, adbScreenrecord, adbDisplay, adbInput, adbGetprop, adbSettings, adbPs, adbLs, adbLogcatFiltered, adbBugreport, adbBackup, adbPortMap,
+  amStartArgs, shQuote, checkRemotePath, requireDeviceChange, deviceSummary, type StartActivityInput,
+} from './providers/adb.js';
+export { SESSIONS, SessionManager, SessionError, PipeProcess, SESSION_LIMITS, type SessionInfo, type SessionKind } from './sessions/manager.js';
+export { r2SessionOpen, r2SessionCmd, gdbSessionOpen, gdbSessionCmd, lldbSessionOpen, lldbSessionCmd, sessionList, sessionClose } from './sessions/debuggers.js';
+export {
+  fridaSessionAttach, fridaSessionLoad, fridaSessionPost, fridaSessionCollect, fridaSessionUnload, fridaSessionResume, findFridaPython, FRIDA_SESSION_HELPER,
+  type FridaEventRecord,
+} from './sessions/frida.js';
+export { ghidraApplyNames, ghidraExportNames, idaApplyNames, idaExportNames, r2ApplyNames, r2ExportNames, namesToR2Script, r2Name, loadNames } from './writeback/providers.js';
+export { ghidraCachedProject } from './providers/ghidra.js';
 export { TOOLS } from './tools.js';
 export { CLI_COMMANDS, parseArgv, toolInput, renderResult } from './cli.js';
 export { ANALYZERS, r2Analyzer, jadxAnalyzer, inventoryAnalyzer } from './analyzer.js';
