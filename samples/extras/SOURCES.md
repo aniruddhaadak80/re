@@ -53,3 +53,19 @@ Fetched by `fetch-fixtures.mjs` (not committed, 1.7 MB and 5 MB): `maccy-Assets.
 `maccy-Maccy.macho` from Maccy 2.8.0 `Maccy.app.zip` (MIT, https://github.com/p0deje/Maccy/releases/tag/2.8.0).
 The Assets.car test checks the facet names against the asset catalog source of that release
 (https://github.com/p0deje/Maccy/tree/2.8.0/Maccy/Assets.xcassets).
+
+## containers/ (wxapkg, UnityFS, single-file JavaScript executables)
+
+| File | Source | License |
+| --- | --- | --- |
+| `demo.wxapkg` | `src/wxapkg/` packed with KillWxapkg v2.4.1 `-repack` (https://github.com/Ackites/KillWxapkg, built with Go 1.23.4) | MIT (this repo) |
+| `demo-pc-encrypted.wxapkg` | `demo.wxapkg` encrypted the way the WeChat PC client does (PBKDF2-SHA1 AppID key, AES-CBC first 1024 bytes, XOR rest) for AppID `wx1234567890abcdef`; KillWxapkg decrypts it back byte for byte | MIT (this repo) |
+| `ExternalAssets.unity3d` | Unity 5.5.0f3 asset bundle from https://github.com/rygo6/CardExample-Unity/blob/master/ExternalAssets/ExternalAssets | MIT |
+| `ExternalAssets-lz4.unity3d` | the same bundle rewritten by UnityPy 1.10.18 `BundleFile.save(packer="lz4")` (LZ4 data block, blocks info at the end) | MIT |
+| `node-sea-prep.blob` | `node --experimental-sea-config src/standalone/sea-config.json` with node 22.23.3 | MIT (this repo) |
+| `bun-1.4.4-graph.bin` | the module graph section (length, graph, offsets, trailer) cut from `bun build --compile src/standalone/app.ts` with Bun 1.4.4 linux-aarch64 | MIT (this repo) |
+| `deno-2.9.8-payload.bin` | the d3n0l4nd payload cut from `deno compile --no-check src/standalone/app.ts` with Deno 2.9.8 linux-aarch64 | MIT (this repo) |
+
+`packages/extras/scripts/make_standalone_fixtures.sh` rebuilds the full 100 MB executables into
+`samples/.cache/extras/standalone/` (not committed); `fetch-fixtures.mjs` downloads the 1.2 MB
+`unity-cards.unity3d` bundle (CardExample-Unity, MIT).

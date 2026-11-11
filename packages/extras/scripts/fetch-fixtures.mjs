@@ -46,6 +46,8 @@ const jobs = [
   // Maccy 2.8.0 (MIT, https://github.com/p0deje/Maccy): a real Xcode-built Assets.car and a Swift Mach-O
   ['maccy-Assets.car', async () => unzipMember(await maccy(), 'Maccy.app/Contents/Resources/Assets.car')],
   ['maccy-Maccy.macho', async () => unzipMember(await maccy(), 'Maccy.app/Contents/MacOS/Maccy')],
+  // CardExample-Unity (MIT, https://github.com/rygo6/CardExample-Unity): a 1.2 MB Unity 5.5 asset bundle with 52 textures
+  ['unity-cards.unity3d', async () => get('https://raw.githubusercontent.com/rygo6/CardExample-Unity/master/ExternalAssets/cards')],
 ];
 let maccyZip;
 async function maccy() { return (maccyZip ??= await get('https://github.com/p0deje/Maccy/releases/download/2.8.0/Maccy.app.zip')); }

@@ -12,6 +12,9 @@ import { decodeKeyedArchive, isKeyedArchive } from './apple/keyedarchive.js';
 import { parseNib, summarizeNib, isNibArchive } from './apple/nib.js';
 import { parseAssetCatalog } from './apple/car.js';
 import { jsonSafe } from './tools.js';
+import { parseWxapkgAny, wxapkgMember } from './containers/wxapkg.js';
+import { parseUnityFs, unityNodeBytes, parseSerializedFile } from './containers/unityfs.js';
+import { inspectStandaloneJs, standaloneFile } from './containers/standalone.js';
 
 const P = PATH_INPUT;
 const LIMIT: Record<string, InputSpec> = {
@@ -120,4 +123,62 @@ export const APPLE_TOOLS: ToolDef[] = [
   },
 ];
 
-export const GAP_TOOLS: ToolDef[] = [...WINDOWS_TOOLS, ...APPLE_TOOLS];
+const hexOf = (d: Uint8Array, max = 4096): string => { let h = ''; for (const x of d.subarray(0, max)) h += x.toString(16).padStart(2, '0'); return h; };
+const textOrHex = (d: Uint8Array, max = 65536): { text?: string; hex?: string; size: number; truncated: boolean } => {
+  const s = new TextDecoder('utf-8', { fatal: false }).decode(d.subarray(0, max));
+  return /[\x00-\x08\x0e-\x1f]|\uFFFD/.test(s) ? { hex: hexOf(d, Math.min(max, 4096)), size: d.length, truncated: d.length > 4096 } : { text: s, size: d.length, truncated: d.length > max };
+};
+
+export const CONTAINER_TOOLS: ToolDef[] = [
+  {
+    name: 'x_wxapkg',
+    description: 'WeChat mini program package (.wxapkg): member table with offsets and sizes, app config, pages, kind (main, subpackage, plugin, game). Decrypts PC client V1MMWX packages when appId is given. With member, returns that file (text or hex).',
+    inputSchema: { ...P, appId: { type: 'string', description: 'Mini program AppID (wx...) to decrypt a V1MMWX package', optional: true }, member: { type: 'string', description: 'Member path to read, for example /app-service.js', optional: true }, ...LIMIT },
+    async run(i) {
+      const w = await parseWxapkgAny(await inputBytes(i), { appId: i.appId });
+      const { bytes, ...rest } = w;
+      if (i.member) {
+        const e = w.entries.find((x) => x.name === i.member || x.name === '/' + String(i.member).replace(/^\//, ''));
+        if (!e) throw new ParseError(`member not found: ${i.member}`);
+        return { member: e, ...textOrHex(wxapkgMember(bytes, e)) };
+      }
+      return { ...rest, entries: page(w.entries, num(i.offset, 0), num(i.limit, 500)) };
+    },
+  },
+  {
+    name: 'x_unity_bundle',
+    description: 'Unity asset bundle (UnityFS): header, Unity version, blocks (compression), node table; each serialized file summarised with target platform, types and objects by class (path id, offset, size). LZ4/LZ4HC and uncompressed blocks are decoded; LZMA blocks are listed only.',
+    inputSchema: { ...P, objects: { type: 'boolean', description: 'Include the object list of each serialized file (paged)', optional: true }, ...LIMIT },
+    async run(i) {
+      const b = await inputBytes(i);
+      const u = parseUnityFs(b);
+      const files = u.nodes.map((n) => {
+        try {
+          const d = unityNodeBytes(b, u, n);
+          if (n.flags & 4) { const s = parseSerializedFile(d); return { node: n.path, serialized: { ...s, objects: i.objects ? page(s.objects, num(i.offset, 0), num(i.limit, 200)) : undefined } }; }
+          return { node: n.path, size: d.length, preview: textOrHex(d, 512) };
+        } catch (e) { return { node: n.path, error: (e as Error).message }; }
+      });
+      return { ...u, files };
+    },
+  },
+  {
+    name: 'x_standalone_js',
+    description: 'JavaScript apps packed into one executable: Node.js SEA (fuse state, NODE_SEA_BLOB with entry script, code cache, assets, exec argv), Bun --compile (embedded module graph with sources) and Deno compile (metadata JSON, entrypoint, permissions, embedded files). With file, returns that embedded file.',
+    inputSchema: { ...P, file: { type: 'string', description: 'Embedded module, asset or entry name to read', optional: true } },
+    async run(i) {
+      const b = await inputBytes(i);
+      const s = inspectStandaloneJs(b);
+      if (i.file) {
+        let d = standaloneFile(b, s, String(i.file));
+        const df = s.deno?.files.find((f) => f.path === i.file);
+        if (!d && df) d = b.subarray(df.offset, df.offset + df.size);
+        if (!d) throw new ParseError(`embedded file not found: ${i.file}`);
+        return { file: i.file, ...textOrHex(d) };
+      }
+      return s;
+    },
+  },
+];
+
+export const GAP_TOOLS: ToolDef[] = [...WINDOWS_TOOLS, ...APPLE_TOOLS, ...CONTAINER_TOOLS];

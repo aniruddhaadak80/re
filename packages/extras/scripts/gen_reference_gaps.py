@@ -203,7 +203,56 @@ def apple():
     return out
 
 
-SECTIONS = {'apple': apple, 'registry': registry, 'prefetch': prefetch, 'jumplists': jumplists}
+def containers():
+    import subprocess, tempfile, shutil
+    C = os.path.join(S, 'containers')
+    out = {'wxapkg': {}, 'unity': {}, 'standalone': {}}
+    # KillWxapkg (MIT, https://github.com/Ackites/KillWxapkg, built with Go 1.23) unpacks and decrypts
+    kill = os.environ.get('KILLWXAPKG', '/tmp/killwx')
+    # KillWxapkg pretty prints JSON members, so those are compared as parsed JSON
+    for f, appid in [('demo.wxapkg', None), ('demo-pc-encrypted.wxapkg', 'wx1234567890abcdef')]:
+        d = tempfile.mkdtemp()
+        shutil.copy(os.path.join(C, f), d)
+        o = tempfile.mkdtemp()
+        cmd = [kill, '-in', os.path.join(d, f), '-out', o, '-id', appid or 'wx0000000000000000']
+        subprocess.run(cmd, check=True, capture_output=True)
+        files = {}
+        for root, _, names in os.walk(o):
+            for n in names:
+                pth = os.path.join(root, n)
+                rel = '/' + os.path.relpath(pth, o).replace(os.sep, '/')
+                if rel.endswith('.wxapkg'):
+                    continue
+                b = open(pth, 'rb').read()
+                files[rel] = {'json': json.loads(b)} if rel.endswith('.json') else {'size': len(b), 'sha256': hashlib.sha256(b).hexdigest()}
+        out['wxapkg'][f] = {'appid': appid, 'files': files}
+    import UnityPy
+    for f in ['ExternalAssets.unity3d', 'ExternalAssets-lz4.unity3d', 'unity-cards.unity3d']:
+        p = os.path.join(C, f) if not f.startswith('unity-cards') else os.path.join(ROOT, 'samples', '.cache', 'extras', f)
+        if not os.path.exists(p):
+            continue
+        env = UnityPy.load(p)
+        bf = list(env.files.values())[0]
+        nodes = []
+        for name, sf in bf.files.items():
+            raw = sf.reader.bytes if hasattr(sf, 'reader') else None
+            nodes.append({'path': name, 'size': len(raw) if raw is not None else None, 'sha256': hashlib.sha256(raw).hexdigest() if raw is not None else None,
+                          'serializedVersion': sf.header.version, 'unityVersion': sf.unity_version, 'platform': int(sf.target_platform),
+                          'objects': [[str(o.path_id), int(o.class_id), o.byte_start, o.byte_size] for o in sf.objects.values()]})
+        out['unity'][f] = {'signature': bf.signature, 'version': bf.version, 'player': bf.version_player, 'engine': bf.version_engine, 'flags': int(bf.dataflags), 'nodes': nodes}
+    src = os.path.join(S, 'src', 'standalone')
+    sha = lambda b: hashlib.sha256(b).hexdigest()
+    blob = open(os.path.join(C, 'node-sea-prep.blob'), 'rb').read()
+    out['standalone'] = {
+        'nodeSeaBlob': {'size': len(blob), 'sha256': sha(blob), 'codePath': json.load(open(os.path.join(src, 'sea-config.json')))['main'],
+                        'mainSha256': sha(open(os.path.join(src, 'hello.js'), 'rb').read()), 'asset': 'greeting.txt', 'assetSha256': sha(open(os.path.join(src, 'greeting.txt'), 'rb').read())},
+        'bun': {'module': '/$bunfs/root/app-bun', 'contentsSha256': sha(open(os.path.join(src, 'bun-build-target-bun.js'), 'rb').read()), 'version': '1.4.4'},
+        'deno': {'entrypoint': 'app.ts', 'files': {n: sha(open(os.path.join(src, n), 'rb').read()) for n in ['app.ts', 'lib.ts']}, 'version': '2.9.8'},
+    }
+    return out
+
+
+SECTIONS = {'containers': containers, 'apple': apple, 'registry': registry, 'prefetch': prefetch, 'jumplists': jumplists}
 
 if __name__ == '__main__':
     ref = json.load(open(OUT)) if os.path.exists(OUT) else {}
