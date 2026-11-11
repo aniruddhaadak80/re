@@ -17,7 +17,7 @@ export interface OpenOptions extends LoadOptions, DecoderOptions {
   quickDiscovery?: boolean;
   /** max instructions decoded per function (default 20000) */
   maxFunctionInsns?: number;
-  /** analyzed functions kept in memory, counted in instructions (default 250000) */
+  /** analyzed functions kept in memory, counted in instructions (default 60000); whole program passes do not fill it */
   cacheInsns?: number;
 }
 
@@ -55,6 +55,8 @@ export class Program {
   readonly functions = new Map<number, FunctionInfo>();
   private sortedFuncs: number[] | undefined;
   private readonly cache = new Map<number, AnalyzedFunction>();
+  /** end address of every function built so far (kept after its analysis is evicted) */
+  private readonly extents = new Map<number, number>();
   private cacheInsns = 0;
   private discovered = false;
   discoveryComplete = true;
@@ -255,7 +257,7 @@ export class Program {
       seen.add(a);
       const f = this.functions.get(a);
       if (!f || f.isImportStub) continue;
-      const af = this.analyze(a);
+      const af = this.analyzeTransient(a);
       if (!af) continue;
       for (const c of af.calls) {
         if (c.target === undefined || c.indirect) continue;
@@ -301,7 +303,7 @@ export class Program {
         if (covered(a)) continue;
         if (this.addFunction({ addr: a, name: `sub_${a.toString(16)}`, source: 'prologue' })) {
           added++;
-          const af = this.analyze(a);
+          const af = this.analyzeTransient(a);
           if (af) i = Math.max(i, a - r.start + Math.max(0, af.codeSize - 1));
         }
       }
@@ -310,9 +312,8 @@ export class Program {
 
   /** analyzed extent of a function when it has been analyzed */
   analysisSizeHint(addr: number): number | undefined {
-    const af = this.cache.get(addr);
-    if (!af || !af.blocks.length) return undefined;
-    return Math.max(...af.blocks.map((b) => b.end)) - addr;
+    const end = this.extents.get(addr);
+    return end === undefined ? undefined : end - addr;
   }
 
   /** ELF without symbols: main is the first argument _start passes to __libc_start_main. */
@@ -366,8 +367,8 @@ export class Program {
     for (let k = best; k >= 0 && k > best - 8; k--) {
       const f = this.functions.get(arr[k]!)!;
       if (f.size && addr < f.addr + f.size) return f;
-      const af = this.cache.get(f.addr);
-      if (af && af.blocks.some((b) => addr >= b.start && addr < b.end)) return f;
+      const end = this.extents.get(f.addr);
+      if (end !== undefined && addr >= f.addr && addr < end) return f;
       if (f.size) break;
     }
     return undefined;
@@ -388,7 +389,7 @@ export class Program {
     const af = this.buildCfg(info);
     this.cache.set(addr, af);
     this.cacheInsns += af.insnCount;
-    const cap = this.opts.cacheInsns ?? 250_000;
+    const cap = this.opts.cacheInsns ?? 60_000;
     while (this.cacheInsns > cap && this.cache.size > 1) {
       const first = this.cache.keys().next().value as number;
       this.cacheInsns -= this.cache.get(first)!.insnCount;
@@ -634,6 +635,7 @@ export class Program {
       ...info, blocks, calls, dataRefs, constants: [...consts], insnCount: total, codeSize, truncated, unresolvedIndirect: unresolved,
     };
     if (switches.size) out.switches = [...switches.values()].sort((a, b) => a.at - b.at);
+    if (blocks.length) { let end = 0; for (const b of blocks) if (b.end > end) end = b.end; this.extents.set(start, end); }
     return out;
   }
 
@@ -875,7 +877,7 @@ export class Program {
       if (budget.expired) { complete = false; break; }
       const f = this.functions.get(a)!;
       if (f.isImportStub) { done.add(a); continue; }
-      const af = this.analyze(a);
+      const af = this.analyzeTransient(a);
       done.add(a);
       analyzed++;
       if (!af) continue;

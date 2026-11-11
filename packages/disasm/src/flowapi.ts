@@ -266,7 +266,7 @@ export async function disasmTraceValues(input: BinaryInput & {
           if (budget.expired || fns.length >= 200) break;
           const f = p.functions.get(a)!;
           if (f.isImportStub) continue;
-          const af = p.analyze(a);
+          const af = p.analyzeTransient(a);
           if (af && af.blocks.some((b) => b.insns.some((i) => i.imms.includes(num)))) fns.push(f);
         }
       }

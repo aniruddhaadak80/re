@@ -41,3 +41,15 @@ for (const c of cases) {
     assert.ok(p.functions.size > 5000);
   });
 }
+
+// Memory: this file used to peak at about 730 MB of resident memory (esbuild darwin-arm64 was the
+// largest part). Whole program passes now analyze functions without caching them, so a complete
+// cross reference index of the darwin build fits well below that.
+test('Go esbuild-darwin-arm64: complete xref index with bounded memory', { skip: !existsSync(join(cache, 'esbuild-darwin-arm64')) && 'run fetch-fixtures.mjs' }, async () => {
+  const path = join(cache, 'esbuild-darwin-arm64');
+  const fr = await disasmFindReferences({ path, string: 'esbuild', budgetMs: 60000 });
+  assert.equal(fr.complete, true);
+  assert.ok(fr.functionsScanned > 8000);
+  const maxRssMb = process.resourceUsage().maxRSS / 1024;
+  assert.ok(maxRssMb < 600, `peak resident memory ${maxRssMb | 0} MB`);
+});

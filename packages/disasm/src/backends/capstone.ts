@@ -9,6 +9,22 @@ type CsModule = any;
 
 const ARM_CONDS = new Set(['eq', 'ne', 'cs', 'hs', 'cc', 'lo', 'mi', 'pl', 'vs', 'vc', 'hi', 'ls', 'ge', 'lt', 'gt', 'le']);
 
+/** Instruction record whose hex bytes are computed on first use (keeps a view, not a copy). */
+class CsInsn implements Insn {
+  address: number; size: number; mnemonic: string; operands: string; flow: Insn['flow'] = 'seq'; imms: number[] = [];
+  target?: number; memAddr?: number; viaMemory?: boolean; memSize?: number; thumb?: boolean;
+  private raw: Uint8Array | undefined;
+  private hex: string | undefined;
+  constructor(address: number, raw: Uint8Array, mnemonic: string, operands: string) {
+    this.address = address; this.size = raw.length; this.raw = raw; this.mnemonic = mnemonic; this.operands = operands;
+  }
+  get bytes(): string {
+    if (this.hex === undefined) { this.hex = hexOf(this.raw ?? new Uint8Array(0)); this.raw = undefined; }
+    return this.hex;
+  }
+  toJSON() { return { address: this.address, size: this.size, bytes: this.bytes, mnemonic: this.mnemonic, operands: this.operands, flow: this.flow, target: this.target, memAddr: this.memAddr, viaMemory: this.viaMemory, memSize: this.memSize, imms: this.imms, thumb: this.thumb }; }
+}
+
 export class CapstoneDecoder implements Decoder {
   readonly name = 'capstone';
   private readonly cs: CsModule;
@@ -65,7 +81,7 @@ export class CapstoneDecoder implements Decoder {
   }
 
   private normalize(arch: Arch, thumb: boolean, address: number, raw: Uint8Array, mnemonic: string, operands: string): Insn {
-    const insn: Insn = { address, size: raw.length, bytes: hexOf(raw), mnemonic, operands, flow: 'seq', imms: [] };
+    const insn: Insn = new CsInsn(address, raw, mnemonic, operands);
     if (thumb) insn.thumb = true;
     const ops = splitOperands(operands);
     if (arch === 'arm64') a64Flow(insn, ops);
@@ -161,6 +177,8 @@ function x86Flow(insn: Insn, ops: string[]): void {
       if (d !== undefined) insn.memAddr = d;
     }
   }
+  const sz = /\b(byte|word|dword|qword|xmmword) ptr\b/.exec(insn.operands);
+  if (sz) insn.memSize = ({ byte: 1, word: 2, dword: 4, qword: 8, xmmword: 16 } as Record<string, number>)[sz[1]!];
   if ((flow === 'icall' || flow === 'ijump') && insn.memAddr !== undefined) insn.viaMemory = true;
   if (flow === 'seq') for (const o of ops) { if (/^-?0x[0-9a-f]+$|^-?[0-9]+$/.test(o)) { const v = parseImm(o); if (v !== undefined) insn.imms.push(v); } }
   insn.flow = flow;

@@ -287,7 +287,7 @@ export async function disasmCallgraph(input: BinaryInput & { function?: string |
   const idx = p.xrefs(clampInt(input.budgetMs, 8000, 100, 60000));
   const callersOf = (a: number) => [...new Set((idx.to.get(a) ?? []).filter((r) => r.kind === 'call' || r.kind === 'jump' || r.kind === 'indirect-call').map((r) => r.func))];
   const calleesOf = (a: number) => {
-    const af = p.analyze(a);
+    const af = p.analyzeTransient(a);
     if (!af) return [] as { addr?: number; name: string }[];
     const m = new Map<string, { addr?: number; name: string }>();
     for (const c of af.calls) {
@@ -298,7 +298,7 @@ export async function disasmCallgraph(input: BinaryInput & { function?: string |
     return [...m.values()];
   };
   if (input.function === undefined) {
-    const rows = [...p.functions.values()].filter((f) => !f.isImportStub).map((f) => ({ f, callers: callersOf(f.addr).length, callees: p.analyze(f.addr)?.calls.length ?? 0 }));
+    const rows = [...p.functions.values()].filter((f) => !f.isImportStub).map((f) => ({ f, callers: callersOf(f.addr).length, callees: p.analyzeTransient(f.addr)?.calls.length ?? 0 }));
     rows.sort((a, b) => b.callers - a.callers || a.f.addr - b.f.addr);
     const pg = page(rows, input.offset, input.limit, 100, 2000);
     return { complete: idx.complete, total: pg.total, offset: pg.offset, hasMore: pg.hasMore, nodes: pg.items.map((r) => ({ addr: hx(r.f.addr), name: r.f.name, callers: r.callers, callSites: r.callees })) };
@@ -380,7 +380,7 @@ export async function disasmSearch(input: BinaryInput & { bytes_pattern?: string
       if (budget.expired) { complete = false; break; }
       const f = p.functions.get(a)!;
       if (f.isImportStub) continue;
-      const af = p.analyze(a);
+      const af = p.analyzeTransient(a);
       if (!af) continue;
       for (const b of af.blocks) for (const i of b.insns) {
         const text = (i.mnemonic + ' ' + i.operands).trim().toLowerCase();
@@ -470,7 +470,7 @@ export async function disasmCallPaths(input: BinaryInput & { target: string | nu
     const callees = (a: number) => {
       let c = calleesCache.get(a);
       if (!c) {
-        const af = p.analyze(a);
+        const af = p.analyzeTransient(a);
         c = [...new Set([...(af?.calls ?? []).filter((x) => x.target !== undefined).map((x) => x.target!), ...(af?.dataRefs ?? []).filter((d) => d.kind === 'code' && p.functions.has(d.addr)).map((d) => d.addr)])];
         calleesCache.set(a, c);
       }

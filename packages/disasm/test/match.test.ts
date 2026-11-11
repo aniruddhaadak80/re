@@ -30,8 +30,10 @@ test('lua: stripped vs unstripped build, >= 95% of matches correct against symbo
   assert.ok(ok / (ok + bad) >= 0.95, `precision ${ok}/${ok + bad}`);
   assert.ok(ok / total >= 0.95, `recall ${ok}/${total}`);
   assert.ok(r.matches.every((m) => m.confidence > 0 && m.confidence <= 1));
-  // the stripped side has no names: everything was matched by code
-  assert.equal(r.byMethod.name, undefined);
+  // the stripped side has no symbols: only main (recovered from _start) and the entry point carry
+  // names there, everything else was matched by code
+  const byName = r.matches.filter((m) => m.method === 'name').map((m) => m.b.name);
+  assert.ok(byName.every((n) => n === 'main' || n === 'entry' || n === '_start'), JSON.stringify(byName));
 });
 
 for (const [older, newer] of [['esbuild-linux-x64-0.23.1', 'esbuild-linux-x64'], ['esbuild-darwin-arm64-0.23.1', 'esbuild-darwin-arm64']] as const) {
