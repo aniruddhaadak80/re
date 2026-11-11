@@ -11,6 +11,9 @@ export { auditElectron, auditAsar, readFuses, detectElectronVersionInBinary, FUS
 export { analyzePcap, readPackets, decodeFrame, parseDns, parseClientHello, parseServerHello, isPcap, linkTypeName, type PcapAnalysis, type Flow, type TlsHello, type DnsMessage, type HttpMessage } from './pcap.js';
 export { SqliteFile, runSelect, parseSelect, parseCreateTable, sampleRows, isSqlite, jsonValue, type QueryResult, type TableInfo, type SqlValue } from './sqlite.js';
 export { analyzeHar, looksLikeHar, type HarSummary } from './har.js';
+export { decodePng, encodePng, diffImages, isPng, type RgbaImage, type PixelDiff } from './png.js';
+export { compareCaptures, endpointPattern, type CaptureComparison, type CaptureLike } from './compare.js';
+export { scanWebMcpScript, scanHtmlForMcp, classifyWellKnown, agentHeaderHints, WELL_KNOWN_PATHS, type WebMcpTool, type WebMcpScriptScan, type HtmlMcpHints, type WellKnownDoc } from './webmcp.js';
 export { md5Hex, safeRelPath, InputError, LIMITS } from './util.js';
 export { makeTools, loadBytes, type ToolDef, type ToolIO } from './tools.js';
 export { ANALYZERS, webJsAnalyzer, webSourcemapAnalyzer, webElectronAnalyzer, webPcapAnalyzer, webSqliteAnalyzer, webHarAnalyzer, obfuscationScore } from './analyzers.js';

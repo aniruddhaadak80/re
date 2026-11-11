@@ -1,0 +1,54 @@
+{
+ "CFBundleIdentifier": "dev.revlens.SampleApp",
+ "CFBundleName": "Sample App",
+ "CFBundleDisplayName": "Sample Ä App",
+ "CFBundleShortVersionString": "2.4.1",
+ "CFBundleVersion": "241",
+ "CFBundleExecutable": "Sample App",
+ "CFBundlePackageType": "APPL",
+ "LSMinimumSystemVersion": "11.0",
+ "CFBundleIconFile": "AppIcon",
+ "CFBundleURLTypes": [
+  {
+   "CFBundleURLName": "dev.revlens.sample",
+   "CFBundleURLSchemes": [
+    "revlens-sample",
+    "rls"
+   ]
+  }
+ ],
+ "NSAppTransportSecurity": {
+  "NSAllowsArbitraryLoads": true
+ },
+ "ElectronAsarIntegrity": {
+  "Resources/app.asar": {
+   "algorithm": "SHA256",
+   "hash": "abababababababababababababababababababababababababababababababab"
+  }
+ },
+ "LSUIElement": false,
+ "NSHighResolutionCapable": true,
+ "Count": 1234567890123,
+ "Neg": -42,
+ "Ratio": 0.125,
+ "Blob": {
+  "$data": "AAH/UmV2TGVucw=="
+ },
+ "Built": {
+  "$date": "2026-01-02T03:04:05.000Z"
+ },
+ "Nested": [
+  [
+   1,
+   2,
+   [
+    3,
+    {
+     "deep": "yes"
+    }
+   ]
+  ],
+  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "ünïcødé"
+ ]
+}

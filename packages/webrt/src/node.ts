@@ -7,8 +7,34 @@ import { readAsar, readAsarFile, isAsar } from './asar.js';
 import { auditAsar, auditElectron, detectElectronVersionInBinary, type ElectronAudit } from './electron.js';
 import { browserCapture, type CaptureOptions } from './capture.js';
 import { InputError, safeRelPath, LIMITS } from './util.js';
+import { runScenario, validateScenario, type ScenarioOptions } from './scenario.js';
+import { compareCaptures } from './compare.js';
+import { inspectPlaywrightTrace } from './trace.js';
+import { cdpTargets } from './cdp.js';
+import { attachNodeInspector, type InspectorOptions } from './inspector.js';
+import { discoverWebMcp, type WebMcpDiscoveryOptions } from './webmcp-node.js';
+import { inflateSync } from 'node:zlib';
+import { isAbsolute } from 'node:path';
 
 export { browserCapture } from './capture.js';
+export { runScenario, validateScenario } from './scenario.js';
+export type { ScenarioSpec, ScenarioStep, ScenarioAssertion, ScenarioOptions, ScenarioCapture, ScenarioStepResult } from './scenario.js';
+export { inspectPlaywrightTrace, listZip, readZipEntry, type TraceSummary } from './trace.js';
+export { cdpTargets, CdpClient, checkDevtoolsEndpoint, type CdpTarget, type CdpVersion } from './cdp.js';
+export { attachNodeInspector, executionAllowed, type InspectorOptions, type InspectorReport } from './inspector.js';
+export { discoverWebMcp, type WebMcpDiscovery, type WebMcpDiscoveryOptions } from './webmcp-node.js';
+
+/** Compare two capture JSON files; screenshot paths are resolved next to each capture and pixel-diffed. */
+export async function compareCaptureFiles(aPath: string, bPath: string, opts: { threshold?: number; limit?: number } = {}) {
+  const load = async (p: string) => { try { return JSON.parse(new TextDecoder().decode(await readFileCapped(p, 512 * 1024 * 1024))); } catch (e) { if (e instanceof InputError) throw e; throw new InputError(`${p} is not JSON`); } };
+  const [a, b] = await Promise.all([load(aPath), load(bPath)]);
+  const dirs = { a: dirname(resolve(aPath)), b: dirname(resolve(bPath)) };
+  const r = await compareCaptures(a, b, {
+    threshold: opts.threshold, limit: opts.limit, inflate: (d) => new Uint8Array(inflateSync(d, { maxOutputLength: 512 * 1024 * 1024 })),
+    loadImage: async (p, side) => readFileCapped(isAbsolute(p) ? p : join(dirs[side], p), 256 * 1024 * 1024),
+  });
+  return { a: resolve(aPath), b: resolve(bPath), ...r };
+}
 export type { CaptureOptions, CaptureResult } from './capture.js';
 
 /** Read a file with a size cap. */
@@ -165,6 +191,55 @@ const nodeExtra: ToolDef[] = [
   },
 ];
 
+nodeExtra.push(
+  { name: '__capture_compare_paths', description: 'internal', inputSchema: {}, run: async (i: { aPath?: string; bPath?: string; threshold?: number; limit?: number }) => { if (!i.aPath || !i.bPath) throw new InputError('give both aPath and bPath'); return compareCaptureFiles(i.aPath, i.bPath, i); } },
+  {
+    name: 'web_browser_scenario',
+    description: 'Run a scripted browser scenario with Playwright (Node only): steps goto, click, type, fill, press, select, check, hover, scroll, wait, reload, back and assert, with evaluate-free assertions (selector exists, count, text, value, url, title, request seen, console message, no page errors). Each step records network requests, console messages, a DOM snapshot (HTML file, element counts, ARIA snapshot), a screenshot and a Playwright trace chunk. On Chromium it also records JavaScript function call counts (precise coverage), DOM event listeners and passive WebMCP tool registrations. Writes capture.json to outDir.',
+    inputSchema: {
+      scenario: { type: 'object', description: 'Scenario: { name?, startUrl?, viewport?, steps: [{ action, url?, selector?, text?, key?, value?, ms?, expect?: [...] }] }.', optional: true },
+      scenarioPath: { type: 'string', description: 'Path of a scenario JSON file, instead of scenario.', optional: true },
+      outDir: { type: 'string', description: 'Folder for capture.json, screenshots, DOM and traces (default: new temp folder).', optional: true },
+      timeoutMs: { type: 'number', description: 'Total budget (default 120000, max 900000).', optional: true },
+      browser: { type: 'string', description: 'chromium (default), firefox or webkit.', optional: true },
+      executablePath: { type: 'string', description: 'Browser executable to use instead of the Playwright download.', optional: true },
+      traces: { type: 'boolean', description: 'Record Playwright trace chunks per step (default true).', optional: true },
+      limit: { type: 'number', description: 'Max HAR entries returned inline (default 200).', optional: true },
+    },
+    run: async (i: ScenarioOptions & { scenario?: unknown; scenarioPath?: string; limit?: number }) => {
+      let spec = i.scenario;
+      if (!spec && i.scenarioPath) { try { spec = JSON.parse(new TextDecoder().decode(await readFileCapped(i.scenarioPath, 4 * 1024 * 1024))); } catch (e) { throw e instanceof InputError ? e : new InputError('scenario file is not JSON'); } }
+      const r = await runScenario(spec, i);
+      const lim = Math.max(1, Math.min(Number(i.limit ?? 200), 5000));
+      return { ...r, har: { log: { ...r.har.log, entries: r.har.log.entries.slice(0, lim) } }, harEntryCount: r.har.log.entries.length, capturePath: join(r.outDir, 'capture.json') };
+    },
+  },
+  {
+    name: 'web_trace_inspect',
+    description: 'Read a Playwright trace.zip: actions with API name, selector, timing and errors, network requests with status, console messages, pages and screencast frame count.',
+    inputSchema: { path: { type: 'string', description: 'trace.zip path.' }, limit: { type: 'number', description: 'Max items per list (default 500).', optional: true } },
+    run: async (i: { path: string; limit?: number }) => inspectPlaywrightTrace(String(i.path), { limit: i.limit }),
+  },
+  {
+    name: 'web_cdp_targets',
+    description: 'List debuggable targets on a Chrome DevTools Protocol endpoint (a browser or Electron app started with --remote-debugging-port, or a Node --inspect port): pages, iframes, workers, service workers, Node contexts, with protocol and V8 versions. Loopback only unless allowRemote.',
+    inputSchema: { endpoint: { type: 'string', description: 'http://127.0.0.1:9222 or a bare port number.' }, allowRemote: { type: 'boolean', description: 'Allow a non-loopback host (default false).', optional: true } },
+    run: async (i: { endpoint: string; allowRemote?: boolean }) => cdpTargets(String(i.endpoint), i),
+  },
+  {
+    name: 'web_webmcp_discover',
+    description: 'Discover WebMCP tools and MCP-over-web endpoints for a URL: agent response headers, MCP link and meta tags, declarative tool forms, navigator.modelContext registrations in inline and same-origin scripts, well-known documents (/.well-known/mcp, mcp.json, server-card, ai-plugin.json, agent card, OAuth protected resource, llms.txt), and with browser=true the tools Chromium itself reports through the CDP WebMCP domain. Tools are never invoked.',
+    inputSchema: { url: { type: 'string', description: 'http or https URL.' }, browser: { type: 'boolean', description: 'Also open the page in Chromium with WebMCP on (needs playwright).', optional: true }, executablePath: { type: 'string', description: 'Chromium executable.', optional: true }, timeoutMs: { type: 'number', description: 'Per request timeout (default 15000).', optional: true } },
+    run: async (i: WebMcpDiscoveryOptions & { url: string }) => discoverWebMcp(String(i.url), i),
+  },
+  {
+    name: 'web_node_inspect',
+    description: 'Attach to a local Node.js process through its inspector (by pid, port or ws URL) and observe it without evaluating code: loaded scripts with hashes and source maps, function call counts from precise coverage, a CPU sampling profile with the hottest functions, and heap usage. Needs allowExecution because it signals and attaches to another process.',
+    inputSchema: { allowExecution: { type: 'boolean', description: 'Must be true.' }, pid: { type: 'number', description: 'Local Node pid; its inspector is switched on (SIGUSR1).', optional: true }, port: { type: 'number', description: 'Inspector port (default 9229).', optional: true }, wsUrl: { type: 'string', description: 'ws:// inspector URL.', optional: true }, durationMs: { type: 'number', description: 'Observation time (default 2000).', optional: true }, cpuProfile: { type: 'boolean', description: 'Take a CPU sampling profile (default true).', optional: true } },
+    run: async (i: InspectorOptions) => attachNodeInspector(i),
+  },
+);
+
 const io: ToolIO = { readFile: (p, max) => readFileCapped(p, max), extra: nodeExtra };
 
 /** Tools with file path support and browser capture. */
@@ -181,7 +256,7 @@ function parseArgs(argv: string[]): { pos: string[]; flags: Record<string, strin
     if (a.startsWith('--')) {
       const [k, v] = a.slice(2).split('=', 2) as [string, string | undefined];
       if (v !== undefined) flags[k] = v;
-      else if (i + 1 < argv.length && !(argv[i + 1] as string).startsWith('--') && !['json', 'include-code', 'include-content', 'no-analyze', 'decode-escapes'].includes(k)) flags[k] = argv[++i] as string;
+      else if (i + 1 < argv.length && !(argv[i + 1] as string).startsWith('--') && !['json', 'include-code', 'include-content', 'no-analyze', 'decode-escapes', 'browser', 'allow-remote', 'allow-execution', 'no-traces'].includes(k)) flags[k] = argv[++i] as string;
       else flags[k] = true;
     } else pos.push(a);
   }
@@ -214,6 +289,12 @@ const needPath = (pos: string[]) => { if (!pos[0]) throw new InputError('missing
 const lines = (xs: (string | undefined | false)[]) => xs.filter((x): x is string => typeof x === 'string').join('\n');
 
 export const CLI_COMMANDS: CliCommand[] = [
+  cmd('browser-scenario', 'web_browser_scenario', 'revlens browser-scenario <scenario.json> [--out dir] [--executable path] [--browser chromium] [--no-traces] [--json]', (p, f) => ({ scenarioPath: needPath(p), outDir: typeof f.out === 'string' ? f.out : undefined, executablePath: typeof f.executable === 'string' ? f.executable : undefined, browser: typeof f.browser === 'string' ? f.browser : undefined, traces: f['no-traces'] ? false : undefined, timeoutMs: num(f.timeout) }), (o) => lines([`${o.name ?? 'scenario'}: ${o.passed ? 'passed' : 'FAILED'} in ${o.durationMs} ms with ${o.browser} ${o.browserVersion ?? ''}`, ...o.steps.map((s: any) => `  ${String(s.index).padStart(3)} ${s.ok ? 'ok  ' : 'FAIL'} ${s.action} ${s.target ?? ''} -> ${s.url}  req=${s.requests.length} console=${s.console.length}${s.error ? '  ' + s.error : ''}${s.assertions.filter((a: any) => !a.pass).map((a: any) => `  assert ${JSON.stringify(a.assertion)} got ${JSON.stringify(a.actual ?? a.error)}`).join('')}`), o.coverage ? `coverage: ${o.coverage.calledFunctions}/${o.coverage.totalFunctions} functions called` : undefined, o.listeners ? `event listeners: ${o.listeners.length}` : undefined, o.webmcp?.tools.length ? `webmcp tools: ${o.webmcp.tools.map((t: any) => t.name).join(', ')}` : undefined, `capture: ${o.capturePath}`, ...o.warnings.map((w: string) => `  warning: ${w}`)])),
+  cmd('capture-compare', 'web_capture_compare', 'revlens capture-compare <a.json> <b.json> [--threshold N] [--json]', (p, f) => { if (!p[1]) throw new InputError('give two capture files'); return { aPath: p[0], bPath: p[1], threshold: num(f.threshold), limit: num(f.limit) }; }, (o) => lines([`similarity score ${o.score} (${o.parts.map((x: any) => `${x.name}=${x.similarity}`).join(', ')})`, `endpoints: +${o.endpoints.added.length} -${o.endpoints.removed.length} =${o.endpoints.common}`, ...o.endpoints.added.map((e: any) => `  + ${e.key}`), ...o.endpoints.removed.map((e: any) => `  - ${e.key}`), ...o.endpoints.statusChanged.map((e: any) => `  ~ ${e.key} ${e.before.join(',')} -> ${e.after.join(',')}`), ...o.headers.map((h: any) => `  headers ${h.side} ${h.key}: ${h.added.map((x: string) => '+' + x).join(' ')} ${h.removed.map((x: string) => '-' + x).join(' ')} ${h.changed.map((c: any) => `~${c.name}`).join(' ')}`), `scripts: +${o.scripts.added.length} -${o.scripts.removed.length} changed ${o.scripts.changed.length} same ${o.scripts.same}`, ...o.screenshots.map((s: any) => `  step ${s.step} screenshot ${s.diff ? `similarity ${s.diff.similarity}, ${s.diff.diffPixels} px differ${s.diff.bbox ? ` in ${s.diff.bbox.width}x${s.diff.bbox.height} at ${s.diff.bbox.x},${s.diff.bbox.y}` : ''}` : s.error}`)])),
+  cmd('trace-inspect', 'web_trace_inspect', 'revlens trace-inspect <trace.zip> [--limit N] [--json]', (p, f) => ({ path: needPath(p), limit: num(f.limit) }), (o) => lines([`${o.browserName ?? '?'} trace v${o.version ?? '?'}: ${o.actions.total} actions (${o.actions.failed} failed), ${o.network.total} requests, ${o.console.total} console, ${o.screencastFrames} frames`, ...o.actions.items.map((a: any) => `  ${a.api}${a.selector ? ' ' + a.selector : ''}${a.url ? ' ' + a.url : ''} ${a.durationMs ?? '?'} ms${a.error ? '  ERROR ' + a.error : ''}`), ...o.network.items.map((n: any) => `  ${n.status} ${n.method} ${n.url}`)])),
+  cmd('cdp-targets', 'web_cdp_targets', 'revlens cdp-targets <http://127.0.0.1:9222|port> [--allow-remote] [--json]', (p, f) => ({ endpoint: needPath(p), allowRemote: !!f['allow-remote'] }), (o) => lines([`${o.version.browser ?? '?'} protocol ${o.version.protocolVersion ?? '?'} V8 ${o.version.v8Version ?? '?'}`, ...o.targets.map((t: any) => `  ${t.type.padEnd(15)} ${t.id} ${t.title} ${t.url}`)])),
+  cmd('webmcp-discover', 'web_webmcp_discover', 'revlens webmcp-discover <url> [--browser] [--executable path] [--json]', (p, f) => ({ url: needPath(p), browser: !!f.browser, executablePath: typeof f.executable === 'string' ? f.executable : undefined, timeoutMs: num(f.timeout) }), (o) => lines([`${o.finalUrl ?? o.url}: WebMCP ${o.summary.hasWebMcp ? 'found' : 'not found'}; ${o.summary.declarativeTools} declarative, ${o.summary.imperativeTools} script, ${o.summary.runtimeTools} runtime tools`, ...o.html.forms.map((x: any) => `  form tool ${x.toolName}: ${x.toolDescription ?? ''} [${x.fields.join(', ')}]`), ...o.staticTools.map((x: any) => `  ${x.api} ${x.name ?? '?'} ${x.description ?? ''} (${x.source ?? ''}:${x.line})`), ...(o.runtime?.tools ?? []).map((x: any) => `  runtime tool ${x.name}: ${x.description ?? ''}`), ...o.html.links.map((l: any) => `  link rel=${l.rel} ${l.href}`), ...o.headers.map((h: any) => `  header ${h.name}: ${h.value}`), ...o.wellKnown.map((d: any) => `  ${d.path} ${d.kind}${d.name ? ' ' + d.name : ''}${d.endpoints.length ? ' -> ' + d.endpoints.join(', ') : ''}`), ...o.warnings.map((w: string) => `  warning: ${w}`)])),
+  cmd('node-inspect', 'web_node_inspect', 'revlens node-inspect (--pid N | --port N | --ws url) --allow-execution [--duration ms] [--json]', (_p, f) => ({ allowExecution: !!f['allow-execution'], pid: num(f.pid), port: num(f.port), wsUrl: typeof f.ws === 'string' ? f.ws : undefined, durationMs: num(f.duration) }), (o) => lines([`${o.target.title ?? ''} ${o.target.url ?? ''} via ${o.attachedVia}, ${o.scriptCount} scripts, ${o.calledFunctions}/${o.totalFunctions} functions called in ${o.durationMs} ms`, ...o.calls.slice(0, 30).map((c: any) => `  ${String(c.count).padStart(8)}  ${c.name}  ${c.url}@${c.offset}`), o.cpu ? `cpu: ${o.cpu.samples} samples` : undefined, ...(o.cpu?.top ?? []).slice(0, 15).map((c: any) => `  ${String(c.selfPercent).padStart(6)}%  ${c.name} ${c.url}:${c.line}`), o.heap ? `heap: ${o.heap.usedSize} / ${o.heap.totalSize}` : undefined])),
   cmd('js-beautify', 'web_js_beautify', 'revlens js-beautify <file.js> [--max-chars N] [--json]', (p, f) => ({ path: needPath(p), maxChars: num(f['max-chars']) ?? 2_000_000 }), (o) => o.code),
   cmd('js-deobfuscate', 'web_js_deobfuscate', 'revlens js-deobfuscate <file.js> [--json]', (p, f) => ({ path: needPath(p), maxChars: num(f['max-chars']) ?? 2_000_000 }), (o) => lines([`// RevLens deobfuscate: ${o.stats.stringsDecoded} strings decoded${o.stringArray ? ` from ${o.stringArray.arrayName} (${o.stringArray.encoding}, rotated ${o.stringArray.rotated})` : ''}, ${o.stats.proxiesInlined} proxies inlined, ${o.stats.helpersRemoved} helpers removed`, ...o.notes.map((n: string) => `// note: ${n}`), o.code])),
   cmd('js-bundle', 'web_bundle_modules', 'revlens js-bundle <bundle.js> [--map file.map] [--include-code] [--limit N] [--json]', (p, f) => ({ path: needPath(p), sourceMapPath: typeof f.map === 'string' ? f.map : undefined, includeCode: !!f['include-code'], limit: num(f.limit), offset: num(f.offset) }), (o) => lines([`bundler: ${o.bundler} (confidence ${o.confidence}), ${o.moduleCount} modules${o.chunkIds.length ? `, chunk ${o.chunkIds.join(',')}` : ''}`, ...o.modules.items.map((m: any) => `  ${String(m.id).padEnd(12)} ${m.path ?? '?'}  line ${m.line}, ${m.size} B${m.deps.length ? `, deps ${m.deps.join(',')}` : ''}${m.exports.length ? `, exports ${m.exports.join(',')}` : ''}`), o.imports.length ? `imports: ${o.imports.map((i: any) => i.source).join(', ')}` : undefined])),

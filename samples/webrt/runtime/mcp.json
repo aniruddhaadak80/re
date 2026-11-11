@@ -1,0 +1,6 @@
+{
+  "serverInfo": { "name": "todo-mcp", "version": "1.2.0" },
+  "description": "Todo MCP server",
+  "transport": { "type": "streamable-http", "url": "https://todo.example/mcp" },
+  "tools": [{ "name": "add_todo" }, { "name": "list_todos" }]
+}

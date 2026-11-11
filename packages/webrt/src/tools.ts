@@ -10,6 +10,8 @@ import { auditAsar } from './electron.js';
 import { analyzePcap } from './pcap.js';
 import { SqliteFile, runSelect, sampleRows, jsonValue } from './sqlite.js';
 import { analyzeHar } from './har.js';
+import { scanWebMcpScript, scanHtmlForMcp, classifyWellKnown } from './webmcp.js';
+import { compareCaptures } from './compare.js';
 import { InputError, base64ToBytes, bytesToBase64, decodeUtf8, encodeUtf8, page, clampLimit, LIMITS } from './util.js';
 
 export type SchemaType = 'string' | 'number' | 'boolean' | 'array' | 'object';
@@ -237,6 +239,39 @@ export function makeTools(io: ToolIO = {}): ToolDef[] {
       description: 'Summarize a HAR file: hosts (third-party marked), API endpoint patterns, methods, statuses, MIME types, redirects, slowest requests, auth header schemes and cookie names (values never returned), missing security headers, mixed content, WebSockets, and endpoints found inside captured scripts.',
       inputSchema: { ...SRC, analyzeScripts: { type: 'boolean', description: 'Run endpoint analysis on script bodies in the HAR (default true).', optional: true }, limit: PAGING.limit },
       run: async (input) => analyzeHar(await loadText(input, io, 512 * 1024 * 1024), { analyzeScripts: input.analyzeScripts, limit: clampLimit(input.limit) }),
+    },
+    {
+      name: 'web_webmcp_scan',
+      description: 'Static WebMCP scan of one HTML page or script: navigator.modelContext provideContext and registerTool calls with tool names, descriptions and input schema fields, declarative tool forms (toolname and tooldescription), MCP link and meta tags, and MCP-B polyfill imports. Nothing is run.',
+      inputSchema: { ...SRC, kind: { type: 'string', description: 'html or js (default: guessed from the content).', optional: true }, limit: PAGING.limit },
+      run: async (input) => {
+        const text = await loadText(input, io, 16 * 1024 * 1024);
+        const isHtml = input.kind ? input.kind === 'html' : /^\s*(?:<!doctype|<html|<head|<body|<)/i.test(text.slice(0, 2000));
+        const lim = clampLimit(input.limit);
+        if (!isHtml) { const r = scanWebMcpScript(text, { source: input.path }); return { kind: 'js', ...r, tools: r.tools.slice(0, lim) }; }
+        const h = scanHtmlForMcp(text);
+        const tools = h.inlineScripts.flatMap((code, i) => { try { return scanWebMcpScript(code, { source: `inline-${i}` }).tools; } catch { return []; } });
+        return { kind: 'html', links: h.links, meta: h.meta, forms: h.forms, scriptSrcs: h.scriptSrcs.slice(0, lim), inlineScripts: h.inlineScripts.length, tools: tools.slice(0, lim) };
+      },
+    },
+    {
+      name: 'web_wellknown_classify',
+      description: 'Classify a fetched well-known discovery document (MCP server card, MCP endpoint list, AI plugin manifest, A2A agent card, OAuth protected resource metadata, llms.txt) and pull out its name, endpoints and tool names.',
+      inputSchema: { path: { type: 'string', description: 'The well-known path, for example /.well-known/mcp.json.' }, text: { type: 'string', description: 'Document body.' }, status: { type: 'number', description: 'HTTP status (default 200).', optional: true }, contentType: { type: 'string', description: 'Content-Type header.', optional: true } },
+      run: async (input) => classifyWellKnown(String(input.path), Number(input.status ?? 200), input.contentType, String(input.text ?? '').slice(0, 2 * 1024 * 1024)),
+    },
+    {
+      name: 'web_capture_compare',
+      description: 'Compare two captures (RevLens scenario capture.json, web_browser_capture output, or HAR): endpoints added and removed with id-normalized paths, status changes, request and response header changes, scripts added, removed or changed by sha256, console differences and per-step screenshot pixel diffs, with a 0 to 1 similarity score.',
+      inputSchema: { aPath: { type: 'string', description: 'First capture JSON file (Node only).', optional: true }, bPath: { type: 'string', description: 'Second capture JSON file (Node only).', optional: true }, aText: { type: 'string', description: 'First capture as JSON text.', optional: true }, bText: { type: 'string', description: 'Second capture as JSON text.', optional: true }, threshold: { type: 'number', description: 'Largest channel difference (0 to 255) still counted as the same pixel (default 0).', optional: true }, limit: PAGING.limit },
+      run: async (input) => {
+        const special = io.extra?.find((t) => t.name === '__capture_compare_paths');
+        if ((input.aPath || input.bPath) && special) return special.run(input);
+        if (typeof input.aText !== 'string' || typeof input.bText !== 'string') throw new InputError('give aText and bText (or aPath and bPath in Node)');
+        let a: unknown, b: unknown;
+        try { a = JSON.parse(input.aText); b = JSON.parse(input.bText); } catch { throw new InputError('captures must be JSON'); }
+        return compareCaptures(a as never, b as never, { threshold: input.threshold, limit: input.limit });
+      },
     },
   ];
   for (const e of io.extra ?? []) if (!e.name.startsWith('__')) tools.push(e);

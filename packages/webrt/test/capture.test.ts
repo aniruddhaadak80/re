@@ -7,7 +7,7 @@ import { browserCapture } from '../src/node.js';
 async function browserAvailable(): Promise<boolean> {
   try {
     const pw: any = await import('playwright' as string);
-    const b = await pw.chromium.launch({ timeout: 15_000 });
+    const b = await pw.chromium.launch({ timeout: 15_000, executablePath: process.env.REVLENS_CHROMIUM || undefined });
     await b.close();
     return true;
   } catch { return false; }
@@ -29,7 +29,7 @@ test('browser capture records requests, scripts, console, storage and analyses s
   await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));
   const port = (server.address() as AddressInfo).port;
   try {
-    const r = await browserCapture(`http://127.0.0.1:${port}/`, { timeoutMs: 30_000, settleMs: 500 });
+    const r = await browserCapture(`http://127.0.0.1:${port}/`, { timeoutMs: 30_000, settleMs: 500, executablePath: process.env.REVLENS_CHROMIUM || undefined });
     assert.equal(r.title, 'fixture');
     const urls = r.har.log.entries.map((e: any) => new URL(e.request.url).pathname);
     assert.ok(urls.includes('/app.js') && urls.includes('/api/v1/ping'));

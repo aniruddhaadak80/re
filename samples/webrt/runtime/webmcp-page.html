@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+  <title>Todo with WebMCP</title>
+  <link rel="mcp" type="application/mcp+json" href="/.well-known/mcp.json">
+  <meta name="webmcp" content="enabled">
+  <script src="/webmcp-app.js"></script>
+</head>
+<body>
+  <form toolname="search_todos" tooldescription="Search the todo list by text" action="/search">
+    <input name="q" type="text">
+    <select name="status"><option>open</option><option>done</option></select>
+  </form>
+  <ul id="list"></ul>
+  <script>
+    if ('modelContext' in navigator) {
+      navigator.modelContext.registerTool({
+        name: 'add_todo',
+        description: 'Add a todo item',
+        inputSchema: { type: 'object', properties: { title: { type: 'string' }, due: { type: 'string' } }, required: ['title'] },
+        async execute(args) { return { content: [{ type: 'text', text: 'added ' + args.title }] }; }
+      });
+    }
+  </script>
+</body>
+</html>

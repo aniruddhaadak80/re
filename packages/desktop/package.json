@@ -1,0 +1,23 @@
+{
+  "name": "@revlens/desktop",
+  "version": "1.0.0",
+  "description": "RevLens desktop and process reverse engineering: process inspection and comparison, installed app discovery and native UI tree capture on Linux, macOS and Windows.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./node": { "types": "./dist/node.d.ts", "default": "./dist/node.js" }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test --import tsx test/*.test.ts"
+  },
+  "peerDependencies": { "@revlens/core": "*" },
+  "peerDependenciesMeta": { "@revlens/core": { "optional": true } },
+  "engines": { "node": ">=20.10.0" },
+  "keywords": ["reverse-engineering", "process", "proc", "lsof", "accessibility", "at-spi", "uiautomation", "desktop", "plist", "registry"],
+  "repository": { "type": "git", "url": "https://github.com/aniruddhaadak80/re.git", "directory": "packages/desktop" }
+}
