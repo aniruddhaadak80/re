@@ -74,7 +74,8 @@ function fullHelp(): string {
     '  revlens sarif <file>             Print SARIF 2.1.0 for GitHub code scanning',
     '  revlens analyzers                List analyzers from every package',
     '  revlens tools [--json]           List every MCP tool the server offers',
-    '  revlens mcp                      Start the MCP server on stdio',
+    '  revlens mcp [--http]             Start the MCP server on stdio, or Streamable HTTP on 127.0.0.1',
+    '                                   --port 7337  --host 127.0.0.1  --token T (or REVLENS_MCP_TOKEN)  --allow-remote',
     '',
     'Setup and external tools',
     ...TOP_LEVEL_COMMANDS.map((c) => `  ${c.usage.replace(/^revlens\s+/, 'revlens ').split('   ')[0]!.padEnd(32)} ${c.summary}`),
@@ -261,6 +262,16 @@ async function main(): Promise<number> {
       return f['fail-on-match'] && matches.length ? 2 : 0;
     }
     case 'mcp': case 'serve-mcp': {
+      const { httpOptionsFromArgv, startHttpServer } = await import('@revlens/mcp/http');
+      const http = httpOptionsFromArgv(process.argv.slice(2));
+      if (http) {
+        const h = await startHttpServer(http);
+        console.error(`RevLens MCP listening on ${h.url}${http.token ? ' (bearer token required)' : ''}`);
+        const stop = () => { void h.close().then(() => process.exit(0)); };
+        process.on('SIGINT', stop);
+        process.on('SIGTERM', stop);
+        return -1;
+      }
       const { StdioServerTransport } = await import('@modelcontextprotocol/sdk/server/stdio.js');
       const { server } = (await import('@revlens/mcp/server')).createServer();
       await server.connect(new StdioServerTransport());
