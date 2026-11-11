@@ -1,0 +1,89 @@
+# Integration workflow for @revlens/bridges. The integrator copies this file to
+# .github/workflows/bridges-integration.yml. It installs real tools on Ubuntu x64 and runs
+# packages/bridges/test/integration.test.ts, which skips any test whose tool is missing.
+name: bridges-integration
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ['packages/bridges/**', 'samples/bridges/**']
+  schedule:
+    - cron: '17 4 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      R2_VERSION: '6.2.6'
+      GHIDRA_URL: https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.2_build/ghidra_12.2_PUBLIC_20261016.zip
+      JADX_VERSION: '1.5.6'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: System tools (binutils, gdb, lldb, llvm, binwalk, adb)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends binutils gdb lldb llvm binwalk adb unzip python3-pip pipx
+          # Frida attaches to a process it did not start
+          sudo sysctl -w kernel.yama.ptrace_scope=0
+
+      - name: radare2 and r2ghidra from GitHub releases
+        run: |
+          curl -fsSL -o /tmp/r2.deb "https://github.com/radareorg/radare2/releases/download/${R2_VERSION}/radare2_${R2_VERSION}_amd64.deb"
+          sudo apt-get install -y /tmp/r2.deb
+          r2 -v
+          curl -fsSL -o /tmp/r2g.zip "https://github.com/radareorg/r2ghidra/releases/download/${R2_VERSION}/r2ghidra-${R2_VERSION}-linux-x86-64.zip"
+          PLUG="$(r2 -H R2_USER_PLUGINS)"
+          mkdir -p "$PLUG"
+          unzip -q /tmp/r2g.zip -d /tmp/r2g
+          cp -r /tmp/r2g/*/* "$PLUG"/ 2>/dev/null || cp -r /tmp/r2g/* "$PLUG"/
+          ls "$PLUG"
+
+      - name: Ghidra 12.2
+        run: |
+          curl -fsSL -o /tmp/ghidra.zip "$GHIDRA_URL"
+          unzip -q /tmp/ghidra.zip -d "$HOME"
+          echo "GHIDRA_INSTALL_DIR=$(ls -d $HOME/ghidra_12.2_PUBLIC)" >> "$GITHUB_ENV"
+
+      - name: jadx, ilspycmd and frida-tools
+        run: |
+          curl -fsSL -o /tmp/jadx.zip "https://github.com/skylot/jadx/releases/download/v${JADX_VERSION}/jadx-${JADX_VERSION}.zip"
+          mkdir -p "$HOME/jadx" && unzip -q /tmp/jadx.zip -d "$HOME/jadx"
+          echo "JADX_HOME=$HOME/jadx" >> "$GITHUB_ENV"
+          dotnet tool install --global ilspycmd --version 9.1.0.7988
+          pipx install frida-tools
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install and build
+        run: |
+          npm ci
+          npx tsc -b packages/core
+          npx tsc -p packages/bridges --noEmit
+
+      - name: Doctor
+        run: |
+          node --import tsx --input-type=module -e "const m = await import('./packages/bridges/src/node.ts'); const inv = await m.inventory(); console.log(m.formatInventory(inv, { verbose: true }));"
+
+      - name: Unit, safety and setup tests
+        run: node --test --import tsx packages/bridges/test/parsers.test.ts packages/bridges/test/safety.test.ts packages/bridges/test/setup.test.ts
+
+      - name: Integration tests with real tools
+        env:
+          REVLENS_CACHE_DIR: ${{ runner.temp }}/revlens-cache
+        run: node --test --test-concurrency=1 --import tsx packages/bridges/test/integration.test.ts

@@ -1,0 +1,5 @@
+Id        Type    Name             OS
+--------  ------  ---------------  -------------------
+local     local   Local System     Debian GNU/Linux 13
+barebone  remote  GDB Remote Stub
+socket    remote  Local Socket

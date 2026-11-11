@@ -1,0 +1,12 @@
+// callconv: x0 arm64 (x0, x1, x2, x3, x4, x5, x6, x7, stack);
+void sym.add_numbers (int64_t arg1, int64_t arg2) {
+    // CALL XREF from main @ 0x95c(x)
+    sp -= 0x10
+    [var_ch] = w0 // arg1
+    [var_8h] = w1 // arg2
+    w1 = [var_ch]
+    w0 = [var_8h]
+    w0 = w1 + w0
+    sp += 0x10
+}
+

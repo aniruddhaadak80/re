@@ -1,0 +1,61 @@
+Breakpoint 1 at 0x101ade0
+Breakpoint 2 at 0x101ae04
+
+Breakpoint 1, 0x000000000101ade0 in add_numbers ()
+@@REVLENS_STOP 0
+x0             0x2                 2
+x1             0x29                41
+x2             0xfffffffff080      281474976706688
+x3             0x101b1ec           16888300
+x4             0xfffffffff020      281474976706592
+x5             0x4                 4
+x6             0x0                 0
+x7             0x0                 0
+x8             0x1000000           16777216
+x9             0x3e8               1000
+x10            0x0                 0
+x11            0x7                 7
+x12            0xfffffffffefa54f8  -17148680
+x13            0xffffffffffffffff  -1
+x14            0x38                56
+x15            0x0                 0
+x16            0x6474e551          1685382481
+x17            0x800000            8388608
+x18            0x1000200           16777728
+x19            0xfffffffff068      281474976706664
+x20            0x2                 2
+x21            0x101aefc           16887548
+x22            0xfffffffff078      281474976706680
+x23            0x0                 0
+x24            0x0                 0
+x25            0x0                 0
+x26            0x0                 0
+x27            0x0                 0
+x28            0x0                 0
+x29            0xfffffffff020      281474976706592
+x30            0x101af20           16887584
+sp             0xffffffffeff0      0xffffffffeff0
+pc             0x101ade0           0x101ade0 <add_numbers+12>
+cpsr           0x60001000          [ EL=0 BTYPE=0 SSBS C Z ]
+fpsr           0x0                 [ ]
+fpcr           0x0                 [ Len=0 Stride=0 RMode=0 ]
+tpidr          0x105ab08           0x105ab08 <builtin_tls+200>
+tpidr2         0x0                 0x0
+#0  0x000000000101ade0 in add_numbers ()
+#1  0x000000000101af20 in main ()
+0xffffffffeff0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0xffffffffeff8:	0x29	0x00	0x00	0x00	0x02	0x00	0x00	0x00
+total=43
+
+Breakpoint 2, 0x000000000101ae04 in check_password ()
+@@REVLENS_STOP 1
+x0             0xfffffffff351      281474976707409
+x1             0x1000247           16777799
+pc             0x101ae04           0x101ae04 <check_password+16>
+#0  0x000000000101ae04 in check_password ()
+#1  0x000000000101af50 in main ()
+checksum=379752446
+access denied
+[Inferior 1 (process 16822) exited with code 01]
+@@REVLENS_STOP 2
+The program has no registers now.
