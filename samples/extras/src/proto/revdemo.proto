@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package revlens.demo.v1;
+
+option go_package = "example.com/revdemo/gen;gen";
+
+import "google/protobuf/timestamp.proto";
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  ROLE_ADMIN = 1;
+  ROLE_VIEWER = 2;
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  Role role = 3;
+  repeated string tags = 4;
+  map<string, int64> quotas = 5;
+  google.protobuf.Timestamp created_at = 6;
+  optional string nickname = 7;
+  oneof contact {
+    string phone = 8;
+    string slack = 9;
+  }
+  message Address {
+    string city = 1;
+    int32 zip = 2;
+  }
+  Address address = 10;
+}
+
+message GetUserRequest { string id = 1; }
+message ListUsersRequest { int32 page_size = 1; string page_token = 2; }
+message ListUsersResponse { repeated User users = 1; string next_page_token = 2; }
+message Event { string kind = 1; bytes payload = 2; }
+
+service UserService {
+  rpc GetUser(GetUserRequest) returns (User);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+  rpc Watch(GetUserRequest) returns (stream Event);
+  rpc Upload(stream Event) returns (User);
+}
