@@ -39,7 +39,7 @@ export const entropyAnalyzer: Analyzer = {
     report.meta.entropyMap = { blockSize: step, values: map };
 
     const high = map.filter((v) => v > 7.2).length;
-    const isBinary = !ctx.text && !['zip', 'jar', 'apk', 'crx', 'xpi', 'vsix', 'npm-tgz', 'gzip', 'pdf'].includes(ctx.format);
+    const isBinary = !ctx.text && !['zip', 'jar', 'apk', 'crx', 'xpi', 'vsix', 'npm-tgz', 'gzip', 'pdf', 'ipa', 'sqlite', 'pcap', 'pcapng'].includes(ctx.format);
     if (isBinary && bytes.length > 4096 && report.file.entropy > 7.2) {
       report.findings.push({
         id: 'entropy.high', analyzer: 'entropy', title: 'Very high overall entropy', severity: 'medium',

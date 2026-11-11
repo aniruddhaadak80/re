@@ -1,6 +1,6 @@
 import type { Claim, ClaimResult, Report } from './types.js';
 import { indexOf, asciiBytes, hexToBytes, hex } from './bytes.js';
-import { detectFormat } from './format.js';
+import { detectFormat, formatFamily } from './format.js';
 import { sha256 } from './hash.js';
 
 /**
@@ -29,7 +29,9 @@ export function verifyClaim(bytes: Uint8Array, claim: Claim, report?: Report): C
     }
     case 'format-is': {
       const f = detectFormat(bytes, report?.file.name);
-      return f === claim.format ? res('VERIFIED', `Magic bytes identify the file as ${f}.`) : res('REFUTED', `Magic bytes identify the file as ${f}, not ${claim.format}.`);
+      if (f === claim.format) return res('VERIFIED', `Magic bytes identify the file as ${f}.`);
+      if (formatFamily(f) === claim.format) return res('VERIFIED', `Magic bytes identify the file as ${f}, which is a kind of ${claim.format}.`);
+      return res('REFUTED', `Magic bytes identify the file as ${f}, not ${claim.format}.`);
     }
     case 'sha256-is': {
       const h = sha256(bytes);

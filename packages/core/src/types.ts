@@ -34,7 +34,9 @@ export interface Section {
 export type FormatId =
   | 'elf' | 'pe' | 'macho' | 'macho-fat' | 'wasm'
   | 'zip' | 'jar' | 'apk' | 'crx' | 'xpi' | 'vsix' | 'npm-tgz' | 'gzip' | 'tar' | 'asar'
-  | 'js' | 'sourcemap' | 'json' | 'pdf' | 'pyc' | 'dex' | 'class' | 'text' | 'unknown';
+  | 'js' | 'sourcemap' | 'json' | 'pdf' | 'pyc' | 'dex' | 'class' | 'text' | 'unknown'
+  // added in 1.0.0, detected by magic bytes so package analyzers can key off them
+  | 'dotnet' | 'ipa' | 'pcap' | 'pcapng' | 'sqlite' | 'har' | 'lua' | 'beam' | 'il2cpp-metadata';
 
 export interface Hashes {
   md5: string;
@@ -116,6 +118,11 @@ export interface AnalyzeOptions {
   rules?: string;
   /** run only these analyzer ids (format and hashes always run) */
   analyzers?: string[];
+  /**
+   * Analyzers from other RevLens packages (managed, webrt, mobile, disasm ...). They run after the
+   * core analyzers on the same report, and archive members analyzed recursively get them too.
+   */
+  extraAnalyzers?: Analyzer[];
 }
 
 /**
@@ -189,4 +196,4 @@ export interface DiffReport {
   summary: string;
 }
 
-export const REVLENS_VERSION = '0.1.1';
+export const REVLENS_VERSION = '1.0.0';

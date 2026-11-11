@@ -7,19 +7,48 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-    "./node": { "types": "./dist/node.d.ts", "default": "./dist/node.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
+    }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "node --test --import tsx test/*.test.ts",
     "fetch-fixtures": "node scripts/fetch-fixtures.mjs"
   },
   "dependencies": {
-    "@revlens/core": ">=0.1.1"
+    "@revlens/core": "1.0.0"
   },
-  "engines": { "node": ">=20.10.0" },
-  "keywords": ["reverse-engineering", "android", "apk", "dex", "smali", "axml", "java", "class", "ipa", "ios", "plist", "il2cpp", "flutter", "react-native"],
-  "repository": { "type": "git", "url": "https://github.com/aniruddhaadak80/re.git", "directory": "packages/mobile" }
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "keywords": [
+    "reverse-engineering",
+    "android",
+    "apk",
+    "dex",
+    "smali",
+    "axml",
+    "java",
+    "class",
+    "ipa",
+    "ios",
+    "plist",
+    "il2cpp",
+    "flutter",
+    "react-native"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aniruddhaadak80/re.git",
+    "directory": "packages/mobile"
+  }
 }

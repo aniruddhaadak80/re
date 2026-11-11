@@ -45,7 +45,8 @@ export async function analyze(bytes: Uint8Array, opts: AnalyzeOptions = {}, dept
     analyzeChild: (b, n) => analyze(b, { ...opts, name: n }, depth + 1),
   };
 
-  for (const a of ANALYZER_LIST) {
+  // Core first, then package analyzers. yara and capa stay last of core; package analyzers see their output.
+  for (const a of [...ANALYZER_LIST, ...(opts.extraAnalyzers ?? [])]) {
     if (opts.analyzers && !opts.analyzers.includes(a.id)) continue;
     let applies = false;
     try { applies = a.applies(ctx); } catch { applies = false; }

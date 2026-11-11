@@ -1,5 +1,6 @@
 {
   "extends": "../core/tsconfig.json",
-  "compilerOptions": { "outDir": "dist", "rootDir": "src", "types": ["node"], "lib": ["ES2022", "DOM"], "composite": false },
-  "include": ["src"]
+  "compilerOptions": { "outDir": "dist", "rootDir": "src", "types": ["node"], "lib": ["ES2022", "DOM"] },
+  "include": ["src"],
+  "references": [{ "path": "../core" }]
 }

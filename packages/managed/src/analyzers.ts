@@ -22,7 +22,7 @@ export const dotnetAnalyzer: Analyzer = {
   id: 'managed-dotnet',
   title: '.NET assembly',
   description: 'Reads ECMA-335 metadata: assembly identity, target framework, references, P/Invoke, resources, ReadyToRun, single-file bundles and obfuscator markers.',
-  applies: (ctx) => (isPe(ctx.bytes) && hasCliHeader(ctx.bytes)) || ((ctx.format === 'elf' || ctx.format === 'macho' || ctx.format === 'pe') && (singleFileBundle(ctx.bytes)?.fileCount ?? 0) > 0),
+  applies: (ctx) => (isPe(ctx.bytes) && hasCliHeader(ctx.bytes)) || ((ctx.format === 'elf' || ctx.format === 'macho' || ctx.format === 'pe' || ctx.format === 'dotnet') && (singleFileBundle(ctx.bytes)?.fileCount ?? 0) > 0),
   run(ctx) {
     const { report, bytes } = ctx;
     const out: Record<string, unknown> = {};

@@ -8,7 +8,7 @@ export const buildinfoAnalyzer: Analyzer = {
   id: 'buildinfo',
   title: 'Go and Rust build info',
   description: 'Reads embedded Go build info and cargo-auditable dependency data from native binaries.',
-  applies: (ctx) => ctx.format === 'elf' || ctx.format === 'pe' || ctx.format === 'macho',
+  applies: (ctx) => ctx.format === 'elf' || ctx.format === 'pe' || ctx.format === 'dotnet' || ctx.format === 'macho',
   run(ctx) {
     const { bytes, report } = ctx;
     const comps: Component[] = [];

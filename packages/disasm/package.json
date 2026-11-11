@@ -7,17 +7,43 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-    "./node": { "types": "./dist/node.d.ts", "default": "./dist/node.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
+    }
   },
-  "files": ["dist"],
-  "scripts": { "build": "tsc -p tsconfig.json" },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
   "dependencies": {
-    "@revlens/core": "*",
+    "@revlens/core": "1.0.0",
     "iced-x86": "^1.22.0",
     "@alexaltea/capstone-js": "^5.0.9"
   },
-  "engines": { "node": ">=20.10.0" },
-  "keywords": ["reverse-engineering", "disassembler", "x86", "aarch64", "arm", "elf", "pe", "macho", "cfg"],
-  "repository": { "type": "git", "url": "https://github.com/aniruddhaadak80/re.git", "directory": "packages/disasm" }
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "keywords": [
+    "reverse-engineering",
+    "disassembler",
+    "x86",
+    "aarch64",
+    "arm",
+    "elf",
+    "pe",
+    "macho",
+    "cfg"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aniruddhaadak80/re.git",
+    "directory": "packages/disasm"
+  }
 }

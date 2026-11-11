@@ -1,6 +1,6 @@
 export * from './types.js';
 export { analyze } from './analyze.js';
-export { detectFormat } from './format.js';
+export { detectFormat, formatFamily, isTextFormat } from './format.js';
 export { ANALYZERS } from './analyzers/index.js';
 export { md5, sha1, sha256, tlshLike, tlshDistance, ctph, ctphSimilarity } from './hash.js';
 export { entropy } from './bytes.js';

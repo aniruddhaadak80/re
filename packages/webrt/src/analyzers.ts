@@ -125,7 +125,7 @@ export const webHarAnalyzer: Analyzer = {
   id: 'webrt-har',
   title: 'HAR traffic log',
   description: 'Summarizes hosts, API endpoints, redirects, auth schemes, cookies and missing security headers in a HAR file.',
-  applies: (ctx) => (ctx.format === 'json' || ctx.format === 'text' || ctx.name.toLowerCase().endsWith('.har')) && looksLikeHar(textOf(ctx).slice(0, 4096)),
+  applies: (ctx) => (ctx.format === 'har' || ctx.format === 'json' || ctx.format === 'text' || ctx.name.toLowerCase().endsWith('.har')) && looksLikeHar(textOf(ctx).slice(0, 4096)),
   run(ctx) {
     try {
       const s = analyzeHar(textOf(ctx), { maxScripts: 20 });

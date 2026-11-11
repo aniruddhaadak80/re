@@ -9,7 +9,7 @@ export const peAnalyzer: Analyzer = {
   id: 'pe',
   title: 'PE',
   description: 'Parses PE headers, sections, imports, the import hash (imphash), DLL characteristics and Authenticode presence.',
-  applies: (ctx) => ctx.format === 'pe',
+  applies: (ctx) => ctx.format === 'pe' || ctx.format === 'dotnet',
   run(ctx) {
     const { bytes, report } = ctx;
     const r = new Reader(bytes, true);

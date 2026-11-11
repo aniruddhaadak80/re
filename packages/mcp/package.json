@@ -1,7 +1,7 @@
 {
   "name": "@revlens/mcp",
-  "version": "0.1.1",
-  "description": "RevLens MCP server: give Claude Code, Codex, Cursor and other agents a zero-install reverse engineering toolkit.",
+  "version": "1.0.0",
+  "description": "RevLens MCP server: give Claude Code, Codex, Cursor, VS Code and other agents a zero-install reverse engineering toolkit with disassembly, pseudo code, mobile, .NET, Python, JavaScript, Electron, PCAP and SQLite tools.",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -15,8 +15,9 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
-    "@revlens/core": "0.1.1",
-    "zod": "^4.6.7"
+    "@revlens/core": "1.0.0",
+    "zod": "^4.6.7",
+    "@revlens/engine": "1.0.0"
   },
   "engines": {
     "node": ">=20.10.0"
@@ -34,5 +35,18 @@
     "type": "git",
     "url": "https://github.com/aniruddhaadak80/re.git",
     "directory": "packages/mcp"
+  },
+  "author": "Aniruddha Adak",
+  "main": "./dist/server.js",
+  "types": "./dist/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    }
   }
 }

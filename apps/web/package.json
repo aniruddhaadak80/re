@@ -1,6 +1,6 @@
 {
   "name": "@revlens/web",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "private": true,
   "description": "RevLens web app: look inside any binary, bundle or package in your browser.",
   "license": "MIT",

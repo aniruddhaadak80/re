@@ -1,14 +1,42 @@
 {
   "name": "revlens",
-  "version": "0.1.1",
-  "description": "RevLens CLI: reverse engineering triage, SBOM, secrets, rules and diffs for binaries, bundles and packages. Zero native dependencies.",
+  "version": "1.0.0",
+  "description": "RevLens CLI: reverse engineer binaries, bundles, apps, bytecode, captures and databases. Triage, disassembly, pseudo code, SBOM, secrets, rules and diffs. Zero native dependencies.",
   "license": "MIT",
   "type": "module",
-  "bin": { "revlens": "./dist/index.js" },
-  "files": ["dist"],
-  "scripts": { "build": "tsc -p tsconfig.json" },
-  "dependencies": { "@revlens/core": "0.1.1" },
-  "engines": { "node": ">=20.10.0" },
-  "keywords": ["reverse-engineering", "cli", "sbom", "sarif", "yara", "security", "elf", "pe", "macho"],
-  "repository": { "type": "git", "url": "https://github.com/aniruddhaadak80/re.git", "directory": "packages/cli" }
+  "bin": {
+    "revlens": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@revlens/core": "1.0.0",
+    "@revlens/engine": "1.0.0",
+    "@revlens/mcp": "1.0.0",
+    "@modelcontextprotocol/sdk": "^1.32.2"
+  },
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "keywords": [
+    "reverse-engineering",
+    "cli",
+    "sbom",
+    "sarif",
+    "yara",
+    "security",
+    "elf",
+    "pe",
+    "macho"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aniruddhaadak80/re.git",
+    "directory": "packages/cli"
+  },
+  "author": "Aniruddha Adak"
 }

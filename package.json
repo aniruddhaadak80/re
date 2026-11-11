@@ -1,7 +1,7 @@
 {
   "name": "revlens-monorepo",
   "private": true,
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "RevLens: the zero-install reverse engineering lens for agents and humans",
   "license": "MIT",
   "type": "module",
@@ -13,16 +13,18 @@
     "node": ">=20.10.0"
   },
   "scripts": {
-    "build": "npm run build -w @revlens/core && npm run build -w revlens && npm run build -w @revlens/mcp",
+    "build": "tsc -b tsconfig.json",
     "build:web": "npm run build -w @revlens/web",
-    "typecheck": "tsc -b packages/core packages/cli packages/mcp",
-    "test": "node --test --import tsx packages/core/test/*.test.ts",
-    "cli": "node --import tsx packages/cli/src/index.ts"
+    "typecheck": "tsc -b tsconfig.json",
+    "test": "node --test --import tsx packages/*/test/*.test.ts",
+    "cli": "node --import tsx packages/cli/src/index.ts",
+    "fetch-fixtures": "node samples/fetch-samples.mjs && node packages/managed/scripts/fetch-fixtures.mjs && node packages/webrt/scripts/fetch-fixtures.mjs && node packages/mobile/scripts/fetch-fixtures.mjs && node packages/disasm/scripts/fetch-fixtures.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
     "fast-check": "^4.10.2",
     "tsx": "^4.23.15",
     "typescript": "^5.6.3"
-  }
+  },
+  "author": "Aniruddha Adak"
 }

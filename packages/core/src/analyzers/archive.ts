@@ -3,7 +3,7 @@ import { listZip, listTar, listAsar, crxZipOffset, type Entry } from '../archive
 import { decompress } from '../archive/inflate.js';
 import { startsWith } from '../bytes.js';
 
-const ARCHIVES = new Set(['zip', 'jar', 'apk', 'crx', 'xpi', 'vsix', 'npm-tgz', 'gzip', 'tar', 'asar']);
+const ARCHIVES = new Set(['zip', 'jar', 'apk', 'crx', 'xpi', 'vsix', 'npm-tgz', 'gzip', 'tar', 'asar', 'ipa']);
 /** Members worth analyzing, by priority. Everything else is only listed. */
 const INTERESTING = /(manifest\.json|package\.json|extension\.vsixmanifest|AndroidManifest\.xml|\.(m?js|cjs|map|wasm|node|so|dll|exe|dylib|dex|json)$)/i;
 const MAX_CHILDREN = 60;

@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/managed" },
+    { "path": "packages/webrt" },
+    { "path": "packages/mobile" },
+    { "path": "packages/disasm" },
+    { "path": "packages/engine" },
+    { "path": "packages/cli" },
+    { "path": "packages/mcp" }
+  ]
+}

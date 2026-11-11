@@ -17,7 +17,7 @@ export const disasmAnalyzer: Analyzer = {
   id: 'disasm',
   title: 'Native code analysis',
   description: 'Disassembles x86, x86-64, AArch64 and ARM code in ELF, PE and Mach-O files: functions, CFG, call graph, string and import references.',
-  applies: (ctx) => ctx.format === 'elf' || ctx.format === 'pe' || ctx.format === 'macho' || ctx.format === 'macho-fat',
+  applies: (ctx) => ctx.format === 'elf' || ctx.format === 'pe' || ctx.format === 'dotnet' || ctx.format === 'macho' || ctx.format === 'macho-fat',
   async run(ctx) {
     let p: Program;
     try {

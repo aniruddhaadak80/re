@@ -27,17 +27,14 @@
   "dependencies": {
     "@babel/generator": "^7.29.1",
     "@babel/parser": "^7.29.2",
-    "@babel/types": "^7.29.0"
+    "@babel/types": "^7.29.0",
+    "@revlens/core": "1.0.0"
   },
   "peerDependencies": {
-    "@revlens/core": "*",
     "playwright": ">=1.40.0"
   },
   "peerDependenciesMeta": {
     "playwright": {
-      "optional": true
-    },
-    "@revlens/core": {
       "optional": true
     }
   },
