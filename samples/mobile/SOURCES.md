@@ -76,3 +76,15 @@ Built by RevLens from samples/mobile/src-jni (MIT, this repo) with `samples/mobi
 | bridge-v1.javap.txt, bridge-v2.javap.txt | `javap -p -s` (JDK 25) of the same class files, the member list reference |
 
 `reference/androguard-graph.json` is written by `packages/mobile/scripts/gen-graph-reference.py` with androguard 4.1.4 (components, raw android:exported, intent filter actions and categories).
+
+## SHA-256 of the committed binaries
+
+These files are checked in because the tests read real binaries; their provenance is listed above.
+
+| File | SHA-256 |
+| --- | --- |
+| `java/Hello.class` | `fb18f45ea0cc77aade5fac0c033aadad2d3b4f5ce7c0e93e07e39ac220438a80` |
+| `java/commons-cli-1.6.0.jar` | `69e1237059acd56f0f8654dcde09d8a1412eee82918bef5564d51f8fb275711b` |
+| `java/hello-035.dex` | `7d4f612a893783ff52379a41a44f37212d24183c0b2e6f626cdcf884e2e4ccb3` |
+| `java/hello-039.dex` | `46e503bcc20b32c926b9b221fdf4bae97f5d0e0ae8ce0dfcef9d31b75cd24ffe` |
+| `java/hello.jar` | `5e1ce92569fea7d6bac616dea41dad217b9dfc927d6c00f49d097188193f4533` |

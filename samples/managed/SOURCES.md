@@ -69,3 +69,18 @@ with keccak256 from js-sha3 (MIT) at generation time.
 and osx-arm64 (.dylib) from the official microsoft.netcore.app.runtime.<rid> 8.0.11 packages on nuget.org,
 pulled by `scripts/fetch-native.mjs` with HTTP range requests. MIT (.NET runtime). `exports.ref.json` is
 written by `scripts/ref-native-exports.py` from llvm-nm, llvm-readobj and llvm-objdump 19.
+
+## SHA-256 of the committed binaries
+
+These files are checked in because the tests read real binaries; their provenance is listed above.
+
+| File | SHA-256 |
+| --- | --- |
+| `dotnet/System.IO.Compression.Brotli.dll` | `de114e94f8acb505ffff5c2cc1be0871c1a76a04823f5e74ba39fb9802eedc98` |
+| `pyinstaller/mini-carchive.bin` | `00fb8b31d982190a8921c2a75c553d5324528f214149326942da816014defdb1` |
+| `python/sample_mod.3.10.pyc` | `ffe52025eb09a139e2f999fead27f3cb269dfa4643b6137a9d0e361e710a2edb` |
+| `python/sample_mod.3.11.pyc` | `d5fe7760c75bd0f019847ed4337d7121789d62507cc02bb9f514a7fe26f20dfd` |
+| `python/sample_mod.3.12.pyc` | `00cee3e9b9676ae08d5f62179d4dcbd9a9a6f26d16ae008f416190f744bef1de` |
+| `python/sample_mod.3.13.pyc` | `11dce6697e0a564984b60a95e9526ee900dc50818d88de6dc3491dfe73abffac` |
+| `python/sample_mod.3.8.pyc` | `9d2438acaa7e4b58c87f63dd05ea5d8accd601a88ff6b3fc67682ff26bb37a7b` |
+| `python/sample_mod.3.9.pyc` | `3a3d321b8d299c262363043f3c76364d79889b3ce38ee4f7b9e88aecfc2e7ae1` |

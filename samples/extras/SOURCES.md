@@ -89,3 +89,18 @@ Built by RevLens from sources in samples/extras/src/proto and samples/extras/src
 | introspection.json | graphql-js 16 `introspectionFromSchema(buildSchema(schema.graphql))` |
 | app.bundle.min.js | `src/contracts-js/make.mjs`: esbuild minified ESM bundle of app.js with gql templates, query strings, a precompiled GraphQL document from graphql-js `parse`, the introspection as a JSON.parse string, and petstore.json inlined as a JS object literal |
 | src/contracts-js/petstore.json | https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.0/petstore.json (OpenAPI Initiative, Apache-2.0) |
+
+## SHA-256 of the committed binaries
+
+These files are checked in because the tests read real binaries; their provenance is listed above.
+
+| File | SHA-256 |
+| --- | --- |
+| `demo-arm64-stripped.elf` | `18edfbea9a68e5b15946f9d864afe0ec40dd555dfbceaaf9f803cc9c6b5a431d` |
+| `demo-x64.elf` | `1aa324d6885e99cbcf535e6d547680b85a7a3e70bd8abff4fb3bffd23e012356` |
+| `go-hello-stripped.elf` | `d2b52119436583afb65577ed3f76895b334ced4d772f9698482ecdb5e5bc6afa` |
+| `hello-arm64.macho` | `9e339b6ff25673eea2858d95ec201ac57e443507070940763d9111b14ee1d6a8` |
+| `hello-res.exe` | `0e0c3fb5e2fce78cbf4ffe9e6926c36e83d7b2b75057c73f11a38378984b5170` |
+| `jiter-0.5.0.so` | `c18af484ce5a42352e9fdf8f36005872c70a98359a7df154c21a5d63c6894e1b` |
+| `kernels-gfx906.o` | `56d8ae53652d90a3982c4fb19564d918668ffacc284e50929ea7f785ff9c6710` |
+| `orjson-3.10.7.so` | `508d35f1f3ee70623d846836d717e38dacc3756ab897fa0d8e58da77f1d63993` |

@@ -54,3 +54,16 @@ unless marked as an excerpt (a line range of the original).
 | `forward-list-empty.txt` | `adb forward --list`, no rules | recorded in the RevLens sandbox, adb 1.0.41 | MIT |
 | `no-device-error.txt` | `adb shell getprop` with no device | recorded in the RevLens sandbox, adb 1.0.41 | MIT |
 | `adb-version.txt` | `adb version` | recorded in the RevLens sandbox | MIT |
+
+## SHA-256 of the committed binaries
+
+These files are checked in because the tests read real binaries; their provenance is listed above.
+
+| File | SHA-256 |
+| --- | --- |
+| `crackme-aarch64-static.elf` | `f2860bcbdbcc3e1ebd0fdbc82f1daa2395a70ae69d4a0a07e7f3ac29e5804f8b` |
+| `crackme-aarch64.elf` | `739ea7f531bed6ffae645db6072ccb57c7cd911337dd42513beace148d9db1d3` |
+| `crackme-x86_64-static.elf` | `1bbe59814bc311d14e084f6bb7659cead17d49df9c19e88411b4a17dda779e0f` |
+| `hello-dotnet.dll` | `63746b2e79c2b670b9e0721b456d88394d83d557df83bdb006ddcde4362ac6fa` |
+| `hello.dex` | `519ae8847aaa44b38573c37e352b4dc05cabd25e7cd2bf5d5e45a063556c37bc` |
+| `hello.jar` | `a34e824bed2365326beb9196d79c53d8e670bced6d130593507cd8dc358ce69f` |

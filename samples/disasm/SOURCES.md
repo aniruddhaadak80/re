@@ -51,3 +51,20 @@ and the `_ZTV*` vtable symbols of the two `virt` builds.
 
 The cross version matching test also uses esbuild 0.23.1 (MIT, npm packages `@esbuild/linux-x64`
 and `@esbuild/darwin-arm64`), downloaded next to 0.24.0 by `packages/disasm/scripts/fetch-fixtures.mjs`.
+
+## SHA-256 of the committed binaries
+
+These files are checked in because the tests read real binaries; their provenance is listed above.
+
+| File | SHA-256 |
+| --- | --- |
+| `hello-arm32.elf` | `b0fd45badbf305973095aa1f165fbea19e4d7f1b93335807b51854c8dfefc5ed` |
+| `hello-arm64.elf` | `d85e579aacba2e62aabeafc490e7cd66924dd301409ed5dd616c31e0b60ed95a` |
+| `hello-arm64.macho` | `e9c9e7b3e3b0a64f0b1ce493f194d776ea601aca351246acd2763c2995ff15b5` |
+| `hello-fat.macho` | `19599a3e19fffdef13ceafdb9790a04e6f19787fdf9ea17c57c513ff53bd602f` |
+| `hello-thumb-static.elf` | `f512693f8238feee017e1659690c7202f21087c8e0c7a4ef5f962d9108b8b9ce` |
+| `hello-x64-stripped.elf` | `6c74f1602d8b4927cbcb19ddb4b3c1dd3683279d66f30b8ed3884b00ce5f6e65` |
+| `hello-x64.elf` | `10007deac7b9907fbc82bedb0e63a815ab305e9c8402abf86a9816683cff1ec4` |
+| `hello-x64.exe` | `7b90fd885b7fb634a0c9b704d93463732502949d9b925ea941cb1afed83a7f89` |
+| `hello-x64.macho` | `1b912fe2f96ef11bd4cee5770ea83b85ad6211e9640fff986bee52d7ed32b769` |
+| `hello-x86.elf` | `74e2f2753e2469863f7e1e8f157a37b53d49c06542f51e35b7fb95d468dd1015` |
