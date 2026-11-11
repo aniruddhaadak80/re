@@ -157,8 +157,8 @@ export async function fridaRun(input: FridaRunInput) {
       eventCount: parsed.events.length, dropped: parsed.dropped, events: parsed.events,
       errors: parsed.errors.slice(0, 50), logs: parsed.logs.slice(0, 200),
       ...(ok ? {} : { error: parsed.errors[0] ?? describeFailure(r) }),
-      ...(mode === 'spawn' && !ok && /ptrace|Operation not permitted|unable to access process/i.test(`${r.stderr}${r.stdout}`)
-        ? { hint: 'Spawning needs ptrace. In containers run with --cap-add=SYS_PTRACE or attach to an already running process instead.' } : {}),
+      ...(mode === 'spawn' && !ok
+        ? { hint: 'Spawning needs ptrace and a working injector. In containers and gVisor style sandboxes run with --cap-add=SYS_PTRACE, or start the program yourself and attach by pid instead.' } : {}),
     };
   });
 }
