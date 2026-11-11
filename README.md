@@ -23,6 +23,8 @@
 
 <code>npx revlens setup claude-code --write</code>
 
+<p><sub><b>English</b> · <a href="docs/readme/README.bn.md">বাংলা</a> · <a href="docs/readme/README.hi.md">हिन्दी</a> · <a href="docs/readme/README.zh.md">中文</a> · <a href="docs/readme/README.ja.md">日本語</a> · <a href="docs/readme/README.es.md">Español</a></sub></p>
+
 </div>
 
 <img src="docs/assets/divider.svg" alt="" width="100%" />

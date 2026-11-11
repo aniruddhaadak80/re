@@ -91,7 +91,7 @@ for (const [id, title] of GROUPS) {
 const mapText = map.join('\n');
 
 // Keep the counts in the README and docs in step with the code.
-const { ALL_ANALYZERS } = await import('../packages/engine/dist/node.js');
+const { ALL_ANALYZERS, ALL_ANALYZERS_NODE } = await import('../packages/engine/dist/node.js');
 const COUNT_RULES = [
   [/MCP-\d+_tools/g, `MCP-${tools.length}_tools`],
   [/MCP server with \d+ tools, \d+ prompts and \d+ resources/g, `MCP server with ${tools.length} tools, ${prompts.length} prompts and ${resources.length} resources`],
@@ -100,6 +100,9 @@ const COUNT_RULES = [
   [/\| Number of MCP tools \| \d+ \|/g, `| Number of MCP tools | ${tools.length} |`],
   [/\b\d+ MCP tools\b/g, `${tools.length} MCP tools`],
   [/\b\d+ CLI commands\b/g, `${CLI_COMMAND_COUNT} CLI commands`],
+  [/LOOP\[\d+ analyzers in order\]/g, `LOOP[${ALL_ANALYZERS.length} analyzers in order]`],
+  [/S-->>C: \d+ tools with JSON schemas/g, `S-->>C: ${tools.length} tools with JSON schemas`],
+  [/\(\d+ analyzers in the browser build, \d+ with the Node only ones\)/g, `(${ALL_ANALYZERS.length} analyzers in the browser build, ${ALL_ANALYZERS_NODE.length} with the Node only ones)`],
 ];
 const COUNTED = ['README.md', 'docs/comparison.md', 'docs/mcp.md', 'docs/agent-skills-and-plugins.md', 'docs/architecture.md', ...['bn', 'hi', 'zh', 'ja', 'es'].map((l) => `docs/readme/README.${l}.md`)];
 const withCounts = (p) => { let t = readFileSync(p, 'utf8'); for (const [re, v] of COUNT_RULES) t = t.replace(re, v); return t; };

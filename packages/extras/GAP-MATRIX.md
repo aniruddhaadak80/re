@@ -1,7 +1,7 @@
 # RevLens vs rea gap matrix
 
 Compared against morluto/rea v6.8.0 (source clone, MCP catalog in docs, 174 contract tool names, 194 CLI command names, 60+ src/ provider folders). 
-Rows group related rea tools. Status: covered, partial, missing. "Before" is the state of all RevLens branches at feat/extras ce77aa5; "after" is the state at the head of feat/extras after this round of work, every after-change backed by tests against reference tools.
+Rows group related rea tools. Status: covered, partial, missing. "Before" is the state of all RevLens branches at feat/extras ce77aa5; "after" is the state on the integrate/1.0 line for RevLens 1.0, every after-change backed by tests against reference tools or by files in the repo.
 Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/GAP-MATRIX.md`.
 
 
@@ -146,15 +146,15 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 |---|---|---|---|---|---|
 | CLI with about 194 commands | src/cli, src/cliCommandNames.ts | cli | covered | covered | one CLI that also loads every package CLI_COMMANDS |
 | MCP server (stdio) | src/server, src/main | mcp | covered | covered | zod 4 schemas, every package TOOLS registered |
-| MCP over HTTP listener | src/main/mcpHttpArguments.ts | mcp | missing | missing | left |
+| MCP over HTTP listener | src/main/mcpHttpArguments.ts | mcp | missing | covered | revlens mcp --http serves Streamable HTTP on localhost by default, with an optional bearer token and allowed origins |
 | doctor / setup / uninstall / update | src/doctorRuntime.ts, src/cli | bridges + cli | covered | covered | bridge_doctor checks tools; setup writes MCP config for clients |
-| server.json (MCP registry) | server.json | mcp | missing | missing | left: publish to the MCP registry |
-| Claude plugin (.claude-plugin) and Codex plugin (.codex-plugin) | repo root | mcp | missing | missing | left |
-| Agent skills (.agents/skills, reverse-engineer-anything) | .agents/skills | docs | missing | missing | left |
+| server.json (MCP registry) | server.json | mcp | missing | covered | server.json at the repo root describes the npm package and stdio transport for the MCP registry |
+| Claude plugin (.claude-plugin) and Codex plugin (.codex-plugin) | repo root | mcp | missing | covered | .claude-plugin (plugin and marketplace) and .codex-plugin both start the RevLens MCP server and ship the agent skill |
+| Agent skills (.agents/skills, reverse-engineer-anything) | .agents/skills | docs | missing | covered | .agents/skills/revlens-reverse-engineer with a generated tool map, so the skill never drifts from the real tool list |
 | RL agent environments (environment-build/serve/export) | src/server/environment, docs/agent-environments.md | extras | missing | partial | x_eval_* harness with ground truth on repo fixtures and scoring; left: HAR-backed replay servers |
 | Agent evaluation (tests/evaluation/model-evals) | tests/evaluation | extras | missing | covered | x_eval_tasks and x_eval_score, task answers checked against verified values |
-| Showcases / examples | examples/ | docs | partial | partial | samples/ plus fetch-samples.mjs; left: written showcases |
-| i18n READMEs (24 locales) | website/locales | docs | missing | missing | left |
+| Showcases / examples | examples/ | docs | partial | covered | docs/showcases has five walkthroughs made from real CLI runs on repo fixtures, examples/ has MCP client configs and a GitHub Actions workflow |
+| i18n READMEs (24 locales) | website/locales | docs | missing | covered | README in English plus Bengali, Hindi, Chinese, Japanese and Spanish under docs/readme, with counts kept in step by gen-tool-docs |
 | Website | website/ | web | covered | covered | RevLens web app analyses files fully in the browser, rea site is docs only |
 | Release process (release-please, CHANGELOG) | release-please-config.json | repo | partial | partial | CHANGELOG present; left: automated releases |
 | Test lanes, mutation testing (stryker), conformance | tests/, stryker.config.mjs | repo | partial | partial | real-file tests against reference tools in each package; left: mutation testing |
@@ -167,7 +167,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | state | covered | partial | missing |
 |---|---|---|---|
 | before | 49 | 26 | 40 |
-| after | 62 | 28 | 25 |
+| after | 68 | 27 | 20 |
 
 ## Where RevLens already exceeds rea
 
@@ -191,7 +191,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | #1558 Java reverse engineering | mobile (javap-style class reader) + bridges (jadx) |
 | #3289 iOS applications | mobile (IPA) + extras (Mach-O code signature, entitlements) |
 | #8121 WeChat wxapkg | extras scan detection; entry listing left |
-| #1269 Codex plugin | mcp (left) |
+| #1269 Codex plugin | .codex-plugin at the repo root |
 | #8543 V8 code cache (.jsc, bytenode) | extras x_v8_inspect |
 | #8911 SQLite with WAL state | webrt |
 | #6337 verifiable manifest for exported bundles | extras x_ledger_export (digest chain) |
