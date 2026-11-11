@@ -19,7 +19,12 @@
     "baseUrl": ".",
     "paths": {
       "@revlens/core": ["../../packages/core/src/index.ts"],
-      "@revlens/core/internal/*": ["../../packages/core/src/*"]
+      "@revlens/core/internal/*": ["../../packages/core/src/*"],
+      "@revlens/engine": ["../../packages/engine/src/index.ts"],
+      "@revlens/managed": ["../../packages/managed/src/index.ts"],
+      "@revlens/webrt": ["../../packages/webrt/src/index.ts"],
+      "@revlens/mobile": ["../../packages/mobile/src/index.ts"],
+      "@revlens/disasm": ["../../packages/disasm/src/index.ts"]
     }
   },
   "include": ["src", "e2e", "vite.config.ts", "playwright.config.ts"]

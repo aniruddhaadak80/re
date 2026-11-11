@@ -22,6 +22,8 @@ function getWorker(): Worker {
     else if (m.type === 'error') p.reject(new Error(m.message));
     else if (m.type === 'rules-result') m.error ? p.reject(new Error(m.error)) : p.resolve((m.matches ?? []) as never);
     else if (m.type === 'verify-result') m.error || !m.result ? p.reject(new Error(m.error ?? 'No result')) : p.resolve(m.result as never);
+    else if (m.type === 'loaded') p.resolve(undefined as never);
+    else if (m.type === 'tool-result') m.error ? p.reject(new Error(m.error)) : p.resolve({ result: m.result, ms: m.ms ?? 0 } as never);
   };
   worker.onerror = (e) => {
     for (const [, p] of pending) p.reject(new Error(e.message || 'The analysis worker stopped.'));
@@ -49,3 +51,13 @@ export function verifyInWorker(fileId: string, claim: Claim): Promise<ClaimResul
   return send<ClaimResult>({ type: 'verify', id: newId('v'), fileId, claim });
 }
 export function forgetInWorker(fileId: string): void { getWorker().postMessage({ type: 'forget', fileId } satisfies WorkerRequest); }
+
+/** Hand bytes to the worker under a file id, so package tools can run on them. */
+export function loadInWorker(fileId: string, bytes: Uint8Array): Promise<void> {
+  const copy = bytes.slice().buffer;
+  return send<void>({ type: 'load', id: newId('l'), fileId, buffer: copy }, undefined, [copy]);
+}
+/** Run one package tool in the worker on a file loaded with loadInWorker or analyzeInWorker. */
+export function toolInWorker<T = unknown>(fileId: string, tool: string, args: Record<string, unknown> = {}): Promise<{ result: T; ms: number }> {
+  return send<{ result: T; ms: number }>({ type: 'tool', id: newId('t'), fileId, tool, args });
+}

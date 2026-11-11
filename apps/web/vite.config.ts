@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const coreSrc = fileURLToPath(new URL('../../packages/core/src/', import.meta.url));
+const pkgSrc = (name: string) => fileURLToPath(new URL(`../../packages/${name}/src/`, import.meta.url));
+const icedStub = fileURLToPath(new URL('./src/lib/iced-stub.ts', import.meta.url));
 const base = process.env.BASE ?? '/re/';
 
 // vite preview serves the same security headers as production (vercel.json), so the browser
@@ -27,6 +29,10 @@ export default defineConfig({
     alias: [
       { find: /^@revlens\/core$/, replacement: `${coreSrc}index.ts` },
       { find: /^@revlens\/core\/internal\/(.*)$/, replacement: `${coreSrc}$1` },
+      // the browser builds of the packages, from source (Node-only entries are never imported here)
+      { find: /^@revlens\/(engine|managed|webrt|mobile|disasm)$/, replacement: `${pkgSrc('$1')}index.ts` },
+      // iced-x86 ships a Node build that reads its .wasm with fs; in the browser Capstone decodes x86 too
+      { find: /^iced-x86$/, replacement: icedStub },
     ],
   },
   worker: { format: 'es' },
