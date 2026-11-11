@@ -33,6 +33,32 @@ function primaryTable(r: unknown, depth = 0): { key: string; rows: Obj[] } | und
   return undefined;
 }
 
+/** A short key and value summary for results that have a natural headline, such as an APK manifest. */
+export function summaryRows(r: unknown): { title: string; rows: [string, string][] } | undefined {
+  if (!isObj(r) || !isObj(r.manifest) || typeof r.manifest.package !== 'string') return undefined;
+  const m = r.manifest;
+  const rows: [string, string][] = [];
+  const add = (k: string, v: unknown) => { if (v !== undefined && v !== null && v !== '') rows.push([k, String(v)]); };
+  add('Package', m.package);
+  add('Version', m.versionName !== undefined ? `${m.versionName}${m.versionCode !== undefined ? ` (code ${m.versionCode})` : ''}` : m.versionCode);
+  add('Min SDK', m.minSdk);
+  add('Target SDK', m.targetSdk);
+  add('Compile SDK', m.compileSdk);
+  add('Launcher activity', m.launcherActivity);
+  if (Array.isArray(m.permissions)) add('Permissions', `${m.permissions.length}${m.permissions.length ? `: ${m.permissions.slice(0, 6).map((p) => (isObj(p) ? String(p.name ?? '') : String(p)).replace(/^android\.permission\./, '')).join(', ')}${m.permissions.length > 6 ? ', ...' : ''}` : ''}`);
+  if (Array.isArray(m.components)) add('Components', m.components.length);
+  if (Array.isArray(m.deepLinks) && m.deepLinks.length) add('Deep links', m.deepLinks.length);
+  if (isObj(r.signing)) {
+    const sg = r.signing;
+    const schemes = ['v1', 'v2', 'v3', 'v31'].filter((k) => isObj(sg[k]) && (sg[k] as Obj).present === true);
+    if (schemes.length) add('Signature schemes', schemes.join(', '));
+    if (Array.isArray(sg.certificateSha256) && sg.certificateSha256.length) add('Signer SHA-256', String(sg.certificateSha256[0]));
+  }
+  if (Array.isArray(r.dex)) add('DEX files', r.dex.length);
+  if (Array.isArray(r.frameworks) && r.frameworks.length) add('Frameworks', r.frameworks.map((f) => (isObj(f) ? f.name ?? f.id : f)).join(', '));
+  return { title: 'Manifest summary', rows };
+}
+
 function cell(v: unknown): string {
   if (v === undefined || v === null) return '';
   if (scalar(v)) return String(v);
@@ -101,11 +127,29 @@ export function CodePanel({ text, label, testId }: { text: string; label: string
 /** Shows any package tool result: its main text, its main table, then the full JSON. */
 export function ToolResult({ result, ms }: { result: unknown; ms?: number }) {
   const text = primaryText(result);
+  const summary = summaryRows(result);
   const table = primaryTable(result);
   const json = safeJson(result);
   return (
     <div className="space-y-4" data-testid="tool-result">
       {text && <CodePanel text={text.text} label={text.key} testId="tool-text" />}
+      {summary && (
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-ink">{summary.title}</p>
+          <div className="overflow-hidden rounded-xl border border-line" data-testid="tool-summary">
+            <table className="w-full table-fixed text-left text-xs">
+              <tbody>
+                {summary.rows.map(([k, v]) => (
+                  <tr key={k} className="border-t border-line/70 first:border-t-0 align-top">
+                    <th scope="row" className="w-36 px-3 py-1.5 font-medium text-muted">{k}</th>
+                    <td className="break-words px-3 py-1.5 font-mono text-fg [overflow-wrap:anywhere]">{v}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
       {table && (
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-ink">{table.key} <span className="font-normal normal-case tracking-normal text-muted">({table.rows.length})</span></p>

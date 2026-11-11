@@ -62,6 +62,15 @@ test.describe('try a sample', () => {
     });
   }
 
+  test('APK report leads with the manifest summary', async ({ page }) => {
+    await page.goto('labs/mobile');
+    await page.getByTestId('sample-apk').click();
+    const summary = page.getByTestId('tool-summary');
+    await expect(summary).toContainText('com.angrydoughnuts.android.alarmclock', { timeout: 45_000 });
+    await expect(summary).toContainText('Target SDK');
+    await expect(summary).toContainText('Permissions');
+  });
+
   test('SQLite query runs a SELECT', async ({ page }) => {
     await page.goto('labs/sqlite');
     await page.getByTestId('sample-db').click();

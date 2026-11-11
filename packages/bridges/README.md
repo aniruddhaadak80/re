@@ -8,7 +8,7 @@ Bridged tools: radare2, rizin, Ghidra headless, jadx, apktool, ILSpy (ilspycmd),
 GNU objdump, llvm-objdump, binwalk, adb, IDA (idat batch mode) and Binary Ninja headless. Cutter and Hopper
 are detected only.
 
-Node only. Node 20.10 or newer.
+Node only. Node 22.12 or newer.
 
 ## What it does
 

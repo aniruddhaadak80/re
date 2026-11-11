@@ -150,4 +150,4 @@ The Markdown report is plain GitHub flavored Markdown, so it renders nicely in t
 
 ## Other CI systems
 
-Any system that can run Node 20.10 or newer can run RevLens. GitLab can show SARIF through its security dashboard converters, and Azure DevOps reads SARIF through the SARIF SAST Scans Tab extension. The JSON report is stable (`schema: "revlens/report@1"`) if you would rather build your own gate.
+Any system that can run Node 22.12 or newer can run RevLens. GitLab can show SARIF through its security dashboard converters, and Azure DevOps reads SARIF through the SARIF SAST Scans Tab extension. The JSON report is stable (`schema: "revlens/report@1"`) if you would rather build your own gate.

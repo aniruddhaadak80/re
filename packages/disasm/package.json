@@ -28,7 +28,7 @@
     "@alexaltea/capstone-js": "^5.0.9"
   },
   "engines": {
-    "node": ">=20.10.0"
+    "node": ">=22.12.0"
   },
   "keywords": [
     "reverse-engineering",

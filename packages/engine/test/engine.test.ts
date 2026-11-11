@@ -52,10 +52,16 @@ test('packages filter limits package analyzers', async () => {
 });
 
 test('registry lists analyzers, tools and commands from every package', () => {
-  assert.equal(PACKAGES.length, 4);
+  // Every @revlens package the engine depends on (except core, and bridges which is Node only) is a PACKAGES entry.
+  const pkg = JSON.parse(readFileSync(join(root, 'packages', 'engine', 'package.json'), 'utf8'));
+  const deps = Object.keys(pkg.dependencies ?? {}).filter((d) => d.startsWith('@revlens/') && d !== '@revlens/core' && d !== '@revlens/bridges');
+  assert.deepEqual(PACKAGES.map((p) => p.npm).sort(), deps.sort());
+  for (const p of PACKAGES) assert.ok(p.analyzers.length > 0, p.id);
   assert.ok(ALL_ANALYZERS.some((a) => a.package === 'disasm'));
   const names = PACKAGE_TOOLS.map((t) => t.name);
   assert.equal(new Set(names).size, names.length);
-  assert.equal(names.length, 47 + 27);
-  assert.equal(TOOL_GROUPS.reduce((n, g) => n + g.commands.length, 0), 42);
+  assert.equal(names.length, TOOL_GROUPS.reduce((n, g) => n + g.tools.length, 0));
+  for (const g of TOOL_GROUPS) assert.ok(g.tools.length > 0, g.id);
+  assert.ok(names.length >= 74);
+  assert.ok(TOOL_GROUPS.reduce((n, g) => n + g.commands.length, 0) >= 42);
 });

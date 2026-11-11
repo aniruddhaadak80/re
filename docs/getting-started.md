@@ -16,7 +16,7 @@ The analysis runs inside a Web Worker on your own device. The file is never uplo
 
 ## Option 2: the terminal
 
-You need Node.js 20.10 or newer. Node 22 is what we test on.
+You need Node.js 22.12 or newer. CI tests on Node 22 and 24. Node 20 reached end of life in April 2026, and a test dependency (@electron/asar 4) needs 22.12, so 1.0 drops it.
 
 ```bash
 npx revlens analyze ./esbuild.exe

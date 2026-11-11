@@ -32,7 +32,7 @@
     "@revlens/webrt": "1.0.0"
   },
   "engines": {
-    "node": ">=20.10.0"
+    "node": ">=22.12.0"
   },
   "keywords": [
     "reverse-engineering",

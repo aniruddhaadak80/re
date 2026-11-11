@@ -5,7 +5,7 @@
 <p>
   <a href="https://github.com/aniruddhaadak80/re/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/aniruddhaadak80/re/ci.yml?branch=main&label=CI&style=flat-square&labelColor=0A0A0B&color=F5B301" /></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-F5B301?style=flat-square&labelColor=0A0A0B" /></a>
-  <img alt="Node 20.10 or newer" src="https://img.shields.io/badge/node-%E2%89%A520.10-14B8A6?style=flat-square&logo=nodedotjs&logoColor=white&labelColor=0A0A0B" />
+  <img alt="Node 22.12 or newer" src="https://img.shields.io/badge/node-%E2%89%A522.12-14B8A6?style=flat-square&logo=nodedotjs&logoColor=white&labelColor=0A0A0B" />
   <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-38BDF8?style=flat-square&logo=typescript&logoColor=white&labelColor=0A0A0B" />
   <a href="docs/mcp.md"><img alt="MCP server" src="https://img.shields.io/badge/MCP-12_tools-10B981?style=flat-square&labelColor=0A0A0B" /></a>
   <a href="CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-FFD166?style=flat-square&labelColor=0A0A0B" /></a>
