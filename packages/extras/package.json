@@ -1,0 +1,25 @@
+{
+  "name": "@revlens/extras",
+  "version": "1.0.0",
+  "description": "RevLens extras in pure TypeScript: C++/Rust/MSVC demangling, Go symbol recovery, deep PE (resources, version info, manifest, rich header, Authenticode, installers), ELF notes and kernel modules, Mach-O code signatures, firmware containers, GPU code, V8 and Hermes bytecode, model files, Windows forensic formats, an evidence and claims ledger, and RL environments for agents.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./node": { "types": "./dist/node.d.ts", "default": "./dist/node.js" }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test --import tsx test/*.test.ts",
+    "fetch-fixtures": "node scripts/fetch-fixtures.mjs"
+  },
+  "dependencies": {
+    "@revlens/core": "*"
+  },
+  "engines": { "node": ">=20.10.0" },
+  "keywords": ["reverse-engineering", "demangle", "go", "gopclntab", "pe", "authenticode", "firmware", "uimage", "squashfs", "uefi", "spirv", "ptx", "v8", "hermes", "gguf", "lnk", "evidence", "rl-environment"],
+  "repository": { "type": "git", "url": "https://github.com/aniruddhaadak80/re.git", "directory": "packages/extras" }
+}
