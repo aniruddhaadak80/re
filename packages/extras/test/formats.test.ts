@@ -174,3 +174,14 @@ test('cpio newc listing matches GNU cpio 2.15 -tv', () => {
   assert.deepEqual(c.entries.map((e) => ({ name: e.name, mode: mode(e.mode, e.type), size: e.size })), REF.cpio);
   assert.equal(c.entries.find((e) => e.name === 'bin/sh')!.target, 'busybox');
 });
+
+test('UF2 made by Microsoft uf2conv.py: family, address and block count match uf2conv -i', () => {
+  // uf2conv.py -c -b 0x10000000 -f RP2040 on 3000 bytes; uf2conv -i: family RP2040 0xe48bff56, target 0x10000000, flags 0x2000
+  const u = X.parseUf2(fx('fw.uf2'));
+  assert.equal(u.blocks, fx('fw.uf2').length / 512);
+  assert.deepEqual(u.missingBlocks, []);
+  assert.deepEqual(u.families.map((f) => [f.id, f.name]), [['0xe48bff56', 'RP2040']]);
+  assert.equal(u.regions[0]!.start, 0x10000000);
+  assert.equal(u.payloadBytes, 12 * 256);
+  assert.deepEqual(u.flags, ['FAMILY_ID_PRESENT']);
+});

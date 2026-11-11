@@ -13,6 +13,7 @@ Small real files used by the @revlens/extras tests. Generators live in `src/`.
 | kernels-gfx906.o | `src/kernel_amd.zig`, `zig build-obj -target amdgcn-amdhsa -mcpu=gfx906` | MIT (this repo) |
 | triangle.vert.spv, triangle.frag.spv, emboss.comp.spv | https://github.com/SaschaWillems/Vulkan `shaders/glsl/{triangle,computeshader}/`, GLSL sources copied next to them in `src/` | MIT, Copyright (c) 2016 Sascha Willems |
 | add.jsc, add.jsc.json | `src/make_v8_fixture.cjs`: `vm.Script#createCachedData` on Node v22.23.3 (V8 12.4.254.21); the JSON records the facts and that V8 accepts the cache | MIT (this repo) |
+| fw.uf2 | 3000 bytes of demo-arm64-stripped.elf converted with Microsoft uf2conv.py (https://github.com/microsoft/uf2, MIT): `uf2conv.py -c -b 0x10000000 -f RP2040` | MIT (this repo) |
 | tiny.gguf, tiny.safetensors, tiny.npy, notepad.lnk, fw.hex, board.dtb | `src/make_data_fixtures.py` with gguf-py, safetensors, numpy, pylnk3, intelhex and fdt from PyPI | MIT (this repo) |
 | fw-blob.bin, uimage.bin | `src/make_firmware_fixture.py`: uImage written by the `uboot` PyPI package, gzip, board.dtb and an ELF header at fixed offsets | MIT (this repo) |
 | jiter-0.5.0.so | the Rust extension from `jiter-0.5.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl` on PyPI (pydantic/jiter) | MIT |
