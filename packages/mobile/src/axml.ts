@@ -55,9 +55,12 @@ export function parseStringPool(r: Buf, off: number): StringPool {
   if (count > AXML_LIMITS.maxStrings) throw new ParseError(`string pool claims ${count} strings`);
   const isUtf8 = (flags & 0x100) !== 0;
   const end = Math.min(r.length, off + size);
-  const strings: string[] = new Array(count);
+  const strings: string[] = new Array(count).fill('');
   const base = off + stringsStart;
-  for (let i = 0; i < count; i++) {
+  // Only offsets that fit inside the chunk can be read; a lying count must not cost a loop per claimed string.
+  const fit = Math.max(0, Math.floor((end - (off + headerSize)) / 4));
+  const readable = Math.min(count, fit);
+  for (let i = 0; i < readable; i++) {
     let s = '';
     try {
       const so = base + r.u32(off + headerSize + i * 4);
