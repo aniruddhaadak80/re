@@ -72,7 +72,7 @@ export function renderResult(r: unknown): string {
   if (o.ok === false) return `error: ${o.error}${o.hint ? `\nhint: ${o.hint}` : ''}`;
   const out: string[] = [];
   if (o.tool) out.push(`[${o.tool}${o.toolVersion ? ' ' + o.toolVersion : ''}]`);
-  if (Array.isArray(o.functions) && o.functions[0]?.instructions) {
+  if (Array.isArray(o.functions) && Array.isArray(o.functions[0]?.instructions)) {
     for (const f of o.functions) { out.push(`${f.address} <${f.name}>:`); for (const i of f.instructions) out.push(`  ${i.address}  ${(i.bytes ?? '').padEnd(10)}  ${i.text}`); }
   } else if (Array.isArray(o.functions)) {
     for (const f of o.functions) out.push(`${f.address}  ${String(f.size ?? '').padStart(7)}  ${f.name}`);
