@@ -18,7 +18,7 @@ const KINDS: { id: Kind; label: string; help: string }[] = [
   { id: 'sha256-is', label: 'SHA-256 is', help: 'Compares the full file hash.' },
   { id: 'uses-component', label: 'Uses a component', help: 'Checks detected components, optionally at a version.' },
 ];
-const FORMATS: FormatId[] = ['elf', 'pe', 'macho', 'macho-fat', 'wasm', 'zip', 'jar', 'apk', 'crx', 'xpi', 'vsix', 'npm-tgz', 'gzip', 'tar', 'asar', 'js', 'sourcemap', 'json', 'pdf', 'pyc', 'dex', 'class', 'text', 'unknown'];
+const FORMATS: FormatId[] = ['elf', 'pe', 'macho', 'macho-fat', 'wasm', 'zip', 'jar', 'apk', 'crx', 'xpi', 'vsix', 'npm-tgz', 'gzip', 'tar', 'asar', 'js', 'sourcemap', 'json', 'pdf', 'pyc', 'dex', 'class', 'text', 'dotnet', 'ipa', 'pcap', 'pcapng', 'sqlite', 'har', 'lua', 'beam', 'il2cpp-metadata', 'unknown'];
 
 interface Loaded { id: string; name: string; report?: Report; status: 'running' | 'done' | 'error'; error?: string }
 

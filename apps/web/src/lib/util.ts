@@ -80,4 +80,6 @@ export const FORMAT_LABEL: Record<string, string> = {
   crx: 'Chrome extension', xpi: 'Firefox add-on', vsix: 'VS Code extension', 'npm-tgz': 'npm package', gzip: 'gzip', tar: 'tar',
   asar: 'Electron ASAR', js: 'JavaScript', sourcemap: 'Source map', json: 'JSON', pdf: 'PDF', pyc: 'Python bytecode', dex: 'Android DEX',
   class: 'Java class', text: 'Text', unknown: 'Unknown',
+  dotnet: '.NET assembly', ipa: 'iOS app (IPA)', pcap: 'Packet capture', pcapng: 'Packet capture (pcapng)', sqlite: 'SQLite database',
+  har: 'HAR network log', lua: 'Lua bytecode', beam: 'Erlang BEAM', 'il2cpp-metadata': 'IL2CPP metadata',
 };

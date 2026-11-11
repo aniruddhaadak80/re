@@ -11,7 +11,7 @@ import { setSettings, useSettings, type Theme } from '../lib/settings';
 import { cx } from '../lib/util';
 
 const NAV = [
-  { to: '/analyze', label: 'Analyze' }, { to: '/diff', label: 'Diff' }, { to: '/verify', label: 'Verify' },
+  { to: '/analyze', label: 'Analyze' }, { to: '/labs', label: 'Tools' }, { to: '/diff', label: 'Diff' }, { to: '/verify', label: 'Verify' },
   { to: '/docs', label: 'Docs' }, { to: '/blog', label: 'Blog' }, { to: '/about', label: 'About' },
 ];
 export const REPO = 'https://github.com/aniruddhaadak80/re';

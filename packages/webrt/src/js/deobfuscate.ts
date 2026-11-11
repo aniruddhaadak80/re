@@ -78,7 +78,6 @@ type Callable = Decoder | Wrapper | Alias;
 
 interface Ctx { array: string[]; callables: Map<string, Callable>; steps: number }
 
-function isPlainVal(v: unknown): v is Val { return v === null || ['string', 'number', 'boolean', 'undefined'].includes(typeof v); }
 
 function evalExpr(n: t.Node, env: Map<string, Val>, ctx: Ctx, depth = 0): Val {
   if (++ctx.steps > MAX_EVAL_STEPS || depth > 64) throw new EvalFail('eval budget');

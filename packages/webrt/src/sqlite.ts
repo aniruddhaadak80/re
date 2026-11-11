@@ -154,7 +154,6 @@ export class SqliteFile {
       const ptrs = ho + (interior ? 12 : 8);
       const pageEnd = po + this.header.pageSize;
       if (ptrs + cells * 2 > pageEnd) throw new InputError(`page ${page} cell count ${cells} overflows page`);
-      const isIndex = type === 2 || type === 10;
       for (let i = 0; i < cells && !stop; i++) {
         const c = po + this.r.u16(ptrs + i * 2, false);
         if (c < ptrs || c >= pageEnd) throw new InputError(`page ${page} cell ${i} pointer out of range`);

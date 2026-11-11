@@ -17,6 +17,24 @@ for (const s of SAMPLES) {
   else console.warn(`[prebuild] sample missing: ${s}`);
 }
 
+// Small real fixtures for the tool pages, copied from the packages' sample folders.
+const LAB_SAMPLES = {
+  'disasm/hello-x64.elf': 'disasm/hello-x64.elf', 'disasm/hello-arm64.elf': 'disasm/hello-arm64.elf', 'disasm/hello-x64.exe': 'disasm/hello-x64.exe',
+  'mobile/com.angrydoughnuts.android.alarmclock_27.apk': 'mobile/apk/com.angrydoughnuts.android.alarmclock_27.apk', 'mobile/hello-035.dex': 'mobile/java/hello-035.dex',
+  'mobile/Hello.class': 'mobile/java/Hello.class', 'mobile/Wikipedia-fixture.ipa': 'mobile/ipa/Wikipedia-fixture.ipa',
+  'managed/System.IO.Compression.Brotli.dll': 'managed/dotnet/System.IO.Compression.Brotli.dll', 'managed/sample_mod.3.12.pyc': 'managed/python/sample_mod.3.12.pyc',
+  'managed/sample.5.4.luac': 'managed/lua/sample.5.4.luac', 'managed/elixir_sup.beam': 'managed/beam/elixir_sup.beam', 'managed/RevToken.runtime.hex': 'managed/evm/RevToken.runtime.hex',
+  'webrt/obfuscated.js': 'webrt/obfuscated.js', 'webrt/bundle.prod.js': 'webrt/webpack-dist/bundle.prod.js', 'webrt/bundle.prod.js.map': 'webrt/webpack-dist/bundle.prod.js.map',
+  'webrt/app.asar': 'webrt/electron/app.asar', 'webrt/dns_udp.pcap': 'webrt/dns_udp.pcap', 'webrt/chrome-34-google.pcap': 'webrt/chrome-34-google.pcap',
+  'webrt/har-redirect.har': 'webrt/har-redirect.har', 'webrt/fixture.sqlite': 'webrt/fixture.sqlite',
+};
+for (const [to, from] of Object.entries(LAB_SAMPLES)) {
+  const src = join(repo, 'samples', from);
+  if (!existsSync(src)) { console.warn(`[prebuild] lab sample missing: ${from}`); continue; }
+  mkdirSync(dirname(join(pub, 'samples', to)), { recursive: true });
+  cpSync(src, join(pub, 'samples', to));
+}
+
 // Non-markdown assets next to docs and blog posts (images, diagrams).
 const copyAssets = (from, to) => {
   if (!existsSync(from)) return;

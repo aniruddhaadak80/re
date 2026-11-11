@@ -14,6 +14,9 @@ const About = lazy(() => import('./pages/About'));
 const Changelog = lazy(() => import('./pages/Changelog'));
 const Settings = lazy(() => import('./pages/Settings'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const Labs = lazy(() => import('./pages/labs/Labs'));
+const LabRoute = lazy(() => import('./pages/labs/Labs').then((m) => ({ default: m.LabRoute })));
+const Disassembler = lazy(() => import('./pages/labs/Disassembler'));
 
 function ScrollManager() {
   const { pathname, hash } = useLocation();
@@ -38,7 +41,7 @@ export default function App() {
     <Layout>
       <ScrollManager />
       <AnimatePresence mode="wait">
-        <motion.div key={section === 'docs' || section === 'blog' ? section : location.pathname}
+        <motion.div key={section === 'docs' || section === 'blog' || section === 'labs' ? section : location.pathname}
           initial={reduced ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={reduced ? undefined : { opacity: 0, y: -6 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
           <Suspense fallback={<Fallback />}>
             <Routes location={location}>
@@ -46,6 +49,9 @@ export default function App() {
               <Route path="/analyze" element={<Analyze />} />
               <Route path="/diff" element={<Diff />} />
               <Route path="/verify" element={<Verify />} />
+              <Route path="/labs" element={<Labs />} />
+              <Route path="/labs/disassembler" element={<Disassembler />} />
+              <Route path="/labs/:slug" element={<LabRoute />} />
               <Route path="/docs" element={<Docs />} />
               <Route path="/docs/:slug" element={<Docs />} />
               <Route path="/blog" element={<Blog />} />

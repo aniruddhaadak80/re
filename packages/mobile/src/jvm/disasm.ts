@@ -254,7 +254,7 @@ function mods(access: number, kind: 'field' | 'method' | 'class', isInterface = 
 
 function simpleName(cls: string): string { return cls.replace(/\//g, '.'); }
 
-export function fieldDecl(cf: ClassFile, f: Member): string {
+export function fieldDecl(_cf: ClassFile, f: Member): string {
   const type = f.signature ? sigTypeToJava(f.signature).text : descToJava(f.descriptor);
   const m = mods(f.access, 'field');
   return `${m ? `${m} ` : ''}${type} ${f.name};`;

@@ -92,7 +92,7 @@ function readImages(ctx: Ctx, cand: Il2cppSection[]): { images: Il2cppImage[]; s
   return { images: [] };
 }
 
-function inferStride(ctx: Ctx, sec: Il2cppSection, count: number | undefined, check: (o: number, i: number) => boolean, candidates: number[]): number | undefined {
+function inferStride(_ctx: Ctx, sec: Il2cppSection, count: number | undefined, check: (o: number, i: number) => boolean, candidates: number[]): number | undefined {
   let best: number | undefined;
   let bestScore = -1;
   for (const s of candidates) {
