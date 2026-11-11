@@ -1,5 +1,6 @@
 # Removes .debug_* sections from a 32/64-bit little endian ELF, keeping .symtab/.strtab.
-# Usage: python3 strip-debug.py in.elf out.elf   (used because zig objcopy crashed on aarch64 hosts)
+# Usage: python3 strip-debug.py in.elf out.elf [--all]  (--all also drops .symtab/.strtab, like strip -s)
+#  (used because zig objcopy crashed on aarch64 hosts)
 import struct, sys
 d = open(sys.argv[1], "rb").read()
 is64 = d[4] == 2
@@ -13,7 +14,8 @@ shs = [list(struct.unpack_from(SH, d, shoff + i * shentsize)) for i in range(shn
 OFF, SIZE, TYPE, LINK, FLAGS = (4, 5, 1, 6, 2) if is64 else (4, 5, 1, 6, 2)
 strtab = shs[shstrndx]
 name = lambda s: d[strtab[OFF] + s[0]:].split(b"\0", 1)[0].decode()
-keep = [i for i, s in enumerate(shs) if not name(s).startswith(".debug")]
+drop_all = "--all" in sys.argv[3:]
+keep = [i for i, s in enumerate(shs) if not name(s).startswith(".debug") and not (drop_all and name(s) in (".symtab", ".strtab", ".comment"))]
 remap = {old: new for new, old in enumerate(keep)}
 alloc_end = max((s[OFF] + (s[SIZE] if s[TYPE] != 8 else 0)) for s in shs if s[FLAGS] & 2)
 out = bytearray(d[:alloc_end])
