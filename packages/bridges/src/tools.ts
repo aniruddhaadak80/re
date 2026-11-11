@@ -3,16 +3,20 @@
 // allowExecution: true. Node only.
 import { inventory } from './doctor.js';
 import { HOOK_TEMPLATES } from './hooks.js';
-import { BridgeInputError } from './providers/common.js';
+import { BridgeInputError, need } from './providers/common.js';
 import { fridaDevices, fridaPs, fridaRun, gdbRun, lldbRun } from './providers/dynamic.js';
 import { ghidraDecompile, ghidraFunctions } from './providers/ghidra.js';
 import { apktoolDecode, ilspyDecompile, jadxDecompile, jadxSearch } from './providers/jvm.js';
 import { r2Decompile, r2Disasm, r2Functions, r2Info, r2Strings, r2Xrefs } from './providers/radare2.js';
 import { adbDevices, adbLogcat, adbPackages, adbPullApk, binjaFunctions, binwalkScan, idaRun, objdump } from './providers/static.js';
+import {
+  adbBackup, adbBugreport, adbDisplay, adbDumpsysPackage, adbGetprop, adbInput, adbInstall, adbListComponents, adbLogcatFiltered, adbLs,
+  adbPmPath, adbPortMap, adbPs, adbPull, adbPush, adbResolveActivity, adbScreenrecord, adbScreenshot, adbSettings, adbStartActivity, adbStopApp, adbUninstall,
+} from './providers/adb.js';
 import { MCP_CLIENTS, setupClient, SetupError } from './setup.js';
 import { UnsafeArgumentError } from './exec.js';
 import { HookParamError } from './hooks.js';
-import type { BridgeTool, ToolInputField } from './types.js';
+import type { BridgeTool, ToolId, ToolInputField } from './types.js';
 
 const f = (type: ToolInputField['type'], description: string, optional = true): ToolInputField => ({ type, description, ...(optional ? { optional: true } : {}) });
 const PATH = f('string', 'path to the file to analyze', false);
@@ -22,11 +26,28 @@ const FN = f('string', 'function name (main, sym.main, check_password) or 0x add
 const LIMIT = f('number', 'max items to return');
 const OFFSET = f('number', 'items to skip, for paging');
 const TIMEOUT = f('number', 'time limit in milliseconds');
+const SERIAL = f('string', 'device serial when several are connected');
+const PKG = f('string', 'package name, for example com.example.app', false);
+const DEVICE = f('boolean', 'must be true: this changes the connected device', false);
 const ALLOW = f('boolean', 'must be true: this runs or instruments code, only use on trusted targets or inside a sandbox', false);
 
+/**
+ * Tools that need exactly one program. For these the program is looked up before the input is
+ * checked, so a missing program always answers { available: false, install } whatever the input.
+ */
+function requiredTool(name: string): ToolId | undefined {
+  if (name.startsWith('bridge_adb_')) return 'adb';
+  return REQUIRES[name];
+}
+const REQUIRES: Record<string, ToolId> = {};
+
 /** Wrap a run function so bad input comes back as { ok: false, error } instead of throwing. */
-function safe(run: (input: any) => Promise<unknown>): (input: any) => Promise<unknown> {
+function safe(run: (input: any) => Promise<unknown>, requires?: ToolId): (input: any) => Promise<unknown> {
   return async (input: any) => {
+    if (requires) {
+      const n = await need(requires);
+      if ('missing' in n) return n.missing;
+    }
     try {
       return await run(input ?? {});
     } catch (e) {
@@ -193,6 +214,145 @@ const RAW: BridgeTool[] = [
     inputSchema: { serial: f('string', 'device serial'), lines: f('number', 'how many lines, default 500'), tag: f('string', 'only this tag') },
     run: (i) => adbLogcat(i),
   },
+  // ---- wider ADB suite ----
+  {
+    name: 'bridge_adb_install',
+    description: 'Install an APK (or base plus split APKs with install-multiple) on a device. Changes the device: needs allowExecution: true.',
+    inputSchema: { path: f('string', 'APK file'), paths: f('array', 'base and split APK files for install-multiple'), serial: SERIAL, replace: f('boolean', 'reinstall keeping data (-r)'), downgrade: f('boolean', 'allow version downgrade (-d)'), allowTest: f('boolean', 'allow test-only APKs (-t)'), grantPermissions: f('boolean', 'grant runtime permissions (-g)'), timeoutMs: TIMEOUT, allowExecution: DEVICE },
+    run: (i) => adbInstall(i),
+  },
+  {
+    name: 'bridge_adb_uninstall',
+    description: 'Uninstall a package from a device. Changes the device: needs allowExecution: true.',
+    inputSchema: { package: PKG, serial: SERIAL, keepData: f('boolean', 'keep data and cache (-k)'), allowExecution: DEVICE },
+    run: (i) => adbUninstall(i),
+  },
+  {
+    name: 'bridge_adb_push',
+    description: 'Copy a local file to the device, below /data/local/tmp, /sdcard or /storage/emulated unless allowAnyRemotePath. Changes the device: needs allowExecution: true.',
+    inputSchema: { path: f('string', 'local file', false), remotePath: f('string', 'device destination path', false), serial: SERIAL, allowAnyRemotePath: f('boolean', 'allow other device folders'), timeoutMs: TIMEOUT, allowExecution: DEVICE },
+    run: (i) => adbPush(i),
+  },
+  {
+    name: 'bridge_adb_pull',
+    description: 'Copy one file from the device to a local folder with its SHA-256. Checks the remote size first (maxBytes) and never overwrites unless asked.',
+    inputSchema: { remotePath: f('string', 'device file path', false), outDir: f('string', 'local folder'), serial: SERIAL, overwrite: f('boolean', 'replace an existing local file'), maxBytes: f('number', 'refuse bigger files, default 2 GiB'), timeoutMs: TIMEOUT },
+    run: (i) => adbPull(i),
+  },
+  {
+    name: 'bridge_adb_start_activity',
+    description: 'Start an activity with am start -W by component, or the launcher activity of a package. Every value is validated and quoted for the device shell. Changes the device: needs allowExecution: true.',
+    inputSchema: { component: f('string', 'component like com.example/.MainActivity'), package: f('string', 'start this package launcher activity instead'), action: f('string', 'intent action'), data: f('string', 'intent data URI'), categories: f('array', 'intent categories'), extras: f('object', 'string extras { key: value }'), forceStop: f('boolean', 'stop the app first (-S)'), serial: SERIAL, timeoutMs: TIMEOUT, allowExecution: DEVICE },
+    run: (i) => adbStartActivity(i),
+  },
+  {
+    name: 'bridge_adb_stop_app',
+    description: 'Force stop an app (am force-stop). Changes the device: needs allowExecution: true.',
+    inputSchema: { package: PKG, serial: SERIAL, allowExecution: DEVICE },
+    run: (i) => adbStopApp(i),
+  },
+  {
+    name: 'bridge_adb_dumpsys_package',
+    description: 'dumpsys package as JSON: version, SDK levels, flags (debuggable, allowBackup), install times, declared, requested, install and runtime permissions, and components with intent filters.',
+    inputSchema: { package: PKG, serial: SERIAL, includeRaw: f('boolean', 'also return the raw text (capped)'), timeoutMs: TIMEOUT },
+    run: (i) => adbDumpsysPackage(i),
+  },
+  {
+    name: 'bridge_adb_components',
+    description: 'List activities, services, receivers and providers of an installed package with their intent actions, categories, schemes and permissions, plus launcher activities.',
+    inputSchema: { package: PKG, kind: f('string', 'activities, services, receivers, providers or all (default)'), serial: SERIAL, timeoutMs: TIMEOUT },
+    run: (i) => adbListComponents(i),
+  },
+  {
+    name: 'bridge_adb_resolve_activity',
+    description: 'Which activity an intent opens (cmd package resolve-activity). Default: the launcher activity of package, or the HOME screen without one.',
+    inputSchema: { package: f('string', 'package to resolve within'), action: f('string', 'intent action, default MAIN'), category: f('string', 'intent category, default LAUNCHER (HOME without package)'), serial: SERIAL },
+    run: (i) => adbResolveActivity(i),
+  },
+  {
+    name: 'bridge_adb_pm_path',
+    description: 'APK paths (base and splits) of an installed package (pm path).',
+    inputSchema: { package: PKG, serial: SERIAL },
+    run: (i) => adbPmPath(i),
+  },
+  {
+    name: 'bridge_adb_screenshot',
+    description: 'Take a PNG screenshot into a local folder; returns the path, size in pixels and SHA-256.',
+    inputSchema: { serial: SERIAL, outDir: f('string', 'local folder'), timeoutMs: TIMEOUT },
+    run: (i) => adbScreenshot(i),
+  },
+  {
+    name: 'bridge_adb_screenrecord',
+    description: 'Record the screen to a local MP4 for a bounded time (1 to 180 seconds, default 10).',
+    inputSchema: { serial: SERIAL, seconds: f('number', 'length, max 180'), size: f('string', 'video size like 1280x720'), bitRate: f('number', 'bits per second'), outDir: f('string', 'local folder') },
+    run: (i) => adbScreenrecord(i),
+  },
+  {
+    name: 'bridge_adb_display',
+    description: 'Display size and density, physical and override (wm size, wm density).',
+    inputSchema: { serial: SERIAL },
+    run: (i) => adbDisplay(i),
+  },
+  {
+    name: 'bridge_adb_input',
+    description: 'Send one input event: tap (x, y), swipe (x, y, x2, y2, durationMs), text (printable ASCII) or keyevent (KEYCODE_HOME or a number). Changes the device: needs allowExecution: true.',
+    inputSchema: { kind: f('string', 'tap, swipe, text or keyevent', false), x: f('number', 'x'), y: f('number', 'y'), x2: f('number', 'swipe end x'), y2: f('number', 'swipe end y'), durationMs: f('number', 'swipe time'), text: f('string', 'text to type'), keycode: f('string', 'KEYCODE_NAME or number'), serial: SERIAL, allowExecution: DEVICE },
+    run: (i) => adbInput(i),
+  },
+  {
+    name: 'bridge_adb_getprop',
+    description: 'Device properties: one key, or all (optionally by prefix) plus a summary (model, release, SDK, ABI, fingerprint, debuggable, secure, patch level).',
+    inputSchema: { key: f('string', 'one property, for example ro.build.version.sdk'), prefix: f('string', 'only keys with this prefix'), serial: SERIAL, limit: LIMIT },
+    run: (i) => adbGetprop(i),
+  },
+  {
+    name: 'bridge_adb_settings',
+    description: 'Read one setting or list a settings namespace (system, secure, global). Read only.',
+    inputSchema: { namespace: f('string', 'system, secure or global', false), key: f('string', 'one key; omit to list all'), serial: SERIAL, limit: LIMIT },
+    run: (i) => adbSettings(i),
+  },
+  {
+    name: 'bridge_adb_ps',
+    description: 'Running processes on the device (user, pid, ppid, memory, state, name), optionally filtered by name.',
+    inputSchema: { filter: f('string', 'substring filter on the name'), serial: SERIAL, limit: LIMIT },
+    run: (i) => adbPs(i),
+  },
+  {
+    name: 'bridge_adb_ls',
+    description: 'List a device folder (ls -la): type, mode, owner, group, size, date, name and link target.',
+    inputSchema: { remotePath: f('string', 'device folder', false), serial: SERIAL, limit: LIMIT },
+    run: (i) => adbLs(i),
+  },
+  {
+    name: 'bridge_adb_logcat_filtered',
+    description: 'Logcat with filter specs (Tag:P), one pid, a buffer (main, system, crash, events, all), a since time and a substring filter.',
+    inputSchema: { specs: f('array', 'filter specs like ActivityManager:I or MyTag:D'), pid: f('number', 'only this process'), buffer: f('string', 'main, system, crash, events, radio, kernel, all'), since: f('string', "'MM-DD hh:mm:ss.mmm' or epoch seconds"), contains: f('string', 'keep lines containing this text'), lines: f('number', 'how many lines, default 500'), serial: SERIAL },
+    run: (i) => adbLogcatFiltered(i),
+  },
+  {
+    name: 'bridge_adb_bugreport',
+    description: 'Collect a bugreport zip with a hard time limit (default 10 minutes, max 30) and a size cap.',
+    inputSchema: { serial: SERIAL, outDir: f('string', 'local folder'), timeoutMs: TIMEOUT, maxBytes: f('number', 'size cap, default 1 GiB') },
+    run: (i) => adbBugreport(i),
+  },
+  {
+    name: 'bridge_adb_backup',
+    description: 'adb backup of one package to a local .ab file and its header. The device asks its user to confirm; apps with allowBackup=false give an empty file.',
+    inputSchema: { package: PKG, includeApk: f('boolean', 'include the APK'), outDir: f('string', 'local folder'), serial: SERIAL, timeoutMs: TIMEOUT },
+    run: (i) => adbBackup(i),
+  },
+  {
+    name: 'bridge_adb_forward',
+    description: 'List, add or remove host to device port forwards (tcp:N, localabstract:name, jdwp:pid). Adding and removing need allowExecution: true.',
+    inputSchema: { action: f('string', 'list (default), add, remove or remove-all'), local: f('string', 'host side, for example tcp:27042'), remote: f('string', 'device side, for example tcp:27042'), serial: SERIAL, allowExecution: f('boolean', 'must be true for add and remove') },
+    run: (i) => adbPortMap({ ...i, direction: 'forward' }),
+  },
+  {
+    name: 'bridge_adb_reverse',
+    description: 'List, add or remove device to host reverse port rules. Adding and removing change the device: need allowExecution: true.',
+    inputSchema: { action: f('string', 'list (default), add, remove or remove-all'), local: f('string', 'device side, for example tcp:8081'), remote: f('string', 'host side, for example tcp:8081'), serial: SERIAL, allowExecution: f('boolean', 'must be true for add and remove') },
+    run: (i) => adbPortMap({ ...i, direction: 'reverse' }),
+  },
   {
     name: 'bridge_ida_run',
     description: 'Run IDA (idat) in batch mode to list functions or decompile selected ones with Hex-Rays when licensed.',
@@ -214,4 +374,4 @@ const RAW: BridgeTool[] = [
 ];
 
 /** Every bridge tool, with input errors returned as JSON instead of thrown. */
-export const TOOLS: BridgeTool[] = RAW.map((t) => ({ ...t, run: safe(t.run) }));
+export const TOOLS: BridgeTool[] = RAW.map((t) => ({ ...t, run: safe(t.run, requiredTool(t.name)) }));

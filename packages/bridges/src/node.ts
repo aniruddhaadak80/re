@@ -13,6 +13,11 @@ export { ghidraFunctions, ghidraDecompile, ghidraExport, type GhidraInput } from
 export { jadxDecompile, jadxSearch, apktoolDecode, ilspyDecompile, parseIlspyTypes, type JadxInput } from './providers/jvm.js';
 export { fridaPs, fridaDevices, fridaRun, gdbRun, lldbRun, debugRun, gdbArgs, lldbArgs, type FridaRunInput, type DebugRunInput } from './providers/dynamic.js';
 export { objdump, binwalkScan, adbDevices, adbPackages, adbPullApk, adbLogcat, idaRun, binjaFunctions, BINJA_EXPORT_SCRIPT, type ObjdumpInput } from './providers/static.js';
+export {
+  adbInstall, adbUninstall, adbPush, adbPull, adbStartActivity, adbStopApp, adbDumpsysPackage, adbListComponents, adbResolveActivity, adbPmPath,
+  adbScreenshot, adbScreenrecord, adbDisplay, adbInput, adbGetprop, adbSettings, adbPs, adbLs, adbLogcatFiltered, adbBugreport, adbBackup, adbPortMap,
+  amStartArgs, shQuote, checkRemotePath, requireDeviceChange, deviceSummary, type StartActivityInput,
+} from './providers/adb.js';
 export { TOOLS } from './tools.js';
 export { CLI_COMMANDS, parseArgv, toolInput, renderResult } from './cli.js';
 export { ANALYZERS, r2Analyzer, jadxAnalyzer, inventoryAnalyzer } from './analyzer.js';

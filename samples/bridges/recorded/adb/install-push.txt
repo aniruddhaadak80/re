@@ -1,0 +1,6 @@
+Performing Streamed Install
+Success
+Performing Streamed Install
+Success
+/home/lordegypt/AndroidThothTerm/archives/ubuntu-base-26.04.1-base-arm64.tar.gz: 1 file pushed, 0 skipped. 16.1 MB/s (35092106 bytes in 2.078s)
+/tmp/tmp.McnRdLRQBk/expected.manifest: 1 file pushed, 0 skipped. 222.9 MB/s (690893 bytes in 0.003s)

@@ -1,7 +1,8 @@
 # samples/bridges fixtures
 
 Every file here is original RevLens test material, MIT licensed, built in the RevLens sandbox from the
-sources in `src/`. Nothing was downloaded from third parties. Tool versions used to build and record
+sources in `src/`, except `recorded/adb/`, which holds real Android device captures taken from
+permissively licensed public repositories (listed below with commit, path and license). Tool versions used to build and record
 them are listed so the values in the tests can be reproduced.
 
 | File | SHA-256 | How it was made |
@@ -26,3 +27,28 @@ Real output captured from the tools on the fixtures above, used by `test/parsers
 - `frida-ps.json`, `frida-ls-devices.txt`: frida-tools 17.26.2 in the sandbox.
 - `ilspy-l.txt`: ilspycmd 9.1.0.7988 `-l cisde hello-dotnet.dll`.
 - `adb-devices-empty.txt`: adb 1.0.41 `devices -l` with no device attached.
+
+## recorded/adb/
+
+Android device output. The sandbox has adb 1.0.41 but no device or emulator, so the device side
+captures come from public repositories under MIT or Apache-2.0. Files are copied byte for byte
+unless marked as an excerpt (a line range of the original).
+
+| File | Command | Source (commit, path) | License |
+| --- | --- | --- | --- |
+| `dumpsys-package-buzzkill-api35.txt` | `dumpsys package com.samruston.buzzkill`, API 35 emulator | github.com/SysAdminDoc/NoNo @ 7120dd6e716238e8b8dc3df5d15a76bcbb71b0a1, `app-audit/evidence/package/dumpsys-package-20260801-130512.txt` | MIT |
+| `dumpsys-package-a2dp-api24.txt` | `dumpsys package a2dp.Vol` (DroidBot run) | github.com/luyangliuable/usability-accessibility-testing-app @ b99e3e1a66b92db0d2998725c8ba25ed78fe7c45, `seed_data/data/28f666de-9a79-4a03-ac74-da77acf5924a/gifdroid/dumpsys_package_a2dp.Vol.txt` | Apache-2.0 |
+| `getprop-atv28.txt` | `getprop`, Android TV API 28 emulator (serials redacted by the source) | github.com/udhaykumarbala/cleanyourtv-app @ 03ad20ebec68284a362b9d90690876c18e212286, `fixtures/conformance/emu-atv28-2026-10-20/getprop.txt` | MIT |
+| `getprop-mitv.txt` | `getprop`, Xiaomi Mi TV | same repo, `fixtures/conformance/mitv-axso0-2026-10-18/getprop.txt` | MIT |
+| `settings-list-global-atv28.txt` | `settings list global` | same repo, `fixtures/conformance/emu-atv28-2026-10-20/settings-global.txt` | MIT |
+| `resolve-activity-home-atv28.txt` | `cmd package resolve-activity --brief` for HOME | same repo, `.../emu-atv28-2026-10-20/home-activity.txt` | MIT |
+| `pm-list-packages-f-atv28.txt` | `pm list packages -f` | same repo, `.../emu-atv28-2026-10-20/packages-all.txt` | MIT |
+| `pm-path-gms-atv28.txt` | `pm path com.google.android.gms` | same repo, `.../emu-atv28-2026-10-20/gms-path.txt` | MIT |
+| `ps-A-galaxy-a30s.txt` | `ps -A` then `top` on a Samsung Galaxy A30s | github.com/luisfvmartins/clean-my-android @ 7929a7e8c8b0e4f035a7951b8262cfa1ac34d671, `reports/samsung/galaxy-a30s/before/processes.txt` | MIT |
+| `wm-size-density-tv.txt` | `wm size`, `wm density` (excerpt, lines 1-2) | github.com/ArpitKadam/android-device-debloater @ 7c1425aa5592712056c78786722eb18a9ea113d9, `SmartTV/backup/display_storage_mem.txt` | MIT |
+| `am-start-W.txt` | `am start -W -n ...` | github.com/Eslamasabry/opencode-mobile-next @ 4f10364f29346e43dafb8de9eee7ce0307223189, `docs/qa/issue-87-proof-2026-09-25/p1-runs/cold-1/am_start.txt` | MIT |
+| `install-push.txt` | `adb install` and `adb push` host output (excerpt, lines 411-416) | github.com/Lord1Egypt/AndroidThothTerm @ f79fcc7f73099112a8b3e1a1a2ea9ecfc3e68451, `docs/garden/closure/device-evidence/extractor-term-ubuntu.txt` | Apache-2.0 |
+| `pull.txt` | `adb pull` host output (excerpt, line 24) | github.com/filipef101/c-sharp-native @ 564ba6bbc89f9ff7e32228c6fd3de46f5cc20e31, `evidence/hot-reload-edits.log` | MIT |
+| `forward-list-empty.txt` | `adb forward --list`, no rules | recorded in the RevLens sandbox, adb 1.0.41 | MIT |
+| `no-device-error.txt` | `adb shell getprop` with no device | recorded in the RevLens sandbox, adb 1.0.41 | MIT |
+| `adb-version.txt` | `adb version` | recorded in the RevLens sandbox | MIT |
