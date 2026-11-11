@@ -1,0 +1,54 @@
+(lldb) target create "./crackme-aarch64-static.elf"
+Current executable set to '/workspace/work/b-bridges/samples/bridges/crackme-aarch64-static.elf' (aarch64).
+(lldb) breakpoint set -n add_numbers
+Breakpoint 1: where = crackme-aarch64-static.elf`add_numbers, address = 0x0000000001024954
+(lldb) breakpoint set -n check_password
+Breakpoint 2: where = crackme-aarch64-static.elf`check_password, address = 0x00000000010249b4
+(lldb) process launch -- a
+Process 8140 launched: '/workspace/work/b-bridges/samples/bridges/crackme-aarch64-static.elf' (aarch64)
+Process 8140 stopped
+* thread #1, name = 'crackme-aarch64', stop reason = breakpoint 1.1
+    frame #0: 0x0000000001024954 crackme-aarch64-static.elf`add_numbers
+crackme-aarch64-static.elf`add_numbers:
+->  0x1024954 <+0>:  sub    sp, sp, #0x30
+    0x1024958 <+4>:  stp    x29, x30, [sp, #0x20]
+    0x102495c <+8>:  add    x29, sp, #0x20
+    0x1024960 <+12>: stur   w0, [x29, #-0x4]
+(lldb) register read x0 x1 pc sp
+      x0 = 0x0000000000000002
+      x1 = 0x0000000000000029
+      pc = 0x0000000001024954  crackme-aarch64-static.elf`add_numbers
+      sp = 0x0000fffffffff000
+(lldb) bt 8
+* thread #1, name = 'crackme-aarch64', stop reason = breakpoint 1.1
+  * frame #0: 0x0000000001024954 crackme-aarch64-static.elf`add_numbers
+    frame #1: 0x0000000001024ba4 crackme-aarch64-static.elf`main + 36
+    frame #2: 0x00000000010582f8 crackme-aarch64-static.elf`libc_start_main_stage2 + 48
+(lldb) memory read -s1 -fx -c16 $sp
+0xfffffffff000: 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+0xfffffffff008: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+(lldb) process continue
+total=43
+Process 8140 resuming
+Process 8140 stopped
+* thread #1, name = 'crackme-aarch64', stop reason = breakpoint 2.1
+    frame #0: 0x00000000010249b4 crackme-aarch64-static.elf`check_password
+crackme-aarch64-static.elf`check_password:
+->  0x10249b4 <+0>:  sub    sp, sp, #0x30
+    0x10249b8 <+4>:  stp    x29, x30, [sp, #0x20]
+    0x10249bc <+8>:  add    x29, sp, #0x20
+    0x10249c0 <+12>: str    x0, [sp, #0x10]
+(lldb) register read x0 x1 pc
+      x0 = 0x0000fffffffff365
+      x1 = 0x0000000001000677  
+      pc = 0x00000000010249b4  crackme-aarch64-static.elf`check_password
+(lldb) bt 8
+* thread #1, name = 'crackme-aarch64', stop reason = breakpoint 2.1
+  * frame #0: 0x00000000010249b4 crackme-aarch64-static.elf`check_password
+    frame #1: 0x0000000001024c98 crackme-aarch64-static.elf`main + 280
+    frame #2: 0x00000000010582f8 crackme-aarch64-static.elf`libc_start_main_stage2 + 48
+(lldb) process continue
+checksum=379752446
+access denied
+Process 8140 resuming
+Process 8140 exited with status = 1 (0x00000001)
