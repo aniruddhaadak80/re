@@ -1,7 +1,7 @@
 # RevLens vs rea gap matrix
 
 Compared against morluto/rea v6.8.0 (source clone, MCP catalog in docs, 174 contract tool names, 194 CLI command names, 60+ src/ provider folders). 
-Rows group related rea tools. Status: covered, partial, missing. "Before" is the state of all RevLens branches at feat/extras ce77aa5; "after" is the state on the integrate/1.0 line for RevLens 1.0, every after-change backed by tests against reference tools or by files in the repo.
+Rows group related rea tools. Status: covered, partial, missing. "Before" is the state of all RevLens branches at feat/extras ce77aa5; "after" is the state on main for RevLens 1.0 after the gaps round (integrate/1.0-gaps), every after-change backed by tests against reference tools or by files in the repo.
 Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/GAP-MATRIX.md`.
 
 
@@ -36,14 +36,14 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | inspect_macho / trace_dylib_resolution | src/native | extras | covered | covered | load commands, rpath expansion, code signature and entitlements |
 | inspect_go_binary | src/go | extras + core | covered | covered | pclntab across Go 1.2 to 1.22+ magics even on stripped binaries, plus buildinfo deps |
 | inspect_rust_binary | src/rust | extras + core | partial | covered | x_rust_info: rustc version, crates from paths, v0 and legacy demangle |
-| demangle-swift (CLI) | src/cli | extras | missing | partial | scheme detection only; left: full Swift demangler |
-| match_native_functions / compare_functions | src/native | core diff + disasm | partial | partial | core diff_files compares sections and symbols; left: per-function similarity matching |
-| trace_native_values / resolve_native_call_targets | src/native | disasm | missing | missing | left: constant propagation for indirect calls |
+| demangle-swift (CLI) | src/cli | extras | missing | partial | scheme detection in the tools; a port of the Swift 6.0.3 new mangling demangler is in the tree (223 of 223 test symbols match swift-demangle) but not exposed as a tool yet |
+| match_native_functions / compare_functions | src/native | disasm | partial | covered | disasm_match_functions maps functions across builds by code, strings, calls, CFG shape and neighbors (95 percent or better on stripped Lua and esbuild versions); disasm_compare_functions diffs two functions with addresses normalized; also in the web Labs |
+| trace_native_values / resolve_native_call_targets | src/native | disasm | missing | covered | disasm_trace_values follows values backward to call arguments and forward to sinks; disasm_indirect_targets resolves jump tables, pointer tables, constants and C++ vtable slots |
 | inspect_native_api / inspect_native_dispatch_metadata / inspect_native_data_type | src/native | disasm | missing | missing | left: ObjC/Swift dispatch metadata and type libraries |
-| annotate_native_function | src/ghidra | bridges | missing | missing | left: write-back names to Ghidra or IDA projects |
+| annotate_native_function | src/ghidra | bridges | missing | covered | bridge_ghidra_apply_names, bridge_ida_apply_names and bridge_r2_apply_names write names, signatures, comments, labels and types; the export tools read them back as one RevLens names JSON |
 | inspect_with_objdump / list_objdump_architectures | src/objdump | bridges | covered | covered | execFile with argument arrays and timeouts |
-| execute_rizin_command / cutter_command / list_cutter_sessions | src/rizin, src/cutter | bridges | partial | partial | radare2 bridge covered; left: Cutter sessions |
-| start/close/status rizin and gdb debug sessions, gdb_console | src/rizin, src/gdb | bridges | partial | partial | one-shot gdb and lldb batches; left: long-lived debug sessions |
+| execute_rizin_command / cutter_command / list_cutter_sessions | src/rizin, src/cutter | bridges | partial | partial | persistent radare2 and rizin sessions, Cutter found with its bundled rizin (bridge_cutter_info); left: driving a running Cutter window |
+| start/close/status rizin and gdb debug sessions, gdb_console | src/rizin, src/gdb | bridges | partial | covered | long-lived r2/rizin, gdb (MI) and lldb sessions with ids, idle timeouts, a session cap, command guards, and clean shutdown when the MCP server exits |
 | inspect_recorded_crash / inspect_apple_ips / trace_crash | src/native | extras | missing | covered | x_apple_ips parses .ips JSON reports and maps frames to images |
 
 ## MCP tools: evidence, investigation, guidance
@@ -77,9 +77,9 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | project_android/apple/harmony/managed_application_graph | src/application | mobile + managed | missing | missing | left: component graphs |
 | identify_flutter_build / inspect_dart_aot | src/flutter | mobile | partial | partial | Flutter detection and snapshot hash; left: Dart AOT object pool |
 | inspect_il2cpp_metadata | src/il2cpp | mobile | covered | covered | global-metadata.dat types and methods |
-| inspect_plist / inspect_keyed_archive / decode_interface_builder / inspect_asset_catalog | src/native (Apple) | mobile | partial | partial | IPA Info.plist and entitlements; left: NSKeyedArchiver, NIB and Assets.car |
+| inspect_plist / inspect_keyed_archive / decode_interface_builder / inspect_asset_catalog | src/native (Apple) | mobile + extras + desktop | partial | covered | IPA Info.plist and entitlements, x_keyed_archive (NSKeyedArchiver), x_nib (NIBArchive), x_asset_catalog (Assets.car BOM) and desktop_plist_parse, checked against plistlib, NSKeyedUnArchiver and nibarchive |
 | ADB: list_adb_devices, read_adb_logcat, list_adb_packages, pull_adb_package | src/adb | bridges | covered | covered | execFile argument arrays |
-| ADB: install/uninstall, push/pull file, start/stop app, activity, screen, bugreport, services, settings, window, display, processes, features, directory, resolve packages | src/adb | bridges | missing | missing | left: the rest of the ADB suite (about 18 tools) |
+| ADB: install/uninstall, push/pull file, start/stop app, activity, screen, bugreport, services, settings, window, display, processes, features, directory, resolve packages | src/adb | bridges | missing | covered | 22 more ADB tools; anything that changes the device needs allowExecution; parsers checked on real device captures |
 
 ## MCP tools: managed runtimes
 
@@ -101,17 +101,17 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | rea feature | where in rea | RevLens owner | before | after | how RevLens is better, or what is left |
 |---|---|---|---|---|---|
 | analyze_web_bundle / analyze_javascript_application / recover_javascript_sources | src/javascript | webrt | covered | covered | beautify, deobfuscate, module unpack, source map recovery |
-| export_web_scripts / inspect_web_page / capture_web_screenshot / list_browser_targets | src/browser | webrt | partial | partial | Playwright capture; left: CDP target listing |
-| capture_browser_scenario / observe_web_session / observe_web_execution / inspect_web_event_listeners | src/browser | webrt | partial | partial | one capture call; left: scripted scenarios and listener inventory |
+| export_web_scripts / inspect_web_page / capture_web_screenshot / list_browser_targets | src/browser | webrt | partial | covered | Playwright capture plus web_cdp_targets for pages, workers and Node contexts on a debugging port |
+| capture_browser_scenario / observe_web_session / observe_web_execution / inspect_web_event_listeners | src/browser | webrt | partial | covered | web_browser_scenario runs scripted steps with assertions and records network, console, DOM, screenshots, traces, coverage and the event listener inventory per step |
 | trace_web_source_location / trace_web_module_imports / compare_source_to_bundle | src/javascript | webrt | partial | partial | source map lookups; left: import graph tracing |
-| compare_web_captures / compare_web_screenshots / compare_javascript_export_shapes | src/browser | webrt | missing | missing | left |
+| compare_web_captures / compare_web_screenshots / compare_javascript_export_shapes | src/browser | webrt | missing | partial | web_capture_compare diffs endpoints, headers, scripts, console and per-step screenshot pixels; left: JavaScript export shape comparison |
 | compare_static_and_observed_endpoints | src/javascript | webrt | partial | partial | endpoints from JS plus HAR; left: automatic join |
-| JS runtime: list/observe/reconcile_javascript_runtime, trace_javascript_semantics | src/javascript | webrt | missing | missing | left |
-| discover_webmcp_tools | src/browser | webrt | missing | missing | left |
-| inspect_electron_fuses / list_electron_targets / inspect_electron_page / capture_electron_scenario | src/electron | webrt | partial | partial | ASAR plus Electron audit incl. fuses; left: live CDP pages |
+| JS runtime: list/observe/reconcile_javascript_runtime, trace_javascript_semantics | src/javascript | webrt | missing | partial | web_node_inspect lists loaded scripts, call counts and a CPU profile through the Node inspector; left: semantic tracing |
+| discover_webmcp_tools | src/browser | webrt | missing | covered | web_webmcp_discover (headers, link tags, forms, scripts, well-known documents and the live Chromium WebMCP domain), web_webmcp_scan and web_wellknown_classify |
+| inspect_electron_fuses / list_electron_targets / inspect_electron_page / capture_electron_scenario | src/electron | webrt | partial | partial | ASAR plus Electron audit incl. fuses, live pages through web_cdp_targets; left: Electron scenario capture |
 | inspect_web_network_capture (HAR) | src/captures | webrt | covered | covered | HAR summary with endpoints and secrets scan |
 | inspect_pcap_capture / inspect_packet_capture / inspect_packet_fields / inspect_pcap_client | src/pcap | webrt | covered | covered | pcap and pcapng with DNS, HTTP, TLS SNI and JA3 in TS, no tshark |
-| inspect_playwright_trace | src/browser | webrt | missing | missing | left |
+| inspect_playwright_trace | src/browser | webrt | missing | covered | web_trace_inspect reads trace.zip actions, network, console and pages |
 | inspect_api_contract (OpenAPI/AsyncAPI) | src/application | webrt | missing | missing | left |
 | inspect_sqlite_database | src/sqlite | webrt | covered | covered | read-only SQLite pages in TS |
 
@@ -126,19 +126,19 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | inspect_gpu_code_objects | src/gpu | extras | missing | partial | x_gpu_inspect: PTX, AMD HSA code objects and SPIR-V verified on real LLVM and glslang output; CUDA fatbin and cubin readers follow the documented layout but no nvcc output was available to verify them |
 | inspect_model_artifact | src/model | extras | missing | covered | x_model_inspect: GGUF metadata and tensors, safetensors header, with dtype size checks |
 | inspect_windows_shortcut | src/windows | extras | missing | covered | x_lnk_inspect: LNK header, target IDList, link info, string data |
-| Windows registry hive, Prefetch, Jump Lists (open requests) | issues #9865 #9423 #9866 | extras | missing | missing | left |
+| Windows registry hive, Prefetch, Jump Lists (open requests) | issues #9865 #9423 #9866 | extras | missing | covered | x_registry_hive, x_prefetch (with MAM LZXPRESS Huffman), x_jump_list and x_ole_compound, checked against regipy, windowsprefetch, dissect.util, olefile and LnkParse3 |
 | inspect_signal_decoders / decode_signal_recording | src/signals | none | missing | missing | left: SDR recordings, out of scope for 1.0 |
-| godot pck, iNES, wxapkg, UnityFS, Node SEA, Bun/Deno standalone | docs/*.md | extras + mobile | missing | partial | x_firmware_scan names Node SEA and wxapkg; left: entry listing |
+| godot pck, iNES, wxapkg, UnityFS, Node SEA, Bun/Deno standalone | docs/*.md | extras + mobile | missing | partial | x_wxapkg (with PC decryption), x_unity_bundle (LZ4) and x_standalone_js (Node SEA, Bun, Deno) list and read entries; left: Godot pck and iNES |
 
 ## MCP tools: dynamic, desktop, process
 
 | rea feature | where in rea | RevLens owner | before | after | how RevLens is better, or what is left |
 |---|---|---|---|---|---|
-| Frida: list devices/processes, instrument, load/unload script, sessions | src/frida | bridges | partial | partial | one-shot frida runs with templates; left: persistent sessions |
-| capture_process_scenario / compare_process_captures / prepare_bounded_process_capture | src/process | none | missing | missing | left |
-| desktop application capture/state/export/tasks | src/desktop | none | missing | missing | left: needs a desktop harness |
+| Frida: list devices/processes, instrument, load/unload script, sessions | src/frida | bridges | partial | covered | persistent Frida sessions: attach or spawn, load templates or scripts, post, collect events, unload, resume |
+| capture_process_scenario / compare_process_captures / prepare_bounded_process_capture | src/process | desktop | missing | partial | desktop_process_inspect snapshots modules, files and sockets on Linux, macOS and Windows and desktop_process_compare diffs them; left: a bounded scenario runner |
+| desktop application capture/state/export/tasks | src/desktop | desktop | missing | partial | desktop_apps_list and desktop_app_inspect find installed apps (.desktop, .app, uninstall keys) and flag Electron apps; left: state export and tasks |
 | build computer (start/act/close, checkpoints, capture, consent) | src/desktop | none | missing | missing | left |
-| observe_native_ui / trace_native_ui_action / capture_native_ui_scenario | src/native | none | missing | missing | left |
+| observe_native_ui / trace_native_ui_action / capture_native_ui_scenario | src/native | desktop | missing | partial | desktop_ui_tree reads the accessibility tree through AT-SPI, macOS AX and Windows UIA; left: action tracing and scenarios |
 
 ## Platform, packaging and process
 
@@ -167,7 +167,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | state | covered | partial | missing |
 |---|---|---|---|
 | before | 49 | 26 | 40 |
-| after | 68 | 27 | 20 |
+| after | 80 | 26 | 9 |
 
 ## Where RevLens already exceeds rea
 
@@ -181,6 +181,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 - Go symbol recovery from pclntab on stripped binaries across all Go magics, in TS.
 - Claims ledger where every claim is bound to a byte range hash and can be re-verified by any reader without the original session.
 - pcap DNS, HTTP, SNI and JA3 in TS with no tshark dependency.
+- Function matching between two binaries runs in the browser too (web Labs disassembler), with no upload.
 
 ## Top open rea requests RevLens can satisfy
 
@@ -190,7 +191,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | #7993 MIPS support | disasm (proposed), extras container already parses MIPS ELF headers |
 | #1558 Java reverse engineering | mobile (javap-style class reader) + bridges (jadx) |
 | #3289 iOS applications | mobile (IPA) + extras (Mach-O code signature, entitlements) |
-| #8121 WeChat wxapkg | extras scan detection; entry listing left |
+| #8121 WeChat wxapkg | extras x_wxapkg: entries, bytes and PC decryption |
 | #1269 Codex plugin | .codex-plugin at the repo root |
 | #8543 V8 code cache (.jsc, bytenode) | extras x_v8_inspect |
 | #8911 SQLite with WAL state | webrt |
@@ -198,5 +199,5 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | #6333 auditable suppression rules | extras ledger status rejected with reason |
 | #8472 gadget search | disasm (proposed) |
 | #2298 WASM function pseudocode | disasm (proposed) |
-| #9866 Jump Lists, #9423 Prefetch, #9865 registry hive | extras (left) |
+| #9866 Jump Lists, #9423 Prefetch, #9865 registry hive | extras x_jump_list, x_prefetch, x_registry_hive |
 | #1316 portable install | web app needs no install at all |

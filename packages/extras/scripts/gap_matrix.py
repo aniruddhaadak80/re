@@ -37,14 +37,14 @@ add('MCP tools: native code', [
  ('inspect_macho / trace_dylib_resolution', 'src/native', 'extras', 'C', 'C', 'load commands, rpath expansion, code signature and entitlements'),
  ('inspect_go_binary', 'src/go', 'extras + core', 'C', 'C', 'pclntab across Go 1.2 to 1.22+ magics even on stripped binaries, plus buildinfo deps'),
  ('inspect_rust_binary', 'src/rust', 'extras + core', 'P', 'C', 'x_rust_info: rustc version, crates from paths, v0 and legacy demangle'),
- ('demangle-swift (CLI)', 'src/cli', 'extras', 'M', 'P', 'scheme detection only; left: full Swift demangler'),
- ('match_native_functions / compare_functions', 'src/native', 'core diff + disasm', 'P', 'P', 'core diff_files compares sections and symbols; left: per-function similarity matching'),
- ('trace_native_values / resolve_native_call_targets', 'src/native', 'disasm', 'M', 'M', 'left: constant propagation for indirect calls'),
+ ('demangle-swift (CLI)', 'src/cli', 'extras', 'M', 'P', 'scheme detection in the tools; a port of the Swift 6.0.3 new mangling demangler is in the tree (223 of 223 test symbols match swift-demangle) but not exposed as a tool yet'),
+ ('match_native_functions / compare_functions', 'src/native', 'disasm', 'P', 'C', 'disasm_match_functions maps functions across builds by code, strings, calls, CFG shape and neighbors (95 percent or better on stripped Lua and esbuild versions); disasm_compare_functions diffs two functions with addresses normalized; also in the web Labs'),
+ ('trace_native_values / resolve_native_call_targets', 'src/native', 'disasm', 'M', 'C', 'disasm_trace_values follows values backward to call arguments and forward to sinks; disasm_indirect_targets resolves jump tables, pointer tables, constants and C++ vtable slots'),
  ('inspect_native_api / inspect_native_dispatch_metadata / inspect_native_data_type', 'src/native', 'disasm', 'M', 'M', 'left: ObjC/Swift dispatch metadata and type libraries'),
- ('annotate_native_function', 'src/ghidra', 'bridges', 'M', 'M', 'left: write-back names to Ghidra or IDA projects'),
+ ('annotate_native_function', 'src/ghidra', 'bridges', 'M', 'C', 'bridge_ghidra_apply_names, bridge_ida_apply_names and bridge_r2_apply_names write names, signatures, comments, labels and types; the export tools read them back as one RevLens names JSON'),
  ('inspect_with_objdump / list_objdump_architectures', 'src/objdump', 'bridges', 'C', 'C', 'execFile with argument arrays and timeouts'),
- ('execute_rizin_command / cutter_command / list_cutter_sessions', 'src/rizin, src/cutter', 'bridges', 'P', 'P', 'radare2 bridge covered; left: Cutter sessions'),
- ('start/close/status rizin and gdb debug sessions, gdb_console', 'src/rizin, src/gdb', 'bridges', 'P', 'P', 'one-shot gdb and lldb batches; left: long-lived debug sessions'),
+ ('execute_rizin_command / cutter_command / list_cutter_sessions', 'src/rizin, src/cutter', 'bridges', 'P', 'P', 'persistent radare2 and rizin sessions, Cutter found with its bundled rizin (bridge_cutter_info); left: driving a running Cutter window'),
+ ('start/close/status rizin and gdb debug sessions, gdb_console', 'src/rizin, src/gdb', 'bridges', 'P', 'C', 'long-lived r2/rizin, gdb (MI) and lldb sessions with ids, idle timeouts, a session cap, command guards, and clean shutdown when the MCP server exits'),
  ('inspect_recorded_crash / inspect_apple_ips / trace_crash', 'src/native', 'extras', 'M', 'C', 'x_apple_ips parses .ips JSON reports and maps frames to images'),
 ])
 add('MCP tools: evidence, investigation, guidance', [
@@ -72,9 +72,9 @@ add('MCP tools: Android, iOS, mobile', [
  ('project_android/apple/harmony/managed_application_graph', 'src/application', 'mobile + managed', 'M', 'M', 'left: component graphs'),
  ('identify_flutter_build / inspect_dart_aot', 'src/flutter', 'mobile', 'P', 'P', 'Flutter detection and snapshot hash; left: Dart AOT object pool'),
  ('inspect_il2cpp_metadata', 'src/il2cpp', 'mobile', 'C', 'C', 'global-metadata.dat types and methods'),
- ('inspect_plist / inspect_keyed_archive / decode_interface_builder / inspect_asset_catalog', 'src/native (Apple)', 'mobile', 'P', 'P', 'IPA Info.plist and entitlements; left: NSKeyedArchiver, NIB and Assets.car'),
+ ('inspect_plist / inspect_keyed_archive / decode_interface_builder / inspect_asset_catalog', 'src/native (Apple)', 'mobile + extras + desktop', 'P', 'C', 'IPA Info.plist and entitlements, x_keyed_archive (NSKeyedArchiver), x_nib (NIBArchive), x_asset_catalog (Assets.car BOM) and desktop_plist_parse, checked against plistlib, NSKeyedUnArchiver and nibarchive'),
  ('ADB: list_adb_devices, read_adb_logcat, list_adb_packages, pull_adb_package', 'src/adb', 'bridges', 'C', 'C', 'execFile argument arrays'),
- ('ADB: install/uninstall, push/pull file, start/stop app, activity, screen, bugreport, services, settings, window, display, processes, features, directory, resolve packages', 'src/adb', 'bridges', 'M', 'M', 'left: the rest of the ADB suite (about 18 tools)'),
+ ('ADB: install/uninstall, push/pull file, start/stop app, activity, screen, bugreport, services, settings, window, display, processes, features, directory, resolve packages', 'src/adb', 'bridges', 'M', 'C', '22 more ADB tools; anything that changes the device needs allowExecution; parsers checked on real device captures'),
 ])
 add('MCP tools: managed runtimes', [
  ('inspect_managed_artifact / inspect_managed_members', 'src/dotnet', 'managed', 'C', 'C', '.NET metadata tables and CIL in TS'),
@@ -90,17 +90,17 @@ add('MCP tools: managed runtimes', [
 ])
 add('MCP tools: web, browser, Electron, network', [
  ('analyze_web_bundle / analyze_javascript_application / recover_javascript_sources', 'src/javascript', 'webrt', 'C', 'C', 'beautify, deobfuscate, module unpack, source map recovery'),
- ('export_web_scripts / inspect_web_page / capture_web_screenshot / list_browser_targets', 'src/browser', 'webrt', 'P', 'P', 'Playwright capture; left: CDP target listing'),
- ('capture_browser_scenario / observe_web_session / observe_web_execution / inspect_web_event_listeners', 'src/browser', 'webrt', 'P', 'P', 'one capture call; left: scripted scenarios and listener inventory'),
+ ('export_web_scripts / inspect_web_page / capture_web_screenshot / list_browser_targets', 'src/browser', 'webrt', 'P', 'C', 'Playwright capture plus web_cdp_targets for pages, workers and Node contexts on a debugging port'),
+ ('capture_browser_scenario / observe_web_session / observe_web_execution / inspect_web_event_listeners', 'src/browser', 'webrt', 'P', 'C', 'web_browser_scenario runs scripted steps with assertions and records network, console, DOM, screenshots, traces, coverage and the event listener inventory per step'),
  ('trace_web_source_location / trace_web_module_imports / compare_source_to_bundle', 'src/javascript', 'webrt', 'P', 'P', 'source map lookups; left: import graph tracing'),
- ('compare_web_captures / compare_web_screenshots / compare_javascript_export_shapes', 'src/browser', 'webrt', 'M', 'M', 'left'),
+ ('compare_web_captures / compare_web_screenshots / compare_javascript_export_shapes', 'src/browser', 'webrt', 'M', 'P', 'web_capture_compare diffs endpoints, headers, scripts, console and per-step screenshot pixels; left: JavaScript export shape comparison'),
  ('compare_static_and_observed_endpoints', 'src/javascript', 'webrt', 'P', 'P', 'endpoints from JS plus HAR; left: automatic join'),
- ('JS runtime: list/observe/reconcile_javascript_runtime, trace_javascript_semantics', 'src/javascript', 'webrt', 'M', 'M', 'left'),
- ('discover_webmcp_tools', 'src/browser', 'webrt', 'M', 'M', 'left'),
- ('inspect_electron_fuses / list_electron_targets / inspect_electron_page / capture_electron_scenario', 'src/electron', 'webrt', 'P', 'P', 'ASAR plus Electron audit incl. fuses; left: live CDP pages'),
+ ('JS runtime: list/observe/reconcile_javascript_runtime, trace_javascript_semantics', 'src/javascript', 'webrt', 'M', 'P', 'web_node_inspect lists loaded scripts, call counts and a CPU profile through the Node inspector; left: semantic tracing'),
+ ('discover_webmcp_tools', 'src/browser', 'webrt', 'M', 'C', 'web_webmcp_discover (headers, link tags, forms, scripts, well-known documents and the live Chromium WebMCP domain), web_webmcp_scan and web_wellknown_classify'),
+ ('inspect_electron_fuses / list_electron_targets / inspect_electron_page / capture_electron_scenario', 'src/electron', 'webrt', 'P', 'P', 'ASAR plus Electron audit incl. fuses, live pages through web_cdp_targets; left: Electron scenario capture'),
  ('inspect_web_network_capture (HAR)', 'src/captures', 'webrt', 'C', 'C', 'HAR summary with endpoints and secrets scan'),
  ('inspect_pcap_capture / inspect_packet_capture / inspect_packet_fields / inspect_pcap_client', 'src/pcap', 'webrt', 'C', 'C', 'pcap and pcapng with DNS, HTTP, TLS SNI and JA3 in TS, no tshark'),
- ('inspect_playwright_trace', 'src/browser', 'webrt', 'M', 'M', 'left'),
+ ('inspect_playwright_trace', 'src/browser', 'webrt', 'M', 'C', 'web_trace_inspect reads trace.zip actions, network, console and pages'),
  ('inspect_api_contract (OpenAPI/AsyncAPI)', 'src/application', 'webrt', 'M', 'M', 'left'),
  ('inspect_sqlite_database', 'src/sqlite', 'webrt', 'C', 'C', 'read-only SQLite pages in TS'),
 ])
@@ -112,16 +112,16 @@ add('MCP tools: firmware, GPU, models, Windows, signals', [
  ('inspect_gpu_code_objects', 'src/gpu', 'extras', 'M', 'P', 'x_gpu_inspect: PTX, AMD HSA code objects and SPIR-V verified on real LLVM and glslang output; CUDA fatbin and cubin readers follow the documented layout but no nvcc output was available to verify them'),
  ('inspect_model_artifact', 'src/model', 'extras', 'M', 'C', 'x_model_inspect: GGUF metadata and tensors, safetensors header, with dtype size checks'),
  ('inspect_windows_shortcut', 'src/windows', 'extras', 'M', 'C', 'x_lnk_inspect: LNK header, target IDList, link info, string data'),
- ('Windows registry hive, Prefetch, Jump Lists (open requests)', 'issues #9865 #9423 #9866', 'extras', 'M', 'M', 'left'),
+ ('Windows registry hive, Prefetch, Jump Lists (open requests)', 'issues #9865 #9423 #9866', 'extras', 'M', 'C', 'x_registry_hive, x_prefetch (with MAM LZXPRESS Huffman), x_jump_list and x_ole_compound, checked against regipy, windowsprefetch, dissect.util, olefile and LnkParse3'),
  ('inspect_signal_decoders / decode_signal_recording', 'src/signals', 'none', 'M', 'M', 'left: SDR recordings, out of scope for 1.0'),
- ('godot pck, iNES, wxapkg, UnityFS, Node SEA, Bun/Deno standalone', 'docs/*.md', 'extras + mobile', 'M', 'P', 'x_firmware_scan names Node SEA and wxapkg; left: entry listing'),
+ ('godot pck, iNES, wxapkg, UnityFS, Node SEA, Bun/Deno standalone', 'docs/*.md', 'extras + mobile', 'M', 'P', 'x_wxapkg (with PC decryption), x_unity_bundle (LZ4) and x_standalone_js (Node SEA, Bun, Deno) list and read entries; left: Godot pck and iNES'),
 ])
 add('MCP tools: dynamic, desktop, process', [
- ('Frida: list devices/processes, instrument, load/unload script, sessions', 'src/frida', 'bridges', 'P', 'P', 'one-shot frida runs with templates; left: persistent sessions'),
- ('capture_process_scenario / compare_process_captures / prepare_bounded_process_capture', 'src/process', 'none', 'M', 'M', 'left'),
- ('desktop application capture/state/export/tasks', 'src/desktop', 'none', 'M', 'M', 'left: needs a desktop harness'),
+ ('Frida: list devices/processes, instrument, load/unload script, sessions', 'src/frida', 'bridges', 'P', 'C', 'persistent Frida sessions: attach or spawn, load templates or scripts, post, collect events, unload, resume'),
+ ('capture_process_scenario / compare_process_captures / prepare_bounded_process_capture', 'src/process', 'desktop', 'M', 'P', 'desktop_process_inspect snapshots modules, files and sockets on Linux, macOS and Windows and desktop_process_compare diffs them; left: a bounded scenario runner'),
+ ('desktop application capture/state/export/tasks', 'src/desktop', 'desktop', 'M', 'P', 'desktop_apps_list and desktop_app_inspect find installed apps (.desktop, .app, uninstall keys) and flag Electron apps; left: state export and tasks'),
  ('build computer (start/act/close, checkpoints, capture, consent)', 'src/desktop', 'none', 'M', 'M', 'left'),
- ('observe_native_ui / trace_native_ui_action / capture_native_ui_scenario', 'src/native', 'none', 'M', 'M', 'left'),
+ ('observe_native_ui / trace_native_ui_action / capture_native_ui_scenario', 'src/native', 'desktop', 'M', 'P', 'desktop_ui_tree reads the accessibility tree through AT-SPI, macOS AX and Windows UIA; left: action tracing and scenarios'),
 ])
 add('Platform, packaging and process', [
  ('CLI with about 194 commands', 'src/cli, src/cliCommandNames.ts', 'cli', 'C', 'C', 'one CLI that also loads every package CLI_COMMANDS'),
@@ -152,6 +152,7 @@ EXCEEDS = [
  'Go symbol recovery from pclntab on stripped binaries across all Go magics, in TS.',
  'Claims ledger where every claim is bound to a byte range hash and can be re-verified by any reader without the original session.',
  'pcap DNS, HTTP, SNI and JA3 in TS with no tshark dependency.',
+ 'Function matching between two binaries runs in the browser too (web Labs disassembler), with no upload.',
 ]
 
 REQUESTS = [
@@ -159,7 +160,7 @@ REQUESTS = [
  ('#7993 MIPS support', 'disasm (proposed), extras container already parses MIPS ELF headers'),
  ('#1558 Java reverse engineering', 'mobile (javap-style class reader) + bridges (jadx)'),
  ('#3289 iOS applications', 'mobile (IPA) + extras (Mach-O code signature, entitlements)'),
- ('#8121 WeChat wxapkg', 'extras scan detection; entry listing left'),
+ ('#8121 WeChat wxapkg', 'extras x_wxapkg: entries, bytes and PC decryption'),
  ('#1269 Codex plugin', '.codex-plugin at the repo root'),
  ('#8543 V8 code cache (.jsc, bytenode)', 'extras x_v8_inspect'),
  ('#8911 SQLite with WAL state', 'webrt'),
@@ -167,7 +168,7 @@ REQUESTS = [
  ('#6333 auditable suppression rules', 'extras ledger status rejected with reason'),
  ('#8472 gadget search', 'disasm (proposed)'),
  ('#2298 WASM function pseudocode', 'disasm (proposed)'),
- ('#9866 Jump Lists, #9423 Prefetch, #9865 registry hive', 'extras (left)'),
+ ('#9866 Jump Lists, #9423 Prefetch, #9865 registry hive', 'extras x_jump_list, x_prefetch, x_registry_hive'),
  ('#1316 portable install', 'web app needs no install at all'),
 ]
 
@@ -175,7 +176,7 @@ def main(out):
     tot = {'before': {'C':0,'P':0,'M':0}, 'after': {'C':0,'P':0,'M':0}}
     lines = ['# RevLens vs rea gap matrix', '',
       'Compared against morluto/rea v6.8.0 (source clone, MCP catalog in docs, 174 contract tool names, 194 CLI command names, 60+ src/ provider folders). ',
-      'Rows group related rea tools. Status: covered, partial, missing. "Before" is the state of all RevLens branches at feat/extras ce77aa5; "after" is the state on the integrate/1.0 line for RevLens 1.0, every after-change backed by tests against reference tools or by files in the repo.',
+      'Rows group related rea tools. Status: covered, partial, missing. "Before" is the state of all RevLens branches at feat/extras ce77aa5; "after" is the state on main for RevLens 1.0 after the gaps round (integrate/1.0-gaps), every after-change backed by tests against reference tools or by files in the repo.',
       'Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/GAP-MATRIX.md`.', '']
     name = {'C':'covered','P':'partial','M':'missing'}
     group = None
