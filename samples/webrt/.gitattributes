@@ -1,0 +1,2 @@
+# keep fixtures byte exact on every platform (tests compare bytes and hashes)
+* -text

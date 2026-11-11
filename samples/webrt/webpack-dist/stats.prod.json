@@ -1,0 +1,62 @@
+[
+ {
+  "chunk": 100,
+  "files": [
+   "chunk.100.prod.js"
+  ],
+  "modules": [
+   {
+    "id": 100,
+    "name": "./dashboard.js"
+   }
+  ]
+ },
+ {
+  "chunk": 792,
+  "files": [
+   "bundle.prod.js"
+  ],
+  "modules": [
+   {
+    "id": 504,
+    "name": "./api.js"
+   },
+   {
+    "id": 620,
+    "name": "./index.js"
+   },
+   {
+    "id": 214,
+    "name": "./util/format.js"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/define property getters"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/ensure chunk"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/get javascript chunk filename"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/hasOwnProperty shorthand"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/jsonp chunk loading"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/load script"
+   },
+   {
+    "id": "",
+    "name": "webpack/runtime/publicPath"
+   }
+  ]
+ }
+]
