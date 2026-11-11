@@ -7,7 +7,7 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-F5B301?style=flat-square&labelColor=0A0A0B" /></a>
   <img alt="Node 22.12 or newer" src="https://img.shields.io/badge/node-%E2%89%A522.12-14B8A6?style=flat-square&logo=nodedotjs&logoColor=white&labelColor=0A0A0B" />
   <img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-38BDF8?style=flat-square&logo=typescript&logoColor=white&labelColor=0A0A0B" />
-  <a href="docs/mcp-tools.md"><img alt="MCP tools" src="https://img.shields.io/badge/MCP-117_tools-10B981?style=flat-square&labelColor=0A0A0B" /></a>
+  <a href="docs/mcp-tools.md"><img alt="MCP tools" src="https://img.shields.io/badge/MCP-161_tools-10B981?style=flat-square&labelColor=0A0A0B" /></a>
   <a href="CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-FFD166?style=flat-square&labelColor=0A0A0B" /></a>
 </p>
 
@@ -37,7 +37,7 @@ RevLens answers with evidence you can check: byte offsets, virtual addresses, se
 
 - **In the browser**, inside a Web Worker. Your file never leaves your machine.
 - **In the terminal**, as `npx revlens`, with 83 commands and JSON, Markdown, HTML, SARIF and CycloneDX output.
-- **In your agent**, as an MCP server with 117 tools, 2 prompts and 2 resources, plus a ready made skill and plugins for Claude Code and Codex.
+- **In your agent**, as an MCP server with 161 tools, 2 prompts and 2 resources, plus a ready made skill and plugins for Claude Code and Codex.
 
 When you do have Ghidra, radare2, jadx, ILSpy, Frida or gdb installed, RevLens drives them too, and `revlens doctor` tells you what is missing and how to install it.
 

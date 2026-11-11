@@ -19,7 +19,7 @@ We built it from each project's README and docs as of 2026-11-11. Projects move 
 | License | MIT | MIT | Apache-2.0 | MIT | MIT | Apache-2.0 |
 | What you install | Node, or nothing in the browser | Node plus the engines you pick | Ghidra, Java, the plugin | IDA Pro | radare2 | jadx GUI with the plugin, Python |
 | Main strength | Answers first with nothing installed, evidence and checks | Breadth and deep engines | Free decompiler | Best in class decompiler | Light native engine | Android decompiled Java |
-| Number of MCP tools | 117 | About 200 | A focused set | A focused set | A focused set | A focused set |
+| Number of MCP tools | 161 | About 200 | A focused set | A focused set | A focused set | A focused set |
 
 ## Feature by feature
 

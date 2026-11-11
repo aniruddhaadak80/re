@@ -81,11 +81,54 @@ export const TOOL_EFFECTS: Record<string, { writes?: boolean; network?: boolean;
   bridge_adb_pull_apk: { writes: true },
   bridge_adb_logcat: { network: true },
   bridge_setup_mcp: { writes: true },
+  bridge_adb_install: { executes: true },
+  bridge_adb_uninstall: { executes: true, writes: true },
+  bridge_adb_push: { executes: true },
+  bridge_adb_pull: { writes: true },
+  bridge_adb_start_activity: { executes: true },
+  bridge_adb_stop_app: { executes: true },
+  bridge_adb_screenshot: { writes: true },
+  bridge_adb_screenrecord: { writes: true },
+  bridge_adb_input: { executes: true },
+  bridge_adb_logcat_filtered: { network: true },
+  bridge_adb_bugreport: { writes: true },
+  bridge_adb_backup: { writes: true },
+  bridge_adb_forward: { executes: true, network: true },
+  bridge_adb_reverse: { executes: true, network: true },
+  bridge_session_close: { executes: true },
+  bridge_r2_session_open: { executes: true },
+  bridge_r2_session_cmd: { executes: true },
+  bridge_gdb_session_open: { executes: true },
+  bridge_gdb_session_cmd: { executes: true },
+  bridge_lldb_session_open: { executes: true },
+  bridge_lldb_session_cmd: { executes: true },
+  bridge_frida_session_attach: { executes: true },
+  bridge_frida_session_load: { executes: true },
+  bridge_frida_session_post: { executes: true },
+  bridge_frida_session_collect: { executes: true },
+  bridge_frida_session_unload: { executes: true },
+  bridge_frida_session_resume: { executes: true },
+  bridge_ghidra_apply_names: { writes: true, executes: true },
+  bridge_ghidra_export_names: { writes: true, executes: true },
+  bridge_ida_apply_names: { writes: true, executes: true },
+  bridge_ida_export_names: { writes: true, executes: true },
+  bridge_r2_apply_names: { writes: true, executes: true },
+  bridge_r2_export_names: { writes: true, executes: true },
   x_ledger_record: { writes: true },
   x_ledger_unknown: { writes: true },
   x_ledger_verify: { writes: true },
   x_ledger_import: { writes: true },
 };
+
+/** Close every open bridge session (radare2, gdb, lldb, Frida). Hosts call this when they shut down. */
+export async function closeAllSessions(): Promise<number> {
+  return bridges.SESSIONS.closeAll();
+}
+
+/** Kill every bridge session process right away, for a synchronous exit path. */
+export function killAllSessions(): void {
+  bridges.SESSIONS.killAll();
+}
 
 const MAX_FILE = Number(process.env.REVLENS_MAX_FILE_MB ?? 256) * 1024 * 1024;
 

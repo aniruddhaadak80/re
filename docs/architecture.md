@@ -23,7 +23,7 @@ RevLens is one engine with three front doors. The engine, `@revlens/engine`, is 
 | `packages/bridges` | `@revlens/bridges` | Drives Ghidra, radare2, rizin, jadx, apktool, ILSpy, Frida, gdb, lldb and more through `execFile`. Node only. |
 | `packages/engine` | `@revlens/engine` | Runs every analyzer on one combined report (34 analyzers in the browser build, 37 with the Node only ones) and collects all agent tools and CLI commands. |
 | `packages/cli` | `revlens` | The `revlens` command with 83 CLI commands. Reads files with `node:fs` and prints or writes results. |
-| `packages/mcp` | `@revlens/mcp` | The MCP server with 117 MCP tools over stdio or Streamable HTTP (`revlens mcp --http`), built on `@modelcontextprotocol/sdk`. |
+| `packages/mcp` | `@revlens/mcp` | The MCP server with 161 MCP tools over stdio or Streamable HTTP (`revlens mcp --http`), built on `@modelcontextprotocol/sdk`. |
 | `apps/web` | `@revlens/web` | Vite, React and Tailwind. Runs the engine in a Web Worker. Deployed to GitHub Pages under `/re/`. |
 | `docs/` | | These pages, also rendered by the web app. |
 | `content/blog/` | | Blog posts, rendered by the web app. |
@@ -151,7 +151,7 @@ sequenceDiagram
   participant S as @revlens/mcp
   participant K as @revlens/engine
   C->>S: initialize
-  S-->>C: 117 tools with JSON schemas
+  S-->>C: 161 tools with JSON schemas
   C->>S: tools/call analyze_file
   S->>K: analyzeAll(bytes)
   K-->>S: Report

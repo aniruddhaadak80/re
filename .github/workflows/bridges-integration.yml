@@ -5,10 +5,10 @@ name: Bridges integration
 on:
   workflow_dispatch:
   push:
-    branches: [main]
-    paths: ['packages/bridges/**', 'samples/bridges/**', '.github/workflows/bridges-integration.yml']
+    branches: [main, 'integrate/**']
+    paths: ['packages/bridges/**', 'samples/bridges/**', 'packages/mcp/**', 'packages/engine/**', '.github/workflows/bridges-integration.yml']
   pull_request:
-    paths: ['packages/bridges/**', 'samples/bridges/**']
+    paths: ['packages/bridges/**', 'samples/bridges/**', 'packages/mcp/**', 'packages/engine/**']
   schedule:
     - cron: '17 4 * * 1'
 
@@ -84,10 +84,23 @@ jobs:
         run: |
           node --import tsx --input-type=module -e "const m = await import('./packages/bridges/src/node.ts'); const inv = await m.inventory(); console.log(m.formatInventory(inv, { verbose: true }));"
 
-      - name: Unit, safety and setup tests
-        run: node --test --import tsx packages/bridges/test/parsers.test.ts packages/bridges/test/safety.test.ts packages/bridges/test/setup.test.ts
+      - name: Unit, safety, setup, ADB parser and Cutter detection tests
+        run: node --test --import tsx packages/bridges/test/parsers.test.ts packages/bridges/test/safety.test.ts packages/bridges/test/setup.test.ts packages/bridges/test/adb.test.ts packages/bridges/test/cutter.test.ts
 
       - name: Integration tests with real tools
         env:
           REVLENS_CACHE_DIR: ${{ runner.temp }}/revlens-cache
         run: node --test --test-concurrency=1 --import tsx packages/bridges/test/integration.test.ts
+
+      - name: Sessions with real radare2, gdb, lldb and Frida
+        env:
+          REVLENS_CACHE_DIR: ${{ runner.temp }}/revlens-cache
+        run: node --test --test-concurrency=1 --import tsx packages/bridges/test/sessions.test.ts
+
+      - name: Names write-back with real Ghidra and radare2
+        env:
+          REVLENS_CACHE_DIR: ${{ runner.temp }}/revlens-cache
+        run: node --test --test-concurrency=1 --import tsx packages/bridges/test/writeback.test.ts
+
+      - name: MCP server closes bridge sessions on exit
+        run: node --test --test-concurrency=1 --import tsx packages/mcp/test/sessions.test.ts

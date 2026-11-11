@@ -5,6 +5,7 @@ import { createServer as createHttpServer, type IncomingMessage, type Server, ty
 import { randomUUID, timingSafeEqual, createHash } from 'node:crypto';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { createServer } from './server.js';
+import { closeAllSessions } from '@revlens/engine/node';
 
 export interface HttpOptions {
   /** interface to bind. Default 127.0.0.1. Anything that is not loopback needs allowRemote and a token. */
@@ -164,6 +165,8 @@ export async function startHttpServer(opts: HttpOptions = {}): Promise<HttpHandl
       clearInterval(sweep);
       await Promise.all([...sessions.values()].map((s) => s.transport.close()));
       sessions.clear();
+      // bridge sessions (radare2, gdb, lldb, Frida) belong to this process, so they end with the server
+      await closeAllSessions().catch(() => 0);
       await new Promise<void>((ok) => server.close(() => ok()));
     },
   };

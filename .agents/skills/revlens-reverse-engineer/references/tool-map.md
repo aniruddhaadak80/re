@@ -1,6 +1,6 @@
 # RevLens tool map
 
-Generated from the server by scripts/gen-tool-docs.mjs. 117 tools.
+Generated from the server by scripts/gen-tool-docs.mjs. 161 tools.
 
 ## Core triage and evidence
 
@@ -136,6 +136,50 @@ Generated from the server by scripts/gen-tool-docs.mjs. 117 tools.
 - `bridge_adb_packages` (reads only): List installed Android packages with their APK paths.
 - `bridge_adb_pull_apk` (writes files): Pull the base and split APKs of an installed package to a local folder, ready for bridge_jadx_decompile.
 - `bridge_adb_logcat` (reads only, network): Dump recent logcat lines from a device, optionally for one tag.
+- `bridge_adb_install` (runs programs): Install an APK (or base plus split APKs with install-multiple) on a device. Changes the device: needs allowExecution: true.
+- `bridge_adb_uninstall` (writes files): Uninstall a package from a device. Changes the device: needs allowExecution: true.
+- `bridge_adb_push` (runs programs): Copy a local file to the device, below /data/local/tmp, /sdcard or /storage/emulated unless allowAnyRemotePath. Changes the device: needs allowExecution: true.
+- `bridge_adb_pull` (writes files): Copy one file from the device to a local folder with its SHA-256. Checks the remote size first (maxBytes) and never overwrites unless asked.
+- `bridge_adb_start_activity` (runs programs): Start an activity with am start -W by component, or the launcher activity of a package. Every value is validated and quoted for the device shell. Changes the device: needs allowExecution: true.
+- `bridge_adb_stop_app` (runs programs): Force stop an app (am force-stop). Changes the device: needs allowExecution: true.
+- `bridge_adb_dumpsys_package` (reads only): dumpsys package as JSON: version, SDK levels, flags (debuggable, allowBackup), install times, declared, requested, install and runtime permissions, and components with intent filters.
+- `bridge_adb_components` (reads only): List activities, services, receivers and providers of an installed package with their intent actions, categories, schemes and permissions, plus launcher activities.
+- `bridge_adb_resolve_activity` (reads only): Which activity an intent opens (cmd package resolve-activity). Default: the launcher activity of package, or the HOME screen without one.
+- `bridge_adb_pm_path` (reads only): APK paths (base and splits) of an installed package (pm path).
+- `bridge_adb_screenshot` (writes files): Take a PNG screenshot into a local folder; returns the path, size in pixels and SHA-256.
+- `bridge_adb_screenrecord` (writes files): Record the screen to a local MP4 for a bounded time (1 to 180 seconds, default 10).
+- `bridge_adb_display` (reads only): Display size and density, physical and override (wm size, wm density).
+- `bridge_adb_input` (runs programs): Send one input event: tap (x, y), swipe (x, y, x2, y2, durationMs), text (printable ASCII) or keyevent (KEYCODE_HOME or a number). Changes the device: needs allowExecution: true.
+- `bridge_adb_getprop` (reads only): Device properties: one key, or all (optionally by prefix) plus a summary (model, release, SDK, ABI, fingerprint, debuggable, secure, patch level).
+- `bridge_adb_settings` (reads only): Read one setting or list a settings namespace (system, secure, global). Read only.
+- `bridge_adb_ps` (reads only): Running processes on the device (user, pid, ppid, memory, state, name), optionally filtered by name.
+- `bridge_adb_ls` (reads only): List a device folder (ls -la): type, mode, owner, group, size, date, name and link target.
+- `bridge_adb_logcat_filtered` (reads only, network): Logcat with filter specs (Tag:P), one pid, a buffer (main, system, crash, events, all), a since time and a substring filter.
+- `bridge_adb_bugreport` (writes files): Collect a bugreport zip with a hard time limit (default 10 minutes, max 30) and a size cap.
+- `bridge_adb_backup` (writes files): adb backup of one package to a local .ab file and its header. The device asks its user to confirm; apps with allowBackup=false give an empty file.
+- `bridge_adb_forward` (network): List, add or remove host to device port forwards (tcp:N, localabstract:name, jdwp:pid). Adding and removing need allowExecution: true.
+- `bridge_adb_reverse` (network): List, add or remove device to host reverse port rules. Adding and removing change the device: need allowExecution: true.
+- `bridge_session_list` (reads only): List open radare2/rizin, gdb, lldb and Frida sessions with ids, targets, idle timeouts and command counts.
+- `bridge_session_close` (runs programs): Close one session by id (or every session with all: true). Sessions also close after their idle timeout and when the server exits.
+- `bridge_r2_session_open` (runs programs): Open a radare2 (or rizin) session on a file and keep it alive across calls, so analysis runs once and names you set stay. Static only, sandboxed (cfg.sandbox), no shell.
+- `bridge_r2_session_cmd` (runs programs): Run one radare2 or rizin command in an open session (afl, pdf @ main, afn name @ addr, axt, izj). JSON commands come back parsed. Shell, pipes, file writes, opening other files and scripts are refused.
+- `bridge_gdb_session_open` (runs programs): Start gdb (MI) on a program with arguments, or attached to a pid, and keep it alive across calls. Program output goes to its own stream. Needs allowExecution: true.
+- `bridge_gdb_session_cmd` (runs programs): Run one gdb console command in a session (break, run, continue, stepi, info registers, bt, x/16gx $sp). Resuming commands wait for the next stop, then interrupt on timeout. shell, python, source, dump, file and similar a
+- `bridge_lldb_session_open` (runs programs): Start lldb on a program with arguments, or attached to a pid, and keep it alive across calls. Needs allowExecution: true.
+- `bridge_lldb_session_cmd` (runs programs): Run one lldb command in a session (b, run, continue, si, register read, bt, memory read). Waits until the program stops. platform shell, script, command script and similar are refused.
+- `bridge_frida_session_attach` (runs programs): Attach Frida to a process (pid or name) or spawn a program and keep the session open for scripts and messages. Needs allowExecution: true.
+- `bridge_frida_session_load` (runs programs): Load a script into a Frida session: a RevLens hook template (see bridge_frida_templates) or your own JavaScript source. Returns a script id. A spawned program is resumed after the first load unless resume: false.
+- `bridge_frida_session_post` (runs programs): Post a JSON message to a loaded script (the script reads it with recv()).
+- `bridge_frida_session_collect` (runs programs): Take buffered events from a Frida session: send() payloads, console logs, parsed RevLens template events, script errors and detach notices. Can wait up to waitMs for minEvents.
+- `bridge_frida_session_unload` (runs programs): Unload one script from a Frida session; the session stays attached.
+- `bridge_frida_session_resume` (runs programs): Resume a spawned program that is still suspended.
+- `bridge_ghidra_apply_names` (writes files): Write function names, signatures, comments, labels and C types from a RevLens names JSON into a Ghidra project (the cached RevLens project for the file by default, so later Ghidra decompiles show the names, or your own p
+- `bridge_ghidra_export_names` (writes files): Export user defined function names and signatures, comments in functions, user labels and /RevLens types from a Ghidra project as a RevLens names JSON.
+- `bridge_ida_apply_names` (writes files): Write a RevLens names JSON into an IDA database with idat: give a .i64/.idb to update it, or a binary plus outDatabase to create one. Names, prototypes, comments, labels and C types.
+- `bridge_ida_export_names` (writes files): Export user names, prototypes, comments, labels and local types from an IDA database (or a binary) as a RevLens names JSON.
+- `bridge_r2_apply_names` (writes files): Write a RevLens names JSON into a radare2 project (or rizin .rzdb), creating it from the binary when needed; returns the r2 script too. Names that r2 cannot hold are mapped to safe ones and listed.
+- `bridge_r2_export_names` (writes files): Export what was added to a radare2 or rizin project (names and comments that differ from a fresh analysis, plus RevLens labels) as a RevLens names JSON.
+- `bridge_cutter_info` (reads only): Find Cutter (the rizin GUI) without starting it: AppImage, macOS app, Windows release or Scoop, Flatpak, distro package. Reports version, install kind, a rizin bundled with it, and how to open a file in it.
 - `bridge_ida_run` (reads only): Run IDA (idat) in batch mode to list functions or decompile selected ones with Hex-Rays when licensed.
 - `bridge_binja_functions` (reads only): List functions with the Binary Ninja headless API (needs a license that allows headless use).
 - `bridge_setup_mcp` (writes files): Add the RevLens MCP server to an agent client config (claude-code, codex, cursor, vscode, windsurf). Dry run by default and returns the new file text; write: true saves it with a backup.
