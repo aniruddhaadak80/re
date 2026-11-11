@@ -2595,5 +2595,47 @@
 }
 },
 "source": "pyelftools 0.33 on the unstripped twin"
+},
+"lua-x64.elf": {
+"disptab": {
+"addr": 17044240,
+"size": 664
+},
+"luaV_execute": {
+"addr": 17017984,
+"size": 16848
+}
+},
+"virt-arm64.elf": {
+"vtables": {
+"_ZTV3Dog": {
+"addr": 16911200,
+"size": 56
+},
+"_ZTV4Bird": {
+"addr": 16911256,
+"size": 56
+},
+"_ZTV5Snake": {
+"addr": 16911312,
+"size": 56
+}
+}
+},
+"virt-x64.elf": {
+"vtables": {
+"_ZTV3Dog": {
+"addr": 16788544,
+"size": 56
+},
+"_ZTV4Bird": {
+"addr": 16788600,
+"size": 56
+},
+"_ZTV5Snake": {
+"addr": 16788656,
+"size": 56
+}
+}
 }
 }

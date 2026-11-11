@@ -10,7 +10,7 @@ const PREFIXES = new Set(['rep', 'repe', 'repne', 'lock', 'bnd', 'notrack', 'xac
 /** Instruction record whose hex bytes are computed on first use. */
 class LazyInsn implements Insn {
   address: number; size: number; mnemonic: string; operands: string; flow: Flow; imms: number[];
-  target?: number; memAddr?: number; viaMemory?: boolean;
+  target?: number; memAddr?: number; viaMemory?: boolean; memSize?: number;
   private raw: Uint8Array | undefined;
   private hex: string | undefined;
   constructor(address: number, size: number, raw: Uint8Array, mnemonic: string, operands: string, flow: Flow, imms: number[]) {
@@ -20,7 +20,7 @@ class LazyInsn implements Insn {
     if (this.hex === undefined) { this.hex = hexOf(this.raw ?? new Uint8Array(0)); this.raw = undefined; }
     return this.hex;
   }
-  toJSON() { return { address: this.address, size: this.size, bytes: this.bytes, mnemonic: this.mnemonic, operands: this.operands, flow: this.flow, target: this.target, memAddr: this.memAddr, viaMemory: this.viaMemory, imms: this.imms }; }
+  toJSON() { return { address: this.address, size: this.size, bytes: this.bytes, mnemonic: this.mnemonic, operands: this.operands, flow: this.flow, target: this.target, memAddr: this.memAddr, viaMemory: this.viaMemory, memSize: this.memSize, imms: this.imms }; }
 }
 
 export class IcedDecoder implements Decoder {
@@ -89,6 +89,7 @@ export class IcedDecoder implements Decoder {
         else if (mnemonic === 'hlt') flow = 'trap';
         let memAddr: number | undefined;
         let viaMemory = false;
+        let memSize = 0;
         const imms: number[] = [];
         const n: number = ins.opCount;
         for (let i = 0; i < n; i++) {
@@ -96,6 +97,7 @@ export class IcedDecoder implements Decoder {
           if (k === m.OpKind.NearBranch16 || k === m.OpKind.NearBranch32 || k === m.OpKind.NearBranch64) {
             target = Number(ins.nearBranchTarget);
           } else if (k === m.OpKind.Memory) {
+            if (!memSize) memSize = m.MemorySizeExt.size(ins.memorySize) as number;
             if (ins.isIpRelMemoryOperand) memAddr = Number(ins.ipRelMemoryAddress);
             else if (ins.memoryBase === m.Register.None && ins.memoryIndex === m.Register.None) memAddr = Number(BigInt.asUintN(bitness, ins.memoryDisplacementU64));
             if ((flow === 'icall' || flow === 'ijump') && memAddr !== undefined) viaMemory = true;
@@ -109,6 +111,7 @@ export class IcedDecoder implements Decoder {
         if (target !== undefined) insn.target = target;
         if (memAddr !== undefined) insn.memAddr = memAddr;
         if (viaMemory) insn.viaMemory = true;
+        if (memSize) insn.memSize = memSize;
         out.push(insn);
       }
     } finally {

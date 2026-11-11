@@ -1,6 +1,6 @@
 // Agent facing functions. Every function takes a file `path` (Node) or `bytes`, returns JSON with
 // hex addresses and file offsets as evidence, and pages large outputs with offset/limit.
-import type { AnalyzedFunction, FunctionInfo, Insn } from './types.js';
+import type { AnalyzedFunction, FunctionInfo, Insn, SwitchTable } from './types.js';
 import { Program, normName, type OpenOptions } from './analysis/program.js';
 import { liftFunction } from './analysis/lift.js';
 import { stringAt } from './analysis/strings.js';
@@ -144,7 +144,20 @@ export function summarizeFunction(p: Program, af: AnalyzedFunction) {
     strings: strings.slice(0, 50),
     constants: af.constants.slice(0, 32).map((c) => (Math.abs(c) > 9 ? hx(c) : String(c))),
     unresolvedIndirect: af.unresolvedIndirect,
+    switches: af.switches?.filter((x) => x.kind === 'switch').length ?? 0,
+    resolvedIndirectCalls: af.calls.filter((c) => c.indirect && (c.candidates || c.resolvedBy)).length,
     truncated: af.truncated,
+  };
+}
+
+function switchJson(p: Program, s: SwitchTable) {
+  const cases = new Map<number, number[]>();
+  s.targets.forEach((t, i) => { const l = cases.get(t); const v = i + (s.bias ?? 0); if (l) l.push(v); else cases.set(t, [v]); });
+  return {
+    at: hx(s.at), kind: s.kind, table: hx(s.table), entrySize: s.entrySize, entries: s.count, bound: s.bound,
+    ...(s.boundAt !== undefined ? { boundAt: hx(s.boundAt) } : {}), ...(s.bias ? { bias: s.bias } : {}), ...(s.sharedWith !== undefined ? { sharedWith: hx(s.sharedWith) } : {}),
+    indexReg: s.indexReg,
+    targets: [...cases].slice(0, 256).map(([t, vals]) => ({ addr: hx(t), name: s.kind === 'call-table' ? p.nameOf(t) : undefined, cases: vals.slice(0, 64) })),
   };
 }
 
@@ -210,7 +223,8 @@ export async function disasmFunction(input: BinaryInput & { function: string | n
       ...(b.exit ? { exit: b.exit } : {}),
       insns: b.insns.filter((i) => shown.has(i)).map((i) => insnJson(p, af, i)),
     })).filter((b) => b.insns.length > 0 || pg.total === 0),
-    calls: af.calls.slice(0, 500).map((c) => ({ at: hx(c.at), target: c.target !== undefined ? hx(c.target) : undefined, name: c.name, indirect: c.indirect || undefined, tail: c.tail })),
+    calls: af.calls.slice(0, 500).map((c) => ({ at: hx(c.at), target: c.target !== undefined ? hx(c.target) : undefined, name: c.name, indirect: c.indirect || undefined, tail: c.tail, ...(c.candidates ? { candidates: c.candidates.slice(0, 64).map((t) => ({ addr: hx(t), name: p.nameOf(t) })), resolvedBy: c.resolvedBy } : c.resolvedBy ? { resolvedBy: c.resolvedBy } : {}) })),
+    switches: (af.switches ?? []).map((s) => switchJson(p, s)),
   };
 }
 
@@ -267,7 +281,7 @@ export async function disasmCallgraph(input: BinaryInput & { function?: string |
   const limit = clampInt(input.limit, 300, 1, 5000);
   const dir = input.direction ?? 'callees';
   const idx = p.xrefs(clampInt(input.budgetMs, 8000, 100, 60000));
-  const callersOf = (a: number) => [...new Set((idx.to.get(a) ?? []).filter((r) => r.kind === 'call' || r.kind === 'jump').map((r) => r.func))];
+  const callersOf = (a: number) => [...new Set((idx.to.get(a) ?? []).filter((r) => r.kind === 'call' || r.kind === 'jump' || r.kind === 'indirect-call').map((r) => r.func))];
   const calleesOf = (a: number) => {
     const af = p.analyze(a);
     if (!af) return [] as { addr?: number; name: string }[];
@@ -275,6 +289,7 @@ export async function disasmCallgraph(input: BinaryInput & { function?: string |
     for (const c of af.calls) {
       if (c.target !== undefined) m.set(hx(c.target), { addr: c.target, name: c.name ?? 'sub_' + c.target.toString(16) });
       else if (c.name) m.set('import:' + c.name, { name: c.name });
+      else if (c.candidates) for (const t of c.candidates.slice(0, 64)) m.set(hx(t), { addr: t, name: p.nameOf(t) ?? 'sub_' + t.toString(16) });
     }
     return [...m.values()];
   };

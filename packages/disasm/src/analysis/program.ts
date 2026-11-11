@@ -1,5 +1,7 @@
 // Program: a loaded binary plus lazy, cached analyses (functions, CFG, xrefs, call graph).
-import type { AnalyzedFunction, BasicBlock, BinaryImage, CallSite, DataRef, Decoder, Edge, FunctionInfo, ImportRef, Insn, Sym } from '../types.js';
+import type { AnalyzedFunction, BasicBlock, BinaryImage, CallSite, DataRef, Decoder, Edge, FunctionInfo, ImportRef, Insn, Sym, SwitchTable } from '../types.js';
+import { resolveJumpTable, type JumpTableContext } from './jumptable.js';
+import { writes } from './regs.js';
 import { Memory } from '../loader/memory.js';
 import { loadImage, type LoadOptions } from '../loader/index.js';
 import { loadDecoders, type DecoderOptions } from '../backends/index.js';
@@ -420,6 +422,38 @@ export class Program {
     const inRange = (t: number) => (limitEnd === undefined ? true : t >= start && t < limitEnd);
     const tails = new Set<number>();
     const pre = new Map<number, Insn>();
+    // predecessor bookkeeping for jump table resolution
+    const fallPred = new Map<number, Insn>();
+    const branchIn = new Map<number, Insn[]>();
+    const switches = new Map<number, SwitchTable>();
+    const defsIdx = new Map<string, Insn[]>();
+    let defsStamp = -1;
+    const jtCtx: JumpTableContext = {
+      arch, bits: this.img.bits, funcStart: start,
+      pred: (ins) => {
+        const fp = fallPred.get(ins.address);
+        const bi = branchIn.get(ins.address);
+        const n = (fp ? 1 : 0) + (bi?.length ?? 0);
+        if (n !== 1) return undefined;
+        return fp ?? bi![0];
+      },
+      read: (a, w) => this.readUint(a, w),
+      defsOf: (reg) => {
+        if (defsStamp !== insnAt.size) {
+          defsStamp = insnAt.size;
+          defsIdx.clear();
+          for (const i of insnAt.values()) for (const w of writes(arch, i)) { const l = defsIdx.get(w); if (l) { if (l.length < 16) l.push(i); } else defsIdx.set(w, [i]); }
+        }
+        return defsIdx.get(reg) ?? [];
+      },
+      isExec: (a) => this.mem.isExec(a),
+      isFunction: (a) => this.functions.has(a) || this.importByStub.has(a) || this.symAt.get(a)?.kind === 'func' || (limitEnd !== undefined && (a < start || a >= limitEnd)),
+    };
+    const noteBranch = (ins: Insn) => {
+      if (ins.target === undefined) return;
+      const l = branchIn.get(ins.target);
+      if (l) { if (l.length < 64) l.push(ins); } else branchIn.set(ins.target, [ins]);
+    };
     while (work.length) {
       let pc = work.pop()!;
       if (insnAt.has(pc)) continue;
@@ -445,6 +479,8 @@ export class Program {
           total++;
           const next = ins.address + ins.size;
           if (ins.flow === 'call' && ins.target === next) ins.flow = 'seq'; // call $+5 (PIC base idiom)
+          if (ins.flow === 'seq' || ins.flow === 'call' || ins.flow === 'icall' || ins.flow === 'cjump') fallPred.set(next, ins);
+          if (ins.flow === 'jump' || ins.flow === 'cjump') noteBranch(ins);
           if (ins.flow === 'jump' && ins.target !== undefined) {
             if (isOtherFunc(ins.target) || !inRange(ins.target) || !this.mem.isExec(ins.target)) tails.add(ins.address);
             else { leaders.add(ins.target); work.push(ins.target); }
@@ -455,6 +491,22 @@ export class Program {
             leaders.add(next);
             work.push(next);
             stop = true; break;
+          }
+          if ((ins.flow === 'ijump' || ins.flow === 'icall') && !(ins.viaMemory && ins.memAddr !== undefined && this.importBySlot.has(ins.memAddr))) {
+            let jt = resolveJumpTable(jtCtx, ins);
+            if (!jt && ins.flow === 'ijump' && ins.operands.includes('[')) {
+              // interpreter loops repeat the same dispatch (jmp [r10+rax*8]) at the end of every handler;
+              // reuse a table already resolved for the identical operand in this function
+              for (const o of switches.values()) {
+                if (o.kind !== 'switch' || o.bound === 'cmp') continue;
+                const oi = insnAt.get(o.at);
+                if (oi && oi.operands === ins.operands && oi.mnemonic === ins.mnemonic) { jt = { ...o, at: ins.address, sharedWith: o.at }; break; }
+              }
+            }
+            if (jt && (jt.kind === 'call-table' || ins.flow === 'ijump')) {
+              switches.set(ins.address, jt);
+              if (jt.kind === 'switch') for (const t of new Set(jt.targets)) { if (inRange(t) && !insnAt.has(t)) work.push(t); leaders.add(t); }
+            }
           }
           if (ins.flow === 'ret' || ins.flow === 'ijump' || ins.flow === 'trap' || ins.flow === 'invalid') { stop = true; break; }
           if ((ins.flow === 'call' || ins.flow === 'icall') && this.isNoReturn(ins.target, ins.viaMemory ? ins.memAddr : undefined)) { stop = true; break; }
@@ -504,7 +556,12 @@ export class Program {
           addEdge(next, 'false');
           break;
         case 'ret': b.exit = 'ret'; break;
-        case 'ijump': b.exit = last.viaMemory && last.memAddr !== undefined && this.importBySlot.has(last.memAddr) ? 'tail' : 'indirect'; break;
+        case 'ijump': {
+          const jt = switches.get(last.address);
+          if (jt?.kind === 'switch') { for (const t of new Set(jt.targets)) addEdge(t, 'case'); if (!b.succ.length) b.exit = 'indirect'; }
+          else b.exit = (last.viaMemory && last.memAddr !== undefined && this.importBySlot.has(last.memAddr)) || jt?.kind === 'call-table' ? 'tail' : 'indirect';
+          break;
+        }
         case 'trap': b.exit = 'trap'; break;
         case 'invalid': b.exit = 'invalid'; break;
         default:
@@ -524,7 +581,14 @@ export class Program {
     for (const b of blocks) {
       codeSize += b.end - b.start;
       for (const ins of b.insns) {
-        if (ins.flow === 'call' || ins.flow === 'icall' || (ins.flow === 'jump' && b.exit === 'tail' && ins === b.insns[b.insns.length - 1]) || (ins.flow === 'ijump' && ins.viaMemory)) {
+        const jt = switches.get(ins.address);
+        if (jt?.kind === 'call-table' && jt.bound === 'const') {
+          calls.push({ at: ins.address, target: jt.targets[0], name: this.nameOf(jt.targets[0]!), indirect: true, tail: ins.flow === 'ijump' || undefined, resolvedBy: 'constant' });
+        } else if (jt?.kind === 'call-table') {
+          calls.push({ at: ins.address, indirect: true, tail: ins.flow === 'ijump' || undefined, candidates: [...new Set(jt.targets)], resolvedBy: 'table' });
+        } else if (jt?.kind === 'switch') {
+          /* resolved switch: edges already added */
+        } else if (ins.flow === 'call' || ins.flow === 'icall' || (ins.flow === 'jump' && b.exit === 'tail' && ins === b.insns[b.insns.length - 1]) || (ins.flow === 'ijump' && ins.viaMemory)) {
           const tail = ins.flow === 'jump' || ins.flow === 'ijump';
           if (ins.target !== undefined) {
             calls.push({ at: ins.address, target: ins.target, name: this.nameOf(ins.target), indirect: false, tail: tail || undefined });
@@ -551,9 +615,11 @@ export class Program {
         }
       }
     }
-    return {
+    const out: AnalyzedFunction = {
       ...info, blocks, calls, dataRefs, constants: [...consts], insnCount: total, codeSize, truncated, unresolvedIndirect: unresolved,
     };
+    if (switches.size) out.switches = [...switches.values()].sort((a, b) => a.at - b.at);
+    return out;
   }
 
   private thunkCache = new Map<number, string | undefined>();
@@ -566,6 +632,23 @@ export class Program {
     if (m && two[1]?.flow === 'ret') r = m[1];
     this.thunkCache.set(target, r);
     return r;
+  }
+
+  /** Reads a pointer sized value, applying load time relocations. */
+  readPtr(a: number): number | undefined { return this.readUint(a, this.img.bits / 8); }
+
+  /** Reads an unsigned integer of w (1, 2, 4 or 8) bytes in the image's byte order. */
+  readUint(a: number, w: number): number | undefined {
+    if (w === this.img.bits / 8 && this.img.relocPtrs) { const v = this.img.relocPtrs.get(a); if (v !== undefined) return v; }
+    const b = this.mem.view(a, w);
+    if (b.length < w) return undefined;
+    const dv = new DataView(b.buffer, b.byteOffset, w);
+    const le = this.img.endian === 'le';
+    if (w === 1) return dv.getUint8(0);
+    if (w === 2) return dv.getUint16(0, le);
+    if (w === 4) return dv.getUint32(0, le);
+    if (w === 8) return Number(dv.getBigUint64(0, le));
+    return undefined;
   }
 
   private isGotLike(a: number): boolean {
@@ -582,7 +665,7 @@ export class Program {
       const s = stringAt(this.mem, addr);
       if (s) return { at, addr, kind: 'string', value: s.value };
       // one level of indirection: a pointer (GOT entry, literal pool, string table) to a string
-      const p = this.mem.readPtr(addr, this.img.bits, this.img.endian === 'le');
+      const p = this.readPtr(addr);
       if (p !== undefined && p !== 0 && p !== addr && this.mem.isMapped(p) && !this.mem.isExec(p)) {
         const s2 = stringAt(this.mem, p);
         if (s2) return { at, addr: p, kind: 'string', value: s2.value };
@@ -630,6 +713,7 @@ export class Program {
       if (!af) continue;
       for (const c of af.calls) {
         if (c.target !== undefined) add(c.target, c.at, a, c.tail ? 'jump' : 'call');
+        else if (c.candidates) for (const t of c.candidates.slice(0, 64)) add(t, c.at, a, 'indirect-call');
       }
       for (const b of af.blocks) {
         const last = b.insns[b.insns.length - 1]!;

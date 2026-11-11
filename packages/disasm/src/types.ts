@@ -77,6 +77,8 @@ export interface BinaryImage {
   fileOffset: number;
   /** other slices in a fat Mach-O */
   slices?: { arch: Arch; offset: number; size: number }[];
+  /** pointer values the dynamic loader writes (ELF RELATIVE relocations), keyed by address */
+  relocPtrs?: Map<number, number>;
   /** Go build detected through a pclntab */
   goVersionHint?: string;
   warnings: string[];
@@ -98,6 +100,8 @@ export interface Insn {
   memAddr?: number;
   /** true when the branch target is read through memAddr (call [slot]) */
   viaMemory?: boolean;
+  /** x86: size in bytes of the memory operand, when the instruction has one */
+  memSize?: number;
   /** literal immediates (non branch) */
   imms: number[];
   thumb?: boolean;
@@ -113,7 +117,34 @@ export interface Decoder {
 export interface Edge {
   from: number;
   to: number;
-  kind: 'fallthrough' | 'jump' | 'true' | 'false';
+  /** 'case' edges leave a block that ends in a resolved jump table */
+  kind: 'fallthrough' | 'jump' | 'true' | 'false' | 'case';
+}
+
+/** A jump table (switch) or a table of code pointers reached by an indirect jump or call. */
+export interface SwitchTable {
+  /** address of the indirect jump or call */
+  at: number;
+  /** address of the table in memory */
+  table: number;
+  /** bytes per entry */
+  entrySize: number;
+  /** number of entries read */
+  count: number;
+  /** target per index (index 0 first), duplicates kept so case values line up */
+  targets: number[];
+  /** how the entry count was found: a bounds check before the jump, an and with a bit mask (an upper limit), a scan of plausible entries, or a single constant target */
+  bound: 'cmp' | 'mask' | 'scan' | 'const';
+  /** value subtracted from the switch variable before indexing, when the code does that */
+  bias?: number;
+  /** 'switch' when targets are inside the function, 'call-table' when they are function entries */
+  kind: 'switch' | 'call-table';
+  /** register holding the index */
+  indexReg?: string;
+  /** address of the bounds check (cmp) */
+  boundAt?: number;
+  /** same table as the dispatch at this address (repeated interpreter dispatch with the same operand) */
+  sharedWith?: number;
 }
 
 export interface BasicBlock {
@@ -132,6 +163,10 @@ export interface CallSite {
   name?: string;
   indirect: boolean;
   tail?: boolean;
+  /** indirect calls: possible targets found by table reads, constant propagation or vtable scan */
+  candidates?: number[];
+  /** how candidates were found */
+  resolvedBy?: 'table' | 'constant' | 'vtable' | 'itab' | 'initial-value';
 }
 
 export interface DataRef {
@@ -160,4 +195,6 @@ export interface AnalyzedFunction extends FunctionInfo {
   codeSize: number;
   truncated: boolean;
   unresolvedIndirect: number;
+  /** jump tables and code pointer tables resolved in this function */
+  switches?: SwitchTable[];
 }
