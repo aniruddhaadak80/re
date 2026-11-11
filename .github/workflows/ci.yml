@@ -35,11 +35,27 @@ jobs:
       - name: Audit dependencies
         if: matrix.os == 'ubuntu-latest' && matrix.node == 22
         run: npm audit --audit-level=low
-      - name: Fetch real world samples
-        run: node samples/fetch-samples.mjs
+      - name: Cache fetched fixtures
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: samples/.cache
+          key: fixtures-${{ runner.os }}-${{ hashFiles('samples/fetch-samples.mjs', 'packages/*/scripts/fetch-fixtures.mjs') }}
+      - name: Fetch real world samples and package fixtures
+        run: npm run fetch-fixtures
       - run: npm run build
       - run: npm run typecheck
-      - run: npm test
+      - name: Test core
+        run: node --test --import tsx packages/core/test/*.test.ts
+      - name: Test managed
+        run: node --test --import tsx packages/managed/test/*.test.ts
+      - name: Test webrt
+        run: node --test --import tsx packages/webrt/test/*.test.ts
+      - name: Test mobile
+        run: node --test --import tsx packages/mobile/test/*.test.ts
+      - name: Test disasm
+        run: node --test --import tsx packages/disasm/test/*.test.ts
+      - name: Test engine, CLI and MCP over stdio
+        run: node --test --import tsx packages/engine/test/*.test.ts packages/cli/test/*.test.ts packages/mcp/test/*.test.ts
       - name: CLI smoke test
         shell: bash
         run: |
@@ -48,6 +64,11 @@ jobs:
           node packages/cli/dist/index.js verify samples/ls-linux.elf format=elf section=.text
           node packages/cli/dist/index.js sbom samples/react-dom.production.min.js > sbom.json
           node -e "const b=require('./sbom.json'); if(!b.components.some(c=>c.purl==='pkg:npm/react-dom@18.3.1')) process.exit(1)"
+          node packages/cli/dist/index.js tools
+          node packages/cli/dist/index.js disasm decompile samples/disasm/hello-x64.elf main
+          node packages/cli/dist/index.js mobile manifest samples/mobile/apk/org.rayg.streaktracker_12.apk
+          node packages/cli/dist/index.js managed dotnet samples/managed/dotnet/System.IO.Compression.Brotli.dll
+          node packages/cli/dist/index.js web pcap-summary samples/webrt/dns_udp.pcap
 
   web:
     name: Web app build and browser tests

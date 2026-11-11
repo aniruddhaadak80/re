@@ -56,7 +56,7 @@ export const pythonAnalyzer: Analyzer = {
   id: 'managed-python',
   title: 'Python bytecode and freezers',
   description: 'Parses .pyc headers and code objects, lists PyInstaller archives, and spots Nuitka, py2exe and cx_Freeze builds.',
-  applies: (ctx) => ctx.format === 'pyc' || isPyc(ctx.bytes) || ((ctx.format === 'pe' || ctx.format === 'elf' || ctx.format === 'macho' || ctx.format === 'unknown') && ctx.bytes.length > 64),
+  applies: (ctx) => ctx.format === 'pyc' || ((ctx.format === 'unknown' || ctx.format === 'text') && isPyc(ctx.bytes)) || ((ctx.format === 'pe' || ctx.format === 'elf' || ctx.format === 'macho' || ctx.format === 'unknown') && ctx.bytes.length > 64),
   run(ctx) {
     const { report, bytes } = ctx;
     const out: Record<string, unknown> = {};

@@ -2,7 +2,10 @@
   "description": "Known self matches for the RevLens self scan. RevLens ships its own detection signatures (the yara-lite starter pack, capa-lite symbol lists, packer and obfuscator fingerprints), documentation that quotes those rules, and a deliberately suspicious demo sample. Scanning those files with the same signatures matches them by design. Each entry is narrow: one file pattern and the exact rules expected there. Any other rule on these files, and every rule on every other file, is still reported.",
   "entries": [
     {
-      "files": ["apps/web/dist/assets/analysis.worker-*.js", "apps/web/dist/assets/index-*.js"],
+      "files": [
+        "apps/web/dist/assets/analysis.worker-*.js",
+        "apps/web/dist/assets/index-*.js"
+      ],
       "rules": [
         "capa/capa.injector",
         "yara/rule.Process_Injection_APIs",
@@ -20,9 +23,34 @@
       "reason": "The analysis worker and the main bundle embed @revlens/core signature tables and the docs that describe each rule."
     },
     {
-      "files": ["apps/web/dist/assets/samples-*.js"],
-      "rules": ["yara/rule.JS_Eval_Decoded", "entropy/obfuscator.eval-of-decoded-payload"],
+      "files": [
+        "apps/web/dist/assets/samples-*.js"
+      ],
+      "rules": [
+        "yara/rule.JS_Eval_Decoded",
+        "entropy/obfuscator.eval-of-decoded-payload"
+      ],
       "reason": "The Suspicious demo sample is assembled in the browser on purpose and contains eval(atob(...)). Its values are fake."
+    },
+    {
+      "files": [
+        "packages/core/dist/analyzers/capa.js",
+        "packages/core/dist/analyzers/entropy.js",
+        "packages/core/dist/rules/starter.js"
+      ],
+      "rules": [
+        "capa/capa.injector",
+        "yara/rule.Process_Injection_APIs",
+        "yara/rule.NPM_Credential_Stealer",
+        "yara/rule.Keylogger_APIs",
+        "yara/rule.Reverse_Shell_Strings",
+        "yara/rule.Ransom_Note_Language",
+        "yara/rule.Crypto_Miner",
+        "yara/rule.UPX_Packed",
+        "entropy/packer.upx",
+        "entropy/obfuscator.jjencode-or-aaencode"
+      ],
+      "reason": "Since 1.0.0 the self scan also covers every published package. These three core files are the capa-lite symbol lists, the packer and obfuscator fingerprints and the yara-lite starter pack, so the same signatures match them by design. Other rules on these files, and all rules on other package files, are still reported."
     }
   ]
 }
