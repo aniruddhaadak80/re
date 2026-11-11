@@ -1,0 +1,20 @@
+# Hand-written fixture following the Desktop Entry Specification 1.5
+[Desktop Entry]
+Type=Application
+Version=1.5
+Name=Tricky Viewer
+Name[de]=Kniffliger Betrachter
+GenericName=Document Viewer
+Comment=Opens; files\swith a semicolon
+Exec=env GDK_BACKEND=x11 "/opt/Tricky Viewer/tricky-viewer" --open "file \"one\".txt" %U
+TryExec=/opt/Tricky Viewer/tricky-viewer
+Icon=tricky-viewer
+Terminal=false
+Categories=Office;Viewer;
+MimeType=application/pdf;image/x\;weird;
+StartupWMClass=TrickyViewer
+Actions=new-window;
+
+[Desktop Action new-window]
+Name=New Window
+Exec="/opt/Tricky Viewer/tricky-viewer" --new-window

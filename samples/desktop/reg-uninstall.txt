@@ -1,0 +1,31 @@
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip
+    DisplayName    REG_SZ    7-Zip 24.08 (x64)
+    DisplayVersion    REG_SZ    24.08
+    DisplayIcon    REG_SZ    C:\Program Files\7-Zip\7zFM.exe
+    InstallLocation    REG_SZ    C:\Program Files\7-Zip\
+    UninstallString    REG_SZ    "C:\Program Files\7-Zip\Uninstall.exe"
+    NoModify    REG_DWORD    0x1
+    EstimatedSize    REG_DWORD    0x1680
+    Publisher    REG_SZ    Igor Pavlov
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{23170F69-40C1-2702-2408-000001000000}
+    DisplayName    REG_SZ    Microsoft Visual C++ 2022 X64 Runtime
+    DisplayVersion    REG_SZ    14.40.33810
+    Publisher    REG_SZ    Microsoft Corporation
+    UninstallString    REG_EXPAND_SZ    MsiExec.exe /X{23170F69-40C1-2702-2408-000001000000}
+    WindowsInstaller    REG_DWORD    0x1
+    InstallDate    REG_SZ    20260105
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Hidden Component
+    DisplayName    REG_SZ    Hidden Component
+    SystemComponent    REG_DWORD    0x1
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Code
+    (Default)    REG_SZ
+    DisplayName    REG_SZ    Microsoft Visual Studio Code
+    DisplayIcon    REG_SZ    "C:\Users\dev\AppData\Local\Programs\Microsoft VS Code\Code.exe",0
+    Publisher    REG_SZ    Microsoft Corporation
+    DisplayVersion    REG_SZ    1.96.2
+
