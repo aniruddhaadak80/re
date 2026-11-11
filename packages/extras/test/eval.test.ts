@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import { TOOLS, EVAL_TASKS, publicTasks, scoreAnswers, scoreTask } from '../src/node.js';
-import { ROOT, cached } from './helpers.js';
+import { ROOT } from './helpers.js';
 
 const run = async (name: string, input: Record<string, unknown>): Promise<any> => TOOLS.find((t) => t.name === name)!.run(input);
 
@@ -14,7 +14,7 @@ async function oracle(id: string, file: string): Promise<unknown> {
     case 'pe-file-version': return (await run('x_pe_resources', { path })).versionInfo.fileVersion;
     case 'pe-company': return (await run('x_pe_resources', { path })).versionInfo.strings.CompanyName;
     case 'pe-exports': return (await run('x_pe_inspect', { path })).exports.functions.map((f: { name: string }) => f.name);
-    case 'pe-imports': { const { parseBin } = await import('../src/node.js'); void parseBin; const { ANALYZERS } = await import('../src/node.js'); void ANALYZERS; const core = await import('@revlens/core'); const { readFileSync } = await import('node:fs'); const r = await core.analyze(new Uint8Array(readFileSync(path)), { name: file }); return r.imports.map((i) => i.library); }
+    case 'pe-imports': { const core = await import('@revlens/core'); const { readFileSync } = await import('node:fs'); const r = await core.analyze(new Uint8Array(readFileSync(path)), { name: file }); return r.imports.map((i) => i.library); }
     case 'pe-authentihash': { const { authenticodeDigest } = await import('../src/node.js'); const { readFileSync } = await import('node:fs'); return authenticodeDigest(new Uint8Array(readFileSync(path))); }
     case 'pe-manifest-level': return (await run('x_pe_resources', { path })).manifest.requestedExecutionLevel;
     case 'elf-needed': return (await run('x_elf_inspect', { path })).dynamic.needed;
@@ -61,7 +61,6 @@ test('an oracle agent using only RevLens tools scores 1.0 on every task', async 
   assert.deepEqual(wrong, []);
   assert.equal(s.score, 1);
   assert.equal(s.accuracy, 1);
-  void cached;
 });
 
 test('scoring rules: hex and int normalise, sets get F1 credit, unknown ids are rejected', () => {

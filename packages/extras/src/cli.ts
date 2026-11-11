@@ -27,8 +27,9 @@ function parseArgs(argv: string[], tool: ToolDef): { input: Record<string, unkno
       else input[key] = val;
     } else rest.push(a);
   }
+  const looksMangled = (a: string) => /^(_Z|__Z|_R|__R|\?)/.test(a);
+  if (tool.inputSchema.symbols && rest.length && rest.every(looksMangled)) input.symbols = rest.splice(0);
   if (rest.length && tool.inputSchema.path && input.path === undefined) input.path = rest.shift();
-  if (rest.length && tool.inputSchema.symbols) input.symbols = rest;
   return { input, json };
 }
 
