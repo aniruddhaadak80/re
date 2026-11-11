@@ -130,6 +130,13 @@ function runTool(msg: Extract<WorkerRequest, { type: 'tool' }>): void {
     try {
       if (msg.tool.startsWith('disasm_')) await ensureDisasm();
       const input: Record<string, unknown> = { ...cleanArgs(msg.args), bytes };
+      // two file tools (disasm_match_functions, disasm_compare_functions) name the second loaded file
+      if (typeof input.secondFileId === 'string') {
+        const second = files.get(input.secondFileId);
+        delete input.secondFileId;
+        if (!second) { post({ type: 'tool-result', id: msg.id, error: 'The second file is no longer loaded. Open it again.' }); return; }
+        input.bytes2 = second;
+      }
       if (msg.tool.startsWith('managed_')) { delete input.bytes; input.bytesBase64 = toBase64(bytes); }
       const result = await tool.run(input);
       post({ type: 'tool-result', id: msg.id, result, ms: Math.round(performance.now() - t) });

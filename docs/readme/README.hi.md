@@ -16,7 +16,7 @@ RevLens ऐसे सबूत के साथ जवाब देता है
 
 - **ब्राउज़र में**, एक Web Worker के अंदर। आपकी फ़ाइल आपकी मशीन से बाहर नहीं जाती।
 - **टर्मिनल में**, `npx revlens` के रूप में, JSON, Markdown, HTML, SARIF और CycloneDX आउटपुट के साथ।
-- **आपके एजेंट में**, एक MCP सर्वर के रूप में (161 MCP tools, 83 CLI commands), साथ में Claude Code और Codex के लिए तैयार स्किल और प्लगइन।
+- **आपके एजेंट में**, एक MCP सर्वर के रूप में (165 MCP tools, 87 CLI commands), साथ में Claude Code और Codex के लिए तैयार स्किल और प्लगइन।
 
 अगर आपके पास Ghidra, radare2, jadx, ILSpy, Frida या gdb है, तो RevLens उन्हें भी चलाता है। `revlens doctor` बताता है कि क्या नहीं है और उसे कैसे इंस्टॉल करें।
 

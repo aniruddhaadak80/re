@@ -6,7 +6,7 @@ order: 27
 
 # Agent skills and plugins
 
-RevLens gives an agent three things: the MCP server (161 MCP tools, 2 prompts, 2 resources), a skill that teaches a careful workflow, and plugin manifests that bundle both.
+RevLens gives an agent three things: the MCP server (165 MCP tools, 2 prompts, 2 resources), a skill that teaches a careful workflow, and plugin manifests that bundle both.
 
 ## The fastest way
 

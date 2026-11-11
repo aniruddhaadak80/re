@@ -502,7 +502,7 @@ class Lifter {
   run(): LiftResult {
     const af = this.af;
     const fl = this.fl;
-    const params = fl ? fl.params.map((r, i) => `int64_t a${i + 1}`) : [];
+    const params = fl ? fl.params.map((_r, i) => `int64_t a${i + 1}`) : [];
     const voidRet = fl ? fl.returns.length > 0 && fl.returns.every((r) => r.value.t === 'entry' && r.value.r === this.retReg) : false;
     const sig = `${voidRet ? 'void' : 'int64_t'} ${af.name}(${params.join(', ')})`;
     this.emitRange(0, this.blocks.length, 1);

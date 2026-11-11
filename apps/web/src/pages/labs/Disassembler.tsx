@@ -1,11 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Cpu, GitBranch, ListTree, Loader2, Search, SquareCode } from 'lucide-react';
+import { ArrowLeft, Cpu, GitBranch, GitCompare, ListTree, Loader2, Search, SquareCode } from 'lucide-react';
+import { DropZone } from '../../components/DropZone';
 import { PageHeader } from '../../components/ui';
 import { CfgView, type CfgBlock } from '../../components/CfgView';
 import { CodePanel, DataTable } from '../../components/ToolResult';
-import { toolInWorker } from '../../lib/engine';
-import { labBySlug, type LabSample } from '../../lib/labs';
+import { forgetInWorker, loadInWorker, newId, toolInWorker } from '../../lib/engine';
+import { labBySlug, loadLabSample, MATCH_SAMPLES, type LabSample } from '../../lib/labs';
 import { useSeo } from '../../lib/seo';
 import { cx } from '../../lib/util';
 import { FilePicker, useLabFile } from './shared';
@@ -17,6 +18,68 @@ interface FnDetail {
   blocks: CfgBlock[];
 }
 type View = 'pseudo' | 'graph' | 'listing';
+interface MatchSide { addr: string; name: string; insns: number }
+interface MatchResult {
+  matched: number; identical: number; changed: number; unmatchedA: number; unmatchedB: number; byMethod: Record<string, number>;
+  matches: { a: MatchSide; b: MatchSide; confidence: number; method: string; identical: boolean }[];
+  onlyInA: MatchSide[]; onlyInB: MatchSide[];
+}
+
+/** Match the functions of the open binary with a second one, all in the worker. */
+function MatchPanel({ fileId }: { fileId: string }) {
+  const [name, setName] = useState('');
+  const [res, setRes] = useState<MatchResult | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const second = useRef<string | null>(null);
+  useEffect(() => () => { if (second.current) forgetInWorker(second.current); }, []);
+  useEffect(() => { setRes(null); setName(''); }, [fileId]);
+  const run = async (n: string, bytes: Uint8Array) => {
+    setBusy(true); setErr(''); setRes(null); setName(n);
+    try {
+      if (second.current) forgetInWorker(second.current);
+      const id = newId('m');
+      second.current = id;
+      await loadInWorker(id, bytes);
+      const r = await toolInWorker<MatchResult>(fileId, 'disasm_match_functions', { secondFileId: id, limit: 500, budgetMs: 30000 });
+      setRes(r.result);
+    } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
+  };
+  return (
+    <div className="card p-4" data-testid="match-panel">
+      <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-ink"><GitCompare size={13} />Match functions with a second binary</p>
+      <p className="mb-3 text-xs text-muted">Maps functions between two builds, for example two versions or a stripped and an unstripped build, by code, strings, calls and shape.</p>
+      <DropZone compact multiple={false} testId="match-input" hint={<span>Second ELF, PE or Mach-O. It stays in your browser.</span>}
+        onFiles={async (fl) => { const x = fl[0]; if (x) void run(x.name, new Uint8Array(await x.arrayBuffer())); }} />
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {MATCH_SAMPLES.map((s) => (
+          <button key={s.id} type="button" className="chip transition hover:border-accent/60 hover:text-fg" title={s.note} data-testid={`match-sample-${s.id}`}
+            onClick={() => void loadLabSample(s).then((b) => run(s.file.split('/').pop() ?? s.file, b), (e: Error) => setErr(e.message))}>{s.label}</button>
+        ))}
+      </div>
+      {busy && <p className="mt-3 flex items-center gap-2 text-sm text-muted"><Loader2 size={14} className="animate-spin text-ink" />Matching against {name}</p>}
+      {err && <p className="mt-3 text-sm text-red-500" role="alert">{err}</p>}
+      {res && (
+        <div className="mt-3 space-y-2 text-xs">
+          <p className="text-sm" data-testid="match-summary">{res.matched} matched with {name}: {res.identical} identical, {res.changed} changed, {res.unmatchedA} only here, {res.unmatchedB} only there</p>
+          <p className="text-muted">{Object.entries(res.byMethod).map(([k, v]) => `${k} ${v}`).join(', ')}</p>
+          <div className="max-h-[22rem] overflow-auto">
+            <table className="w-full font-mono" data-testid="match-table">
+              <thead><tr className="text-left text-muted"><th className="pr-2">this file</th><th className="pr-2">second file</th><th className="pr-2">method</th><th>conf.</th></tr></thead>
+              <tbody>
+                {res.matches.map((m) => (
+                  <tr key={m.a.addr + m.b.addr} className={m.identical ? '' : 'text-gold'}>
+                    <td className="pr-2 break-all">{m.a.name}</td><td className="pr-2 break-all">{m.b.name}</td><td className="pr-2">{m.method}</td><td>{m.confidence.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const lab = labBySlug('disassembler')!;
 
@@ -127,6 +190,7 @@ export default function Disassembler() {
               )}
             </div>
           )}
+          {file && info && <MatchPanel fileId={file.id} />}
         </div>
       </div>
     </div>

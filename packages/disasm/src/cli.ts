@@ -3,6 +3,8 @@ import {
   disasmAt, disasmCallgraph, disasmCallPaths, disasmFindReferences, disasmFunction, disasmInfo,
   disasmListFunctions, disasmPseudocode, disasmSearch, disasmXrefs,
 } from './api.js';
+import { disasmTraceValues, disasmIndirectTargets } from './flowapi.js';
+import { disasmMatchFunctions, disasmCompareFunctions } from './matchapi.js';
 
 export interface CliCommand { name: string; usage: string; summary: string; run(argv: string[]): Promise<number> }
 
@@ -16,7 +18,7 @@ function parse(argv: string[]): Parsed {
     if (a.startsWith('--')) {
       const eq = a.indexOf('=');
       if (eq > 0) flags[a.slice(2, eq)] = a.slice(eq + 1);
-      else if (['json', 'imports', 'thumb', 'exact'].includes(a.slice(2))) flags[a.slice(2)] = true;
+      else if (['json', 'imports', 'thumb', 'exact', 'unresolved', 'no-names'].includes(a.slice(2))) flags[a.slice(2)] = true;
       else flags[a.slice(2)] = argv[++i] ?? '';
     } else pos.push(a);
   }
@@ -100,5 +102,75 @@ export const CLI_COMMANDS: CliCommand[] = [
   wrap('call-paths', 'call-paths <file> <target> [--from f] [--max-depth n] [--json]', 'Call paths from entry to a function', 2, async (p) => {
     const r = await disasmCallPaths({ ...common(p), target: p.pos[1]!, from: str(p.flags.from), maxDepth: num(p.flags['max-depth']), maxPaths: num(p.flags['max-paths']) });
     return { json: r, text: () => (r.paths.length ? r.paths.map((x) => x.join(' -> ')).join('\n') : `no path from ${r.from.name} to ${r.target.name}`) };
+  }),
+  wrap('trace-values', 'trace-values <file> [function] [--call addr|name] [--occurrence n] [--arg n] [--value text|0xaddr] [--param n] [--depth n] [--limit n] [--json]', 'Value flow: what reaches a call argument (backward) or where a value goes (forward)', 1, async (p) => {
+    const r: any = await disasmTraceValues({
+      ...common(p), function: p.pos[1], call: str(p.flags.call), occurrence: num(p.flags.occurrence), arg: num(p.flags.arg),
+      value: str(p.flags.value), param: num(p.flags.param), depth: num(p.flags.depth), limit: num(p.flags.limit), budgetMs: num(p.flags['budget-ms']),
+    });
+    return {
+      json: r,
+      text: () => {
+        const lines: string[] = [];
+        if (r.mode === 'backward') {
+          lines.push(`backward value flow in ${r.function?.name ?? '?'} @ ${r.function?.addr ?? '?'}  abi ${r.abi}${r.complete ? '' : '  (budget reached)'}`);
+          for (const c of r.calls ?? []) {
+            lines.push(`call ${c.callee ?? '(indirect)'} at ${c.at}`);
+            for (const a of c.args ?? []) {
+              lines.push(`  arg ${a.index}${a.reg ? ` (${a.reg})` : ''} = ${a.value?.text ?? '?'}${a.producedAt ? `   set at ${a.producedAt}` : ''}`);
+              const walk = (list: any[] | undefined, pad: string) => { for (const up of list ?? []) { lines.push(`${pad}from ${up.function} call at ${up.callAt}: ${up.value?.text ?? '?'}`); walk(up.fromCallers, pad + '  '); } };
+              walk(a.fromCallers, '    ');
+            }
+          }
+        } else {
+          lines.push(`forward value flow, depth ${r.depth}, ${r.functionsSearched ?? 0} functions searched${r.complete ? '' : '  (budget reached)'}`);
+          for (const x of r.results ?? []) {
+            lines.push(`value ${x.value?.text ?? '?'}`);
+            const walk = (list: any[] | undefined, pad: string) => {
+              for (const k of list ?? []) {
+                lines.push(`${pad}${String(k.kind).padEnd(12)} ${k.at ?? ''}  in ${k.function ?? '?'}${k.callee ? `  -> ${k.callee}${k.argIndex !== undefined ? ` arg ${k.argIndex}` : ''}` : ''}`);
+                if (k.into) walk(k.into.sinks, pad + '  ');
+              }
+            };
+            walk(x.sinks, '  ');
+          }
+        }
+        return lines.join('\n') || 'nothing found';
+      },
+    };
+  }),
+  wrap('indirect', 'indirect <file> [function] [--unresolved] [--limit n] [--offset n] [--json]', 'Indirect calls and jumps with resolved targets (jump tables, pointer tables, constants, vtables)', 1, async (p) => {
+    const r: any = await disasmIndirectTargets({ ...common(p), function: p.pos[1], unresolved: p.flags.unresolved ? true : undefined, limit: num(p.flags.limit), offset: num(p.flags.offset), budgetMs: num(p.flags['budget-ms']) });
+    return {
+      json: r,
+      text: () => [
+        `${r.total} indirect sites, ${r.resolved} resolved, ${r.unresolved} unresolved (${r.functionsScanned} functions${r.complete ? '' : ', budget reached'})`,
+        ...(r.sites ?? []).map((x: any) => `${String(x.at).padStart(12)}  ${String(x.kind).padEnd(8)} in ${x.function}  ${x.resolved ? `by ${x.resolvedBy}${x.table ? ` at ${x.table}` : ''}: ${(x.targets ?? []).slice(0, 12).map((t: any) => t.name ?? t.addr).join(' ')}${(x.targets ?? []).length > 12 ? ' ...' : ''}` : 'unresolved'}`),
+        ...(r.hasMore ? [`... more, use --offset ${r.offset + (r.sites?.length ?? 0)}`] : []),
+      ].join('\n'),
+    };
+  }),
+  wrap('match-functions', 'match-functions <file> <file2> [--no-names] [--min-confidence n] [--filter s] [--limit n] [--offset n] [--json]', 'Map functions between two binaries (versions, stripped vs unstripped)', 2, async (p) => {
+    const r: any = await disasmMatchFunctions({ ...common(p), path2: p.pos[1]!, arch2: str(p.flags.arch2), useNames: p.flags['no-names'] ? false : undefined, minConfidence: num(p.flags['min-confidence']), filter: str(p.flags.filter), limit: num(p.flags.limit), offset: num(p.flags.offset), budgetMs: num(p.flags['budget-ms']) });
+    return {
+      json: r,
+      text: () => [
+        `${r.matched} matched (${r.identical} identical, ${r.changed} changed), ${r.unmatchedA} only in first, ${r.unmatchedB} only in second`,
+        `methods: ${Object.entries(r.byMethod ?? {}).map(([k, v]) => `${k} ${v}`).join(', ')}`,
+        ...(r.matches ?? []).map((m: any) => `${m.a.addr.padStart(12)} ${m.a.name.padEnd(28)} ${m.b.addr.padStart(12)} ${m.b.name.padEnd(28)} ${m.method.padEnd(9)} ${m.confidence.toFixed(2)}${m.identical ? '' : '  changed'}`),
+        ...(r.hasMore ? [`... more, use --offset ${r.offset + r.matches.length}`] : []),
+      ].join('\n'),
+    };
+  }),
+  wrap('compare-functions', 'compare-functions <file> <function> [file2] [function2] [--context n] [--limit n] [--json]', 'Side by side diff of two functions with addresses normalized', 2, async (p) => {
+    const r: any = await disasmCompareFunctions({ ...common(p), function: p.pos[1]!, path2: p.pos[2], function2: p.pos[3], arch2: str(p.flags.arch2), context: num(p.flags.context), limit: num(p.flags.limit) });
+    return {
+      json: r,
+      text: () => [
+        `${r.a.name} @ ${r.a.addr} (${r.a.insns} insns) vs ${r.b.name} @ ${r.b.addr} (${r.b.insns} insns): ${r.identical ? 'identical' : `similarity ${Number(r.similarity).toFixed(2)}`}`,
+        `blocks: ${r.blocks?.identical ?? 0} identical, ${r.blocks?.changed ?? 0} changed`,
+        ...(r.diff ?? []).map((l: any) => (l.op === '@@' ? l.text : `${l.op} ${(l.a ?? '').padStart(12)} ${(l.b ?? '').padStart(12)}  ${l.text}`)),
+      ].join('\n'),
+    };
   }),
 ];

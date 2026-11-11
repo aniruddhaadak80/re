@@ -1,6 +1,6 @@
 # RevLens tool map
 
-Generated from the server by scripts/gen-tool-docs.mjs. 161 tools.
+Generated from the server by scripts/gen-tool-docs.mjs. 165 tools.
 
 ## Core triage and evidence
 
@@ -30,6 +30,10 @@ Generated from the server by scripts/gen-tool-docs.mjs. 161 tools.
 - `disasm_find_references` (reads only): Find the functions that reference a string (substring match by default) or call/load an import (by name, e.g. "strcmp", "CreateProcessW"), with the exact instruction addresses.
 - `disasm_call_paths` (reads only): Call paths from the entry point (or a given function) to a target function, shortest first, plus the direct callers of the target. Answers "how does execution reach X".
 - `disasm_at` (reads only): Disassemble N instructions linearly at any address (or function name), annotated with symbols, imports and strings. Works without function analysis.
+- `disasm_trace_values` (reads only): Native value flow. Backward: with function + call (address or callee name, optional occurrence and arg index from 0), shows the value reaching each argument (constant, string, stack address, incoming argument, return val
+- `disasm_indirect_targets` (reads only): Indirect calls and jumps of a function (or the whole program within a budget) with resolved targets: jump tables (switch), tables of code pointers, constants found by value tracking, initial values of writable function p
+- `disasm_match_functions` (reads only): Map functions between two binaries (two versions, or a stripped and an unstripped build) without relying on addresses: equal names (optional), identical normalized instructions, strings, imports and constants, CFG shape,
+- `disasm_compare_functions` (reads only): Side by side diff of two functions (same binary, or function in path vs function2 in path2): overall similarity, per dimension (instructions, CFG, strings, calls, constants), identical/changed basic blocks, and a unified
 
 ## Android, Java and iOS
 

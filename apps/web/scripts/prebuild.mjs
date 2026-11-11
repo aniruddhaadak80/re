@@ -20,6 +20,7 @@ for (const s of SAMPLES) {
 // Small real fixtures for the tool pages, copied from the packages' sample folders.
 const LAB_SAMPLES = {
   'disasm/hello-x64.elf': 'disasm/hello-x64.elf', 'disasm/hello-arm64.elf': 'disasm/hello-arm64.elf', 'disasm/hello-x64.exe': 'disasm/hello-x64.exe',
+  'disasm/virt-x64.elf': 'disasm/virt-x64.elf', 'disasm/virt-x64-stripped.elf': 'disasm/virt-x64-stripped.elf',
   'mobile/com.angrydoughnuts.android.alarmclock_27.apk': 'mobile/apk/com.angrydoughnuts.android.alarmclock_27.apk', 'mobile/hello-035.dex': 'mobile/java/hello-035.dex',
   'mobile/Hello.class': 'mobile/java/Hello.class', 'mobile/Wikipedia-fixture.ipa': 'mobile/ipa/Wikipedia-fixture.ipa',
   'managed/System.IO.Compression.Brotli.dll': 'managed/dotnet/System.IO.Compression.Brotli.dll', 'managed/sample_mod.3.12.pyc': 'managed/python/sample_mod.3.12.pyc',

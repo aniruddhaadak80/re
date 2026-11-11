@@ -27,6 +27,7 @@ export const LABS: Lab[] = [
       { id: 'hello-x64-elf', file: 'disasm/hello-x64.elf', label: 'hello (x86-64 ELF)', note: 'A small C program built with clang for Linux.' },
       { id: 'hello-arm64-elf', file: 'disasm/hello-arm64.elf', label: 'hello (AArch64 ELF)', note: 'The same program for 64-bit ARM Linux.' },
       { id: 'hello-x64-exe', file: 'disasm/hello-x64.exe', label: 'hello.exe (x86-64 PE)', note: 'The same program as a Windows executable.' },
+      { id: 'virt-x64-elf', file: 'disasm/virt-x64.elf', label: 'virt (C++ x86-64 ELF)', note: 'Small C++ program with virtual calls, with symbols.' },
     ],
     tools: [],
   },
@@ -142,6 +143,12 @@ export function argsFrom(fields: LabField[] | undefined, values: Record<string, 
   }
   return out;
 }
+
+/** Second binaries for function matching in the disassembler. */
+export const MATCH_SAMPLES: LabSample[] = [
+  { id: 'virt-x64-stripped', file: 'disasm/virt-x64-stripped.elf', label: 'virt, stripped', note: 'The virt program with every symbol removed.' },
+  { id: 'hello-x64-elf', file: 'disasm/hello-x64.elf', label: 'hello (x86-64 ELF)', note: 'A different program, to see what does not match.' },
+];
 
 export async function loadLabSample(s: LabSample): Promise<Uint8Array> {
   const r = await fetch(`${import.meta.env.BASE_URL}samples/${s.file}`);

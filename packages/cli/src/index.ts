@@ -273,7 +273,20 @@ async function main(): Promise<number> {
         return -1;
       }
       const { StdioServerTransport } = await import('@modelcontextprotocol/sdk/server/stdio.js');
+      const { closeAllSessions, killAllSessions } = await import('@revlens/engine/node');
       const { server } = (await import('@revlens/mcp/server')).createServer();
+      // bridge sessions (radare2, gdb, lldb, Frida) end with the server
+      let stopping = false;
+      const stop = () => {
+        if (stopping) return;
+        stopping = true;
+        setTimeout(() => { killAllSessions(); process.exit(0); }, 5_000).unref();
+        void server.close().catch(() => undefined).then(() => closeAllSessions().catch(() => 0)).finally(() => process.exit(0));
+      };
+      process.once('exit', () => killAllSessions());
+      process.stdin.once('end', stop);
+      process.on('SIGINT', stop);
+      process.on('SIGTERM', stop);
       await server.connect(new StdioServerTransport());
       return -1;
     }

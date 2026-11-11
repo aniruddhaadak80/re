@@ -113,6 +113,17 @@ test.describe('try a sample', () => {
     await expect(page.getByTestId('disasm-info')).toContainText('arm64');
   });
 
+  test('disassembler: matches functions with a stripped build', async ({ page }) => {
+    const errors = watch(page);
+    await page.goto('labs/disassembler');
+    await page.getByTestId('sample-virt-x64-elf').click();
+    await expect(page.getByTestId('function-view')).toBeVisible({ timeout: 60_000 });
+    await page.getByTestId('match-sample-virt-x64-stripped').click();
+    await expect(page.getByTestId('match-summary')).toContainText('22 matched', { timeout: 60_000 });
+    await expect(page.getByTestId('match-table')).toContainText('sub_10018d0');
+    expect(errors).toEqual([]);
+  });
+
   test('disassembler: PE executable lists functions', async ({ page }) => {
     await page.goto('labs/disassembler');
     await page.getByTestId('sample-hello-x64-exe').click();
