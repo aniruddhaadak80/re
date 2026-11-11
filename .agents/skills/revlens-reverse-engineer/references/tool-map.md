@@ -144,7 +144,7 @@ Generated from the server by scripts/gen-tool-docs.mjs. 203 tools.
 
 - `desktop_plist_parse` (reads only): Parse an XML or binary (bplist00) property list. Data values come back as base64, dates as ISO strings, UIDs as {$uid}. With bundle=true, also summarise it as an app Info.plist (id, version, executable, URL schemes).
 - `desktop_entry_parse` (reads only): Parse a freedesktop .desktop file: groups and keys, plus an app record with the executable split from Exec per the spec quoting rules, packaging (Flatpak, Snap, AppImage), categories and MIME types.
-- `desktop_reg_uninstall_parse` (reads only): Parse `reg query ...\Uninstall /s` output into installed app records (name, version, publisher, install location, executable, MSI flag, uninstall command).
+- `desktop_reg_uninstall_parse` (reads only): Parse `reg query ...\\Uninstall /s` output into installed app records (name, version, publisher, install location, executable, MSI flag, uninstall command).
 - `desktop_proc_parse` (reads only): Parse Linux /proc text that was copied off a machine: kind=maps (modules with base and size), status, tcp, tcp6, udp, udp6, unix (sockets with decoded addresses and states), or lsof (lsof -F output).
 - `desktop_gvariant_parse` (reads only): Parse GVariant text as printed by gdbus call (tuples, arrays, dicts, variants, object paths, typed numbers) into JSON.
 - `desktop_snapshot_compare` (reads only): Compare two process snapshot objects (as JSON text) without touching the system: modules, files, sockets, children, memory and thread changes.
