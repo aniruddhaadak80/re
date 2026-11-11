@@ -17,6 +17,8 @@ import { MCP_CLIENTS, setupClient, SetupError } from './setup.js';
 import { gdbSessionCmd, gdbSessionOpen, lldbSessionCmd, lldbSessionOpen, r2SessionCmd, r2SessionOpen, sessionClose, sessionList } from './sessions/debuggers.js';
 import { fridaSessionAttach, fridaSessionCollect, fridaSessionLoad, fridaSessionPost, fridaSessionResume, fridaSessionUnload } from './sessions/frida.js';
 import { SessionError } from './sessions/manager.js';
+import { ghidraApplyNames, ghidraExportNames, idaApplyNames, idaExportNames, r2ApplyNames, r2ExportNames } from './writeback/providers.js';
+import { NamesError } from './names.js';
 import { UnsafeArgumentError } from './exec.js';
 import { HookParamError } from './hooks.js';
 import type { BridgeTool, ToolId, ToolInputField } from './types.js';
@@ -29,6 +31,8 @@ const FN = f('string', 'function name (main, sym.main, check_password) or 0x add
 const LIMIT = f('number', 'max items to return');
 const OFFSET = f('number', 'items to skip, for paging');
 const TIMEOUT = f('number', 'time limit in milliseconds');
+const NAMES = f('object', 'RevLens names JSON object { schema: "revlens/names@1", functions, comments, labels, types }');
+const NAMES_PATH = f('string', 'path to a RevLens names JSON file instead of names');
 const SID = f('string', 'session id from the open call', false);
 const IDLE = f('number', 'close the session after this many ms without use (default 15 minutes)');
 const SERIAL = f('string', 'device serial when several are connected');
@@ -47,7 +51,9 @@ function requiredTool(name: string): ToolId | undefined {
   if (name.startsWith('bridge_frida_session_')) return 'frida';
   return REQUIRES[name];
 }
-const REQUIRES: Record<string, ToolId> = {};
+const REQUIRES: Record<string, ToolId> = {
+  bridge_ghidra_apply_names: 'ghidra', bridge_ghidra_export_names: 'ghidra', bridge_ida_apply_names: 'ida', bridge_ida_export_names: 'ida',
+};
 
 /** Wrap a run function so bad input comes back as { ok: false, error } instead of throwing. */
 function safe(run: (input: any) => Promise<unknown>, requires?: ToolId): (input: any) => Promise<unknown> {
@@ -63,6 +69,7 @@ function safe(run: (input: any) => Promise<unknown>, requires?: ToolId): (input:
         return { ok: false, inputError: true, error: e.message };
       }
       if (e instanceof SessionError) return { ok: false, sessionError: true, error: e.message };
+      if (e instanceof NamesError) return { ok: false, inputError: true, error: e.message, problems: e.problems.slice(0, 100) };
       throw e;
     }
   };
@@ -446,6 +453,43 @@ const RAW: BridgeTool[] = [
     description: 'Resume a spawned program that is still suspended.',
     inputSchema: { sessionId: SID },
     run: (i) => fridaSessionResume(i),
+  },
+  // ---- write-back ----
+  {
+    name: 'bridge_ghidra_apply_names',
+    description: 'Write function names, signatures, comments, labels and C types from a RevLens names JSON into a Ghidra project (the cached RevLens project for the file by default, so later Ghidra decompiles show the names, or your own project).',
+    inputSchema: { path: PATH, names: NAMES, namesPath: NAMES_PATH, projectDir: f('string', 'your Ghidra project folder'), projectName: f('string', 'project name (the .gpr file name without extension)'), programName: f('string', 'program inside the project'), cacheDir: f('string', 'folder for cached Ghidra projects'), timeoutMs: TIMEOUT },
+    run: (i) => ghidraApplyNames(i),
+  },
+  {
+    name: 'bridge_ghidra_export_names',
+    description: 'Export user defined function names and signatures, comments in functions, user labels and /RevLens types from a Ghidra project as a RevLens names JSON.',
+    inputSchema: { path: PATH, all: f('boolean', 'every non default name and comment'), outPath: f('string', 'also save the JSON here'), projectDir: f('string', 'your Ghidra project folder'), projectName: f('string', 'project name'), programName: f('string', 'program inside the project'), cacheDir: f('string', 'folder for cached Ghidra projects'), timeoutMs: TIMEOUT },
+    run: (i) => ghidraExportNames(i),
+  },
+  {
+    name: 'bridge_ida_apply_names',
+    description: 'Write a RevLens names JSON into an IDA database with idat: give a .i64/.idb to update it, or a binary plus outDatabase to create one. Names, prototypes, comments, labels and C types.',
+    inputSchema: { path: f('string', 'IDA database (.i64/.idb) or binary', false), names: NAMES, namesPath: NAMES_PATH, outDatabase: f('string', 'new .i64 path when path is a binary'), binaryForBase: f('string', 'original binary, to read its image base when path is a database'), timeoutMs: TIMEOUT },
+    run: (i) => idaApplyNames(i),
+  },
+  {
+    name: 'bridge_ida_export_names',
+    description: 'Export user names, prototypes, comments, labels and local types from an IDA database (or a binary) as a RevLens names JSON.',
+    inputSchema: { path: f('string', 'IDA database (.i64/.idb) or binary', false), all: f('boolean', 'every non dummy name'), outPath: f('string', 'also save the JSON here'), timeoutMs: TIMEOUT },
+    run: (i) => idaExportNames(i),
+  },
+  {
+    name: 'bridge_r2_apply_names',
+    description: 'Write a RevLens names JSON into a radare2 project (or rizin .rzdb), creating it from the binary when needed; returns the r2 script too. Names that r2 cannot hold are mapped to safe ones and listed.',
+    inputSchema: { path: PATH, names: NAMES, namesPath: NAMES_PATH, engine: ENGINE, project: f('string', 'project name, default revlens_<sha256 prefix>'), projectsDir: f('string', 'projects folder'), analysis: f('string', 'analysis when creating the project: none, aa (default) or aaa'), timeoutMs: TIMEOUT },
+    run: (i) => r2ApplyNames(i),
+  },
+  {
+    name: 'bridge_r2_export_names',
+    description: 'Export what was added to a radare2 or rizin project (names and comments that differ from a fresh analysis, plus RevLens labels) as a RevLens names JSON.',
+    inputSchema: { path: PATH, engine: ENGINE, project: f('string', 'project name'), projectsDir: f('string', 'projects folder'), all: f('boolean', 'every function name'), outPath: f('string', 'also save the JSON here'), timeoutMs: TIMEOUT },
+    run: (i) => r2ExportNames(i),
   },
   {
     name: 'bridge_ida_run',

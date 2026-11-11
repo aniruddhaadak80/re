@@ -11,7 +11,8 @@ export interface ParsedArgs { flags: Record<string, string | boolean | string[]>
 export function parseArgv(argv: string[]): ParsedArgs {
   const flags: ParsedArgs['flags'] = {};
   const positional: string[] = [];
-  const BOOL = new Set(['json', 'write', 'verbose', 'refresh', 'allow-execution', 'help', 'applications', 'case-sensitive', 'third-party-only', 'no-sources']);
+  const BOOL = new Set(['json', 'write', 'verbose', 'refresh', 'allow-execution', 'help', 'applications', 'case-sensitive', 'third-party-only', 'no-sources',
+    'all', 'replace', 'downgrade', 'allow-test', 'grant-permissions', 'keep-data', 'overwrite', 'include-raw', 'force-stop', 'include-apk', 'allow-any-remote-path', 'resume']);
   for (let i = 0; i < argv.length && i < 10_000; i++) {
     const a = argv[i]!;
     if (a === '--') { positional.push(...argv.slice(i + 1)); break; }

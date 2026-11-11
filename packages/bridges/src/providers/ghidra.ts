@@ -141,3 +141,30 @@ export async function ghidraDecompile(input: GhidraInput & { functions: string[]
     results, notFound: sel.filter((s) => !covered(s)),
   };
 }
+
+/**
+ * The cached RevLens Ghidra project for a file (the one bridge_ghidra_functions and
+ * bridge_ghidra_decompile use), importing and analyzing the file first when it is not there yet.
+ */
+export async function ghidraCachedProject(input: GhidraInput): Promise<{ ok: true; projectDir: string; projectName: string; programName: string; det: Detection } | { ok: false; error: string } | { missing: Unavailable }> {
+  const { path } = requireFile(input.path);
+  const sha = await sha256File(path);
+  const projectDir = join(cacheRoot(input.cacheDir), 'ghidra', sha.slice(0, 32));
+  const markerPath = join(projectDir, 'revlens-project.json');
+  if (!existsSync(markerPath) || !existsSync(join(projectDir, `${PROJECT}.gpr`))) {
+    const r = await ghidraExport({ ...input, mode: 'info' });
+    if ('missing' in r) return r;
+    if (!r.ok) return { ok: false, error: r.error };
+  }
+  const n = await need('ghidra');
+  if ('missing' in n) return n;
+  try {
+    const m = JSON.parse(await readFile(markerPath, 'utf8')) as Marker;
+    return { ok: true, projectDir, projectName: PROJECT, programName: m.programName, det: n.det };
+  } catch {
+    return { ok: false, error: 'cached Ghidra project marker is unreadable' };
+  }
+}
+
+/** Environment for analyzeHeadless (JAVA_HOME from detection). */
+export { headlessEnv as ghidraHeadlessEnv };
