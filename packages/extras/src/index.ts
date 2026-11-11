@@ -33,6 +33,7 @@ export * from './containers/wxapkg.js';
 export * from './containers/lz4.js';
 export * from './containers/unityfs.js';
 export * from './containers/standalone.js';
+export * from './contracts/index.js';
 export * from './ledger/ledger.js';
 export * from './eval/harness.js';
 export { TOOLS, jsonSafe, resetLedger, setLedgerStore } from './tools.js';

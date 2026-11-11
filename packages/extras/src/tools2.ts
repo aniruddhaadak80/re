@@ -15,6 +15,7 @@ import { jsonSafe } from './tools.js';
 import { parseWxapkgAny, wxapkgMember } from './containers/wxapkg.js';
 import { parseUnityFs, unityNodeBytes, parseSerializedFile } from './containers/unityfs.js';
 import { inspectStandaloneJs, standaloneFile } from './containers/standalone.js';
+import { scanApiContracts, protoToText, schemaToSdl } from './contracts/index.js';
 
 const P = PATH_INPUT;
 const LIMIT: Record<string, InputSpec> = {
@@ -181,4 +182,43 @@ export const CONTAINER_TOOLS: ToolDef[] = [
   },
 ];
 
-export const GAP_TOOLS: ToolDef[] = [...WINDOWS_TOOLS, ...APPLE_TOOLS, ...CONTAINER_TOOLS];
+export const CONTRACT_TOOLS: ToolDef[] = [
+  {
+    name: 'x_api_contracts',
+    description: 'API contracts shipped inside binaries and JS bundles: protobuf FileDescriptorProto blobs (Go protoc-gen-go raw or gzip, C++, Java, Python _pb2 literals and .pyc, protobuf-es base64) rebuilt as .proto text; OpenAPI 3 / Swagger 2 documents as JSON, YAML (Go embed), minified JS object literals or JSON strings, with operations, servers, security schemes and schemas; GraphQL schema SDL, introspection results, and operations from gql templates, query strings and precompiled DocumentNode objects. Every hit has its offset.',
+    inputSchema: {
+      ...P,
+      kind: { type: 'string', description: 'protobuf, openapi, graphql or all (default)', optional: true },
+      proto: { type: 'boolean', description: 'Include the rebuilt .proto text of every descriptor', optional: true },
+      document: { type: 'boolean', description: 'Include each full OpenAPI document (can be large)', optional: true },
+      sdl: { type: 'boolean', description: 'Include each GraphQL schema rendered as SDL', optional: true },
+      ...LIMIT,
+    },
+    async run(i) {
+      const k = String(i.kind ?? 'all');
+      const kinds = k === 'all' ? undefined : [k as 'protobuf' | 'openapi' | 'graphql'];
+      if (kinds && !['protobuf', 'openapi', 'graphql'].includes(k)) throw new ParseError(`unknown kind ${k}`);
+      const r = await scanApiContracts(await inputBytes(i), { kinds });
+      const off = num(i.offset, 0), lim = num(i.limit, 200);
+      return {
+        size: r.size,
+        counts: { protobuf: r.protobuf.length, openapi: r.openapi.length, graphqlSchemas: r.graphqlSchemas.length, graphqlOperations: r.graphqlOperations.length },
+        protobuf: r.protobuf.map((d) => ({
+          offset: d.offset, length: d.length, encoding: d.encoding, name: d.file.name, package: d.file.package, syntax: d.file.syntax, dependencies: d.file.dependencies, goPackage: d.file.goPackage,
+          messages: d.file.messages.map((m) => m.name), enums: d.file.enums.map((e) => e.name),
+          services: d.file.services.map((s) => ({ name: s.name, methods: s.methods.map((m) => `${m.name}(${m.clientStreaming ? 'stream ' : ''}${m.inputType}) returns (${m.serverStreaming ? 'stream ' : ''}${m.outputType})${m.httpRule ? ' ' + m.httpRule : ''}`) })),
+          proto: i.proto ? protoToText(d.file) : undefined,
+        })),
+        openapi: r.openapi.map(({ document, operations, ...o }) => ({ ...o, operations: page(operations, off, lim), document: i.document ? document : undefined })),
+        graphqlSchemas: r.graphqlSchemas.map(({ schema, ...s }) => ({
+          ...s, types: schema.types.filter((t) => !t.name.startsWith('__')).map((t) => ({ kind: t.kind, name: t.name, fields: t.fields.length || t.values.length || t.members.length })),
+          rootFields: Object.fromEntries((['queryType', 'mutationType', 'subscriptionType'] as const).filter((x) => schema[x]).map((x) => [schema[x]!, schema.types.find((t) => t.name === schema[x])?.fields.map((f) => `${f.name}${f.args.length ? `(${f.args.map((a) => `${a.name}: ${a.type}`).join(', ')})` : ''}: ${f.type}`) ?? []])),
+          sdl: i.sdl ? schemaToSdl(schema) : undefined,
+        })),
+        graphqlOperations: page(r.graphqlOperations.map((o) => ({ ...o, text: o.text.length > 2000 ? o.text.slice(0, 2000) + '...' : o.text })), off, lim),
+      };
+    },
+  },
+];
+
+export const GAP_TOOLS: ToolDef[] = [...WINDOWS_TOOLS, ...APPLE_TOOLS, ...CONTAINER_TOOLS, ...CONTRACT_TOOLS];

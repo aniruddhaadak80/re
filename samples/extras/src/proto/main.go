@@ -5,6 +5,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"os"
 
 	gen "example.com/revdemo/gen"
 	"google.golang.org/protobuf/proto"
@@ -21,5 +22,8 @@ const getUserQuery = `query GetUser($id: ID!) { user(id: $id) { id email role } 
 func main() {
 	u := &gen.User{Id: "u1", Email: "a@example.com", Role: gen.Role_ROLE_ADMIN}
 	b, _ := proto.Marshal(u)
-	fmt.Println(len(b), len(openapiYAML), len(schemaSDL), len(getUserQuery))
+	fmt.Println(len(b), len(openapiYAML), len(schemaSDL))
+	if os.Getenv("REVDEMO_PRINT") != "" {
+		fmt.Println(getUserQuery)
+	}
 }

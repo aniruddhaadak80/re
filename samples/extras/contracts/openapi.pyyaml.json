@@ -1,0 +1,172 @@
+{
+ "components": {
+  "schemas": {
+   "ListUsersResponse": {
+    "properties": {
+     "next_page_token": {
+      "type": "string"
+     },
+     "users": {
+      "items": {
+       "$ref": "#/components/schemas/User"
+      },
+      "type": "array"
+     }
+    },
+    "type": "object"
+   },
+   "Role": {
+    "enum": [
+     "ROLE_UNSPECIFIED",
+     "ROLE_ADMIN",
+     "ROLE_VIEWER"
+    ],
+    "type": "string"
+   },
+   "User": {
+    "properties": {
+     "email": {
+      "format": "email",
+      "type": "string"
+     },
+     "id": {
+      "type": "string"
+     },
+     "role": {
+      "$ref": "#/components/schemas/Role"
+     },
+     "tags": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "id",
+     "email"
+    ],
+    "type": "object"
+   }
+  },
+  "securitySchemes": {
+   "apiKey": {
+    "in": "header",
+    "name": "X-RevDemo-Key",
+    "type": "apiKey"
+   },
+   "bearerAuth": {
+    "scheme": "bearer",
+    "type": "http"
+   }
+  }
+ },
+ "info": {
+  "description": "Test contract embedded in the RevLens Go fixture.\nMirrors revdemo.proto over HTTP.\n",
+  "title": "RevDemo Users API",
+  "version": "1.4.0"
+ },
+ "openapi": "3.0.3",
+ "paths": {
+  "/users": {
+   "get": {
+    "operationId": "listUsers",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "page_size",
+      "schema": {
+       "format": "int32",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "page_token",
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ListUsersResponse"
+        }
+       }
+      },
+      "description": "A page of users"
+     }
+    },
+    "summary": "List users"
+   },
+   "post": {
+    "operationId": "createUser",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/User"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "description": "Created"
+     }
+    },
+    "security": [
+     {
+      "bearerAuth": []
+     }
+    ],
+    "summary": "Create a user"
+   }
+  },
+  "/users/{id}": {
+   "delete": {
+    "deprecated": true,
+    "operationId": "deleteUser",
+    "responses": {
+     "204": {
+      "description": "Deleted"
+     }
+    }
+   },
+   "get": {
+    "operationId": "getUser",
+    "responses": {
+     "200": {
+      "description": "The user"
+     },
+     "404": {
+      "description": "Not found"
+     }
+    }
+   },
+   "parameters": [
+    {
+     "in": "path",
+     "name": "id",
+     "required": true,
+     "schema": {
+      "type": "string"
+     }
+    }
+   ]
+  }
+ },
+ "servers": [
+  {
+   "url": "https://api.revdemo.example/v1"
+  },
+  {
+   "description": "local dev",
+   "url": "http://localhost:8080/v1"
+  }
+ ]
+}
