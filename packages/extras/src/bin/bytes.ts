@@ -88,8 +88,10 @@ export function addressMap(bytes: Uint8Array, q: { va?: number | string; offset?
     const va = typeof q.va === 'string' ? parseInt(q.va, q.va.startsWith('0x') ? 16 : 10) : q.va;
     if (!Number.isFinite(va)) throw new ParseError('bad va');
     const off = vaToOffset(img, va);
-    const s = img.sections.find((x) => va >= x.vaddr && va < x.vaddr + Math.max(x.vsize, x.size));
-    const g = img.segments.find((x) => va >= x.vaddr && va < x.vaddr + x.vsize);
+    // PE section addresses are RVAs; accept either a full VA or an RVA
+    const a = img.format === 'pe' && img.imageBase > 0 && va >= img.imageBase ? va - img.imageBase : va;
+    const s = img.sections.find((x) => a >= x.vaddr && a < x.vaddr + Math.max(x.vsize, x.size));
+    const g = img.segments.find((x) => a >= x.vaddr && a < x.vaddr + x.vsize);
     return { va: '0x' + va.toString(16), offset: off >= 0 ? off : undefined, section: s?.name, segment: g?.name, mapped: off >= 0 };
   }
   if (q.offset !== undefined) {
