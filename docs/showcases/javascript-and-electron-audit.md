@@ -49,7 +49,7 @@ checkLicense('RL-ABCDEFGHIJKLMNOPQ');
 
 The string array is decoded by a small evaluator over literals. The input code is never run.
 
-## 2. Network calls
+## 2. Why deobfuscate first
 
 ```console
 $ revlens js-endpoints samples/webrt/obfuscated.js
@@ -59,6 +59,7 @@ flags: -
 dynamic code: -
 ```
 
+On the obfuscated file the endpoint search finds nothing, because the URL only exists inside the encoded string array. After deobfuscation it is plain: `https://telemetry.revlens-fixture.example/collect`, posted with a bearer token. The [JavaScript page](https://aniruddhaadak80.github.io/re/labs/javascript) runs both steps in the browser.
 
 ## 3. Electron security review
 

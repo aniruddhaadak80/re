@@ -61,39 +61,24 @@ The strings "access granted" and "access denied" are used by one function. That 
 ## 4. Read it
 
 ```console
-$ revlens decompile samples/disasm/hello-x64-stripped.elf sub_1001a70
-// sub_1001a70 at 0x1001a70, 34 instructions, 4 blocks
+$ revlens decompile samples/disasm/hello-x64-stripped.elf sub_10018e0
+// sub_10018e0 at 0x10018e0, 18 instructions, 1 blocks
 // light lift: registers stand in for variables; calling convention rdi,rsi,rdx,rcx,r8,r9
-void sub_1001a70() {
-  r12 = 0x1000000;
-  r13 = 0x1000000;
-  r13 -= r12;
-  if (r13 != 0) {
-    rbx = rdx;
-    r14 = rsi;
-    r15d = edi;
-    r13 >>= 3;
-    __asm("adc r13, 0");
-    do {
-      edi = r15d;
-      rsi = r14;
-      rdx = rbx;
-      (**(r12))(r15d, r14, rbx);
-      r12 += 8;
-      r13 += 0x10000000000000000;
-    } while (r13 != 0);
-  }
-  rbx = pop();
-  r12 = pop();
-  r13 = pop();
-  r14 = pop();
-  r15 = pop();
-  rbp = pop();
+void sub_10018e0() {
+  rsi = "revlens-secret-key";
+  strcmp();
+  ebx = 0;
+  bl = eax == 0;
+  rax = "access granted";
+  rdi = "access denied";
+  if (eax == 0) rdi = rax;
+  puts("access denied");
+  eax = ebx;
   return rax;
 }
 ```
 
-The function compares its argument with a constant string through `strcmp` and prints one of the two messages.
+The function compares its argument with the constant `revlens-secret-key` through `strcmp`, then picks the message: the compiler used a conditional move, so the light lifter prints the default `puts` argument and shows the swap on the line above it. The accepted input is `revlens-secret-key`.
 
 ## 5. Verify before you say it
 
@@ -104,8 +89,8 @@ VERIFIED import=strcmp  dynamic symbols imports strcmp.
 REFUTED  string=hunter2  The string does not appear in the file as ASCII or UTF-16.
 ```
 
-Two claims hold and the made up one is refuted, each with the offset that proves it. An agent using the MCP server makes the same check with `verify_claim` before it reports.
+Two claims hold, with the offset or import that proves them, and the made up password is refuted. An agent using the MCP server makes the same check with `verify_claim` before it reports.
 
 ## With Ghidra installed
 
-The same address works with the bridge: `revlens bridge ghidra_decompile samples/disasm/hello-x64-stripped.elf --functions 0x1001a70`. See [bridges](../bridges.md).
+The same address works with the bridge: `revlens bridge ghidra_decompile samples/disasm/hello-x64-stripped.elf --functions 0x10018e0`. See [bridges](../bridges.md).

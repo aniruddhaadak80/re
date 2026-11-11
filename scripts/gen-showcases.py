@@ -63,17 +63,17 @@ The strings "access granted" and "access denied" are used by one function. That 
 
 ## 4. Read it
 
-{block(['decompile', ELF, 'sub_1001a70'], 40)}
-The function compares its argument with a constant string through `strcmp` and prints one of the two messages.
+{block(['decompile', ELF, 'sub_10018e0'], 40)}
+The function compares its argument with the constant `revlens-secret-key` through `strcmp`, then picks the message: the compiler used a conditional move, so the light lifter prints the default `puts` argument and shows the swap on the line above it. The accepted input is `revlens-secret-key`.
 
 ## 5. Verify before you say it
 
 {block(['verify', ELF, 'string=revlens-secret-key', 'import=strcmp', 'string=hunter2'])}
-Two claims hold and the made up one is refuted, each with the offset that proves it. An agent using the MCP server makes the same check with `verify_claim` before it reports.
+Two claims hold, with the offset or import that proves them, and the made up password is refuted. An agent using the MCP server makes the same check with `verify_claim` before it reports.
 
 ## With Ghidra installed
 
-The same address works with the bridge: `revlens bridge ghidra_decompile {ELF} --functions 0x1001a70`. See [bridges](../bridges.md).
+The same address works with the bridge: `revlens bridge ghidra_decompile {ELF} --functions 0x10018e0`. See [bridges](../bridges.md).
 ''')
 
 APK = 'samples/mobile/apk/com.angrydoughnuts.android.alarmclock_27.apk'
@@ -92,11 +92,12 @@ RevLens reads the v1 JAR signature and the APK Signing Block. It reports what is
 
 ## 3. Search the code
 
-{block(['dex-search', APK, '--query', 'http'], 25)}
+{block(['dex-search', APK, '--query', 'DeleteAll'], 15)}
+No hardcoded URLs turned up for `http` in this app, which fits an offline alarm clock. Searching for a class name finds the confirmation dialog.
 
-## 4. Read a method as smali
+## 4. Read a class as smali
 
-{block(['dex', APK, '--filter', 'AlarmClockActivity'], 15)}
+{block(['smali', APK, '--class', 'com.angrydoughnuts.android.alarmclock.AlarmClockActivity$DeleteAllConfirmation'], 40)}
 The smali output matches baksmali line for line on the test corpus. For Java source, install jadx and run `revlens bridge jadx_decompile {APK}`.
 ''')
 
@@ -116,11 +117,14 @@ page('dotnet-and-python-bytecode.md', 'Showcase: read .NET and Python bytecode',
 
 ## 3. One method as CIL
 
-{block(['dotnet', DLL, 'search', 'Compress', '--kind', 'method'], 15)}
+{block(['dotnet', DLL, 'search', 'Quality', '--kind', 'method'], 10)}
+
+{block(['dotnet', DLL, 'il', 'System.IO.Compression.BrotliUtils::GetQualityFromCompressionLevel'], 40)}
+The `switch` maps the four `CompressionLevel` values to Brotli quality 4, 1, 0 and 11. Each instruction carries its IL offset, and the header gives the file offset of the method body.
 
 ## 4. A Python module
 
-{block(['pyc', PYC], 40)}
+{block(['pyc', PYC], 30)}
 The opcode names and arguments match `dis.get_instructions` from CPython 3.12 for every instruction in the test corpus.
 
 ## 5. A PyInstaller archive
@@ -139,9 +143,10 @@ page('javascript-and-electron-audit.md', 'Showcase: deobfuscate JavaScript and a
 {block(['js-deobfuscate', OBF], 40)}
 The string array is decoded by a small evaluator over literals. The input code is never run.
 
-## 2. Network calls
+## 2. Why deobfuscate first
 
 {block(['js-endpoints', OBF], 25)}
+On the obfuscated file the endpoint search finds nothing, because the URL only exists inside the encoded string array. After deobfuscation it is plain: `https://telemetry.revlens-fixture.example/collect`, posted with a bearer token. The [JavaScript page](https://aniruddhaadak80.github.io/re/labs/javascript) runs both steps in the browser.
 
 ## 3. Electron security review
 

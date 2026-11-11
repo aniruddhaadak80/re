@@ -65,25 +65,44 @@ $ revlens dotnet samples/managed/dotnet/System.IO.Compression.Brotli.dll types -
 ## 3. One method as CIL
 
 ```console
-$ revlens dotnet samples/managed/dotnet/System.IO.Compression.Brotli.dll search Compress --kind method
-22 hits
-method 0x06000002 Interop/Brotli::BrotliDecoderDecompressStream(Microsoft.Win32.SafeHandles.SafeBrotliDecoderHandle, ref nuint, byte**, ref nuint, byte**, ref nuint)
-method 0x06000003 Interop/Brotli::BrotliDecoderDecompress(nuint, byte*, nuint*, byte*)
-method 0x06000008 Interop/Brotli::BrotliEncoderCompressStream(Microsoft.Win32.SafeHandles.SafeBrotliEncoderHandle, System.IO.Compression.BrotliEncoderOperation, ref nuint, byte**, ref nuint, byte**, ref nuint)
-method 0x0600000b Interop/Brotli::BrotliEncoderCompress(int, int, int, nuint, byte*, nuint*, byte*)
-method 0x0600000d Interop/Brotli::<BrotliDecoderDecompressStream>g____PInvoke|1_0(nint, nuint*, byte**, nuint*, byte**, nuint*)
-method 0x06000011 Interop/Brotli::<BrotliEncoderCompressStream>g____PInvoke|7_0(nint, System.IO.Compression.BrotliEncoderOperation, nuint*, byte**, nuint*, byte**, nuint*)
-method 0x06000029 System.SR::get_BrotliStream_Compress_UnsupportedOperation()
-method 0x0600002a System.SR::get_BrotliStream_Compress_InvalidData()
-method 0x0600002b System.SR::get_BrotliStream_Decompress_UnsupportedOperation()
-method 0x0600002c System.SR::get_BrotliStream_Decompress_InvalidData()
-method 0x0600002d System.SR::get_BrotliStream_Decompress_InvalidStream()
-method 0x0600002e System.SR::get_BrotliStream_Decompress_TruncatedData()
-method 0x06000045 System.IO.Compression.BrotliStream::TryDecompress(System.Span<byte>, ref int)
+$ revlens dotnet samples/managed/dotnet/System.IO.Compression.Brotli.dll search Quality --kind method
+3 hits
+method 0x06000024 System.SR::get_BrotliEncoder_Quality()
 method 0x06000066 System.IO.Compression.BrotliUtils::GetQualityFromCompressionLevel(System.IO.Compression.CompressionLevel)
-... (8 more lines)
+method 0x06000072 System.IO.Compression.BrotliEncoder::SetQuality(int)
 ```
 
+
+```console
+$ revlens dotnet samples/managed/dotnet/System.IO.Compression.Brotli.dll il System.IO.Compression.BrotliUtils::GetQualityFromCompressionLevel
+.method 0x06000066 System.IO.Compression.BrotliUtils::GetQualityFromCompressionLevel int (System.IO.Compression.CompressionLevel compressionLevel)
+  // rva 0x00017684 file offset 0x00007684 fat header, code size 59
+  .maxstack 2
+  .locals ([0] int)
+  IL_0000: ldarg.0
+  IL_0001: switch (IL_0020, IL_001c, IL_0018, IL_0024)
+  IL_0016: br.s IL_0029
+  IL_0018: ldc.i4.0
+  IL_0019: stloc.0
+  IL_001a: br.s IL_0039
+  IL_001c: ldc.i4.1
+  IL_001d: stloc.0
+  IL_001e: br.s IL_0039
+  IL_0020: ldc.i4.4
+  IL_0021: stloc.0
+  IL_0022: br.s IL_0039
+  IL_0024: ldc.i4.s 11
+  IL_0026: stloc.0
+  IL_0027: br.s IL_0039
+  IL_0029: call System.SR::get_ArgumentOutOfRange_Enum()
+  IL_002e: ldstr "compressionLevel"
+  IL_0033: newobj System.ArgumentException::.ctor(string, string)
+  IL_0038: throw
+  IL_0039: ldloc.0
+  IL_003a: ret
+```
+
+The `switch` maps the four `CompressionLevel` values to Brotli quality 4, 1, 0 and 11. Each instruction carries its IL offset, and the header gives the file offset of the method body.
 
 ## 4. A Python module
 
@@ -119,17 +138,7 @@ Disassembly of <module> (sample_mod.py, line 1):
          50 CALL                        1
          58 STORE_NAME                  9 (BIG)
          60 PUSH_NULL
-         62 LOAD_BUILD_CLASS
-         64 LOAD_CONST                  7 (<code object Widget at 0x0, file "sample_mod.py", line 11>)
-         66 MAKE_FUNCTION               0
-         68 LOAD_CONST                  8 ('Widget')
-         70 LOAD_NAME                   5 (OrderedDict)
-         72 CALL                        3
-         80 STORE_NAME                 10 (Widget)
-         82 LOAD_CONST                  9 (<code object risky at 0x0, file "sample_mod.py", line 31>)
-         84 MAKE_FUNCTION               0
-         86 STORE_NAME                 11 (risky)
-... (532 more lines)
+... (542 more lines)
 ```
 
 The opcode names and arguments match `dis.get_instructions` from CPython 3.12 for every instruction in the test corpus.
