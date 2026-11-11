@@ -31,6 +31,10 @@ in browsers and in Web Workers.
 - Function selectors from the dispatcher (`PUSH4 sel EQ PUSH dest JUMPI`), named from an embedded table of about 70 common signatures (ERC-20, ERC-721, ERC-1155, Ownable, AccessControl, proxies).
 - Proxy patterns: EIP-1967 and EIP-1822 storage slots, ZeppelinOS slots, EIP-1167 clones, DELEGATECALL. Known event topics. Solidity CBOR metadata (solc version, IPFS hash shown as a CID).
 
+**Native boundaries and version diffs (.NET)**
+- P/Invoke map: every ImplMap row (module, entry point, charset, calling convention, SetLastError) is matched to the exports of the native libraries you pass in (ELF `.so`, PE `.dll`, Mach-O `.dylib`). Library names are probed the way the runtime does it (`lib` prefix, platform extensions, `A` and `W` suffixes on Windows). Each binding is `resolved` (with the export address or ordinal), `missing-export` or `library-not-shipped`.
+- Member diff: two builds of an assembly compared by type and member. Added and removed types, kind, visibility, base type and interface changes, methods keyed by name, generic arity and parameter types, fields, and with `bodies` the methods whose IL changed, tokens resolved to names. `publicOnly` limits it to the public and protected surface.
+
 ## API
 
 ```ts
@@ -75,6 +79,8 @@ List outputs are paged with `offset` and `limit`.
 | `managed_beam_info` | BEAM chunks, atoms, exports, imports, attributes, compile info |
 | `managed_evm_disasm` | EVM instructions with program counters |
 | `managed_evm_selectors` | selectors with names, proxy patterns, events, metadata, risky opcodes |
+| `managed_pinvoke_map` | P/Invoke declarations matched to ELF, PE and Mach-O exports: resolved, missing export, library not shipped |
+| `managed_compare_members` | member level diff of two assemblies, optionally with changed IL bodies |
 
 ### CLI commands
 
@@ -87,6 +93,8 @@ revlens pyinstaller <app> [list | extract --out <dir> [--filter s]]
 revlens lua <file.luac> [--no-listing]
 revlens beam <file.beam>
 revlens evm <file | 0xhex> [selectors | disasm]
+revlens pinvoke-map <assembly.dll> <native lib>... [--status resolved|missing-export|library-not-shipped]
+revlens compare-members <old.dll> <new.dll> [--bodies] [--public] [--filter s]
 ```
 
 ## Limits
@@ -95,6 +103,8 @@ revlens evm <file | 0xhex> [selectors | disasm]
 - .NET: no decompilation to C#; generic instantiation names are decoded but generic parameters show by position rather than by name. R2R native code is not disassembled. Bundles are listed, not extracted (offsets are given). Obfuscator detection looks for markers, so a protector that leaves none is missed.
 - Python: 3.7 opcodes are derived, not generated from a 3.7 interpreter (none was available for aarch64). Line number tables are not decoded. 3.14 pycs are recognised but not disassembled. Encrypted PYZ archives (PyInstaller before 6 with `--key`) are reported as errors.
 - Lua: operand decoding is per opcode family, not a full `luac -l` clone; LuaJIT debug info (line maps, names) is skipped.
+- P/Invoke map: function pointers passed at run time, `NativeLibrary.Load` calls and `DllImportResolver` callbacks are not followed; only the static ImplMap rows are mapped.
+- Member diff: attributes, properties and events are not compared yet; methods are matched by signature, so a rename shows as one removal and one addition.
 - BEAM: the Code chunk is summarised, not disassembled.
 - EVM: selectors come from the standard dispatcher shape; hand written or heavily optimised dispatchers may hide some.
 - Nuitka, py2exe and cx_Freeze detection is string based and has not been checked on real builds.
@@ -111,6 +121,8 @@ revlens evm <file | 0xhex> [selectors | disasm]
 | Lua 5.1 to 5.4 | dumps from the real runtimes | function tree, parameters, line ranges, constants, locals, known opcode shapes |
 | BEAM | pybeam 0.8.1 | module, atoms, exports with labels, imports |
 | EVM | solc 0.8.26 output | disassembly text equals `deployedBytecode.opcodes`; selectors equal `methodIdentifiers` |
+| P/Invoke map | dnfile 0.18.0 ImplMap rows; llvm-nm, llvm-readobj and llvm-objdump 19 on the .NET 8.0.11 System.IO.Compression.Native builds for Linux, Windows and macOS | native export lists match the LLVM tools; every Brotli DllImport resolves on all three; a demo library shows resolved, missing export and library not shipped |
+| Member diff | dnfile 0.18.0 TypeDef, MethodDef and Field lists | member lists of RevDemoLib 1.0.0 and 2.0.0 and of Newtonsoft.Json 12.0.3 and 13.0.3 match, and the RevDemoLib diff is exact |
 
 Fixtures and their licenses are listed in `samples/managed/SOURCES.md`. Run
 `node packages/managed/scripts/fetch-fixtures.mjs` to fetch Newtonsoft.Json and build the PyInstaller onefile
