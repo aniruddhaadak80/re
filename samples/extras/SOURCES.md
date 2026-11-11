@@ -28,3 +28,16 @@ Fetched at test time, not committed (`packages/extras/scripts/fetch-fixtures.mjs
 |---|---|---|
 | strings64.exe | https://download.sysinternals.com/files/Strings.zip (Microsoft signed) | Sysinternals license does not allow redistribution |
 | WindowServer.ips | https://gist.github.com/luckman212/5b645096c44936ba8530071fa6a23efd (a public macOS 12 crash report) | no license stated, so it is not redistributed |
+
+## windows/ (registry hives, Prefetch, Jump Lists)
+
+| File | Source | License |
+| --- | --- | --- |
+| `SAM.gz`, `BCD`, `SECURITY`, `NTUSER.DAT.gz` | regipy test data, https://github.com/mkorman90/regipy/tree/master/regipy_tests/data (xz there, recompressed with gzip or stored raw here) | MIT |
+| `*-*.pf` (XP, Vista, 7, 8.x, 10 compressed) | Eric Zimmerman Prefetch test files, https://github.com/EricZimmerman/Prefetch/tree/master/Prefetch.Test/TestFiles | MIT |
+| `win10-*.automaticDestinations-ms`, `win7-*.automaticDestinations-ms`, `dtformats-*.customDestinations-ms` | Eric Zimmerman JumpList test files, https://github.com/EricZimmerman/JumpList/tree/master/JumpList.Test/TestFiles | MIT |
+
+Expected values for these and the other gap formats live in `reference-gaps.json`, written by
+`packages/extras/scripts/gen_reference_gaps.py` from regipy 6.5.0, windowsprefetch 4.0.3 (with
+dissect.util 3.24 LZXPRESS Huffman standing in for the Windows-only RtlDecompressBufferEx),
+olefile 0.47 and LnkParse3 1.6.0.

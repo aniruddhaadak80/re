@@ -111,4 +111,8 @@ export const CLI_COMMANDS: CliCommand[] = [
   command('x-ledger-export', 'x_ledger_export', 'Export a ledger as JSON or Markdown'),
   command('x-eval-tasks', 'x_eval_tasks', 'List eval tasks for agents'),
   command('x-eval-score', 'x_eval_score', 'Score agent answers to the eval tasks'),
+  command('x-registry', 'x_registry_hive', 'Windows registry hive keys and values'),
+  command('x-prefetch', 'x_prefetch', 'Windows Prefetch files, compressed or not'),
+  command('x-jumplist', 'x_jump_list', 'Windows Jump Lists with embedded shell links'),
+  command('x-ole', 'x_ole_compound', 'OLE compound file directory and streams'),
 ];

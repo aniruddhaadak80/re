@@ -1,0 +1,598 @@
+{
+ "jumplists": {
+  "dtformats-5afe4de1b92fc382.customDestinations-ms": {
+   "footer": "abfbbfba",
+   "lnkOffsets": [
+    36,
+    1945,
+    3876,
+    5765,
+    7684,
+    9589,
+    11498,
+    13437,
+    15360
+   ],
+   "lnks": [
+    {
+     "arguments": "{A97AF2A4-8EF1-49C1-8B4C-68B8AE925549} http://go.microsoft.com/fwlink/?LinkID=139460",
+     "localBasePath": "C:\\Windows\\System32\\GettingStarted.exe",
+     "offset": 36
+    },
+    {
+     "arguments": "{6283D460-3C57-4F5A-96AE-30F77FEF3125} %systemroot%\\system32\\control.exe /name Microsoft.Personalization",
+     "localBasePath": "C:\\Windows\\System32\\GettingStarted.exe",
+     "offset": 1945
+    },
+    {
+     "arguments": "{89ECBF03-2033-4BCB-AE4A-665E2B737389} %systemroot%\\System32\\migwiz\\migwiz.exe",
+     "localBasePath": "C:\\Windows\\System32\\GettingStarted.exe",
+     "offset": 3876
+    },
+    {
+     "arguments": "{D36AFB67-9043-4714-B4A3-E9E9481750A1} %systemroot%\\system32\\control.exe /name Microsoft.HomeGroup",
+     "localBasePath": "C:\\Windows\\System32\\GettingStarted.exe",
+     "offset": 5765
+    },
+    {
+     "arguments": "{6819DEE2-366D-4F92-8F73-EC24116674D3} %systemroot%\\system32\\UserAccountControlSettings.exe",
+     "localBasePath": "C:\\Windows\\System32\\GettingStarted.exe",
+     "offset": 7684
+    },
+    {
+     "arguments": "{AEB13B0B-E2A0-47AD-9C5C-D541FB776583} http://go.microsoft.com/fwlink/?LinkId=130744",
+     "localBasePath": "C:\\Windows\\System32\\GettingStarted.exe",
+     "offset": 9589
+    },
+    {
+     "arguments": "{8CA415C2-0F7F-4A7D-8B09-DF76E995775B} %systemroot%\\system32\\control.exe /name Microsoft.BackupAndRestoreCenter",
+     "localBasePath": "C:\\Windows\\System32\\GettingStarted.exe",
+     "offset": 11498
+    },
+    {
+     "arguments": "{100B7438-E8AF-470F-8676-87964C64E890} %systemroot%\\system32\\control.exe /name Microsoft.UserAccounts",
+     "localBasePath": "C:\\Windows\\System32\\GettingStarted.exe",
+     "offset": 13437
+    },
+    {
+     "arguments": "{DE3895CB-077B-4C38-B6E3-F3DE1E0D84FC} %systemroot%\\system32\\control.exe /name Microsoft.Display",
+     "localBasePath": "C:\\Windows\\System32\\GettingStarted.exe",
+     "offset": 15360
+    }
+   ]
+  },
+  "win10-f01b4d95cf55d32a.automaticDestinations-ms": {
+   "destList": [
+    {
+     "count": 2,
+     "entry": 7,
+     "host": "desktop-annfp9d",
+     "lnk": {
+      "localBasePath": "C:\\Temp",
+      "size": 0
+     },
+     "modified": "2015-11-24T20:31:34.447Z",
+     "path": "C:\\Temp",
+     "pin": -1
+    },
+    {
+     "count": 1,
+     "entry": 9,
+     "host": "desktop-annfp9d",
+     "lnk": {
+      "localBasePath": "C:\\Temp\\1",
+      "size": 0
+     },
+     "modified": "2015-11-24T20:31:34.433Z",
+     "path": "C:\\Temp\\1",
+     "pin": -1
+    },
+    {
+     "count": 1,
+     "entry": 8,
+     "host": "desktop-annfp9d",
+     "lnk": {
+      "localBasePath": "C:\\",
+      "size": 4096
+     },
+     "modified": "2015-11-24T20:30:55.493Z",
+     "path": "C:\\",
+     "pin": -1
+    },
+    {
+     "count": 3,
+     "entry": 1,
+     "host": "desktop-annfp9d",
+     "lnk": {
+      "localBasePath": "C:\\Users\\e\\Desktop",
+      "size": 0
+     },
+     "modified": "2015-11-24T18:31:14.402Z",
+     "path": "C:\\Users\\e\\Desktop",
+     "pin": 0
+    },
+    {
+     "count": 3,
+     "entry": 2,
+     "host": "desktop-annfp9d",
+     "lnk": {
+      "localBasePath": "C:\\Users\\e\\Downloads",
+      "size": 0
+     },
+     "modified": "2015-11-24T18:31:14.402Z",
+     "path": "knownfolder:{374DE290-123F-4565-9164-39C4925E467B}",
+     "pin": 1
+    },
+    {
+     "count": 3,
+     "entry": 6,
+     "host": "desktop-annfp9d",
+     "lnk": {
+      "localBasePath": "C:\\Users\\e\\Videos",
+      "size": 0
+     },
+     "modified": "2015-11-24T18:31:14.386Z",
+     "path": "knownfolder:{18989B1D-99B5-455B-841C-AB7C74E4DDFC}",
+     "pin": -1
+    },
+    {
+     "count": 3,
+     "entry": 5,
+     "host": "desktop-annfp9d",
+     "lnk": {
+      "localBasePath": "C:\\Users\\e\\Music",
+      "size": 0
+     },
+     "modified": "2015-11-24T18:31:14.386Z",
+     "path": "knownfolder:{4BD8D571-6D19-48D3-BE97-422220080E43}",
+     "pin": -1
+    },
+    {
+     "count": 3,
+     "entry": 4,
+     "host": "desktop-annfp9d",
+     "lnk": {
+      "localBasePath": "C:\\Users\\e\\Pictures",
+      "size": 0
+     },
+     "modified": "2015-11-24T18:31:14.386Z",
+     "path": "knownfolder:{33E28130-4E1E-4676-835A-98395C3BC3BB}",
+     "pin": 3
+    },
+    {
+     "count": 3,
+     "entry": 3,
+     "host": "desktop-annfp9d",
+     "lnk": {
+      "localBasePath": "C:\\Users\\e\\Documents",
+      "size": 4096
+     },
+     "modified": "2015-11-24T18:31:14.386Z",
+     "path": "knownfolder:{FDD39AD0-238F-46AF-ADB4-6C85480369C7}",
+     "pin": 2
+    }
+   ],
+   "entries": 9,
+   "pinned": 4,
+   "streams": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "DestList"
+   ],
+   "version": 3
+  },
+  "win7-1b4dd67f29cb1962.automaticDestinations-ms": {
+   "destList": [
+    {
+     "count": null,
+     "entry": 4,
+     "host": "win7x64",
+     "lnk": {
+      "localBasePath": "C:\\Users\\e\\AppData\\Roaming\\Microsoft\\Windows\\Libraries\\Videos.library-ms",
+      "size": 3483
+     },
+     "modified": "2016-01-16T20:23:24.890Z",
+     "path": "::{031E4825-7B94-4DC3-B131-E946B44C8DD5}\\Videos.library-ms",
+     "pin": -1
+    },
+    {
+     "count": null,
+     "entry": 3,
+     "host": "win7x64",
+     "lnk": {
+      "localBasePath": "C:\\Users\\e\\AppData\\Roaming\\Microsoft\\Windows\\Libraries\\Music.library-ms",
+      "size": 3470
+     },
+     "modified": "2016-01-16T20:23:24.890Z",
+     "path": "::{031E4825-7B94-4DC3-B131-E946B44C8DD5}\\Music.library-ms",
+     "pin": -1
+    },
+    {
+     "count": null,
+     "entry": 2,
+     "host": "win7x64",
+     "lnk": {
+      "localBasePath": "C:\\Users\\e\\AppData\\Roaming\\Microsoft\\Windows\\Libraries\\Pictures.library-ms",
+      "size": 3505
+     },
+     "modified": "2016-01-16T20:23:24.890Z",
+     "path": "::{031E4825-7B94-4DC3-B131-E946B44C8DD5}\\Pictures.library-ms",
+     "pin": -1
+    },
+    {
+     "count": null,
+     "entry": 1,
+     "host": "win7x64",
+     "lnk": {
+      "localBasePath": "C:\\Users\\e\\AppData\\Roaming\\Microsoft\\Windows\\Libraries\\Documents.library-ms",
+      "size": 3513
+     },
+     "modified": "2016-01-16T20:23:24.890Z",
+     "path": "::{031E4825-7B94-4DC3-B131-E946B44C8DD5}\\Documents.library-ms",
+     "pin": -1
+    }
+   ],
+   "entries": 4,
+   "pinned": 0,
+   "streams": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "DestList"
+   ],
+   "version": 1
+  }
+ },
+ "prefetch": {
+  "vista-CMD.EXE-89305D47.pf": {
+   "executable": "CMD.EXE",
+   "files": 7,
+   "firstFile": "\\DEVICE\\HARDDISKVOLUME1\\WINDOWS\\SYSTEM32\\NTDLL.DLL",
+   "hash": "89305D47",
+   "lastFile": "\\DEVICE\\HARDDISKVOLUME1\\WINDOWS\\SYSTEM32\\MSVCRT.DLL",
+   "runCount": 3,
+   "timestamps": [
+    "2016-01-16 20:03:15.551424"
+   ],
+   "version": 23,
+   "volumes": [
+    {
+     "path": "\\DEVICE\\HARDDISKVOLUME1",
+     "serial": "E8EAB8B5"
+    }
+   ]
+  },
+  "win10-CALC.EXE-3FBEF7FD.pf": {
+   "decompressedSha256": "3802026ff363594ebe2d874d0079334602d5f713c9a20f6a6965b414eae2cb92",
+   "decompressedSize": 47848,
+   "executable": "CALC.EXE",
+   "files": 63,
+   "firstFile": "\\VOLUME{01d1217a9c4c6779-8c9f49ec}\\WINDOWS\\SYSTEM32\\NTDLL.DLL",
+   "hash": "3FBEF7FD",
+   "lastFile": "\\VOLUME{01d1217a9c4c6779-8c9f49ec}\\$MFT",
+   "runCount": 2,
+   "timestamps": [
+    "2016-01-11 22:08:20.985332",
+    "2016-01-10 02:12:33.809542"
+   ],
+   "version": 30,
+   "volumes": [
+    {
+     "path": "\\VOLUME{01d1217a9c4c6779-8c9f49ec}",
+     "serial": "8C9F49EC"
+    }
+   ]
+  },
+  "win10-CMD.EXE-D269B812.pf": {
+   "decompressedSha256": "96f88ba411a4ea17bcab77c92b7647076dd92f9388caf6458d896cc7acf84c0f",
+   "decompressedSize": 25138,
+   "executable": "CMD.EXE",
+   "files": 62,
+   "firstFile": "\\VOLUME{01d1217a9c4c6779-8c9f49ec}\\WINDOWS\\SYSTEM32\\DISKPART.EXE",
+   "hash": "D269B812",
+   "lastFile": "\\VOLUME{01d1217a9c4c6779-8c9f49ec}\\WINDOWS\\SYSTEM32\\EN-US\\CMD.EXE.MUI",
+   "runCount": 55,
+   "timestamps": [
+    "2016-01-12 20:07:03.981068",
+    "2016-01-10 02:29:02.788726",
+    "2016-01-04 23:27:28.405870",
+    "2016-01-04 23:27:28.726892",
+    "2016-01-04 18:38:10.935656",
+    "2016-01-04 18:38:11.344164",
+    "2015-12-31 21:42:29.667018",
+    "2015-12-17 22:34:21.579860"
+   ],
+   "version": 30,
+   "volumes": [
+    {
+     "path": "\\VOLUME{01d12173f395296c-66f451bc}",
+     "serial": "66F451BC"
+    },
+    {
+     "path": "\\VOLUME{01d1217a9c4c6779-8c9f49ec}",
+     "serial": "8C9F49EC"
+    }
+   ]
+  },
+  "win7-CMD.EXE-4A81B364.pf": {
+   "executable": "CMD.EXE",
+   "files": 16,
+   "firstFile": "\\DEVICE\\HARDDISKVOLUME2\\WINDOWS\\SYSTEM32\\NTDLL.DLL",
+   "hash": "4A81B364",
+   "lastFile": "\\DEVICE\\HARDDISKVOLUME2\\WINDOWS\\GLOBALIZATION\\SORTING\\SORTDEFAULT.NLS",
+   "runCount": 2,
+   "timestamps": [
+    "2016-01-16 20:26:42.515108"
+   ],
+   "version": 23,
+   "volumes": [
+    {
+     "path": "\\DEVICE\\HARDDISKVOLUME2",
+     "serial": "88008C2F"
+    }
+   ]
+  },
+  "win8x-CMD.EXE-4A81B364.pf": {
+   "executable": "CMD.EXE",
+   "files": 13,
+   "firstFile": "\\DEVICE\\HARDDISKVOLUME2\\WINDOWS\\SYSTEM32\\NTDLL.DLL",
+   "hash": "4A81B364",
+   "lastFile": "\\DEVICE\\HARDDISKVOLUME2\\WINDOWS\\SYSTEM32\\CONHOST.EXE",
+   "runCount": 2,
+   "timestamps": [
+    "2016-01-16 21:10:14.120848",
+    "2016-01-16 21:10:09.746036"
+   ],
+   "version": 26,
+   "volumes": [
+    {
+     "path": "\\DEVICE\\HARDDISKVOLUME2",
+     "serial": "C6EE7444"
+    }
+   ]
+  },
+  "xppro-CMD.EXE-087B4001.pf": {
+   "executable": "CMD.EXE",
+   "files": 33,
+   "firstFile": "\\DEVICE\\HARDDISKVOLUME1\\WINDOWS\\SYSTEM32\\NTDLL.DLL",
+   "hash": "087B4001",
+   "lastFile": "\\DEVICE\\HARDDISKVOLUME1\\WINDOWS\\IE7\\SPUNINST\\IERESETICONS.EXE",
+   "runCount": 2,
+   "timestamps": [
+    "2013-03-10 10:11:49.281250"
+   ],
+   "version": 17,
+   "volumes": [
+    {
+     "path": "\\DEVICE\\HARDDISKVOLUME1",
+     "serial": "24CB074B"
+    }
+   ]
+  }
+ },
+ "registry": {
+  "BCD": {
+   "keys": 132,
+   "objects": [
+    "{0ce4991b-e6b3-4b16-b23c-5e0d9250e5d9}",
+    "{1afa9c49-16ab-4a5c-901b-212802da9460}",
+    "{4636856e-540f-4170-a130-a84776f4c654}",
+    "{5189b25c-5558-4bf2-bca4-289b11bd29e2}",
+    "{6efb52bf-1766-41db-a6b3-0ee5eff72bd7}",
+    "{733b62de-f608-11eb-825c-c112f60133ab}",
+    "{733b62e2-f608-11eb-825c-c112f60133ab}",
+    "{733b62e3-f608-11eb-825c-c112f60133ab}",
+    "{733b62e4-f608-11eb-825c-c112f60133ab}",
+    "{733b62e5-f608-11eb-825c-c112f60133ab}",
+    "{733b62e6-f608-11eb-825c-c112f60133ab}",
+    "{733b62e7-f608-11eb-825c-c112f60133ab}",
+    "{7ea2e1ac-2e61-4728-aaa3-896d9d0a9f0e}",
+    "{7ff607e0-4395-11db-b0de-0800200c9a66}",
+    "{9dea862c-5cdd-4e70-acc1-f32b344d4795}",
+    "{a5a30fa2-3d06-4e9f-b5f4-a01df9d1fcba}",
+    "{b2721d73-1db4-4c62-bf78-c548a880142d}"
+   ],
+   "root": "NewStoreRoot",
+   "rootSubkeys": [
+    "Description",
+    "Objects"
+   ],
+   "values": 103
+  },
+  "NTUSER.DAT.gz": {
+   "desktop": {
+    "ActiveWndTrackTimeout": [
+     "REG_DWORD",
+     0
+    ],
+    "BlockSendInputResets": [
+     "REG_SZ",
+     "0"
+    ],
+    "CaretWidth": [
+     "REG_DWORD",
+     1
+    ],
+    "ClickLockTime": [
+     "REG_DWORD",
+     1200
+    ],
+    "CoolSwitchColumns": [
+     "REG_SZ",
+     "7"
+    ],
+    "CoolSwitchRows": [
+     "REG_SZ",
+     "3"
+    ],
+    "CursorBlinkRate": [
+     "REG_SZ",
+     "530"
+    ],
+    "DockMoving": [
+     "REG_SZ",
+     "1"
+    ],
+    "DragFromMaximize": [
+     "REG_SZ",
+     "1"
+    ],
+    "DragFullWindows": [
+     "REG_SZ",
+     "1"
+    ],
+    "DragHeight": [
+     "REG_SZ",
+     "4"
+    ],
+    "DragWidth": [
+     "REG_SZ",
+     "4"
+    ],
+    "FocusBorderHeight": [
+     "REG_DWORD",
+     1
+    ],
+    "FocusBorderWidth": [
+     "REG_DWORD",
+     1
+    ],
+    "FontSmoothing": [
+     "REG_SZ",
+     "2"
+    ],
+    "FontSmoothingGamma": [
+     "REG_DWORD",
+     0
+    ],
+    "FontSmoothingOrientation": [
+     "REG_DWORD",
+     1
+    ],
+    "FontSmoothingType": [
+     "REG_DWORD",
+     2
+    ],
+    "ForegroundFlashCount": [
+     "REG_DWORD",
+     7
+    ],
+    "ForegroundLockTimeout": [
+     "REG_DWORD",
+     200000
+    ],
+    "LeftOverlapChars": [
+     "REG_SZ",
+     "3"
+    ],
+    "MenuShowDelay": [
+     "REG_SZ",
+     "400"
+    ],
+    "PaintDesktopVersion": [
+     "REG_DWORD",
+     0
+    ],
+    "Pattern": [
+     "REG_DWORD",
+     0
+    ],
+    "RightOverlapChars": [
+     "REG_SZ",
+     "3"
+    ],
+    "ScreenSaveActive": [
+     "REG_SZ",
+     "1"
+    ],
+    "SnapSizing": [
+     "REG_SZ",
+     "1"
+    ],
+    "TileWallpaper": [
+     "REG_SZ",
+     "0"
+    ],
+    "UserPreferencesMask": [
+     "REG_BINARY",
+     "9024038010000000"
+    ],
+    "Wallpaper": [
+     "REG_SZ",
+     "C:\\Users\\vibranium\\AppData\\Roaming\\Microsoft\\Windows\\Themes\\TranscodedWallpaper.jpg"
+    ],
+    "WallpaperOriginX": [
+     "REG_DWORD",
+     0
+    ],
+    "WallpaperOriginY": [
+     "REG_DWORD",
+     0
+    ],
+    "WallpaperStyle": [
+     "REG_SZ",
+     "10"
+    ],
+    "WheelScrollChars": [
+     "REG_SZ",
+     "3"
+    ],
+    "WheelScrollLines": [
+     "REG_SZ",
+     "3"
+    ],
+    "WindowArrangementActive": [
+     "REG_SZ",
+     "1"
+    ]
+   },
+   "environment": {
+    "TEMP": "%USERPROFILE%\\AppData\\Local\\Temp",
+    "TMP": "%USERPROFILE%\\AppData\\Local\\Temp"
+   },
+   "environmentLastWritten": 129779615947800947,
+   "keys": 1812,
+   "root": "CMI-CreateHive{6A1C4018-979D-4291-A7DC-7AED1C75B67C}",
+   "rootSubkeys": [
+    "AppEvents",
+    "Console",
+    "Control Panel",
+    "Environment",
+    "EUDC",
+    "Identities",
+    "Keyboard Layout",
+    "Network",
+    "Printers",
+    "Software",
+    "System"
+   ],
+   "values": 4094
+  },
+  "SAM.gz": {
+   "keys": 65,
+   "root": "CMI-CreateHive{899121E8-11D8-44B6-ACEB-301713D5ED8C}",
+   "rootSubkeys": [
+    "SAM"
+   ],
+   "values": 70
+  },
+  "SECURITY": {
+   "keys": 100,
+   "root": "ROOT",
+   "rootSubkeys": [
+    "Cache",
+    "Policy",
+    "RXACT"
+   ],
+   "values": 109
+  }
+ }
+}

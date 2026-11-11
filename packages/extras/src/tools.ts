@@ -21,6 +21,7 @@ import { parseIps } from './apple/ips.js';
 import { Ledger, evidenceFor, type EvidenceRef } from './ledger/ledger.js';
 import { EVAL_TASKS, scoreAnswers, publicTasks } from './eval/harness.js';
 import { sha256 } from '@revlens/core';
+import { GAP_TOOLS } from './tools2.js';
 
 /** Make any value JSON safe: bigint to string, bytes to capped hex, Map and Set to plain values. */
 export function jsonSafe(x: unknown, depth = 0): unknown {
@@ -353,6 +354,7 @@ export const TOOLS: ToolDef[] = [
     inputSchema: { answers: { type: 'object', description: 'Map of task id to answer (string, number or list)' }, agent: { type: 'string', description: 'Label for the agent being scored', optional: true } },
     async run(i) { return scoreAnswers((i.answers ?? {}) as Record<string, unknown>, { agent: i.agent }); },
   },
+  ...GAP_TOOLS,
 ];
 
 export { EVAL_TASKS };
