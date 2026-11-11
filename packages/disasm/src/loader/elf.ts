@@ -109,7 +109,11 @@ export function loadElf(bytes: Uint8Array): BinaryImage {
   // Relocations that name import slots
   const imports: ImportRef[] = [];
   const slotTypes = arch === 'x86_64' ? [6, 7] : arch === 'x86' ? [6, 7] : arch === 'arm64' ? [1025, 1026] : arch === 'arm' ? [21, 22] : [];
-  const addReloc = (offset: number, symIdx: number, type: number, syms: { name: string }[]) => {
+  // pointers the dynamic loader writes at load time (RELA RELATIVE: value = image base + addend)
+  const relocPtrs = new Map<number, number>();
+  const relativeType = arch === 'x86_64' ? 8 : arch === 'arm64' ? 1027 : -1;
+  const addReloc = (offset: number, symIdx: number, type: number, syms: { name: string }[], addend?: number) => {
+    if (type === relativeType && addend !== undefined) { if (relocPtrs.size < 2_000_000) relocPtrs.set(offset, addend); return; }
     if (!slotTypes.includes(type)) return;
     const name = syms[symIdx]?.name;
     if (!name) return;
@@ -126,7 +130,7 @@ export function loadElf(bytes: Uint8Array): BinaryImage {
       if (!r.ok(o, ent)) break;
       if (is64) {
         const info = r.u64(o + 8);
-        addReloc(r.u64(o), Math.floor(info / 2 ** 32), info % 2 ** 32, syms);
+        addReloc(r.u64(o), Math.floor(info / 2 ** 32), info % 2 ** 32, syms, rela ? r.i64(o + 16) : undefined);
       } else {
         const info = r.u32(o + 4);
         addReloc(r.u32(o), info >>> 8, info & 0xff, syms);
@@ -161,5 +165,6 @@ export function loadElf(bytes: Uint8Array): BinaryImage {
     imageBase: segments.length ? Math.min(...segments.map((s) => s.vaddr)) : 0,
     segments, sections, symbols, imports, hints,
     bytes, fileOffset: 0, warnings,
+    ...(relocPtrs.size ? { relocPtrs } : {}),
   };
 }

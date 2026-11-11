@@ -1,5 +1,8 @@
 // Program: a loaded binary plus lazy, cached analyses (functions, CFG, xrefs, call graph).
-import type { AnalyzedFunction, BasicBlock, BinaryImage, CallSite, DataRef, Decoder, Edge, FunctionInfo, ImportRef, Insn, Sym } from '../types.js';
+import type { AnalyzedFunction, BasicBlock, BinaryImage, CallSite, DataRef, Decoder, Edge, FunctionInfo, ImportRef, Insn, Sym, SwitchTable } from '../types.js';
+import { resolveJumpTable, type JumpTableContext } from './jumptable.js';
+import { writes } from './regs.js';
+import { analyzeFlow, type FlowResult, type Val } from './dataflow.js';
 import { Memory } from '../loader/memory.js';
 import { loadImage, type LoadOptions } from '../loader/index.js';
 import { loadDecoders, type DecoderOptions } from '../backends/index.js';
@@ -14,7 +17,7 @@ export interface OpenOptions extends LoadOptions, DecoderOptions {
   quickDiscovery?: boolean;
   /** max instructions decoded per function (default 20000) */
   maxFunctionInsns?: number;
-  /** analyzed functions kept in memory, counted in instructions (default 250000) */
+  /** analyzed functions kept in memory, counted in instructions (default 60000); whole program passes do not fill it */
   cacheInsns?: number;
 }
 
@@ -52,6 +55,8 @@ export class Program {
   readonly functions = new Map<number, FunctionInfo>();
   private sortedFuncs: number[] | undefined;
   private readonly cache = new Map<number, AnalyzedFunction>();
+  /** end address of every function built so far (kept after its analysis is evicted) */
+  private readonly extents = new Map<number, number>();
   private cacheInsns = 0;
   private discovered = false;
   discoveryComplete = true;
@@ -252,7 +257,7 @@ export class Program {
       seen.add(a);
       const f = this.functions.get(a);
       if (!f || f.isImportStub) continue;
-      const af = this.analyze(a);
+      const af = this.analyzeTransient(a);
       if (!af) continue;
       for (const c of af.calls) {
         if (c.target === undefined || c.indirect) continue;
@@ -298,7 +303,7 @@ export class Program {
         if (covered(a)) continue;
         if (this.addFunction({ addr: a, name: `sub_${a.toString(16)}`, source: 'prologue' })) {
           added++;
-          const af = this.analyze(a);
+          const af = this.analyzeTransient(a);
           if (af) i = Math.max(i, a - r.start + Math.max(0, af.codeSize - 1));
         }
       }
@@ -307,9 +312,8 @@ export class Program {
 
   /** analyzed extent of a function when it has been analyzed */
   analysisSizeHint(addr: number): number | undefined {
-    const af = this.cache.get(addr);
-    if (!af || !af.blocks.length) return undefined;
-    return Math.max(...af.blocks.map((b) => b.end)) - addr;
+    const end = this.extents.get(addr);
+    return end === undefined ? undefined : end - addr;
   }
 
   /** ELF without symbols: main is the first argument _start passes to __libc_start_main. */
@@ -363,8 +367,8 @@ export class Program {
     for (let k = best; k >= 0 && k > best - 8; k--) {
       const f = this.functions.get(arr[k]!)!;
       if (f.size && addr < f.addr + f.size) return f;
-      const af = this.cache.get(f.addr);
-      if (af && af.blocks.some((b) => addr >= b.start && addr < b.end)) return f;
+      const end = this.extents.get(f.addr);
+      if (end !== undefined && addr >= f.addr && addr < end) return f;
       if (f.size) break;
     }
     return undefined;
@@ -385,13 +389,26 @@ export class Program {
     const af = this.buildCfg(info);
     this.cache.set(addr, af);
     this.cacheInsns += af.insnCount;
-    const cap = this.opts.cacheInsns ?? 250_000;
+    const cap = this.opts.cacheInsns ?? 60_000;
     while (this.cacheInsns > cap && this.cache.size > 1) {
       const first = this.cache.keys().next().value as number;
       this.cacheInsns -= this.cache.get(first)!.insnCount;
       this.cache.delete(first);
     }
     return af;
+  }
+
+  /** Analysis without touching the cache (whole program passes that must not grow memory). */
+  analyzeTransient(addr: number): AnalyzedFunction | undefined {
+    const cached = this.cache.get(addr);
+    if (cached) return cached;
+    if (!this.decoder || !this.mem.isExec(addr)) return undefined;
+    let info = this.functions.get(addr);
+    if (!info) {
+      const s = this.symAt.get(addr);
+      info = { addr, name: s?.name ?? `sub_${addr.toString(16)}`, source: 'call', thumb: this.img.arch === 'arm' ? this.isThumb(addr) : undefined };
+    }
+    return this.buildCfg(info);
   }
 
   private isNoReturn(target: number | undefined, slot?: number): boolean {
@@ -420,6 +437,39 @@ export class Program {
     const inRange = (t: number) => (limitEnd === undefined ? true : t >= start && t < limitEnd);
     const tails = new Set<number>();
     const pre = new Map<number, Insn>();
+    // predecessor bookkeeping for jump table resolution
+    const fallPred = new Map<number, Insn>();
+    const branchIn = new Map<number, Insn[]>();
+    const switches = new Map<number, SwitchTable>();
+    const defsIdx = new Map<string, Insn[]>();
+    let defsStamp = -1;
+    const jtCtx: JumpTableContext = {
+      arch, bits: this.img.bits, funcStart: start,
+      pred: (ins) => {
+        const fp = fallPred.get(ins.address);
+        const bi = branchIn.get(ins.address);
+        const n = (fp ? 1 : 0) + (bi?.length ?? 0);
+        if (n !== 1) return undefined;
+        return fp ?? bi![0];
+      },
+      read: (a, w) => this.readUint(a, w),
+      isReadOnly: (a) => this.isReadOnly(a),
+      defsOf: (reg) => {
+        if (defsStamp !== insnAt.size) {
+          defsStamp = insnAt.size;
+          defsIdx.clear();
+          for (const i of insnAt.values()) for (const w of writes(arch, i)) { const l = defsIdx.get(w); if (l) { if (l.length < 16) l.push(i); } else defsIdx.set(w, [i]); }
+        }
+        return defsIdx.get(reg) ?? [];
+      },
+      isExec: (a) => this.mem.isExec(a),
+      isFunction: (a) => this.functions.has(a) || this.importByStub.has(a) || this.symAt.get(a)?.kind === 'func' || (limitEnd !== undefined && (a < start || a >= limitEnd)),
+    };
+    const noteBranch = (ins: Insn) => {
+      if (ins.target === undefined) return;
+      const l = branchIn.get(ins.target);
+      if (l) { if (l.length < 64) l.push(ins); } else branchIn.set(ins.target, [ins]);
+    };
     while (work.length) {
       let pc = work.pop()!;
       if (insnAt.has(pc)) continue;
@@ -445,6 +495,8 @@ export class Program {
           total++;
           const next = ins.address + ins.size;
           if (ins.flow === 'call' && ins.target === next) ins.flow = 'seq'; // call $+5 (PIC base idiom)
+          if (ins.flow === 'seq' || ins.flow === 'call' || ins.flow === 'icall' || ins.flow === 'cjump') fallPred.set(next, ins);
+          if (ins.flow === 'jump' || ins.flow === 'cjump') noteBranch(ins);
           if (ins.flow === 'jump' && ins.target !== undefined) {
             if (isOtherFunc(ins.target) || !inRange(ins.target) || !this.mem.isExec(ins.target)) tails.add(ins.address);
             else { leaders.add(ins.target); work.push(ins.target); }
@@ -455,6 +507,22 @@ export class Program {
             leaders.add(next);
             work.push(next);
             stop = true; break;
+          }
+          if ((ins.flow === 'ijump' || ins.flow === 'icall') && !(ins.viaMemory && ins.memAddr !== undefined && this.importBySlot.has(ins.memAddr))) {
+            let jt = resolveJumpTable(jtCtx, ins);
+            if (!jt && ins.flow === 'ijump' && ins.operands.includes('[')) {
+              // interpreter loops repeat the same dispatch (jmp [r10+rax*8]) at the end of every handler;
+              // reuse a table already resolved for the identical operand in this function
+              for (const o of switches.values()) {
+                if (o.kind !== 'switch' || o.bound === 'cmp') continue;
+                const oi = insnAt.get(o.at);
+                if (oi && oi.operands === ins.operands && oi.mnemonic === ins.mnemonic) { jt = { ...o, at: ins.address, sharedWith: o.at }; break; }
+              }
+            }
+            if (jt && (jt.kind === 'call-table' || ins.flow === 'ijump')) {
+              switches.set(ins.address, jt);
+              if (jt.kind === 'switch') for (const t of new Set(jt.targets)) { if (inRange(t) && !insnAt.has(t)) work.push(t); leaders.add(t); }
+            }
           }
           if (ins.flow === 'ret' || ins.flow === 'ijump' || ins.flow === 'trap' || ins.flow === 'invalid') { stop = true; break; }
           if ((ins.flow === 'call' || ins.flow === 'icall') && this.isNoReturn(ins.target, ins.viaMemory ? ins.memAddr : undefined)) { stop = true; break; }
@@ -504,7 +572,12 @@ export class Program {
           addEdge(next, 'false');
           break;
         case 'ret': b.exit = 'ret'; break;
-        case 'ijump': b.exit = last.viaMemory && last.memAddr !== undefined && this.importBySlot.has(last.memAddr) ? 'tail' : 'indirect'; break;
+        case 'ijump': {
+          const jt = switches.get(last.address);
+          if (jt?.kind === 'switch') { for (const t of new Set(jt.targets)) addEdge(t, 'case'); if (!b.succ.length) b.exit = 'indirect'; }
+          else b.exit = (last.viaMemory && last.memAddr !== undefined && this.importBySlot.has(last.memAddr)) || jt?.kind === 'call-table' ? 'tail' : 'indirect';
+          break;
+        }
         case 'trap': b.exit = 'trap'; break;
         case 'invalid': b.exit = 'invalid'; break;
         default:
@@ -524,7 +597,14 @@ export class Program {
     for (const b of blocks) {
       codeSize += b.end - b.start;
       for (const ins of b.insns) {
-        if (ins.flow === 'call' || ins.flow === 'icall' || (ins.flow === 'jump' && b.exit === 'tail' && ins === b.insns[b.insns.length - 1]) || (ins.flow === 'ijump' && ins.viaMemory)) {
+        const jt = switches.get(ins.address);
+        if (jt?.kind === 'call-table' && jt.bound === 'const') {
+          calls.push({ at: ins.address, target: jt.targets[0], name: this.nameOf(jt.targets[0]!), indirect: true, tail: ins.flow === 'ijump' || undefined, resolvedBy: jt.initialValue ? 'initial-value' : 'constant' });
+        } else if (jt?.kind === 'call-table') {
+          calls.push({ at: ins.address, indirect: true, tail: ins.flow === 'ijump' || undefined, candidates: [...new Set(jt.targets)], resolvedBy: 'table' });
+        } else if (jt?.kind === 'switch') {
+          /* resolved switch: edges already added */
+        } else if (ins.flow === 'call' || ins.flow === 'icall' || (ins.flow === 'jump' && b.exit === 'tail' && ins === b.insns[b.insns.length - 1]) || (ins.flow === 'ijump' && ins.viaMemory)) {
           const tail = ins.flow === 'jump' || ins.flow === 'ijump';
           if (ins.target !== undefined) {
             calls.push({ at: ins.address, target: ins.target, name: this.nameOf(ins.target), indirect: false, tail: tail || undefined });
@@ -551,9 +631,12 @@ export class Program {
         }
       }
     }
-    return {
+    const out: AnalyzedFunction = {
       ...info, blocks, calls, dataRefs, constants: [...consts], insnCount: total, codeSize, truncated, unresolvedIndirect: unresolved,
     };
+    if (switches.size) out.switches = [...switches.values()].sort((a, b) => a.at - b.at);
+    if (blocks.length) { let end = 0; for (const b of blocks) if (b.end > end) end = b.end; this.extents.set(start, end); }
+    return out;
   }
 
   private thunkCache = new Map<number, string | undefined>();
@@ -566,6 +649,176 @@ export class Program {
     if (m && two[1]?.flow === 'ret') r = m[1];
     this.thunkCache.set(target, r);
     return r;
+  }
+
+  // ---------- value flow ----------
+
+  private flowCache = new Map<number, FlowResult>();
+
+  /** Calling convention used by the value tracker: argument registers in order and the return register. */
+  abi(): { argRegs: string[]; retReg: string; name: string; win64: boolean } {
+    const arch = this.img.arch;
+    const go = !!this.img.goVersionHint;
+    if (arch === 'x86_64') {
+      if (go) return { argRegs: ['rax', 'rbx', 'rcx', 'rdi', 'rsi', 'r8', 'r9', 'r10', 'r11'], retReg: 'rax', name: 'go-regabi-amd64', win64: false };
+      if (this.img.format === 'pe') return { argRegs: ['rcx', 'rdx', 'r8', 'r9'], retReg: 'rax', name: 'win64', win64: true };
+      return { argRegs: ['rdi', 'rsi', 'rdx', 'rcx', 'r8', 'r9'], retReg: 'rax', name: 'sysv', win64: false };
+    }
+    if (arch === 'arm64') return { argRegs: Array.from({ length: go ? 16 : 8 }, (_, i) => 'x' + i), retReg: 'x0', name: go ? 'go-regabi-arm64' : 'aapcs64', win64: false };
+    if (arch === 'arm') return { argRegs: ['r0', 'r1', 'r2', 'r3'], retReg: 'r0', name: 'aapcs', win64: false };
+    return { argRegs: [], retReg: 'eax', name: 'cdecl', win64: false };
+  }
+
+  /** True when addr is in a section that is not writable at run time (.rodata, .data.rel.ro after relro, __const, .rdata). */
+  isReadOnly(addr: number): boolean {
+    const r = this.mem.find(addr);
+    if (!r) return false;
+    if (!r.write) return true;
+    return /^(\.data\.rel\.ro|__const|__DATA_CONST|\.got)/.test(r.name) || r.name === '__auth_got' || r.name === '__got';
+  }
+
+  /** Value flow facts for a function (cached, bounded). */
+  flow(addr: number): FlowResult | undefined {
+    const c = this.flowCache.get(addr);
+    if (c) return c;
+    const af = this.analyze(addr);
+    if (!af) return undefined;
+    const abi = this.abi();
+    const res = analyzeFlow(af, this.img.arch, {
+      argRegs: abi.argRegs, retReg: abi.retReg, win64: abi.win64,
+      readConst: (a, w) => (w === this.img.bits / 8 && this.isReadOnly(a) ? this.readPtr(a) : undefined),
+      maxIterations: Math.max(2000, af.blocks.length * 12),
+    });
+    this.flowCache.set(addr, res);
+    if (this.flowCache.size > 64) this.flowCache.delete(this.flowCache.keys().next().value as number);
+    return res;
+  }
+
+  private vtableList: { addr: number; slots: number[]; name?: string }[] | undefined;
+
+  /** Tables of code pointers in read only data: C++ vtables (named by _ZTV symbols when present) and similar dispatch tables. */
+  vtables(): { addr: number; slots: number[]; name?: string }[] {
+    if (this.vtableList) return this.vtableList;
+    const out: { addr: number; slots: number[]; name?: string }[] = [];
+    const ptr = this.img.bits / 8;
+    const isFn = (v: number | undefined) => v !== undefined && v !== 0 && this.mem.isExec(v) && (this.functions.has(v) || this.symAt.get(v)?.kind === 'func' || this.importByStub.has(v));
+    const named = this.img.symbols.filter((s) => s.name.startsWith('_ZTV') || s.name.startsWith('__ZTV') || s.name.startsWith('go:itab.') || s.name.startsWith('go.itab.'));
+    if (named.length) {
+      for (const s of named.slice(0, 20000)) {
+        const go = s.name.includes('itab');
+        const first = s.addr + (go ? 3 * ptr : 2 * ptr);
+        const slots: number[] = [];
+        const n = s.size ? Math.min(512, Math.floor((s.addr + s.size - first) / ptr)) : 512;
+        for (let i = 0; i < n; i++) { const v = this.readPtr(first + i * ptr); if (!v || !this.mem.isExec(v)) break; slots.push(v); }
+        if (slots.length) out.push({ addr: first, slots, name: s.name });
+      }
+    } else {
+      // unnamed: runs of function pointers in read only data
+      this.discover();
+      for (const r of this.mem.regions) {
+        if (r.exec || r.fsize === 0 || !this.isReadOnly(r.start) || !/rel\.ro|const|rodata|rdata/.test(r.name)) continue;
+        let run: number[] = [];
+        let runStart = 0;
+        // Itanium shape: [offset to top: 0 or a small negative][RTTI pointer or 0][slots...]; MSVC: [RTTI locator][slots...]
+        const header = (a: number) => {
+          const rtti = this.readPtr(a - ptr);
+          const rttiOk = rtti === 0 || (rtti !== undefined && this.mem.isMapped(rtti) && !this.mem.isExec(rtti));
+          if (this.img.format === 'pe') return rttiOk;
+          const top = this.readPtr(a - 2 * ptr);
+          const topOk = top !== undefined && (top === 0 || (ptr === 8 ? top > 2 ** 64 - 2 ** 20 : top > 2 ** 32 - 2 ** 20));
+          return rttiOk && topOk;
+        };
+        const flush = () => { if (run.length >= 1 && header(runStart)) out.push({ addr: runStart, slots: run }); run = []; };
+        for (let a = r.start; a + ptr <= r.end && out.length < 20000; a += ptr) {
+          const v = this.readPtr(a);
+          if (isFn(v)) { if (!run.length) runStart = a; run.push(v!); } else flush();
+        }
+        flush();
+      }
+    }
+    this.vtableList = out;
+    return out;
+  }
+
+  private resolved = new Set<number>();
+
+  /** Resolve indirect calls of a function with the value tracker: constant targets, read only
+   * function pointers, initial values of writable pointers, and vtable/itab slot candidates. */
+  resolveIndirect(addr: number): AnalyzedFunction | undefined {
+    const af = this.analyze(addr);
+    if (!af || this.resolved.has(addr)) return af;
+    this.resolved.add(addr);
+    const tailBlocks = af.blocks.filter((b) => b.exit === 'indirect' && b.insns[b.insns.length - 1]!.flow === 'ijump');
+    if (!tailBlocks.length && !af.calls.some((c) => c.indirect && c.target === undefined && !c.candidates && !c.name)) return af;
+    const fl = this.flow(addr);
+    if (!fl) return af;
+    for (const b of tailBlocks) {
+      const at = b.insns[b.insns.length - 1]!.address;
+      const r = this.targetsOf(fl.calls.get(at)?.target, this.img.bits / 8);
+      if (!r || !r.targets.every((t) => this.functions.has(t) || this.importByStub.has(t) || !(b.start >= addr && t >= addr && t < addr + (af.size ?? af.codeSize)))) continue;
+      b.exit = 'tail';
+      if (r.targets.length === 1 && r.how !== 'vtable') af.calls.push({ at, target: r.targets[0], name: this.nameOf(r.targets[0]!), indirect: true, tail: true, resolvedBy: r.how });
+      else af.calls.push({ at, indirect: true, tail: true, candidates: r.targets, resolvedBy: r.how });
+      if (af.unresolvedIndirect > 0) af.unresolvedIndirect--;
+    }
+    af.calls.sort((x, y) => x.at - y.at);
+    const ptr = this.img.bits / 8;
+    for (const c of af.calls) {
+      if (!c.indirect || c.target !== undefined || c.candidates || c.name) continue;
+      const r = this.targetsOf(fl.calls.get(c.at)?.target, ptr);
+      if (!r) continue;
+      if (r.targets.length === 1 && r.how !== 'vtable') { c.target = r.targets[0]; c.name = this.nameOf(r.targets[0]!); c.resolvedBy = r.how; }
+      else { c.candidates = r.targets; c.resolvedBy = r.how; }
+      if (af.unresolvedIndirect > 0) af.unresolvedIndirect--;
+    }
+    return af;
+  }
+
+  private targetsOf(v: Val | undefined, ptr: number): { targets: number[]; how: 'constant' | 'initial-value' | 'vtable' } | undefined {
+    if (!v) return undefined;
+    const exec = (x: number) => this.mem.isExec(x);
+    if (v.t === 'const') return exec(v.v) ? { targets: [v.v], how: 'constant' } : undefined;
+    if (v.t === 'phi') {
+      const ts = v.vals.map((x) => (x.t === 'const' && exec(x.v) ? x.v : undefined));
+      return ts.every((x) => x !== undefined) ? { targets: [...new Set(ts as number[])], how: 'constant' } : undefined;
+    }
+    if (v.t !== 'load') return undefined;
+    const a = v.addr;
+    if (a.t === 'const') {
+      const p = this.readPtr(a.v);
+      if (p !== undefined && exec(p)) return { targets: [p], how: this.isReadOnly(a.v) ? 'constant' : 'initial-value' };
+      return undefined;
+    }
+    // load(load(obj) + off): a call through the object's vtable; every vtable's slot off / ptr is a candidate
+    let vptr: Val | undefined;
+    let off = 0;
+    if (a.t === 'load') { vptr = a; off = 0; }
+    else if (a.t === 'sum' && a.base.t === 'load') { vptr = a.base; off = a.k; }
+    if (!vptr || off < 0 || off % ptr !== 0) return undefined;
+    // Go interface calls go through itabs, whose method sets are not tied to one slot layout: no class hierarchy guess there
+    if (this.img.goVersionHint) return undefined;
+    const slot = off / ptr;
+    const tables = this.vtables().filter((t) => t.name === undefined || /^_?_ZTV/.test(t.name));
+    const cands = [...new Set(tables.map((t) => t.slots[slot]).filter((x): x is number => x !== undefined))];
+    if (!cands.length || cands.length > 64) return undefined;
+    return { targets: cands, how: 'vtable' };
+  }
+
+  /** Reads a pointer sized value, applying load time relocations. */
+  readPtr(a: number): number | undefined { return this.readUint(a, this.img.bits / 8); }
+
+  /** Reads an unsigned integer of w (1, 2, 4 or 8) bytes in the image's byte order. */
+  readUint(a: number, w: number): number | undefined {
+    if (w === this.img.bits / 8 && this.img.relocPtrs) { const v = this.img.relocPtrs.get(a); if (v !== undefined) return v; }
+    const b = this.mem.view(a, w);
+    if (b.length < w) return undefined;
+    const dv = new DataView(b.buffer, b.byteOffset, w);
+    const le = this.img.endian === 'le';
+    if (w === 1) return dv.getUint8(0);
+    if (w === 2) return dv.getUint16(0, le);
+    if (w === 4) return dv.getUint32(0, le);
+    if (w === 8) return Number(dv.getBigUint64(0, le));
+    return undefined;
   }
 
   private isGotLike(a: number): boolean {
@@ -582,7 +835,7 @@ export class Program {
       const s = stringAt(this.mem, addr);
       if (s) return { at, addr, kind: 'string', value: s.value };
       // one level of indirection: a pointer (GOT entry, literal pool, string table) to a string
-      const p = this.mem.readPtr(addr, this.img.bits, this.img.endian === 'le');
+      const p = this.readPtr(addr);
       if (p !== undefined && p !== 0 && p !== addr && this.mem.isMapped(p) && !this.mem.isExec(p)) {
         const s2 = stringAt(this.mem, p);
         if (s2) return { at, addr: p, kind: 'string', value: s2.value };
@@ -624,12 +877,13 @@ export class Program {
       if (budget.expired) { complete = false; break; }
       const f = this.functions.get(a)!;
       if (f.isImportStub) { done.add(a); continue; }
-      const af = this.analyze(a);
+      const af = this.analyzeTransient(a);
       done.add(a);
       analyzed++;
       if (!af) continue;
       for (const c of af.calls) {
         if (c.target !== undefined) add(c.target, c.at, a, c.tail ? 'jump' : 'call');
+        else if (c.candidates) for (const t of c.candidates.slice(0, 64)) add(t, c.at, a, 'indirect-call');
       }
       for (const b of af.blocks) {
         const last = b.insns[b.insns.length - 1]!;

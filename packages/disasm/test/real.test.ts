@@ -173,7 +173,8 @@ test('pseudocode: structured if/else and loops with inlined calls and strings', 
   assert.match(sum.pseudocode, /do \{|while \(/);
   assert.ok(sum.summary.loops >= 1);
   const d2 = await disasmPseudocode({ path: P('hello-x64.elf'), function: 'deep2' });
-  assert.match(d2.pseudocode, /if \(edi >= 2\) \{[\s\S]*return deep3\(\);/);
+  // deep2(int v): the parameter is named a1 and the void return type is recovered
+  assert.match(d2.pseudocode, /void deep2\(int64_t a1\) \{\n  if \(a1 >= 2\) \{[\s\S]*return deep3\(\);/);
   assert.equal(d2.gotos, 0);
   const cp = await disasmPseudocode({ path: P('hello-thumb-static.elf'), function: 'check_password' });
   assert.match(cp.pseudocode, /"revlens-secret-key"/);

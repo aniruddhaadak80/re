@@ -1,0 +1,2641 @@
+{
+"lua-x64-stripped.elf": {
+"functions": {
+"GCTM": {
+"addr": 16965008,
+"size": 322
+},
+"__libc_csu_fini": {
+"addr": 17035232,
+"size": 6
+},
+"__libc_csu_init": {
+"addr": 17035120,
+"size": 102
+},
+"_start": {
+"addr": 16836656,
+"size": 43
+},
+"addk": {
+"addr": 17004048,
+"size": 485
+},
+"addnum2buff": {
+"addr": 16927616,
+"size": 247
+},
+"addstr2buff": {
+"addr": 16927264,
+"size": 337
+},
+"adjustlocalvars": {
+"addr": 16917328,
+"size": 532
+},
+"arith": {
+"addr": 16898768,
+"size": 374
+},
+"arith_add": {
+"addr": 16898512,
+"size": 25
+},
+"arith_div": {
+"addr": 16898672,
+"size": 28
+},
+"arith_idiv": {
+"addr": 16898704,
+"size": 28
+},
+"arith_mod": {
+"addr": 16898608,
+"size": 28
+},
+"arith_mul": {
+"addr": 16898576,
+"size": 28
+},
+"arith_pow": {
+"addr": 16898640,
+"size": 28
+},
+"arith_sub": {
+"addr": 16898544,
+"size": 28
+},
+"arith_unm": {
+"addr": 16898736,
+"size": 28
+},
+"atomic": {
+"addr": 16958960,
+"size": 1529
+},
+"atomic2gen": {
+"addr": 16960496,
+"size": 566
+},
+"aux_lines": {
+"addr": 16947888,
+"size": 141
+},
+"aux_rawset": {
+"addr": 17030256,
+"size": 238
+},
+"auxresume": {
+"addr": 16989568,
+"size": 177
+},
+"auxsetstr": {
+"addr": 17029216,
+"size": 191
+},
+"auxsort": {
+"addr": 16874528,
+"size": 1059
+},
+"basicgetobjname": {
+"addr": 16983264,
+"size": 563
+},
+"body": {
+"addr": 16915344,
+"size": 1159
+},
+"boxgc": {
+"addr": 17020304,
+"size": 80
+},
+"byteoffset": {
+"addr": 16858832,
+"size": 405
+},
+"callbinTM": {
+"addr": 16870496,
+"size": 389
+},
+"check_match": {
+"addr": 16913104,
+"size": 122
+},
+"check_next1": {
+"addr": 16943936,
+"size": 67
+},
+"check_next2": {
+"addr": 16945024,
+"size": 196
+},
+"checkformat": {
+"addr": 16896848,
+"size": 257
+},
+"checktab": {
+"addr": 16874288,
+"size": 238
+},
+"clearbyvalues": {
+"addr": 16961328,
+"size": 468
+},
+"close_func": {
+"addr": 16905552,
+"size": 388
+},
+"close_state": {
+"addr": 16903840,
+"size": 235
+},
+"closepaux": {
+"addr": 16975040,
+"size": 21
+},
+"codebinexpval": {
+"addr": 17003056,
+"size": 154
+},
+"codepoint": {
+"addr": 16859248,
+"size": 580
+},
+"constfolding": {
+"addr": 16998352,
+"size": 351
+},
+"constructor": {
+"addr": 16914768,
+"size": 561
+},
+"correctgraylist": {
+"addr": 16964800,
+"size": 205
+},
+"correctstack": {
+"addr": 16970288,
+"size": 105
+},
+"createlabel": {
+"addr": 16919376,
+"size": 547
+},
+"db_debug": {
+"addr": 16988160,
+"size": 341
+},
+"db_gethook": {
+"addr": 16984048,
+"size": 374
+},
+"db_getinfo": {
+"addr": 16984432,
+"size": 1216
+},
+"db_getlocal": {
+"addr": 16985648,
+"size": 344
+},
+"db_getmetatable": {
+"addr": 16986032,
+"size": 56
+},
+"db_getregistry": {
+"addr": 16986000,
+"size": 21
+},
+"db_getupvalue": {
+"addr": 16986096,
+"size": 116
+},
+"db_getuservalue": {
+"addr": 16983920,
+"size": 119
+},
+"db_setcstacklimit": {
+"addr": 16987952,
+"size": 52
+},
+"db_sethook": {
+"addr": 16986720,
+"size": 487
+},
+"db_setlocal": {
+"addr": 16987216,
+"size": 315
+},
+"db_setmetatable": {
+"addr": 16987536,
+"size": 88
+},
+"db_setupvalue": {
+"addr": 16987632,
+"size": 132
+},
+"db_setuservalue": {
+"addr": 16986608,
+"size": 110
+},
+"db_traceback": {
+"addr": 16987776,
+"size": 172
+},
+"db_upvalueid": {
+"addr": 16986512,
+"size": 90
+},
+"db_upvaluejoin": {
+"addr": 16986224,
+"size": 282
+},
+"discharge2reg": {
+"addr": 17004544,
+"size": 644
+},
+"doREPL": {
+"addr": 16867552,
+"size": 881
+},
+"docall": {
+"addr": 16868592,
+"size": 253
+},
+"dofilecont": {
+"addr": 17010256,
+"size": 14
+},
+"dostring": {
+"addr": 16868448,
+"size": 142
+},
+"dothecall": {
+"addr": 16965344,
+"size": 20
+},
+"dumpFunction": {
+"addr": 16967344,
+"size": 1898
+},
+"dumpString": {
+"addr": 16969248,
+"size": 211
+},
+"entergen": {
+"addr": 16953824,
+"size": 152
+},
+"errfile": {
+"addr": 17017040,
+"size": 158
+},
+"error": {
+"addr": 16865024,
+"size": 46
+},
+"error_expected": {
+"addr": 16920144,
+"size": 50
+},
+"errorlimit": {
+"addr": 16905952,
+"size": 104
+},
+"exp2RK": {
+"addr": 16999120,
+"size": 115
+},
+"exp2reg": {
+"addr": 16993488,
+"size": 865
+},
+"explist": {
+"addr": 16919264,
+"size": 106
+},
+"f_call": {
+"addr": 17031712,
+"size": 19
+},
+"f_close": {
+"addr": 16947360,
+"size": 103
+},
+"f_flush": {
+"addr": 16951472,
+"size": 103
+},
+"f_gc": {
+"addr": 16951024,
+"size": 93
+},
+"f_lines": {
+"addr": 16951392,
+"size": 74
+},
+"f_luaopen": {
+"addr": 16903520,
+"size": 311
+},
+"f_parser": {
+"addr": 16975584,
+"size": 226
+},
+"f_read": {
+"addr": 16951216,
+"size": 79
+},
+"f_seek": {
+"addr": 16951584,
+"size": 209
+},
+"f_setvbuf": {
+"addr": 16951808,
+"size": 178
+},
+"f_tostring": {
+"addr": 16951120,
+"size": 82
+},
+"f_write": {
+"addr": 16951296,
+"size": 95
+},
+"findfield": {
+"addr": 17020016,
+"size": 278
+},
+"finishbinexpneg": {
+"addr": 17002912,
+"size": 144
+},
+"finishbinexpval": {
+"addr": 17005536,
+"size": 608
+},
+"finishgencycle": {
+"addr": 16964544,
+"size": 253
+},
+"finishpcall": {
+"addr": 17010592,
+"size": 58
+},
+"forbody": {
+"addr": 16920208,
+"size": 582
+},
+"freehash": {
+"addr": 16877792,
+"size": 44
+},
+"freeobj": {
+"addr": 16958736,
+"size": 213
+},
+"funcargs": {
+"addr": 16917872,
+"size": 402
+},
+"funcnamefromcall": {
+"addr": 16979904,
+"size": 254
+},
+"g_iofile": {
+"addr": 16947472,
+"size": 170
+},
+"g_read": {
+"addr": 16948416,
+"size": 1892
+},
+"g_write": {
+"addr": 16950752,
+"size": 269
+},
+"gctm": {
+"addr": 16929472,
+"size": 95
+},
+"generic_reader": {
+"addr": 17010368,
+"size": 194
+},
+"getF": {
+"addr": 17017344,
+"size": 87
+},
+"getS": {
+"addr": 17017488,
+"size": 33
+},
+"getdetails": {
+"addr": 16897360,
+"size": 220
+},
+"getfield": {
+"addr": 16923824,
+"size": 198
+},
+"getgeneric": {
+"addr": 16878528,
+"size": 188
+},
+"gethexa": {
+"addr": 16944752,
+"size": 264
+},
+"getobjname": {
+"addr": 16982768,
+"size": 484
+},
+"getoption": {
+"addr": 16897584,
+"size": 926
+},
+"gmatch": {
+"addr": 16886272,
+"size": 256
+},
+"gmatch_aux": {
+"addr": 16897120,
+"size": 226
+},
+"hookf": {
+"addr": 16988016,
+"size": 134
+},
+"inclinenumber": {
+"addr": 16942624,
+"size": 134
+},
+"intarith": {
+"addr": 16924656,
+"size": 115
+},
+"interror": {
+"addr": 17015264,
+"size": 72
+},
+"io_close": {
+"addr": 16945728,
+"size": 141
+},
+"io_fclose": {
+"addr": 16947808,
+"size": 71
+},
+"io_flush": {
+"addr": 16945872,
+"size": 123
+},
+"io_input": {
+"addr": 16946000,
+"size": 30
+},
+"io_lines": {
+"addr": 16946032,
+"size": 285
+},
+"io_noclose": {
+"addr": 16952000,
+"size": 72
+},
+"io_open": {
+"addr": 16946320,
+"size": 305
+},
+"io_output": {
+"addr": 16946640,
+"size": 30
+},
+"io_pclose": {
+"addr": 16950688,
+"size": 63
+},
+"io_popen": {
+"addr": 16946672,
+"size": 221
+},
+"io_read": {
+"addr": 16946896,
+"size": 99
+},
+"io_readline": {
+"addr": 16948032,
+"size": 372
+},
+"io_tmpfile": {
+"addr": 16947008,
+"size": 116
+},
+"io_type": {
+"addr": 16947136,
+"size": 97
+},
+"io_write": {
+"addr": 16947248,
+"size": 99
+},
+"ipairsaux": {
+"addr": 17010272,
+"size": 81
+},
+"iter_aux": {
+"addr": 16860864,
+"size": 386
+},
+"iter_auxlax": {
+"addr": 16860832,
+"size": 9
+},
+"iter_auxstrict": {
+"addr": 16860848,
+"size": 12
+},
+"iter_codes": {
+"addr": 16860688,
+"size": 129
+},
+"jumponcond": {
+"addr": 16996032,
+"size": 542
+},
+"jumpscopeerror": {
+"addr": 16920048,
+"size": 87
+},
+"l_alloc": {
+"addr": 17019744,
+"size": 29
+},
+"l_message": {
+"addr": 16869488,
+"size": 89
+},
+"laction": {
+"addr": 16868992,
+"size": 99
+},
+"leaveblock": {
+"addr": 16913232,
+"size": 594
+},
+"lessequalothers": {
+"addr": 16839344,
+"size": 219
+},
+"lessthanothers": {
+"addr": 16838768,
+"size": 207
+},
+"lexerror": {
+"addr": 16937216,
+"size": 328
+},
+"ll_loadlib": {
+"addr": 16929568,
+"size": 148
+},
+"ll_require": {
+"addr": 16931936,
+"size": 651
+},
+"ll_searchpath": {
+"addr": 16929728,
+"size": 178
+},
+"llex": {
+"addr": 16937904,
+"size": 4551
+},
+"loadFunction": {
+"addr": 16862064,
+"size": 2953
+},
+"loadStringN": {
+"addr": 16865072,
+"size": 350
+},
+"loadfunc": {
+"addr": 16931744,
+"size": 180
+},
+"lookforfunc": {
+"addr": 16929920,
+"size": 359
+},
+"lstop": {
+"addr": 16869104,
+"size": 43
+},
+"luaB_assert": {
+"addr": 17006272,
+"size": 123
+},
+"luaB_auxwrap": {
+"addr": 16989760,
+"size": 191
+},
+"luaB_close": {
+"addr": 16989328,
+"size": 233
+},
+"luaB_cocreate": {
+"addr": 16988592,
+"size": 75
+},
+"luaB_collectgarbage": {
+"addr": 17006400,
+"size": 499
+},
+"luaB_coresume": {
+"addr": 16988672,
+"size": 156
+},
+"luaB_corunning": {
+"addr": 16988832,
+"size": 36
+},
+"luaB_costatus": {
+"addr": 16988880,
+"size": 182
+},
+"luaB_cowrap": {
+"addr": 16989072,
+"size": 95
+},
+"luaB_dofile": {
+"addr": 17006912,
+"size": 109
+},
+"luaB_error": {
+"addr": 17007024,
+"size": 122
+},
+"luaB_getmetatable": {
+"addr": 17007152,
+"size": 78
+},
+"luaB_ipairs": {
+"addr": 17007232,
+"size": 71
+},
+"luaB_load": {
+"addr": 17007520,
+"size": 342
+},
+"luaB_loadfile": {
+"addr": 17007312,
+"size": 201
+},
+"luaB_next": {
+"addr": 17007872,
+"size": 83
+},
+"luaB_pairs": {
+"addr": 17007968,
+"size": 135
+},
+"luaB_pcall": {
+"addr": 17008112,
+"size": 140
+},
+"luaB_print": {
+"addr": 17008256,
+"size": 241
+},
+"luaB_rawequal": {
+"addr": 17008704,
+"size": 72
+},
+"luaB_rawget": {
+"addr": 17008880,
+"size": 75
+},
+"luaB_rawlen": {
+"addr": 17008784,
+"size": 85
+},
+"luaB_rawset": {
+"addr": 17008960,
+"size": 88
+},
+"luaB_select": {
+"addr": 17009056,
+"size": 161
+},
+"luaB_setmetatable": {
+"addr": 17009232,
+"size": 155
+},
+"luaB_tonumber": {
+"addr": 17009392,
+"size": 539
+},
+"luaB_tostring": {
+"addr": 17009936,
+"size": 46
+},
+"luaB_type": {
+"addr": 17009984,
+"size": 84
+},
+"luaB_warn": {
+"addr": 17008512,
+"size": 187
+},
+"luaB_xpcall": {
+"addr": 17010080,
+"size": 169
+},
+"luaB_yield": {
+"addr": 16989168,
+"size": 34
+},
+"luaB_yieldable": {
+"addr": 16989216,
+"size": 99
+},
+"luaC_barrier_": {
+"addr": 16952496,
+"size": 81
+},
+"luaC_barrierback_": {
+"addr": 16952800,
+"size": 126
+},
+"luaC_changemode": {
+"addr": 16953600,
+"size": 222
+},
+"luaC_checkfinalizer": {
+"addr": 16953136,
+"size": 310
+},
+"luaC_fix": {
+"addr": 16952928,
+"size": 47
+},
+"luaC_freeallobjects": {
+"addr": 16953984,
+"size": 444
+},
+"luaC_fullgc": {
+"addr": 16958144,
+"size": 582
+},
+"luaC_newobj": {
+"addr": 16953072,
+"size": 58
+},
+"luaC_newobjdt": {
+"addr": 16952976,
+"size": 82
+},
+"luaC_runtilstate": {
+"addr": 16954432,
+"size": 61
+},
+"luaC_step": {
+"addr": 16955808,
+"size": 2333
+},
+"luaD_call": {
+"addr": 16973696,
+"size": 155
+},
+"luaD_callnoyield": {
+"addr": 16973856,
+"size": 160
+},
+"luaD_closeprotected": {
+"addr": 16974896,
+"size": 134
+},
+"luaD_growstack": {
+"addr": 16970400,
+"size": 151
+},
+"luaD_hook": {
+"addr": 16970800,
+"size": 298
+},
+"luaD_hookcall": {
+"addr": 16971104,
+"size": 90
+},
+"luaD_inctop": {
+"addr": 16970720,
+"size": 65
+},
+"luaD_pcall": {
+"addr": 16975072,
+"size": 132
+},
+"luaD_poscall": {
+"addr": 16971200,
+"size": 645
+},
+"luaD_precall": {
+"addr": 16973216,
+"size": 467
+},
+"luaD_pretailcall": {
+"addr": 16972048,
+"size": 689
+},
+"luaD_protectedparser": {
+"addr": 16975216,
+"size": 367
+},
+"luaD_rawrunprotected": {
+"addr": 16969744,
+"size": 125
+},
+"luaD_reallocstack": {
+"addr": 16969872,
+"size": 414
+},
+"luaD_seterrorobj": {
+"addr": 16969472,
+"size": 118
+},
+"luaD_shrinkstack": {
+"addr": 16970560,
+"size": 155
+},
+"luaD_throw": {
+"addr": 16969600,
+"size": 131
+},
+"luaE_checkcstack": {
+"addr": 16901744,
+"size": 51
+},
+"luaE_extendCI": {
+"addr": 16901568,
+"size": 60
+},
+"luaE_freethread": {
+"addr": 16902304,
+"size": 184
+},
+"luaE_incCstack": {
+"addr": 16901808,
+"size": 39
+},
+"luaE_resetthread": {
+"addr": 16902496,
+"size": 144
+},
+"luaE_setdebt": {
+"addr": 16901504,
+"size": 45
+},
+"luaE_shrinkCI": {
+"addr": 16901632,
+"size": 106
+},
+"luaE_warnerror": {
+"addr": 16904144,
+"size": 252
+},
+"luaE_warning": {
+"addr": 16904112,
+"size": 32
+},
+"luaF_close": {
+"addr": 16966176,
+"size": 430
+},
+"luaF_closeupval": {
+"addr": 16966032,
+"size": 137
+},
+"luaF_findupval": {
+"addr": 16965648,
+"size": 172
+},
+"luaF_freeproto": {
+"addr": 16966688,
+"size": 166
+},
+"luaF_getlocalname": {
+"addr": 16966864,
+"size": 73
+},
+"luaF_initupvals": {
+"addr": 16965520,
+"size": 119
+},
+"luaF_newCclosure": {
+"addr": 16965376,
+"size": 39
+},
+"luaF_newLclosure": {
+"addr": 16965424,
+"size": 90
+},
+"luaF_newproto": {
+"addr": 16966608,
+"size": 65
+},
+"luaF_newtbcupval": {
+"addr": 16965824,
+"size": 173
+},
+"luaF_unlinkupval": {
+"addr": 16966000,
+"size": 30
+},
+"luaG_addinfo": {
+"addr": 16981088,
+"size": 105
+},
+"luaG_callerror": {
+"addr": 16979792,
+"size": 101
+},
+"luaG_concaterror": {
+"addr": 16980848,
+"size": 30
+},
+"luaG_errormsg": {
+"addr": 16981200,
+"size": 103
+},
+"luaG_findlocal": {
+"addr": 16976720,
+"size": 245
+},
+"luaG_forerror": {
+"addr": 16980160,
+"size": 41
+},
+"luaG_getfuncline": {
+"addr": 16976128,
+"size": 306
+},
+"luaG_opinterror": {
+"addr": 16980880,
+"size": 24
+},
+"luaG_ordererror": {
+"addr": 16980992,
+"size": 96
+},
+"luaG_runerror": {
+"addr": 16980208,
+"size": 638
+},
+"luaG_tointerror": {
+"addr": 16980912,
+"size": 70
+},
+"luaG_tracecall": {
+"addr": 16981312,
+"size": 68
+},
+"luaG_traceexec": {
+"addr": 16981392,
+"size": 1365
+},
+"luaG_typeerror": {
+"addr": 16979440,
+"size": 41
+},
+"luaH_finishset": {
+"addr": 16879312,
+"size": 32
+},
+"luaH_free": {
+"addr": 16877952,
+"size": 144
+},
+"luaH_get": {
+"addr": 16878720,
+"size": 582
+},
+"luaH_getint": {
+"addr": 16878096,
+"size": 196
+},
+"luaH_getn": {
+"addr": 16881184,
+"size": 1400
+},
+"luaH_getshortstr": {
+"addr": 16878304,
+"size": 84
+},
+"luaH_getstr": {
+"addr": 16878400,
+"size": 126
+},
+"luaH_new": {
+"addr": 16877888,
+"size": 60
+},
+"luaH_newkey": {
+"addr": 16879344,
+"size": 1741
+},
+"luaH_next": {
+"addr": 16875840,
+"size": 383
+},
+"luaH_realasize": {
+"addr": 16875776,
+"size": 59
+},
+"luaH_resize": {
+"addr": 16876224,
+"size": 1277
+},
+"luaH_resizearray": {
+"addr": 16877840,
+"size": 38
+},
+"luaH_set": {
+"addr": 16881088,
+"size": 87
+},
+"luaH_setint": {
+"addr": 16877504,
+"size": 284
+},
+"luaK_checkstack": {
+"addr": 16991920,
+"size": 48
+},
+"luaK_code": {
+"addr": 16991424,
+"size": 119
+},
+"luaK_codeABCk": {
+"addr": 16990448,
+"size": 144
+},
+"luaK_codeABx": {
+"addr": 16991776,
+"size": 131
+},
+"luaK_codek": {
+"addr": 16992240,
+"size": 319
+},
+"luaK_concat": {
+"addr": 16990592,
+"size": 142
+},
+"luaK_dischargevars": {
+"addr": 16992752,
+"size": 599
+},
+"luaK_exp2K": {
+"addr": 17005200,
+"size": 324
+},
+"luaK_exp2anyreg": {
+"addr": 16994368,
+"size": 101
+},
+"luaK_exp2anyregup": {
+"addr": 16994480,
+"size": 126
+},
+"luaK_exp2const": {
+"addr": 16989968,
+"size": 135
+},
+"luaK_exp2nextreg": {
+"addr": 16993360,
+"size": 116
+},
+"luaK_exp2val": {
+"addr": 16994608,
+"size": 115
+},
+"luaK_finish": {
+"addr": 17003712,
+"size": 322
+},
+"luaK_fixline": {
+"addr": 17003216,
+"size": 54
+},
+"luaK_getlabel": {
+"addr": 16991024,
+"size": 12
+},
+"luaK_goiffalse": {
+"addr": 16996576,
+"size": 241
+},
+"luaK_goiftrue": {
+"addr": 16995712,
+"size": 306
+},
+"luaK_indexed": {
+"addr": 16996832,
+"size": 475
+},
+"luaK_infix": {
+"addr": 16998704,
+"size": 401
+},
+"luaK_int": {
+"addr": 16992032,
+"size": 205
+},
+"luaK_jump": {
+"addr": 16990736,
+"size": 118
+},
+"luaK_nil": {
+"addr": 16990112,
+"size": 326
+},
+"luaK_patchlist": {
+"addr": 16991040,
+"size": 15
+},
+"luaK_patchtohere": {
+"addr": 16991392,
+"size": 24
+},
+"luaK_posfix": {
+"addr": 16999248,
+"size": 3654
+},
+"luaK_prefix": {
+"addr": 16997312,
+"size": 1030
+},
+"luaK_reserveregs": {
+"addr": 16991968,
+"size": 59
+},
+"luaK_ret": {
+"addr": 16990864,
+"size": 153
+},
+"luaK_self": {
+"addr": 16995328,
+"size": 372
+},
+"luaK_semerror": {
+"addr": 16989952,
+"size": 16
+},
+"luaK_setlist": {
+"addr": 17003408,
+"size": 297
+},
+"luaK_setoneret": {
+"addr": 16992672,
+"size": 71
+},
+"luaK_setreturns": {
+"addr": 16992560,
+"size": 106
+},
+"luaK_settablesize": {
+"addr": 17003280,
+"size": 124
+},
+"luaK_storevar": {
+"addr": 16994736,
+"size": 589
+},
+"luaL_addgsub": {
+"addr": 17019152,
+"size": 266
+},
+"luaL_addlstring": {
+"addr": 17015920,
+"size": 66
+},
+"luaL_addstring": {
+"addr": 17012000,
+"size": 77
+},
+"luaL_addvalue": {
+"addr": 17012096,
+"size": 101
+},
+"luaL_argerror": {
+"addr": 17012304,
+"size": 250
+},
+"luaL_buffinit": {
+"addr": 17011952,
+"size": 37
+},
+"luaL_buffinitsize": {
+"addr": 17016096,
+"size": 65
+},
+"luaL_callmeta": {
+"addr": 17017616,
+"size": 168
+},
+"luaL_checkany": {
+"addr": 17014960,
+"size": 48
+},
+"luaL_checkinteger": {
+"addr": 17015200,
+"size": 58
+},
+"luaL_checklstring": {
+"addr": 17014720,
+"size": 70
+},
+"luaL_checknumber": {
+"addr": 17015008,
+"size": 78
+},
+"luaL_checkoption": {
+"addr": 17014384,
+"size": 205
+},
+"luaL_checkstack": {
+"addr": 17014800,
+"size": 77
+},
+"luaL_checktype": {
+"addr": 17014880,
+"size": 73
+},
+"luaL_checkudata": {
+"addr": 17014240,
+"size": 141
+},
+"luaL_checkversion_": {
+"addr": 17019904,
+"size": 112
+},
+"luaL_error": {
+"addr": 17012560,
+"size": 270
+},
+"luaL_execresult": {
+"addr": 17013728,
+"size": 185
+},
+"luaL_fileresult": {
+"addr": 17013568,
+"size": 158
+},
+"luaL_getmetafield": {
+"addr": 17013328,
+"size": 121
+},
+"luaL_getsubtable": {
+"addr": 17018688,
+"size": 117
+},
+"luaL_gsub": {
+"addr": 17019424,
+"size": 229
+},
+"luaL_len": {
+"addr": 17017792,
+"size": 89
+},
+"luaL_loadbufferx": {
+"addr": 17017440,
+"size": 38
+},
+"luaL_loadfilex": {
+"addr": 17016528,
+"size": 505
+},
+"luaL_loadstring": {
+"addr": 17017536,
+"size": 67
+},
+"luaL_newmetatable": {
+"addr": 17013920,
+"size": 132
+},
+"luaL_newstate": {
+"addr": 17019664,
+"size": 71
+},
+"luaL_openlibs": {
+"addr": 16952080,
+"size": 412
+},
+"luaL_optinteger": {
+"addr": 17015344,
+"size": 79
+},
+"luaL_optlstring": {
+"addr": 17014592,
+"size": 127
+},
+"luaL_optnumber": {
+"addr": 17015088,
+"size": 102
+},
+"luaL_prepbuffsize": {
+"addr": 17012080,
+"size": 15
+},
+"luaL_pushresult": {
+"addr": 17012208,
+"size": 86
+},
+"luaL_pushresultsize": {
+"addr": 17016000,
+"size": 93
+},
+"luaL_ref": {
+"addr": 17016176,
+"size": 234
+},
+"luaL_requiref": {
+"addr": 17018816,
+"size": 331
+},
+"luaL_setfuncs": {
+"addr": 17018464,
+"size": 223
+},
+"luaL_setmetatable": {
+"addr": 17014064,
+"size": 41
+},
+"luaL_testudata": {
+"addr": 17014112,
+"size": 119
+},
+"luaL_tolstring": {
+"addr": 17017888,
+"size": 568
+},
+"luaL_traceback": {
+"addr": 17010656,
+"size": 1296
+},
+"luaL_typeerror": {
+"addr": 17013104,
+"size": 218
+},
+"luaL_unref": {
+"addr": 17016416,
+"size": 98
+},
+"luaL_where": {
+"addr": 17013456,
+"size": 110
+},
+"luaM_free_": {
+"addr": 16933152,
+"size": 32
+},
+"luaM_growaux_": {
+"addr": 16932592,
+"size": 228
+},
+"luaM_malloc_": {
+"addr": 16933376,
+"size": 103
+},
+"luaM_realloc_": {
+"addr": 16933184,
+"size": 96
+},
+"luaM_saferealloc_": {
+"addr": 16932832,
+"size": 127
+},
+"luaM_shrinkvector_": {
+"addr": 16932960,
+"size": 159
+},
+"luaM_toobig": {
+"addr": 16933120,
+"size": 18
+},
+"luaO_arith": {
+"addr": 16924784,
+"size": 91
+},
+"luaO_ceillog2": {
+"addr": 16924032,
+"size": 69
+},
+"luaO_chunkid": {
+"addr": 16928016,
+"size": 319
+},
+"luaO_hexavalue": {
+"addr": 16924880,
+"size": 35
+},
+"luaO_pushfstring": {
+"addr": 16927872,
+"size": 132
+},
+"luaO_pushvfstring": {
+"addr": 16925904,
+"size": 1356
+},
+"luaO_rawarith": {
+"addr": 16924112,
+"size": 529
+},
+"luaO_str2num": {
+"addr": 16924928,
+"size": 652
+},
+"luaO_tostring": {
+"addr": 16925712,
+"size": 180
+},
+"luaO_utf8esc": {
+"addr": 16925584,
+"size": 123
+},
+"luaS_clearcache": {
+"addr": 16900016,
+"size": 90
+},
+"luaS_createlngstrobj": {
+"addr": 16900960,
+"size": 58
+},
+"luaS_eqlngstr": {
+"addr": 16899152,
+"size": 51
+},
+"luaS_hash": {
+"addr": 16899216,
+"size": 130
+},
+"luaS_hashlongstr": {
+"addr": 16899360,
+"size": 153
+},
+"luaS_init": {
+"addr": 16900112,
+"size": 202
+},
+"luaS_new": {
+"addr": 16901088,
+"size": 173
+},
+"luaS_newlstr": {
+"addr": 16900320,
+"size": 627
+},
+"luaS_newudata": {
+"addr": 16901264,
+"size": 231
+},
+"luaS_remove": {
+"addr": 16901024,
+"size": 59
+},
+"luaS_resize": {
+"addr": 16899520,
+"size": 332
+},
+"luaT_adjustvarargs": {
+"addr": 16871504,
+"size": 344
+},
+"luaT_callTM": {
+"addr": 16870096,
+"size": 101
+},
+"luaT_callTMres": {
+"addr": 16870208,
+"size": 158
+},
+"luaT_callorderTM": {
+"addr": 16871264,
+"size": 83
+},
+"luaT_callorderiTM": {
+"addr": 16871360,
+"size": 141
+},
+"luaT_gettm": {
+"addr": 16869824,
+"size": 47
+},
+"luaT_gettmbyobj": {
+"addr": 16869872,
+"size": 91
+},
+"luaT_getvarargs": {
+"addr": 16871856,
+"size": 441
+},
+"luaT_init": {
+"addr": 16869728,
+"size": 91
+},
+"luaT_objtypename": {
+"addr": 16869968,
+"size": 127
+},
+"luaT_trybinTM": {
+"addr": 16870368,
+"size": 122
+},
+"luaT_trybinassocTM": {
+"addr": 16870976,
+"size": 248
+},
+"luaT_trybiniTM": {
+"addr": 16871232,
+"size": 31
+},
+"luaT_tryconcatTM": {
+"addr": 16870896,
+"size": 74
+},
+"luaU_dump": {
+"addr": 16966944,
+"size": 388
+},
+"luaU_undump": {
+"addr": 16861264,
+"size": 794
+},
+"luaV_concat": {
+"addr": 16840240,
+"size": 801
+},
+"luaV_equalobj": {
+"addr": 16839568,
+"size": 660
+},
+"luaV_execute": {
+"addr": 16841872,
+"size": 16848
+},
+"luaV_finishOp": {
+"addr": 16841600,
+"size": 260
+},
+"luaV_finishget": {
+"addr": 16837664,
+"size": 300
+},
+"luaV_finishset": {
+"addr": 16837968,
+"size": 440
+},
+"luaV_flttointeger": {
+"addr": 16837120,
+"size": 125
+},
+"luaV_idiv": {
+"addr": 16841264,
+"size": 89
+},
+"luaV_lessequal": {
+"addr": 16838976,
+"size": 353
+},
+"luaV_lessthan": {
+"addr": 16838416,
+"size": 349
+},
+"luaV_mod": {
+"addr": 16841360,
+"size": 95
+},
+"luaV_modf": {
+"addr": 16841456,
+"size": 68
+},
+"luaV_objlen": {
+"addr": 16841056,
+"size": 204
+},
+"luaV_shiftl": {
+"addr": 16841536,
+"size": 49
+},
+"luaV_tointeger": {
+"addr": 16837424,
+"size": 239
+},
+"luaV_tointegerns": {
+"addr": 16837248,
+"size": 165
+},
+"luaV_tonumber_": {
+"addr": 16836976,
+"size": 133
+},
+"luaX_init": {
+"addr": 16936960,
+"size": 126
+},
+"luaX_lookahead": {
+"addr": 16942464,
+"size": 28
+},
+"luaX_newstring": {
+"addr": 16937552,
+"size": 134
+},
+"luaX_next": {
+"addr": 16937824,
+"size": 66
+},
+"luaX_setinput": {
+"addr": 16937696,
+"size": 128
+},
+"luaX_syntaxerror": {
+"addr": 16937200,
+"size": 12
+},
+"luaX_token2str": {
+"addr": 16937088,
+"size": 108
+},
+"luaY_nvarstack": {
+"addr": 16904400,
+"size": 70
+},
+"luaY_parser": {
+"addr": 16904480,
+"size": 1062
+},
+"luaZ_fill": {
+"addr": 16836704,
+"size": 73
+},
+"luaZ_init": {
+"addr": 16836784,
+"size": 24
+},
+"luaZ_read": {
+"addr": 16836816,
+"size": 160
+},
+"lua_absindex": {
+"addr": 17021136,
+"size": 36
+},
+"lua_arith": {
+"addr": 17023552,
+"size": 78
+},
+"lua_atpanic": {
+"addr": 17021088,
+"size": 24
+},
+"lua_callk": {
+"addr": 17031312,
+"size": 116
+},
+"lua_checkstack": {
+"addr": 17020784,
+"size": 93
+},
+"lua_close": {
+"addr": 16904080,
+"size": 21
+},
+"lua_closeslot": {
+"addr": 17021472,
+"size": 52
+},
+"lua_closethread": {
+"addr": 16902640,
+"size": 177
+},
+"lua_compare": {
+"addr": 17023632,
+"size": 365
+},
+"lua_concat": {
+"addr": 17033264,
+"size": 91
+},
+"lua_copy": {
+"addr": 17021792,
+"size": 326
+},
+"lua_createtable": {
+"addr": 17028592,
+"size": 113
+},
+"lua_dump": {
+"addr": 17031936,
+"size": 44
+},
+"lua_error": {
+"addr": 17032928,
+"size": 46
+},
+"lua_gc": {
+"addr": 17032000,
+"size": 917
+},
+"lua_getallocf": {
+"addr": 17033520,
+"size": 29
+},
+"lua_getfield": {
+"addr": 17027312,
+"size": 292
+},
+"lua_getglobal": {
+"addr": 17026880,
+"size": 168
+},
+"lua_gethook": {
+"addr": 16976560,
+"size": 13
+},
+"lua_gethookcount": {
+"addr": 16976592,
+"size": 12
+},
+"lua_gethookmask": {
+"addr": 16976576,
+"size": 12
+},
+"lua_geti": {
+"addr": 17027616,
+"size": 317
+},
+"lua_getinfo": {
+"addr": 16977536,
+"size": 1893
+},
+"lua_getiuservalue": {
+"addr": 17028944,
+"size": 231
+},
+"lua_getlocal": {
+"addr": 16976976,
+"size": 290
+},
+"lua_getmetatable": {
+"addr": 17028720,
+"size": 217
+},
+"lua_getstack": {
+"addr": 16976608,
+"size": 97
+},
+"lua_gettable": {
+"addr": 17027056,
+"size": 249
+},
+"lua_gettop": {
+"addr": 17021184,
+"size": 25
+},
+"lua_getupvalue": {
+"addr": 17033728,
+"size": 276
+},
+"lua_iscfunction": {
+"addr": 17022480,
+"size": 142
+},
+"lua_isinteger": {
+"addr": 17022624,
+"size": 132
+},
+"lua_isnumber": {
+"addr": 17022768,
+"size": 155
+},
+"lua_isstring": {
+"addr": 17022928,
+"size": 141
+},
+"lua_isuserdata": {
+"addr": 17023072,
+"size": 142
+},
+"lua_isyieldable": {
+"addr": 16974752,
+"size": 21
+},
+"lua_len": {
+"addr": 17033360,
+"size": 151
+},
+"lua_load": {
+"addr": 17031744,
+"size": 179
+},
+"lua_newstate": {
+"addr": 16902992,
+"size": 520
+},
+"lua_newthread": {
+"addr": 16901856,
+"size": 440
+},
+"lua_newuserdatauv": {
+"addr": 17033632,
+"size": 89
+},
+"lua_next": {
+"addr": 17032976,
+"size": 177
+},
+"lua_pcallk": {
+"addr": 17031440,
+"size": 261
+},
+"lua_pushboolean": {
+"addr": 17026768,
+"size": 28
+},
+"lua_pushcclosure": {
+"addr": 17026512,
+"size": 241
+},
+"lua_pushfstring": {
+"addr": 17026336,
+"size": 162
+},
+"lua_pushinteger": {
+"addr": 17026048,
+"size": 22
+},
+"lua_pushlightuserdata": {
+"addr": 17026800,
+"size": 22
+},
+"lua_pushlstring": {
+"addr": 17026080,
+"size": 97
+},
+"lua_pushnil": {
+"addr": 17025984,
+"size": 19
+},
+"lua_pushnumber": {
+"addr": 17026016,
+"size": 23
+},
+"lua_pushstring": {
+"addr": 17026192,
+"size": 93
+},
+"lua_pushthread": {
+"addr": 17026832,
+"size": 38
+},
+"lua_pushvalue": {
+"addr": 17022128,
+"size": 145
+},
+"lua_pushvfstring": {
+"addr": 17026288,
+"size": 46
+},
+"lua_rawequal": {
+"addr": 17023216,
+"size": 333
+},
+"lua_rawget": {
+"addr": 17027936,
+"size": 214
+},
+"lua_rawgeti": {
+"addr": 17028160,
+"size": 194
+},
+"lua_rawgetp": {
+"addr": 17028368,
+"size": 210
+},
+"lua_rawlen": {
+"addr": 17025056,
+"size": 185
+},
+"lua_rawset": {
+"addr": 17030224,
+"size": 20
+},
+"lua_rawseti": {
+"addr": 17030544,
+"size": 215
+},
+"lua_rawsetp": {
+"addr": 17030496,
+"size": 36
+},
+"lua_resetthread": {
+"addr": 16902832,
+"size": 160
+},
+"lua_resume": {
+"addr": 16974016,
+"size": 468
+},
+"lua_rotate": {
+"addr": 17021536,
+"size": 251
+},
+"lua_setallocf": {
+"addr": 17033552,
+"size": 17
+},
+"lua_setcstacklimit": {
+"addr": 16901552,
+"size": 11
+},
+"lua_setfield": {
+"addr": 17029712,
+"size": 148
+},
+"lua_setglobal": {
+"addr": 17029184,
+"size": 26
+},
+"lua_sethook": {
+"addr": 16976448,
+"size": 106
+},
+"lua_seti": {
+"addr": 17029872,
+"size": 352
+},
+"lua_setiuservalue": {
+"addr": 17031056,
+"size": 247
+},
+"lua_setlocal": {
+"addr": 16977280,
+"size": 247
+},
+"lua_setmetatable": {
+"addr": 17030768,
+"size": 285
+},
+"lua_settable": {
+"addr": 17029408,
+"size": 296
+},
+"lua_settop": {
+"addr": 17021216,
+"size": 256
+},
+"lua_setupvalue": {
+"addr": 17034016,
+"size": 326
+},
+"lua_setwarnf": {
+"addr": 17033584,
+"size": 24
+},
+"lua_status": {
+"addr": 17031984,
+"size": 10
+},
+"lua_stringtonumber": {
+"addr": 17024000,
+"size": 41
+},
+"lua_toboolean": {
+"addr": 17024480,
+"size": 142
+},
+"lua_tocfunction": {
+"addr": 17025248,
+"size": 153
+},
+"lua_toclose": {
+"addr": 17033168,
+"size": 85
+},
+"lua_tointegerx": {
+"addr": 17024256,
+"size": 215
+},
+"lua_tolstring": {
+"addr": 17024624,
+"size": 423
+},
+"lua_tonumberx": {
+"addr": 17024048,
+"size": 208
+},
+"lua_topointer": {
+"addr": 17025760,
+"size": 222
+},
+"lua_tothread": {
+"addr": 17025600,
+"size": 152
+},
+"lua_touserdata": {
+"addr": 17025408,
+"size": 183
+},
+"lua_type": {
+"addr": 17022288,
+"size": 152
+},
+"lua_typename": {
+"addr": 17022448,
+"size": 21
+},
+"lua_upvalueid": {
+"addr": 17034352,
+"size": 369
+},
+"lua_upvaluejoin": {
+"addr": 17034736,
+"size": 371
+},
+"lua_version": {
+"addr": 17021120,
+"size": 14
+},
+"lua_warning": {
+"addr": 17033616,
+"size": 10
+},
+"lua_xmove": {
+"addr": 17020880,
+"size": 196
+},
+"lua_yieldk": {
+"addr": 16974784,
+"size": 101
+},
+"luaopen_base": {
+"addr": 17006144,
+"size": 121
+},
+"luaopen_coroutine": {
+"addr": 16988512,
+"size": 71
+},
+"luaopen_debug": {
+"addr": 16983840,
+"size": 71
+},
+"luaopen_io": {
+"addr": 16945232,
+"size": 482
+},
+"luaopen_math": {
+"addr": 16933488,
+"size": 293
+},
+"luaopen_os": {
+"addr": 16921616,
+"size": 71
+},
+"luaopen_package": {
+"addr": 16928336,
+"size": 632
+},
+"luaopen_string": {
+"addr": 16882976,
+"size": 203
+},
+"luaopen_table": {
+"addr": 16872304,
+"size": 71
+},
+"luaopen_utf8": {
+"addr": 16858720,
+"size": 111
+},
+"main": {
+"addr": 16865424,
+"size": 248
+},
+"mainpositionTV": {
+"addr": 16882592,
+"size": 374
+},
+"markmt": {
+"addr": 16961072,
+"size": 256
+},
+"match": {
+"addr": 16894128,
+"size": 1857
+},
+"match_class": {
+"addr": 16896256,
+"size": 360
+},
+"math_abs": {
+"addr": 16933792,
+"size": 90
+},
+"math_acos": {
+"addr": 16933888,
+"size": 44
+},
+"math_asin": {
+"addr": 16933936,
+"size": 44
+},
+"math_atan": {
+"addr": 16933984,
+"size": 78
+},
+"math_ceil": {
+"addr": 16934064,
+"size": 115
+},
+"math_cos": {
+"addr": 16934192,
+"size": 44
+},
+"math_deg": {
+"addr": 16934240,
+"size": 47
+},
+"math_exp": {
+"addr": 16934288,
+"size": 44
+},
+"math_floor": {
+"addr": 16934416,
+"size": 115
+},
+"math_fmod": {
+"addr": 16934544,
+"size": 228
+},
+"math_log": {
+"addr": 16934848,
+"size": 179
+},
+"math_max": {
+"addr": 16935040,
+"size": 154
+},
+"math_min": {
+"addr": 16935200,
+"size": 154
+},
+"math_modf": {
+"addr": 16935360,
+"size": 176
+},
+"math_rad": {
+"addr": 16935536,
+"size": 47
+},
+"math_random": {
+"addr": 16936320,
+"size": 488
+},
+"math_randomseed": {
+"addr": 16936816,
+"size": 129
+},
+"math_sin": {
+"addr": 16935584,
+"size": 44
+},
+"math_sqrt": {
+"addr": 16935632,
+"size": 60
+},
+"math_tan": {
+"addr": 16935696,
+"size": 44
+},
+"math_toint": {
+"addr": 16934336,
+"size": 75
+},
+"math_type": {
+"addr": 16935744,
+"size": 92
+},
+"math_ult": {
+"addr": 16934784,
+"size": 63
+},
+"msghandler": {
+"addr": 16868848,
+"size": 142
+},
+"opencheck": {
+"addr": 16947648,
+"size": 150
+},
+"os_clock": {
+"addr": 16921696,
+"size": 47
+},
+"os_date": {
+"addr": 16921744,
+"size": 645
+},
+"os_difftime": {
+"addr": 16922400,
+"size": 65
+},
+"os_execute": {
+"addr": 16922480,
+"size": 80
+},
+"os_exit": {
+"addr": 16922560,
+"size": 104
+},
+"os_getenv": {
+"addr": 16922672,
+"size": 52
+},
+"os_remove": {
+"addr": 16922736,
+"size": 67
+},
+"os_rename": {
+"addr": 16922816,
+"size": 96
+},
+"os_setlocale": {
+"addr": 16922912,
+"size": 95
+},
+"os_time": {
+"addr": 16923008,
+"size": 380
+},
+"os_tmpname": {
+"addr": 16923392,
+"size": 87
+},
+"pairscont": {
+"addr": 17010576,
+"size": 11
+},
+"panic": {
+"addr": 17020576,
+"size": 92
+},
+"patchlistaux": {
+"addr": 16991056,
+"size": 331
+},
+"pmain": {
+"addr": 16865680,
+"size": 1857
+},
+"precallC": {
+"addr": 16972752,
+"size": 260
+},
+"prepbuffsize": {
+"addr": 17015424,
+"size": 491
+},
+"print_usage": {
+"addr": 16869584,
+"size": 136
+},
+"propagatemark": {
+"addr": 16961808,
+"size": 2009
+},
+"push_onecapture": {
+"addr": 16896624,
+"size": 218
+},
+"pushglobalfuncname": {
+"addr": 17012832,
+"size": 268
+},
+"pushline": {
+"addr": 16869152,
+"size": 329
+},
+"read_line": {
+"addr": 16950320,
+"size": 359
+},
+"read_long_string": {
+"addr": 16943136,
+"size": 798
+},
+"read_numeral": {
+"addr": 16944016,
+"size": 733
+},
+"reallymarkobject": {
+"addr": 16952592,
+"size": 204
+},
+"recfield": {
+"addr": 16917056,
+"size": 264
+},
+"restassign": {
+"addr": 16920800,
+"size": 808
+},
+"resume": {
+"addr": 16974496,
+"size": 248
+},
+"rethook": {
+"addr": 16971856,
+"size": 180
+},
+"save": {
+"addr": 16942496,
+"size": 119
+},
+"savelineinfo": {
+"addr": 16991552,
+"size": 222
+},
+"searcher_C": {
+"addr": 16931104,
+"size": 257
+},
+"searcher_Croot": {
+"addr": 16931376,
+"size": 354
+},
+"searcher_Lua": {
+"addr": 16930848,
+"size": 256
+},
+"searcher_preload": {
+"addr": 16930720,
+"size": 128
+},
+"searchpath": {
+"addr": 16930288,
+"size": 431
+},
+"setallfields": {
+"addr": 16923488,
+"size": 329
+},
+"setpath": {
+"addr": 16928976,
+"size": 483
+},
+"setseed": {
+"addr": 16935840,
+"size": 478
+},
+"singlematch": {
+"addr": 16896000,
+"size": 250
+},
+"singlestep": {
+"addr": 16954496,
+"size": 1301
+},
+"singlevar": {
+"addr": 16918288,
+"size": 164
+},
+"singlevaraux": {
+"addr": 16918464,
+"size": 785
+},
+"skip_sep": {
+"addr": 16942768,
+"size": 368
+},
+"skipcomment": {
+"addr": 17017200,
+"size": 144
+},
+"sort": {
+"addr": 16874128,
+"size": 150
+},
+"sort_comp": {
+"addr": 16875600,
+"size": 171
+},
+"statement": {
+"addr": 16906064,
+"size": 7038
+},
+"str_byte": {
+"addr": 16883184,
+"size": 270
+},
+"str_char": {
+"addr": 16883456,
+"size": 177
+},
+"str_dump": {
+"addr": 16883648,
+"size": 159
+},
+"str_find": {
+"addr": 16883808,
+"size": 15
+},
+"str_find_aux": {
+"addr": 16893216,
+"size": 903
+},
+"str_format": {
+"addr": 16883824,
+"size": 2435
+},
+"str_gsub": {
+"addr": 16886528,
+"size": 1655
+},
+"str_len": {
+"addr": 16888192,
+"size": 47
+},
+"str_lower": {
+"addr": 16888240,
+"size": 144
+},
+"str_match": {
+"addr": 16888384,
+"size": 12
+},
+"str_pack": {
+"addr": 16889264,
+"size": 1920
+},
+"str_packsize": {
+"addr": 16891184,
+"size": 241
+},
+"str_rep": {
+"addr": 16888400,
+"size": 343
+},
+"str_reverse": {
+"addr": 16888752,
+"size": 137
+},
+"str_sub": {
+"addr": 16888896,
+"size": 221
+},
+"str_unpack": {
+"addr": 16891440,
+"size": 1681
+},
+"str_upper": {
+"addr": 16889120,
+"size": 144
+},
+"subexpr": {
+"addr": 16913840,
+"size": 922
+},
+"suffixedexp": {
+"addr": 16916512,
+"size": 541
+},
+"sweeptolive": {
+"addr": 16953456,
+"size": 138
+},
+"tablerehash": {
+"addr": 16899856,
+"size": 154
+},
+"tconcat": {
+"addr": 16872384,
+"size": 405
+},
+"tinsert": {
+"addr": 16872800,
+"size": 239
+},
+"tmove": {
+"addr": 16873632,
+"size": 486
+},
+"tpack": {
+"addr": 16873040,
+"size": 133
+},
+"traverseephemeron": {
+"addr": 16963824,
+"size": 705
+},
+"tremove": {
+"addr": 16873408,
+"size": 222
+},
+"tryagain": {
+"addr": 16933280,
+"size": 89
+},
+"tryfuncTM": {
+"addr": 16973024,
+"size": 181
+},
+"tunpack": {
+"addr": 16873184,
+"size": 213
+},
+"typeerror": {
+"addr": 16979488,
+"size": 50
+},
+"undefgoto": {
+"addr": 16919936,
+"size": 105
+},
+"unroll": {
+"addr": 16975824,
+"size": 294
+},
+"utfchar": {
+"addr": 16859840,
+"size": 286
+},
+"utflen": {
+"addr": 16860128,
+"size": 551
+},
+"varinfo": {
+"addr": 16979552,
+"size": 237
+},
+"warnfcont": {
+"addr": 17020672,
+"size": 108
+},
+"warnfoff": {
+"addr": 17019776,
+"size": 118
+},
+"warnfon": {
+"addr": 17020384,
+"size": 181
+},
+"writer": {
+"addr": 16893136,
+"size": 73
+}
+},
+"source": "pyelftools 0.33 on the unstripped twin"
+},
+"lua-x64.elf": {
+"disptab": {
+"addr": 17044240,
+"size": 664
+},
+"luaV_execute": {
+"addr": 17017984,
+"size": 16848
+}
+},
+"virt-arm64.elf": {
+"vtables": {
+"_ZTV3Dog": {
+"addr": 16911200,
+"size": 56
+},
+"_ZTV4Bird": {
+"addr": 16911256,
+"size": 56
+},
+"_ZTV5Snake": {
+"addr": 16911312,
+"size": 56
+}
+}
+},
+"virt-x64.elf": {
+"vtables": {
+"_ZTV3Dog": {
+"addr": 16788544,
+"size": 56
+},
+"_ZTV4Bird": {
+"addr": 16788600,
+"size": 56
+},
+"_ZTV5Snake": {
+"addr": 16788656,
+"size": 56
+}
+}
+}
+}
