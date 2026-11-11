@@ -38,3 +38,7 @@ export { parseBeam, isBeam, etf } from './beam/beam.js';
 export type { BeamFile } from './beam/beam.js';
 export { analyzeEvm, disassembleEvm, extractSelectors, detectProxy, solidityMetadata, solcStyleOpcodes, evmBytes, EVM_OPCODES, KNOWN_SELECTORS, KNOWN_EVENTS, PROXY_SLOTS } from './evm/evm.js';
 export type { EvmInstruction, SelectorHit, ProxyHit, SolcMetadata, EvmSummary } from './evm/evm.js';
+export { compareAssemblies, snapshotAssembly, mapPInvokes } from './dotnet/compare.js';
+export type { NetDiff, NetTypeChange, PInvokeBinding } from './dotnet/compare.js';
+export { nativeExports, probingNames } from './dotnet/native.js';
+export type { NativeLibrary, NativeExport } from './dotnet/native.js';

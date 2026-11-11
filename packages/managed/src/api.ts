@@ -10,6 +10,7 @@ import { parseCArchive, extractPyInstaller, parsePyz, readCArchiveEntry, detectP
 import { parseLua, luaListing } from './lua/lua.js';
 import { parseBeam } from './beam/beam.js';
 import { analyzeEvm } from './evm/evm.js';
+import { compareAssemblies, mapPInvokes } from './dotnet/compare.js';
 
 export interface Paging { offset?: number; limit?: number }
 
@@ -182,4 +183,24 @@ export async function evmSelectorsTool(input: InputSpec): Promise<unknown> {
   const { instructions, opcodeStats, ...summary } = analyzeEvm(bytes);
   void instructions;
   return { ...summary, topOpcodes: Object.entries(opcodeStats).sort((a, b) => b[1] - a[1]).slice(0, 15) };
+}
+
+/** Match .NET DllImports to the exports of shipped native libraries (ELF, PE, Mach-O). */
+export async function pinvokeMapTool(input: InputSpec & Paging & { libraries?: string[]; librariesBase64?: { name: string; base64: string }[]; status?: string }): Promise<unknown> {
+  const asm = await assemblyFor(input);
+  const libs: { name: string; bytes: Uint8Array }[] = [];
+  for (const p of (input.libraries ?? []).slice(0, 200)) libs.push({ name: p, bytes: (await loadInput({ path: p })).bytes });
+  for (const l of (input.librariesBase64 ?? []).slice(0, 200)) libs.push({ name: l.name, bytes: (await loadInput({ bytesBase64: l.base64 })).bytes });
+  const r = mapPInvokes(asm, libs);
+  const bs = input.status ? r.bindings.filter((b) => b.status === input.status) : r.bindings;
+  return { summary: r.summary, libraries: r.libraries, modules: [...new Set(r.bindings.map((b) => b.library))], bindings: page(bs, input.offset, input.limit ?? 200, 2000) };
+}
+
+/** Diff types, methods, fields and signatures between two .NET assemblies. */
+export async function compareMembersTool(input: InputSpec & Paging & { otherPath?: string; otherBytesBase64?: string; bodies?: boolean; filter?: string; publicOnly?: boolean }): Promise<unknown> {
+  if (!input.otherPath && !input.otherBytesBase64) throw new ParseError('otherPath or otherBytesBase64 is required');
+  const a = loadAssembly((await loadInput(input)).bytes);
+  const b = loadAssembly((await loadInput({ path: input.otherPath, bytesBase64: input.otherBytesBase64 })).bytes);
+  const d = compareAssemblies(a, b, { bodies: input.bodies, filter: input.filter, publicOnly: input.publicOnly });
+  return { ...d, changes: page(d.changes, input.offset, input.limit ?? 100, 2000) };
 }
