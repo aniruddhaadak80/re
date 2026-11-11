@@ -1,0 +1,207 @@
+{
+ "com.angrydoughnuts.android.alarmclock_27.apk": {
+  "activities": [
+   "com.angrydoughnuts.android.alarmclock.AlarmClockActivity",
+   "com.angrydoughnuts.android.alarmclock.AlarmNotificationActivity"
+  ],
+  "androguard": "4.1.4",
+  "certificates": [
+   {
+    "issuer": "Common Name: FDroid, Organizational Unit: FDroid, Organization: fdroid.org, Locality: ORG, State/Province: ORG, Country: UK",
+    "serial": "1305797533",
+    "sha256": "b4582f0386a2ac6f150c7ca782df4040744ee2b6d33ecfbe4f6488e326288e49",
+    "subject": "Common Name: FDroid, Organizational Unit: FDroid, Organization: fdroid.org, Locality: ORG, State/Province: ORG, Country: UK"
+   }
+  ],
+  "dex": [
+   {
+    "classes": 111,
+    "fieldIds": 446,
+    "methodIds": 822,
+    "name": "classes.dex",
+    "strings": 1203
+   }
+  ],
+  "label": "Alarm Klock",
+  "mainActivity": "com.angrydoughnuts.android.alarmclock.AlarmClockActivity",
+  "minSdk": "33",
+  "package": "com.angrydoughnuts.android.alarmclock",
+  "permissions": [
+   "android.permission.FOREGROUND_SERVICE",
+   "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+   "android.permission.POST_NOTIFICATIONS",
+   "android.permission.READ_MEDIA_AUDIO",
+   "android.permission.RECEIVE_BOOT_COMPLETED",
+   "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+   "android.permission.SCHEDULE_EXACT_ALARM",
+   "android.permission.USE_FULL_SCREEN_INTENT",
+   "android.permission.VIBRATE",
+   "android.permission.WAKE_LOCK"
+  ],
+  "providers": [
+   "com.angrydoughnuts.android.alarmclock.AlarmClockProvider"
+  ],
+  "receivers": [
+   "com.angrydoughnuts.android.alarmclock.AlarmNotificationService$AlarmTriggerReceiver",
+   "com.angrydoughnuts.android.alarmclock.CountdownRefresh",
+   "com.angrydoughnuts.android.alarmclock.SystemMessageReceiver"
+  ],
+  "services": [
+   "com.angrydoughnuts.android.alarmclock.AlarmNotificationService"
+  ],
+  "signedV1": true,
+  "signedV2": true,
+  "signedV3": true,
+  "targetSdk": "36",
+  "v2CertSha256": [
+   "b4582f0386a2ac6f150c7ca782df4040744ee2b6d33ecfbe4f6488e326288e49"
+  ],
+  "v3CertSha256": [
+   "b4582f0386a2ac6f150c7ca782df4040744ee2b6d33ecfbe4f6488e326288e49"
+  ],
+  "versionCode": "27",
+  "versionName": "2.13"
+ },
+ "de.markusfisch.android.screentime_16.apk": {
+  "activities": [
+   "de.markusfisch.android.screentime.activity.MainActivity",
+   "de.markusfisch.android.screentime.activity.MultiDayActivity"
+  ],
+  "androguard": "4.1.4",
+  "certificates": [
+   {
+    "issuer": "Common Name: FDroid, Organizational Unit: FDroid, Organization: fdroid.org, Locality: ORG, State/Province: ORG, Country: UK",
+    "serial": "532799048",
+    "sha256": "6692dc53ddebbdbc4c4fa692b398de09145047584dca9b350d7d7188458b9e94",
+    "subject": "Common Name: FDroid, Organizational Unit: FDroid, Organization: fdroid.org, Locality: ORG, State/Province: ORG, Country: UK"
+   }
+  ],
+  "dex": [
+   {
+    "classes": 218,
+    "fieldIds": 500,
+    "methodIds": 1310,
+    "name": "classes.dex",
+    "strings": 1328
+   }
+  ],
+  "label": "Screen Time",
+  "mainActivity": "de.markusfisch.android.screentime.activity.MainActivity",
+  "minSdk": "11",
+  "package": "de.markusfisch.android.screentime",
+  "permissions": [
+   "android.permission.FOREGROUND_SERVICE",
+   "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
+   "android.permission.PACKAGE_USAGE_STATS",
+   "android.permission.POST_NOTIFICATIONS",
+   "android.permission.RECEIVE_BOOT_COMPLETED",
+   "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+   "android.permission.WRITE_EXTERNAL_STORAGE"
+  ],
+  "providers": [],
+  "receivers": [
+   "de.markusfisch.android.screentime.receiver.EventReceiver"
+  ],
+  "services": [
+   "de.markusfisch.android.screentime.service.TrackerService"
+  ],
+  "signedV1": true,
+  "signedV2": true,
+  "signedV3": true,
+  "targetSdk": "37",
+  "v2CertSha256": [
+   "6692dc53ddebbdbc4c4fa692b398de09145047584dca9b350d7d7188458b9e94"
+  ],
+  "v3CertSha256": [
+   "6692dc53ddebbdbc4c4fa692b398de09145047584dca9b350d7d7188458b9e94"
+  ],
+  "versionCode": "16",
+  "versionName": "1.4.0"
+ },
+ "omegacentauri.mobi.simplestopwatch_31.apk": {
+  "activities": [
+   "omegacentauri.mobi.simplestopwatch.Clock",
+   "omegacentauri.mobi.simplestopwatch.ClockWithSeconds",
+   "omegacentauri.mobi.simplestopwatch.Options",
+   "omegacentauri.mobi.simplestopwatch.StopWatch"
+  ],
+  "androguard": "4.1.4",
+  "certificates": [
+   {
+    "issuer": "Common Name: FDroid, Organizational Unit: FDroid, Organization: fdroid.org, Locality: ORG, State/Province: ORG, Country: UK",
+    "serial": "10190537645463097237",
+    "sha256": "53f7c03751587546b5cff6b4e93dbae5f89a1be81e50b214cb710863fd3c94ce",
+    "subject": "Common Name: FDroid, Organizational Unit: FDroid, Organization: fdroid.org, Locality: ORG, State/Province: ORG, Country: UK"
+   }
+  ],
+  "dex": [
+   {
+    "classes": 130,
+    "fieldIds": 371,
+    "methodIds": 740,
+    "name": "classes.dex",
+    "strings": 1067
+   }
+  ],
+  "label": "Giant Stopwatch",
+  "mainActivity": "omegacentauri.mobi.simplestopwatch.StopWatch",
+  "minSdk": "4",
+  "package": "omegacentauri.mobi.simplestopwatch",
+  "permissions": [
+   "android.permission.RECEIVE_BOOT_COMPLETED",
+   "android.permission.VIBRATE"
+  ],
+  "providers": [],
+  "receivers": [
+   "omegacentauri.mobi.simplestopwatch.boot"
+  ],
+  "services": [],
+  "signedV1": true,
+  "signedV2": true,
+  "signedV3": true,
+  "targetSdk": "29",
+  "v2CertSha256": [
+   "53f7c03751587546b5cff6b4e93dbae5f89a1be81e50b214cb710863fd3c94ce"
+  ],
+  "v3CertSha256": [
+   "53f7c03751587546b5cff6b4e93dbae5f89a1be81e50b214cb710863fd3c94ce"
+  ],
+  "versionCode": "31",
+  "versionName": "1.31"
+ },
+ "org.rayg.streaktracker_12.apk": {
+  "activities": [
+   "android.app.NativeActivity"
+  ],
+  "androguard": "4.1.4",
+  "certificates": [
+   {
+    "issuer": "Common Name: RaynardGerraldo, Organizational Unit: Getcha Some, Organization: JMJ, Locality: Unknown, State/Province: Unknown, Country: Unknown",
+    "serial": "16044278611257442201",
+    "sha256": "7979555883676dc54a9a22b13c70c70c3c4aa3a7585afa618faebd3c9a04cd8b",
+    "subject": "Common Name: RaynardGerraldo, Organizational Unit: Getcha Some, Organization: JMJ, Locality: Unknown, State/Province: Unknown, Country: Unknown"
+   }
+  ],
+  "dex": [],
+  "label": "Streak",
+  "mainActivity": "android.app.NativeActivity",
+  "minSdk": "22",
+  "package": "org.rayg.streaktracker",
+  "permissions": [],
+  "providers": [],
+  "receivers": [],
+  "services": [],
+  "signedV1": true,
+  "signedV2": true,
+  "signedV3": true,
+  "targetSdk": "33",
+  "v2CertSha256": [
+   "7979555883676dc54a9a22b13c70c70c3c4aa3a7585afa618faebd3c9a04cd8b"
+  ],
+  "v3CertSha256": [
+   "7979555883676dc54a9a22b13c70c70c3c4aa3a7585afa618faebd3c9a04cd8b"
+  ],
+  "versionCode": "12",
+  "versionName": "1.4.0"
+ }
+}
