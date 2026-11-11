@@ -82,7 +82,7 @@ export function desktopEntryToApp(e: DesktopEntry, source: string): AppRecord | 
   const extra: Record<string, string> = {};
   for (const k of ['StartupWMClass', 'X-Flatpak', 'X-SnapInstanceName', 'TryExec', 'Path', 'DBusActivatable', 'X-GNOME-UsesNotifications']) if (d[k] !== undefined) extra[k] = d[k]!;
   return {
-    platform: 'linux', source, name: d.Name ?? source.split('/').pop()!.replace(/\.desktop$/, ''), id: source.split('/').pop()!.replace(/\.desktop$/, ''),
+    platform: 'linux', source, name: d.Name ?? source.split(/[\\/]/).pop()!.replace(/\.desktop$/, ''), id: source.split(/[\\/]/).pop()!.replace(/\.desktop$/, ''),
     version: d['X-AppImage-Version'], exec, executable, icon: d.Icon, categories: list(d.Categories), mimeTypes: list(d.MimeType),
     packaging, hidden: d.NoDisplay === 'true' || d.Hidden === 'true', terminal: d.Terminal === 'true', extra: Object.keys(extra).length ? extra : undefined,
   };
@@ -102,7 +102,7 @@ export function infoPlistToApp(p: PlistValue, bundlePath: string): AppRecord {
   const urlTypes = Array.isArray(o.CFBundleURLTypes) ? (o.CFBundleURLTypes as Record<string, PlistValue>[]).flatMap((u) => (Array.isArray(u?.CFBundleURLSchemes) ? (u.CFBundleURLSchemes as string[]) : [])).slice(0, 50) : [];
   if (urlTypes.length) extra.urlSchemes = urlTypes.join(',');
   return {
-    platform: 'macos', source: `${bundlePath}/Contents/Info.plist`, name: s('CFBundleDisplayName') ?? s('CFBundleName') ?? bundlePath.split('/').pop()!.replace(/\.app$/, ''),
+    platform: 'macos', source: `${bundlePath}/Contents/Info.plist`, name: s('CFBundleDisplayName') ?? s('CFBundleName') ?? bundlePath.split(/[\\/]/).pop()!.replace(/\.app$/, ''),
     id: s('CFBundleIdentifier'), version: s('CFBundleShortVersionString') ?? s('CFBundleVersion'), executable: exeName ? `${bundlePath}/Contents/MacOS/${exeName}` : undefined,
     installLocation: bundlePath, icon: s('CFBundleIconFile') ?? s('CFBundleIconName'), packaging: 'app-bundle', extra,
   };

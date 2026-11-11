@@ -169,7 +169,8 @@ test('CDP target listing on a real remote debugging port', async (t) => {
   try {
     const p = await b.newPage(); await p.goto(`${base}/v1/`);
     const r = await cdpTargets(String(port));
-    assert.equal(r.version.browser, `Chrome/${b.version()}`.replace(/^Chrome\/HeadlessChrome/, 'HeadlessChrome'));
+    // full Chromium reports Chrome/<version>, the headless shell HeadlessChrome/<version>
+    assert.equal(r.version.browser.replace(/^HeadlessChrome\//, 'Chrome/'), `Chrome/${b.version().replace(/^HeadlessChrome\//, '')}`);
     const pg = r.targets.find((x) => x.type === 'page' && x.url === `${base}/v1/`);
     assert.ok(pg, JSON.stringify(r.targets));
     assert.equal(pg!.title, 'Counter v1');

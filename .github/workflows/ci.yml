@@ -51,7 +51,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends dbus dbus-bin dbus-daemon at-spi2-core libglib2.0-bin lsof
       - name: Playwright Chromium for the web runtime browser tests
         if: runner.os == 'Linux'
-        run: npx playwright install --with-deps chromium
+        run: |
+          npx playwright install --with-deps chromium
+          # the full Chromium build (not the headless shell) has the WebMCP and accessibility code the tests read
+          echo "REVLENS_CHROMIUM=$(node -e "import('playwright').then((m) => console.log(m.chromium.executablePath()))")" >> "$GITHUB_ENV"
       - name: Test core
         run: node --test --import tsx packages/core/test/*.test.ts
       - name: Test managed
