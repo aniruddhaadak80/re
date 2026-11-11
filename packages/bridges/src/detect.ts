@@ -423,14 +423,27 @@ async function decompilerPlugin(id: 'radare2' | 'rizin', exe: string, env: NodeJ
 
 let cache: Map<ToolId, Detection> | undefined;
 
+/** REVLENS_BRIDGES_DISABLE=all or a comma list of tool ids hides tools, for tests and locked down hosts. */
+export function disabledTools(env: NodeJS.ProcessEnv = process.env): Set<string> {
+  const v = (env.REVLENS_BRIDGES_DISABLE ?? '').trim().toLowerCase();
+  if (!v) return new Set();
+  return new Set(v === 'all' || v === '1' ? TOOL_IDS : v.split(',').map((x) => x.trim()).filter(Boolean));
+}
+
+function disabled(id: ToolId): Detection {
+  return { id, name: TOOL_META[id].name, available: false, problems: ['disabled by REVLENS_BRIDGES_DISABLE'] };
+}
+
 /** Detect every tool (cached for the life of the process unless `refresh` is set). */
 export async function detectAll(opts: DetectOptions = {}): Promise<Map<ToolId, Detection>> {
   if (cache && !opts.refresh && !opts.env) return cache;
   const out = new Map<ToolId, Detection>();
-  const java = await detectJava(opts);
+  const off = disabledTools(opts.env ?? process.env);
+  const java = off.has('java') ? disabled('java') : await detectJava(opts);
   out.set('java', java);
   const rest = TOOL_IDS.filter((id) => id !== 'java');
   const results = await Promise.all(rest.map(async (id) => {
+    if (off.has(id)) return disabled(id);
     if (id === 'ghidra') return detectGhidra(opts, java);
     if (id === 'ida') return detectIda(opts);
     if (id === 'binja') return detectBinja(opts);
@@ -444,6 +457,7 @@ export async function detectAll(opts: DetectOptions = {}): Promise<Map<ToolId, D
 /** Detect one tool. */
 export async function detect(id: ToolId, opts: DetectOptions = {}): Promise<Detection> {
   if (cache && !opts.refresh && !opts.env) return cache.get(id)!;
+  if (disabledTools(opts.env ?? process.env).has(id)) return disabled(id);
   if (id === 'java') return detectJava(opts);
   if (id === 'ghidra') return detectGhidra(opts, await detectJava(opts));
   if (id === 'ida') return detectIda(opts);
