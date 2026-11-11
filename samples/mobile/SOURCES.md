@@ -64,3 +64,15 @@ Outputs of real reference tools, regenerated with `packages/mobile/scripts/gen-e
   `global-metadata.dat` (IL2CPP metadata v29), pulled with HTTP range requests.
 - LocalSend 1.18.2 (F-Droid build 643), Apache-2.0, https://github.com/localsend/localsend:
   listing, manifest, `resources.arsc` and the first 1 MB of `lib/arm64-v8a/libapp.so` (Flutter).
+
+## JNI and member diff fixtures (samples/mobile/jni)
+
+Built by RevLens from samples/mobile/src-jni (MIT, this repo) with `samples/mobile/src-jni/build.sh`.
+
+| file | how it was made |
+|---|---|
+| jnidemo.apk | classes.dex from javac (JDK 25, --release 8) + D8 (r8.jar, --min-api 21) of NativeBridge.java; lib/arm64-v8a and lib/armeabi-v7a libjnidemo.so from jnidemo.c with zig 0.14.1 cc (aarch64-linux-musl, arm-linux-musleabihf, -shared -fPIC -O1 -s). Static Java_* exports, an overloaded long-name export, and a JNINativeMethod table passed to RegisterNatives in JNI_OnLoad. No manifest. |
+| bridge-v1.dex, bridge-v2.dex | D8 output for NativeBridge.java (v1) and v2/ (one method removed, one signature changed, methods and fields added, a new class) |
+| bridge-v1.javap.txt, bridge-v2.javap.txt | `javap -p -s` (JDK 25) of the same class files, the member list reference |
+
+`reference/androguard-graph.json` is written by `packages/mobile/scripts/gen-graph-reference.py` with androguard 4.1.4 (components, raw android:exported, intent filter actions and categories).

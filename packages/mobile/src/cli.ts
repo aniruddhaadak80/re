@@ -1,6 +1,6 @@
 // CLI commands. Each prints human text by default and JSON with --json.
 
-import { mobileApkReport, mobileAppFramework, mobileDexClasses, mobileDexMethod, mobileDexSearch, mobileDexXrefs, mobileIl2cppTypes, mobileIpaInfo, mobileJavaClass, mobileManifest, mobileNativeLibs, mobileSigning } from './tools.js';
+import { mobileApkReport, mobileAppFramework, mobileDexClasses, mobileDexMethod, mobileDexSearch, mobileDexXrefs, mobileIl2cppTypes, mobileIpaInfo, mobileJavaClass, mobileManifest, mobileNativeLibs, mobileSigning, mobileAppGraph, mobileIpaGraph, mobileJniMap, mobileCompareMembers } from './tools.js';
 
 export interface CliCommand { name: string; usage: string; summary: string; run(argv: string[]): Promise<number> }
 
@@ -199,6 +199,49 @@ export const CLI_COMMANDS: CliCommand[] = [
           for (const l of libs) out.push(`  ${l.name}  ${l.size} bytes  JNI_OnLoad=${l.elf?.jniOnLoad ?? '?'}  Java_* exports=${l.elf?.jniExports.length ?? '?'}`);
         }
         out.push(`native methods in DEX: ${r.nativeMethods?.length ?? 0}, without static export: ${r.unresolvedNativeMethods}`);
+        return out.join('\n');
+      },
+    };
+  }),
+  cmd('app-graph', 'app-graph <file.apk> [--no-mermaid] [--json]', 'Android component graph with exported state, intent filters, deep links, providers and permissions, as Mermaid.', async (p) => {
+    const r = await mobileAppGraph({ path: p.file, mermaid: !p.flags['no-mermaid'], limit: 1000 });
+    return { data: r, text: () => r.mermaid ?? `${r.nodes.total} nodes, ${r.edges.total} edges` };
+  }),
+  cmd('ipa-graph', 'ipa-graph <file.ipa> [--no-mermaid] [--json]', 'iOS bundle graph: executables, extensions, frameworks, entitlements, URL schemes, as Mermaid.', async (p) => {
+    const r = await mobileIpaGraph({ path: p.file, mermaid: !p.flags['no-mermaid'], limit: 1000 });
+    return { data: r, text: () => r.mermaid ?? `${r.nodes.total} nodes, ${r.edges.total} edges` };
+  }),
+  cmd('jni-map', 'jni-map <file.apk|lib.so> [--abi A] [--json]', 'Map DEX native methods to Java_* exports and RegisterNatives tables.', async (p) => {
+    const r = await mobileJniMap({ path: p.file, abi: str(p.flags.abi), limit: 1000 }) as Record<string, any>;
+    return {
+      data: r,
+      text: () => {
+        if (!r.methods) return JSON.stringify(r, null, 2);
+        const out: string[] = [];
+        for (const m of r.methods.items) out.push(`${m.class}.${m.method}${m.signature}`, ...(m.bindings.length ? m.bindings.map((b: any) => `  ${b.abi}  ${b.how}  ${b.symbol ?? ''} ${b.address ?? ''} ${b.evidence ?? ''}`.trimEnd()) : ['  unresolved']));
+        for (const l of r.libraries) for (const t of l.tables) out.push(`${l.path}: JNINativeMethod table at ${t.vaddr} (${t.section}) ${t.entries.map((e: any) => `${e.name}${e.signature}->${e.fn}`).join(', ')}`);
+        if (r.orphanExports.length) out.push(`Java_* exports with no Java declaration: ${r.orphanExports.map((x: any) => x.name).join(', ')}`);
+        return out.join('\n');
+      },
+    };
+  }),
+  cmd('compare-members', 'compare-members <old.apk|.dex|.jar> --other <new.apk|.dex|.jar> [--bodies] [--filter X] [--json]', 'Diff classes, methods and fields between two DEX sets.', async (p) => {
+    const r = await mobileCompareMembers({ path: p.file, otherPath: str(p.flags.other), bodies: !!p.flags.bodies, filter: str(p.flags.filter), limit: 1000 });
+    return {
+      data: r,
+      text: () => {
+        const out = [`classes: ${r.classes.a} -> ${r.classes.b}, +${r.classes.added.length} -${r.classes.removed.length} changed ${r.classes.changed}`];
+        for (const c of r.classes.added) out.push(`+ class ${c}`);
+        for (const c of r.classes.removed) out.push(`- class ${c}`);
+        for (const c of r.changes.items) {
+          out.push(`~ ${c.class}`);
+          for (const m of c.methods.added) out.push(`  + ${m.access} ${m.name}${m.descriptor}`);
+          for (const m of c.methods.removed) out.push(`  - ${m.access} ${m.name}${m.descriptor}`);
+          for (const m of c.methods.accessChanged) out.push(`  * ${m.name}${m.descriptor}: ${m.from} -> ${m.to}`);
+          for (const m of c.methods.bodyChanged) out.push(`  * body ${m}`);
+          for (const f of c.fields.added) out.push(`  + ${f.access} ${f.name}:${f.descriptor}`);
+          for (const f of c.fields.removed) out.push(`  - ${f.access} ${f.name}:${f.descriptor}`);
+        }
         return out.join('\n');
       },
     };

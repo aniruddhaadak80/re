@@ -1,0 +1,197 @@
+{
+ "com.angrydoughnuts.android.alarmclock_27.apk": {
+  "androguard": "4.1.4",
+  "components": {
+   "com.angrydoughnuts.android.alarmclock.AlarmClockActivity": {
+    "actions": [
+     "android.intent.action.MAIN"
+    ],
+    "categories": [
+     "android.intent.category.LAUNCHER"
+    ],
+    "exportedAttr": "true",
+    "kind": "activity"
+   },
+   "com.angrydoughnuts.android.alarmclock.AlarmClockProvider": {
+    "actions": [],
+    "authorities": "com.angrydoughnuts.android.alarmclock.provider",
+    "categories": [],
+    "exportedAttr": "false",
+    "kind": "provider"
+   },
+   "com.angrydoughnuts.android.alarmclock.AlarmNotificationActivity": {
+    "actions": [],
+    "categories": [],
+    "exportedAttr": null,
+    "kind": "activity"
+   },
+   "com.angrydoughnuts.android.alarmclock.AlarmNotificationService": {
+    "actions": [],
+    "categories": [],
+    "exportedAttr": "false",
+    "kind": "service"
+   },
+   "com.angrydoughnuts.android.alarmclock.AlarmNotificationService$AlarmTriggerReceiver": {
+    "actions": [],
+    "categories": [],
+    "exportedAttr": null,
+    "kind": "receiver"
+   },
+   "com.angrydoughnuts.android.alarmclock.CountdownRefresh": {
+    "actions": [],
+    "categories": [],
+    "exportedAttr": null,
+    "kind": "receiver"
+   },
+   "com.angrydoughnuts.android.alarmclock.SystemMessageReceiver": {
+    "actions": [
+     "android.intent.action.BOOT_COMPLETED",
+     "android.intent.action.MY_PACKAGE_REPLACED",
+     "android.intent.action.TIMEZONE_CHANGED"
+    ],
+    "categories": [],
+    "exportedAttr": "false",
+    "kind": "receiver"
+   }
+  },
+  "declaredPermissions": [],
+  "package": "com.angrydoughnuts.android.alarmclock",
+  "permissions": [
+   "android.permission.FOREGROUND_SERVICE",
+   "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+   "android.permission.POST_NOTIFICATIONS",
+   "android.permission.READ_MEDIA_AUDIO",
+   "android.permission.RECEIVE_BOOT_COMPLETED",
+   "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+   "android.permission.SCHEDULE_EXACT_ALARM",
+   "android.permission.USE_FULL_SCREEN_INTENT",
+   "android.permission.VIBRATE",
+   "android.permission.WAKE_LOCK"
+  ]
+ },
+ "de.markusfisch.android.screentime_16.apk": {
+  "androguard": "4.1.4",
+  "components": {
+   "de.markusfisch.android.screentime.activity.MainActivity": {
+    "actions": [
+     "android.intent.action.MAIN"
+    ],
+    "categories": [
+     "android.intent.category.LAUNCHER"
+    ],
+    "exportedAttr": "true",
+    "kind": "activity"
+   },
+   "de.markusfisch.android.screentime.activity.MultiDayActivity": {
+    "actions": [],
+    "categories": [],
+    "exportedAttr": null,
+    "kind": "activity"
+   },
+   "de.markusfisch.android.screentime.receiver.EventReceiver": {
+    "actions": [
+     "android.intent.action.ACTION_SHUTDOWN",
+     "android.intent.action.BOOT_COMPLETED",
+     "android.intent.action.LOCKED_BOOT_COMPLETED",
+     "android.intent.action.MY_PACKAGE_REPLACED",
+     "android.intent.action.PACKAGE_REPLACED",
+     "android.intent.action.QUICKBOOT_POWEROFF",
+     "android.intent.action.QUICKBOOT_POWERON",
+     "com.htc.intent.action.QUICKBOOT_POWEROFF",
+     "com.htc.intent.action.QUICKBOOT_POWERON"
+    ],
+    "categories": [],
+    "exportedAttr": "false",
+    "kind": "receiver"
+   },
+   "de.markusfisch.android.screentime.service.TrackerService": {
+    "actions": [],
+    "categories": [],
+    "exportedAttr": "false",
+    "kind": "service"
+   }
+  },
+  "declaredPermissions": [],
+  "package": "de.markusfisch.android.screentime",
+  "permissions": [
+   "android.permission.FOREGROUND_SERVICE",
+   "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
+   "android.permission.PACKAGE_USAGE_STATS",
+   "android.permission.POST_NOTIFICATIONS",
+   "android.permission.RECEIVE_BOOT_COMPLETED",
+   "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+   "android.permission.WRITE_EXTERNAL_STORAGE"
+  ]
+ },
+ "omegacentauri.mobi.simplestopwatch_31.apk": {
+  "androguard": "4.1.4",
+  "components": {
+   "omegacentauri.mobi.simplestopwatch.Clock": {
+    "actions": [],
+    "categories": [],
+    "exportedAttr": null,
+    "kind": "activity"
+   },
+   "omegacentauri.mobi.simplestopwatch.ClockWithSeconds": {
+    "actions": [],
+    "categories": [],
+    "exportedAttr": null,
+    "kind": "activity"
+   },
+   "omegacentauri.mobi.simplestopwatch.Options": {
+    "actions": [],
+    "categories": [
+     "android.intent.category.PREFERENCE"
+    ],
+    "exportedAttr": null,
+    "kind": "activity"
+   },
+   "omegacentauri.mobi.simplestopwatch.StopWatch": {
+    "actions": [
+     "android.intent.action.MAIN"
+    ],
+    "categories": [
+     "android.intent.category.LAUNCHER"
+    ],
+    "exportedAttr": null,
+    "kind": "activity"
+   },
+   "omegacentauri.mobi.simplestopwatch.boot": {
+    "actions": [
+     "android.intent.action.BOOT_COMPLETED",
+     "android.intent.action.QUICKBOOT_POWERON",
+     "com.htc.intent.action.QUICKBOOT_POWERON"
+    ],
+    "categories": [
+     "android.intent.category.DEFAULT"
+    ],
+    "exportedAttr": "true",
+    "kind": "receiver"
+   }
+  },
+  "declaredPermissions": [],
+  "package": "omegacentauri.mobi.simplestopwatch",
+  "permissions": [
+   "android.permission.RECEIVE_BOOT_COMPLETED",
+   "android.permission.VIBRATE"
+  ]
+ },
+ "org.rayg.streaktracker_12.apk": {
+  "androguard": "4.1.4",
+  "components": {
+   "android.app.NativeActivity": {
+    "actions": [
+     "android.intent.action.MAIN"
+    ],
+    "categories": [
+     "android.intent.category.LAUNCHER"
+    ],
+    "exportedAttr": "true",
+    "kind": "activity"
+   }
+  },
+  "declaredPermissions": [],
+  "package": "org.rayg.streaktracker",
+  "permissions": []
+ }
+}

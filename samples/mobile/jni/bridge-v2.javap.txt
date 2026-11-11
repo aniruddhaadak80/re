@@ -1,0 +1,47 @@
+Compiled from "Extra.java"
+final class org.revlens.jnidemo.Extra implements java.lang.Runnable {
+  org.revlens.jnidemo.Extra();
+    descriptor: ()V
+
+  public void run();
+    descriptor: ()V
+}
+Compiled from "NativeBridge.java"
+public class org.revlens.jnidemo.NativeBridge {
+  public static final java.lang.String VERSION;
+    descriptor: Ljava/lang/String;
+  private int calls;
+    descriptor: I
+  public org.revlens.jnidemo.NativeBridge();
+    descriptor: ()V
+
+  public static native int add(int, int);
+    descriptor: (II)I
+
+  public native java.lang.String greet(java.lang.String, java.lang.String);
+    descriptor: (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+  public native long hash(byte[], int);
+    descriptor: ([BI)J
+
+  public static native void reset();
+    descriptor: ()V
+
+  public native int overloaded(int);
+    descriptor: (I)I
+
+  public native int overloaded(java.lang.String);
+    descriptor: (Ljava/lang/String;)I
+
+  public native void shutdown();
+    descriptor: ()V
+
+  public int twice(int);
+    descriptor: (I)I
+
+  protected long thrice(long);
+    descriptor: (J)J
+
+  static {};
+    descriptor: ()V
+}

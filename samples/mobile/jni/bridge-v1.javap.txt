@@ -1,0 +1,32 @@
+Compiled from "NativeBridge.java"
+public class org.revlens.jnidemo.NativeBridge {
+  public org.revlens.jnidemo.NativeBridge();
+    descriptor: ()V
+
+  public static native int add(int, int);
+    descriptor: (II)I
+
+  public native java.lang.String greet(java.lang.String);
+    descriptor: (Ljava/lang/String;)Ljava/lang/String;
+
+  public native long hash(byte[], int);
+    descriptor: ([BI)J
+
+  public static native void reset();
+    descriptor: ()V
+
+  public native boolean missing();
+    descriptor: ()Z
+
+  public native int overloaded(int);
+    descriptor: (I)I
+
+  public native int overloaded(java.lang.String);
+    descriptor: (Ljava/lang/String;)I
+
+  public int twice(int);
+    descriptor: (I)I
+
+  static {};
+    descriptor: ()V
+}
