@@ -1,0 +1,25 @@
+{
+  "name": "@revlens/bridges",
+  "version": "1.0.0",
+  "description": "RevLens bridges: drive radare2, rizin, Ghidra headless, jadx, apktool, ILSpy, Frida, gdb, lldb, objdump, binwalk, adb, IDA and Binary Ninja from code, the CLI and MCP agents. Node only.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./node": { "types": "./dist/node.d.ts", "default": "./dist/node.js" },
+    "./pure": { "types": "./dist/pure.d.ts", "default": "./dist/pure.js" }
+  },
+  "files": ["dist", "ci", "README.md"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test --import tsx test/*.test.ts"
+  },
+  "dependencies": {
+    "@revlens/core": "^0.1.1 || ^1.0.0"
+  },
+  "engines": { "node": ">=20.10.0" },
+  "keywords": ["reverse-engineering", "radare2", "rizin", "ghidra", "jadx", "frida", "gdb", "ida", "mcp", "doctor"],
+  "repository": { "type": "git", "url": "https://github.com/aniruddhaadak80/re.git", "directory": "packages/bridges" }
+}

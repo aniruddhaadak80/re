@@ -1,0 +1,46 @@
+Breakpoint 1 at 0x40072c
+
+Breakpoint 1, 0x000000000040072c in add_numbers ()
+x0             0x2                 2
+x1             0x29                41
+x2             0xfffffffff460      281474976707680
+x3             0x4005f4            4195828
+x4             0xfffffffff2a0      281474976707232
+x5             0xfe655d1a4050f0dc  -115583848098500388
+x6             0x4                 4
+x7             0x7f7f7f7f7f7f7f7f  9187201950435737471
+x8             0x101010101010101   72340172838076673
+x9             0x2                 2
+x10            0x0                 0
+x11            0x0                 0
+x12            0x4a7dc0            4881856
+x13            0x400a08            4196872
+x14            0x3e181             254337
+x15            0x4a1000            4853760
+x16            0x1                 1
+x17            0x4169c0            4286912
+x18            0x1503538           22033720
+x19            0x4                 4
+x20            0x2                 2
+x21            0xfffffffff448      281474976707656
+x22            0xfffffffff460      281474976707680
+x23            0x49c190            4833680
+x24            0x4a6000            4874240
+x25            0x4                 4
+x26            0x400268            4194920
+x27            0x18                24
+x28            0x4a0020            4849696
+x29            0xfffffffff270      281474976707184
+x30            0x400858            4196440
+sp             0xfffffffff260      0xfffffffff260
+pc             0x40072c            0x40072c <add_numbers+12>
+cpsr           0x60001000          [ EL=0 BTYPE=0 SSBS C Z ]
+fpsr           0x0                 [ ]
+fpcr           0x0                 [ Len=0 Stride=0 RMode=0 ]
+tpidr          0x4a7740            0x4a7740
+tpidr2         0x0                 0x0
+#0  0x000000000040072c in add_numbers ()
+#1  0x0000000000400858 in main ()
+0xfffffffff260:	0x88	0x77	0x4a	0x00	0x00	0x00	0x00	0x00
+0xfffffffff268:	0x29	0x00	0x00	0x00	0x02	0x00	0x00	0x00
+[Inferior 1 (process 9483) killed]
