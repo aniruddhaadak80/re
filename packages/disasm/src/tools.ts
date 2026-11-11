@@ -1,0 +1,113 @@
+// Agent tool table (MCP friendly). Every tool takes `path` (or `bytes`) plus paging params.
+import {
+  disasmAt, disasmCallgraph, disasmCallPaths, disasmFindReferences, disasmFunction, disasmInfo,
+  disasmListFunctions, disasmPseudocode, disasmSearch, disasmXrefs,
+} from './api.js';
+
+export interface ToolParam { type: 'string' | 'number' | 'boolean' | 'array' | 'object'; description: string; optional?: boolean }
+export interface Tool { name: string; description: string; inputSchema: Record<string, ToolParam>; run: (input: any) => Promise<unknown> } // eslint-disable-line @typescript-eslint/no-explicit-any
+
+const path: ToolParam = { type: 'string', description: 'Path to an ELF, PE or Mach-O file (fat Mach-O picks x86_64, then arm64, unless arch is set)' };
+const arch: ToolParam = { type: 'string', description: 'Fat Mach-O slice to analyze: x86_64, arm64, x86 or arm', optional: true };
+const offset: ToolParam = { type: 'number', description: 'Paging: items to skip (default 0)', optional: true };
+const limit = (d: number, max: number): ToolParam => ({ type: 'number', description: `Paging: max items (default ${d}, max ${max})`, optional: true });
+const fn: ToolParam = { type: 'string', description: 'Function name (exact or without leading underscore/version suffix) or address like 0x401000' };
+const budget: ToolParam = { type: 'number', description: 'Time budget in ms for program wide indexing (default 8000); results say complete:false when it ran out', optional: true };
+
+export const TOOLS: Tool[] = [
+  {
+    name: 'disasm_info',
+    description: 'Overview of a native binary for disassembly: format, architecture, entry point, sections, symbol/import/function counts and decoder in use.',
+    inputSchema: { path, arch },
+    run: (i) => disasmInfo(i),
+  },
+  {
+    name: 'disasm_list_functions',
+    description: 'List functions found from symbols, exports, Go pclntab, .pdata/.eh_frame/LC_FUNCTION_STARTS, import stubs, call targets and prologue scan. Filter by name, sort by addr/name/size, paged.',
+    inputSchema: {
+      path, arch, offset, limit: limit(100, 2000),
+      filter: { type: 'string', description: 'Case insensitive substring of the function name', optional: true },
+      sort: { type: 'string', description: 'addr (default), name or size', optional: true },
+      includeImports: { type: 'boolean', description: 'Include PLT/stub/thunk entries for imports', optional: true },
+    },
+    run: (i) => disasmListFunctions(i),
+  },
+  {
+    name: 'disasm_function',
+    description: 'Disassemble one function with its control flow graph: basic blocks, edges (true/false/jump/fallthrough), exits, calls with resolved import names, string and data references, plus a summary.',
+    inputSchema: { path, arch, function: fn, offset: { type: 'number', description: 'Instruction offset for paging (default 0)', optional: true }, limit: limit(400, 5000) },
+    run: (i) => disasmFunction(i),
+  },
+  {
+    name: 'disasm_pseudocode',
+    description: 'Readable C like pseudo code for one function (if/else and loop recovery, goto fallback) with call arguments and string literals inlined, plus a summary (calls, strings, constants, size, cyclomatic complexity).',
+    inputSchema: { path, arch, function: fn, maxLines: { type: 'number', description: 'Max output lines (default 300)', optional: true } },
+    run: (i) => disasmPseudocode(i),
+  },
+  {
+    name: 'disasm_xrefs',
+    description: 'Cross references. direction "to": every call, jump, string or data reference to an address, function, symbol or import. direction "from": everything a function calls or references.',
+    inputSchema: {
+      path, arch, target: { type: 'string', description: 'Address, function name, symbol or import name' },
+      direction: { type: 'string', description: '"to" (default) or "from"', optional: true }, offset, limit: limit(200, 5000), budgetMs: budget,
+    },
+    run: (i) => disasmXrefs(i),
+  },
+  {
+    name: 'disasm_callgraph',
+    description: 'Call graph around a function (callees, callers or both, to a depth), or without a function the program wide list of functions ranked by number of callers.',
+    inputSchema: {
+      path, arch, function: { ...fn, optional: true },
+      direction: { type: 'string', description: 'callees (default), callers or both', optional: true },
+      depth: { type: 'number', description: 'Depth 1-8 (default 2)', optional: true }, offset, limit: limit(300, 5000), budgetMs: budget,
+    },
+    run: (i) => disasmCallgraph(i),
+  },
+  {
+    name: 'disasm_search',
+    description: 'Search code: bytes_pattern hex with ?? wildcards (e.g. "48 8d 3d ?? ?? ?? ??"), insn glob over instruction text or its resolved reference (e.g. "call *strcmp*", "xor e*, e*"), or text for literal bytes anywhere.',
+    inputSchema: {
+      path, arch,
+      bytes_pattern: { type: 'string', description: 'Hex bytes, ?? for any byte', optional: true },
+      insn: { type: 'string', description: 'Glob (* and ?) over "mnemonic operands", case insensitive', optional: true },
+      text: { type: 'string', description: 'Literal text to find as bytes', optional: true },
+      scope: { type: 'string', description: 'code (default for bytes_pattern) or all', optional: true },
+      offset, limit: limit(100, 2000), budgetMs: budget,
+    },
+    run: (i) => disasmSearch(i),
+  },
+  {
+    name: 'disasm_find_references',
+    description: 'Find the functions that reference a string (substring match by default) or call/load an import (by name, e.g. "strcmp", "CreateProcessW"), with the exact instruction addresses.',
+    inputSchema: {
+      path, arch,
+      string: { type: 'string', description: 'Text inside referenced strings', optional: true },
+      import: { type: 'string', description: 'Import name (leading underscores and @version ignored)', optional: true },
+      exact: { type: 'boolean', description: 'Exact match instead of substring', optional: true },
+      caseSensitive: { type: 'boolean', description: 'Case sensitive string match', optional: true },
+      offset, limit: limit(50, 1000), budgetMs: budget,
+    },
+    run: (i) => disasmFindReferences(i),
+  },
+  {
+    name: 'disasm_call_paths',
+    description: 'Call paths from the entry point (or a given function) to a target function, shortest first, plus the direct callers of the target. Answers "how does execution reach X".',
+    inputSchema: {
+      path, arch, target: fn,
+      from: { type: 'string', description: 'Start function (default: entry point)', optional: true },
+      maxDepth: { type: 'number', description: 'Max path length (default 12)', optional: true },
+      maxPaths: { type: 'number', description: 'Max paths returned (default 10)', optional: true }, budgetMs: budget,
+    },
+    run: (i) => disasmCallPaths(i),
+  },
+  {
+    name: 'disasm_at',
+    description: 'Disassemble N instructions linearly at any address (or function name), annotated with symbols, imports and strings. Works without function analysis.',
+    inputSchema: {
+      path, arch, address: { type: 'string', description: 'Address like 0x401000 or a function name' },
+      count: { type: 'number', description: 'Instructions (default 32, max 2000)', optional: true },
+      thumb: { type: 'boolean', description: 'ARM only: decode as Thumb', optional: true },
+    },
+    run: (i) => disasmAt(i),
+  },
+];
