@@ -143,13 +143,14 @@ export function parseAmdgpu(b: Uint8Array): AmdgpuInfo {
   const mach = flags & 0xff;
   // EI_ABIVERSION for ELFOSABI_AMDGPU_HSA (64): 2 means v4, 3 means v5, 4 means v6
   const cov = osabi === 64 ? (abiv + 2) : null;
-  const feat = (bits: number, name: string): string => {
-    if (cov !== null && cov >= 4) { const x = flags & bits; return x === 0 ? 'unsupported' : x === bits ? `${name}+` : x === (bits & (bits << 1)) ? `${name}-` : 'any'; }
-    return 'unknown';
+  const feat = (mask: number, any: number, name: string): string => {
+    if (cov === null || cov < 4) return 'unknown';
+    const x = flags & mask;
+    return x === 0 ? 'unsupported' : x === any ? 'any' : x === any * 2 ? `${name}-` : `${name}+`;
   };
   const kernels = elfSymbols(img).filter((s) => s.name.endsWith('.kd')).map((s) => s.name.slice(0, -3));
   const hasMetadataNote = img.sections.some((s) => s.name === '.note');
-  return { target: AMDGPU_MACH[mach] ?? `mach-${hexs(mach)}`, mach, codeObjectVersion: cov, xnack: feat(0x300, 'xnack'), sramecc: feat(0xc00, 'sramecc'), kernels, hasMetadataNote };
+  return { target: AMDGPU_MACH[mach] ?? `mach-${hexs(mach)}`, mach, codeObjectVersion: cov, xnack: feat(0x300, 0x100, 'xnack'), sramecc: feat(0xc00, 0x400, 'sramecc'), kernels, hasMetadataNote };
 }
 
 const SPIRV_EXEC: Record<number, string> = { 0: 'Vertex', 1: 'TessellationControl', 2: 'TessellationEvaluation', 3: 'Geometry', 4: 'Fragment', 5: 'GLCompute', 6: 'Kernel', 5267: 'TaskNV', 5268: 'MeshNV', 5313: 'RayGenerationKHR', 5314: 'IntersectionKHR', 5315: 'AnyHitKHR', 5316: 'ClosestHitKHR', 5317: 'MissKHR', 5318: 'CallableKHR', 5364: 'TaskEXT', 5365: 'MeshEXT' };
