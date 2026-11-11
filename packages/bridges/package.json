@@ -1,7 +1,7 @@
 {
   "name": "@revlens/bridges",
   "version": "1.0.0",
-  "description": "RevLens bridges: drive radare2, rizin, Ghidra headless, jadx, apktool, ILSpy, Frida, gdb, lldb, objdump, binwalk, adb, IDA and Binary Ninja from code, the CLI and MCP agents. Node only.",
+  "description": "RevLens bridges: drive radare2, rizin, Ghidra headless, jadx, apktool, ILSpy, Frida, gdb, lldb, objdump, binwalk, adb, IDA and Binary Ninja from code, the CLI and MCP agents, with persistent debugger and Frida sessions, the full adb suite, and names write-back into Ghidra, IDA and radare2 projects. Node only.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
