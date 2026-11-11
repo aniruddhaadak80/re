@@ -1381,7 +1381,7 @@ class OldDemangler {
   return sig;
 }
 
-  demangleMetatypeRepresentation(depth: number): Node {
+  demangleMetatypeRepresentation(_depth: number): Node {
   if (this.Mangled.nextIf('t'))
     return this.Factory.createNode(K.MetatypeRepresentation, "@thin");
 

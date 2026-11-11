@@ -667,7 +667,7 @@ export class NodePrinter {
     return;
   }
 
-  let getLabelFor = (Param: Node, Index: number): string => {
+  let getLabelFor = (_Param: Node, Index: number): string => {
     let Label = LabelList.getChild(Index);
     /* assert */ void 0;
     return Label.getKind() == K.Identifier ? Label.getText()
@@ -734,7 +734,8 @@ export class NodePrinter {
     break;
   case K.EscapingObjCBlock:
     this.Printer.p("@escaping ");
-    // falls through
+    printConventionWithMangledCType("block");
+    break;
   case K.ObjCBlock:
     printConventionWithMangledCType("block");
     break;
@@ -1152,7 +1153,7 @@ export class NodePrinter {
 }
 
 
-  shouldShowEntityType(EntityKind: Kind, Options: DemangleOptions): boolean {
+  shouldShowEntityType(EntityKind: Kind, _Options: DemangleOptions): boolean {
   switch (EntityKind) {
   case K.ExplicitClosure:
   case K.ImplicitClosure:
@@ -3085,9 +3086,8 @@ export class NodePrinter {
     }
     return NONE;
   case K.PredefinedObjCAsyncCompletionHandlerImpl:
-    this.Printer.p("predefined ");
-    // falls through
   case K.ObjCAsyncCompletionHandlerImpl:
+    if (kind === K.PredefinedObjCAsyncCompletionHandlerImpl) this.Printer.p("predefined ");
     this.Printer.p("@objc completion handler block implementation for ");
     if (Node.getNumChildren() >= 4)
       this.print(Node.getChild(3), depth + 1);

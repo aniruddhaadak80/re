@@ -4,7 +4,7 @@
 
 import {
   Node, NONE, K, type Kind, DemangleError, isContext, isDigit, isLowerLetter, isUpperLetter, isLetter, isWordStart, isWordEnd,
-  FunctionSigSpecializationParamKind, MangledDifferentiabilityKind, AutoDiffFunctionKind, MangledLifetimeDependenceKind,
+  FunctionSigSpecializationParamKind,
   VALUE_WITNESSES, STDLIB_NAME, MANGLING_MODULE_OBJC, MANGLING_MODULE_CLANG_IMPORTER, charCode,
 } from './nodes.js';
 import * as N from './nodes.js';
@@ -12,7 +12,6 @@ import { decodePunycodeString } from './punycode.js';
 import { demangleOldSymbolAsNode } from './old.js';
 
 const MAX_NODES = 100000;
-const MAX_DEPTH = 1024;
 
 export class Demangler {
   Text = '';
