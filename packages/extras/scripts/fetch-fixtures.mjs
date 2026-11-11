@@ -1,6 +1,6 @@
 // Downloads fixtures that cannot be committed into samples/.cache/extras.
 // Run: node packages/extras/scripts/fetch-fixtures.mjs   (tests that need them skip when absent)
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, renameSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { inflateRawSync } from 'node:zlib';
@@ -50,10 +50,18 @@ const jobs = [
   ['unity-cards.unity3d', async () => get('https://raw.githubusercontent.com/rygo6/CardExample-Unity/master/ExternalAssets/cards')],
 ];
 let maccyZip;
+
+/** Write to a fresh temp file next to dest (created exclusively), then rename it into place. */
+function writeAtomic(dest, data) {
+  const tmp = `${dest}.${process.pid}.tmp`;
+  rmSync(tmp, { force: true });
+  writeFileSync(tmp, data, { flag: 'wx' });
+  renameSync(tmp, dest);
+}
 async function maccy() { return (maccyZip ??= await get('https://github.com/p0deje/Maccy/releases/download/2.8.0/Maccy.app.zip')); }
 for (const [out, f] of jobs) {
   const dest = join(cache, out);
   if (existsSync(dest)) continue;
-  try { writeFileSync(dest, await f()); console.log('fetched', out); } catch (e) { console.error('skip', out, e.message); }
+  try { writeAtomic(dest, await f()); console.log('fetched', out); } catch (e) { console.error('skip', out, e.message); }
 }
 console.log('extras fixtures in', cache);

@@ -75,7 +75,8 @@ test('pcapng: multiple interfaces, packet count and DNS chain (dpkt reports 6 pa
   assert.equal(pk[0]?.ts, 1767663089.5003304);
   assert.deepEqual([...new Set(pk.map((p) => p.interfaceId))].sort(), [0, 1]);
   const names = r.dns.flatMap((d) => d.questions.map((q) => q.name));
-  assert.ok(names.includes('www.apple.com') && names.includes('google.com'));
+  const nameSet = new Set(names);
+  assert.ok(nameSet.has('www.apple.com') && nameSet.has('google.com'));
   const chain = r.dns.find((d) => d.response && d.questions[0]?.name === 'www.apple.com')!.answers.map((a) => `${a.type} ${a.data}`);
   assert.deepEqual(chain, ['CNAME www-apple-com.v.aaplimg.com', 'CNAME www.apple.com.edgekey.net', 'CNAME e6858.dsce9.akamaiedge.net', 'A 23.194.101.24']);
 });

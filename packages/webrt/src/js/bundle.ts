@@ -3,7 +3,7 @@
 import { parseJs, walk, staticString, propKey, memberName, t } from './ast.js';
 import { printAst } from './print.js';
 import { lineIndex, safeRelPath, truncate } from '../util.js';
-import { SourceMapIndex, type RawSourceMap } from '../sourcemap.js';
+import { SourceMapIndex, sourceMappingComments, type RawSourceMap } from '../sourcemap.js';
 
 export type BundlerKind = 'webpack5' | 'webpack4' | 'webpack-chunk' | 'browserify' | 'esbuild' | 'rollup' | 'vite' | 'parcel' | 'unknown';
 
@@ -85,8 +85,11 @@ export function unpackBundle(code: string, opts: { includeCode?: boolean; maxMod
   const { ast, errors } = parseJs(code);
   const pos = lineIndex(code);
   const res: BundleResult = { bundler: 'unknown', confidence: 0, chunkIds: [], modules: [], entryIds: [], imports: [], exports: [], runtime: {}, parserErrors: errors, notes: [] };
-  const sm = /\/\/[#@]\s*sourceMappingURL=(\S+)\s*$/.exec(code.slice(-4096));
-  if (sm) res.sourceMappingURL = sm[1];
+  const tail = code.slice(-4096);
+  for (const [start, end] of sourceMappingComments(tail, false, true)) {
+    const v = tail.slice(start, end);
+    if (v && !/\s/.test(v)) { res.sourceMappingURL = v; break; }
+  }
   const maxCode = opts.maxModuleCode ?? 200_000;
 
   // ESM / CJS level imports and exports of the file itself

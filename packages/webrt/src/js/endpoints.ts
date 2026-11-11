@@ -32,7 +32,7 @@ export interface EndpointReport {
 
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'request']);
 const ABS_URL = /^(?:https?|wss?):\/\/[^\s"'<>`]{1,2000}$/i;
-const API_PATH = /^\/(?:[\w.~%@:+-]+|\$\{\})(?:\/(?:[\w.~%@:+,-]+|\$\{\}|:\w+|\{\w+\}))*\/?(?:\?[\w=&%.${}-]*)?$/;
+const API_PATH = /^\/(?:[\w.~%@:+-]+|\$\{\})(?:\/(?:[\w.~%@:+,-]+|\$\{\}|\{\w+\}))*\/?(?:\?[\w=&%.${}-]*)?$/;
 const ASSET_EXT = /\.(?:png|jpe?g|gif|svg|webp|ico|css|woff2?|ttf|eot|map|mp4|mp3|wav|avif)$/i;
 const FLAG_CALLEE = /(?:^|\.)(?:isEnabled|isFeatureEnabled|featureEnabled|isOn|isOff|checkGate|getFeatureValue|getFeature|useFeature|useFeatureFlag|useFlag|useGate|getFlag|variation|boolVariation|stringVariation|getExperiment|useExperiment|getTreatment|isActive|hasFeature|feature|flag)$/i;
 const STORAGE = /^(?:window\.)?(?:localStorage|sessionStorage)\.(?:getItem|setItem|removeItem)$/;

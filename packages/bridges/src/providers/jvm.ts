@@ -1,12 +1,12 @@
 // JVM, Android and .NET decompiler bridges: jadx, apktool and ilspycmd. Node only.
 import { existsSync } from 'node:fs';
-import { readFile, rm, writeFile } from 'node:fs/promises';
+import { readFile, rm } from 'node:fs/promises';
 import { installFor } from '../catalog.js';
 import { join } from 'node:path';
 import { describeFailure, runTool } from '../exec.js';
 import { lines } from '../parsers/common.js';
 import type { Detection } from '../types.js';
-import { BridgeInputError, cacheRoot, ensureDir, inside, int, listFiles, need, requireFile, sha256File, withLock } from './common.js';
+import { BridgeInputError, cacheRoot, ensureDir, inside, int, listFiles, need, requireFile, sha256File, withLock, writeMarker } from './common.js';
 
 function javaEnv(det: Detection, java?: Detection): NodeJS.ProcessEnv {
   const env = { ...process.env };
@@ -55,7 +55,7 @@ async function jadxRun(input: JadxInput) {
     const r = await runTool(n.det.path!, args, { timeoutMs: int(input.timeoutMs, 10 * 60_000, 5000, 2 * 3600_000), maxOutputBytes: 4 * 1024 * 1024, env: javaEnv(n.det, java) });
     const src = join(outDir, 'sources');
     if (!existsSync(src)) return { ok: false as const, error: `jadx produced no sources (${describeFailure(r)})`, det: n.det };
-    await writeFile(done, new Date().toISOString(), 'utf8');
+    await writeMarker(done, new Date().toISOString());
     return { ok: true as const, outDir, cached: false, det: n.det, durationMs: r.durationMs };
   });
 }
@@ -158,7 +158,7 @@ export async function apktoolDecode(input: { path: string; cacheDir?: string; ti
         : await runTool(n.det.path!, args, { timeoutMs: int(input.timeoutMs, 10 * 60_000, 5000, 7_200_000), env: javaEnv(n.det, java) });
       durationMs = r.durationMs;
       if (!existsSync(join(outDir, 'AndroidManifest.xml'))) return { ...head('apktool', n.det, path), ok: false, error: `apktool failed (${describeFailure(r)})` };
-      await writeFile(done, new Date().toISOString(), 'utf8');
+      await writeMarker(done, new Date().toISOString());
     }
     const manifest = (await readFile(join(outDir, 'AndroidManifest.xml'), 'utf8')).slice(0, 2_000_000);
     const yml = existsSync(join(outDir, 'apktool.yml')) ? (await readFile(join(outDir, 'apktool.yml'), 'utf8')).slice(0, 200_000) : null;

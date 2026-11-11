@@ -1,6 +1,6 @@
 // Downloads large real Go binaries (esbuild 0.24.0 and 0.23.1, MIT) from the npm registry into
 // samples/.cache/disasm for the performance tests. Run: node packages/disasm/scripts/fetch-fixtures.mjs
-import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, renameSync, rmSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -30,15 +30,22 @@ const targets = [
   ['@esbuild/linux-x64', 'package/bin/esbuild', 'esbuild-linux-x64-0.23.1', '0.23.1'],
   ['@esbuild/darwin-arm64', 'package/bin/esbuild', 'esbuild-darwin-arm64-0.23.1', '0.23.1'],
 ];
+/** Write to a fresh temp file next to dest (created exclusively), then rename it into place. */
+function writeAtomic(dest, data) {
+  const tmp = `${dest}.${process.pid}.tmp`;
+  rmSync(tmp, { force: true });
+  writeFileSync(tmp, data, { flag: 'wx' });
+  renameSync(tmp, dest);
+}
+
 for (const [pkg, member, out, version] of targets) {
   const dest = join(cache, out);
   if (existsSync(dest)) continue;
-  const meta = await (await fetch(`https://registry.npmjs.org/${pkg.replace('/', '%2f')}/${version}`)).json();
+  const meta = await (await fetch(`https://registry.npmjs.org/${pkg.replace(/\//g, '%2f')}/${version}`)).json();
   const r = await fetch(meta.dist.tarball);
   if (!r.ok) throw new Error(`${pkg}: HTTP ${r.status}`);
   const tgz = Buffer.from(await r.arrayBuffer());
-  writeFileSync(dest, untar(gunzipSync(tgz), member));
+  writeAtomic(dest, untar(gunzipSync(tgz), member));
   console.log('fetched', out);
 }
-void readFileSync;
 console.log('fixtures ready in', cache);

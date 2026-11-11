@@ -2,9 +2,10 @@
 // Cursor, VS Code and Windsurf. Dry run by default; `write: true` saves with a timestamped backup.
 // The merge functions are pure so they can be tested without touching the disk.
 import { existsSync } from 'node:fs';
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { randomBytes } from 'node:crypto';
+import { mkdir, open, readFile, rename, rm, writeFile, type FileHandle } from 'node:fs/promises';
 import { homedir } from 'node:os';
-import { dirname, join, posix, win32 } from 'node:path';
+import { basename, dirname, join, posix, win32 } from 'node:path';
 
 export type McpClient = 'claude-code' | 'codex' | 'cursor' | 'vscode' | 'windsurf';
 export const MCP_CLIENTS: McpClient[] = ['claude-code', 'codex', 'cursor', 'vscode', 'windsurf'];
@@ -218,16 +219,31 @@ export async function planSetup(o: SetupOptions): Promise<SetupPlan> {
   return { client: o.client, scope, path, format, exists, changed: after !== before, before, after, entry, name };
 }
 
-/** Write a plan to disk. Existing files are copied to `<file>.revlens-backup-<timestamp>` first. */
+/**
+ * Write a plan to disk. An existing file is copied to `<file>.revlens-backup-<timestamp>` first (read
+ * through one descriptor, the backup created exclusively). The new content goes to a fresh temp file in
+ * the same folder, opened exclusively with the old file's permissions, and is renamed over the config, so
+ * the config is replaced in one step and never left half written.
+ */
 export async function applySetup(plan: SetupPlan, now: Date = new Date()): Promise<{ path: string; backup: string | null; written: boolean }> {
   if (!plan.changed) return { path: plan.path, backup: null, written: false };
-  await mkdir(dirname(plan.path), { recursive: true });
+  const dir = dirname(plan.path);
+  await mkdir(dir, { recursive: true });
   let backup: string | null = null;
-  if (existsSync(plan.path)) {
-    backup = `${plan.path}.revlens-backup-${now.toISOString().replace(/[:.]/g, '-')}`;
-    await copyFile(plan.path, backup);
+  let mode = 0o644;
+  let fh: FileHandle | undefined;
+  try { fh = await open(plan.path, 'r'); } catch (e) { if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e; }
+  if (fh) {
+    try {
+      const st = await fh.stat();
+      mode = st.mode & 0o777;
+      backup = `${plan.path}.revlens-backup-${now.toISOString().replace(/[:.]/g, '-')}`;
+      await writeFile(backup, await fh.readFile(), { flag: 'wx', mode });
+    } finally { await fh.close(); }
   }
-  await writeFile(plan.path, plan.after, 'utf8');
+  const tmp = join(dir, `.${basename(plan.path)}.revlens-${process.pid}-${randomBytes(6).toString('hex')}.tmp`);
+  await writeFile(tmp, plan.after, { encoding: 'utf8', flag: 'wx', mode });
+  try { await rename(tmp, plan.path); } catch (e) { await rm(tmp, { force: true }); throw e; }
   return { path: plan.path, backup, written: true };
 }
 

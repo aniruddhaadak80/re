@@ -98,17 +98,68 @@ function flatten(map: RawSourceMap, depth = 0): { map: RawSourceMap; line: numbe
 
 /** Extract an inline base64 source map from a script's sourceMappingURL comment, if any. */
 export function inlineSourceMap(js: string): RawSourceMap | undefined {
-  const m = /[#@]\s*sourceMappingURL=data:application\/json[^,]*?(;base64)?,([A-Za-z0-9+/=%._~-]+)\s*$/m.exec(js.slice(-8 * 1024 * 1024));
-  if (!m || !m[2]) return undefined;
+  const text = js.slice(-8 * 1024 * 1024);
+  let m: { base64: boolean; payload: string } | undefined;
+  let comma = -1;
+  for (const [start, end] of sourceMappingComments(text, true)) {
+    if (!text.startsWith('data:application/json', start)) continue;
+    if (comma < start) comma = text.indexOf(',', start);
+    if (comma < 0) break;
+    if (comma >= end) continue;
+    INLINE_PAYLOAD.lastIndex = comma + 1;
+    if (!INLINE_PAYLOAD.test(text) || INLINE_PAYLOAD.lastIndex !== end) continue;
+    m = { base64: text.slice(start, comma).endsWith(';base64'), payload: text.slice(comma + 1, end) };
+    break;
+  }
+  if (!m) return undefined;
   try {
-    const json = m[1] ? decodeUtf8(base64ToBytes(m[2])) : decodeURIComponent(m[2]);
+    const json = m.base64 ? decodeUtf8(base64ToBytes(m.payload)) : decodeURIComponent(m.payload);
     return parseSourceMap(json);
   } catch { return undefined; }
 }
 
 export function sourceMapUrl(js: string): string | undefined {
-  const m = /[#@]\s*sourceMappingURL=(\S+)\s*$/m.exec(js.slice(-65536));
-  return m?.[1];
+  const text = js.slice(-65536);
+  let skip = -1;
+  for (const [start, end] of sourceMappingComments(text, true)) {
+    if (start < skip || start === end) continue;
+    SPACE_G.lastIndex = start;
+    const w = SPACE_G.exec(text);
+    if (!w || w.index >= end) return text.slice(start, end);
+    skip = w.index; // every later value that starts before this space also contains it
+  }
+  return undefined;
+}
+
+const MAPPING_KEY = 'sourceMappingURL=';
+const INLINE_PAYLOAD = /[A-Za-z0-9+/=%._~-]+/y;
+const HAS_SPACE = /\s/;
+const SPACE_G = /\s/g;
+const LINE_END = /[\n\r\u2028\u2029]/g;
+
+/**
+ * Where the values of `#` or `@` sourceMappingURL= comments sit, in order: the offset just after the `=`
+ * and the end of its line (or of the whole text when perLine is false) with trailing white space left
+ * out. Callers validate the value. A plain scan with per line caching instead of a backtracking regex, so
+ * it stays linear on hostile input.
+ */
+export function* sourceMappingComments(text: string, perLine: boolean, needSlashes = false): Generator<[start: number, end: number]> {
+  let lineEnd = -1;
+  let trimmed = -1;
+  for (let i = text.indexOf(MAPPING_KEY); i >= 0; i = text.indexOf(MAPPING_KEY, i + 1)) {
+    let j = i - 1;
+    while (j >= 0 && HAS_SPACE.test(text[j] as string)) j--;
+    if (j < 0 || (text[j] !== '#' && text[j] !== '@')) continue;
+    if (needSlashes && (text[j - 1] !== '/' || text[j - 2] !== '/')) continue;
+    const start = i + MAPPING_KEY.length;
+    if (start > lineEnd) {
+      lineEnd = text.length;
+      if (perLine) { LINE_END.lastIndex = start; const e = LINE_END.exec(text); if (e) lineEnd = e.index; }
+      trimmed = lineEnd;
+      while (trimmed > start && HAS_SPACE.test(text[trimmed - 1] as string)) trimmed--;
+    }
+    yield [start, Math.max(start, trimmed)];
+  }
 }
 
 /** Recover original files from a source map: safe relative paths, sizes and (optionally) content. */

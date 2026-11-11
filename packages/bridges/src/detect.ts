@@ -335,6 +335,31 @@ function idaRoots(env: NodeJS.ProcessEnv, platform: NodeJS.Platform): { root: st
   return out;
 }
 
+/**
+ * Version from an IDA install folder name, such as "IDA Professional 9.1" or "ida-pro-9.0": the first
+ * dotted number after an "ida" (any case) with only non digits between. A plain scan, linear in the path.
+ */
+function idaVersionFromPath(root: string): string | undefined {
+  const lower = root.toLowerCase();
+  for (let i = lower.indexOf('ida'); i >= 0; i = lower.indexOf('ida', i + 1)) {
+    let j = i + 3;
+    while (j < root.length && !isDigit(root.charCodeAt(j))) j++;
+    let k = j;
+    let dots = 0;
+    for (;;) {
+      const s = k;
+      while (k < root.length && isDigit(root.charCodeAt(k))) k++;
+      if (k === s) { if (dots > 0) k--; break; }
+      if (root[k] === '.' && k + 1 < root.length && isDigit(root.charCodeAt(k + 1))) { dots++; k++; continue; }
+      break;
+    }
+    if (dots > 0) return root.slice(j, k);
+  }
+  return undefined;
+}
+
+function isDigit(c: number): boolean { return c >= 48 && c <= 57; }
+
 function detectIda(opts: DetectOptions): Detection {
   const env = opts.env ?? process.env;
   const platform = opts.platform ?? process.platform;
@@ -343,7 +368,7 @@ function detectIda(opts: DetectOptions): Detection {
     for (const n of ['idat', 'idat64']) {
       const p = join(root, platform === 'win32' ? `${n}.exe` : n);
       if (isExecutable(p, platform)) {
-        const ver = /(?:ida[^0-9]*)([0-9]+(?:\.[0-9]+)+)/i.exec(root)?.[1];
+        const ver = idaVersionFromPath(root);
         const hexrays = ['hexx64', 'hexarm64', 'hexrays'].some((x) => {
           try { return readdirSync(join(root, 'plugins')).some((f) => f.startsWith(x)); } catch { return false; }
         });

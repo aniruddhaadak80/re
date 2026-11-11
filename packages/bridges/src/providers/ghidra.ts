@@ -7,7 +7,7 @@ import { describeFailure, runTool, withTempDir } from '../exec.js';
 import { parseGhidraExport, type GhidraExport } from '../parsers/ghidra.js';
 import { GHIDRA_EXPORT_SCRIPT, GHIDRA_SCRIPT_NAME } from '../scripts.js';
 import type { Detection, Unavailable } from '../types.js';
-import { BridgeInputError, cacheRoot, ensureDir, int, need, requireFile, sha256File, withLock } from './common.js';
+import { BridgeInputError, cacheRoot, ensureDir, int, need, requireFile, sha256File, withLock, writeMarker } from './common.js';
 
 export interface GhidraInput {
   path: string;
@@ -91,7 +91,7 @@ export async function ghidraExport(input: GhidraInput & { mode: 'info' | 'functi
     }
     if (!cached) {
       const m: Marker = { programName: basename(path), sha256: sha, createdAt: new Date().toISOString(), ghidraVersion: det.version ?? null };
-      await writeFile(markerPath, JSON.stringify(m), 'utf8');
+      await writeMarker(markerPath, JSON.stringify(m));
     }
     const parsed = parseGhidraExport(await readFile(outJson, 'utf8'));
     if (!parsed) return { ok: false, error: 'Ghidra export JSON was not valid', det };

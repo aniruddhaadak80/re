@@ -1,7 +1,7 @@
 // Shared helpers for provider operations: input checks, results, caching. Node only.
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { createReadStream, statSync } from 'node:fs';
-import { mkdir, readdir, rm, stat } from 'node:fs/promises';
+import { mkdir, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { homedir, tmpdir, userInfo } from 'node:os';
 import { join, relative, resolve, sep } from 'node:path';
 import { detect } from '../detect.js';
@@ -78,6 +78,17 @@ function defaultCacheRoot(): string {
   let uid = 'user';
   try { uid = String(userInfo().uid); } catch { /* unknown */ }
   return join(tmpdir(), `revlens-cache-${uid}`);
+}
+
+/**
+ * Write a small marker file (cache done stamps, project markers) atomically: a fresh owner only file in
+ * the same folder, opened exclusively, then renamed over the target. A reader never sees half a marker,
+ * and nothing another user planted at the temp name is followed or reused.
+ */
+export async function writeMarker(path: string, text: string): Promise<void> {
+  const tmp = `${path}.${process.pid}-${randomBytes(6).toString('hex')}.tmp`;
+  await writeFile(tmp, text, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
+  try { await rename(tmp, path); } catch (e) { await rm(tmp, { force: true }); throw e; }
 }
 
 export async function ensureDir(d: string): Promise<string> {

@@ -144,7 +144,8 @@ test('jadx: decompiles Hello from the DEX and JAR, search finds the API host', {
   assert.match(src.source, /return i \+ i2;/);
   assert.match(src.source, /API_HOST = "https:\/\/api\.example\.invalid\/v1"/);
   const s = await run('bridge_jadx_search', { path: S('hello.dex'), query: 'API.EXAMPLE.invalid' });
-  assert.ok(s.hits.some((h: any) => h.className === 'dev.revlens.fixture.Hello' && h.text.includes('https://api.example.invalid/v1')));
+  const urlIn = (text: string) => { const m = /https?:\/\/[^\s"']+/.exec(text); try { return m ? new URL(m[0]) : null; } catch { return null; } };
+  assert.ok(s.hits.some((h: any) => { const u = urlIn(h.text); return h.className === 'dev.revlens.fixture.Hello' && u?.host === 'api.example.invalid' && u.pathname === '/v1'; }));
 });
 
 test('ILSpy: lists Greeter and decompiles AddNumbers and the secret', { skip: skipUnless('ilspy'), timeout: 5 * 60_000 }, async () => {

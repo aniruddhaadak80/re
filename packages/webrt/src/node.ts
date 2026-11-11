@@ -7,7 +7,7 @@ import { readAsar, readAsarFile, isAsar } from './asar.js';
 import { auditAsar, auditElectron, detectElectronVersionInBinary, type ElectronAudit } from './electron.js';
 import { browserCapture, type CaptureOptions } from './capture.js';
 import { InputError, safeRelPath, LIMITS } from './util.js';
-import { runScenario, validateScenario, type ScenarioOptions } from './scenario.js';
+import { runScenario, type ScenarioOptions } from './scenario.js';
 import { compareCaptures } from './compare.js';
 import { inspectPlaywrightTrace } from './trace.js';
 import { cdpTargets } from './cdp.js';
@@ -124,8 +124,12 @@ async function collectJs(dir: string, root: string, out: { path: string; code: s
     const p = join(dir, ent.name);
     if (ent.isDirectory()) await collectJs(p, root, out, depth + 1);
     else if (ent.isFile() && /\.(?:c|m)?js$/.test(ent.name)) {
-      const st = await stat(p);
-      if (st.size <= 4 * 1024 * 1024) out.push({ path: p.slice(root.length + 1).split(sep).join('/'), code: await readFile(p, 'utf8') });
+      // One descriptor for the size check and the read.
+      const fh = await open(p, 'r');
+      try {
+        const st = await fh.stat();
+        if (st.isFile() && st.size <= 4 * 1024 * 1024) out.push({ path: p.slice(root.length + 1).split(sep).join('/'), code: await fh.readFile('utf8') });
+      } finally { await fh.close(); }
     }
   }
 }

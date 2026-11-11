@@ -5,7 +5,7 @@
 //     `python3 -m PyInstaller` is available (pip install pyinstaller). Its TOC reference is
 //     written with PyInstaller's own archive reader.
 // Tests that need these files skip when they are missing.
-import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, copyFileSync, renameSync, rmSync } from 'node:fs';
 import { execFile } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,6 +22,14 @@ function run(cmd, args, opts = {}) {
   });
 }
 
+/** Write to a fresh temp file next to dest (created exclusively), then rename it into place. */
+function writeAtomic(dest, data) {
+  const tmp = `${dest}.${process.pid}.tmp`;
+  rmSync(tmp, { force: true });
+  writeFileSync(tmp, data, { flag: 'wx' });
+  renameSync(tmp, dest);
+}
+
 async function newtonsoft(version = '13.0.3', file = 'Newtonsoft.Json.dll') {
   const out = join(cache, file);
   if (existsSync(out)) { console.log('have', out); return; }
@@ -32,7 +40,7 @@ async function newtonsoft(version = '13.0.3', file = 'Newtonsoft.Json.dll') {
   const zip = unzipSync(new Uint8Array(await res.arrayBuffer()), { filter: (f) => f.name === 'lib/netstandard2.0/Newtonsoft.Json.dll' });
   const dll = zip['lib/netstandard2.0/Newtonsoft.Json.dll'];
   if (!dll) throw new Error('Newtonsoft.Json.dll not found in nupkg');
-  writeFileSync(out, dll);
+  writeAtomic(out, dll);
   console.log('wrote', out, dll.length);
 }
 

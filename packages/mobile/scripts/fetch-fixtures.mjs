@@ -8,7 +8,8 @@
 //     release v1.1.1.2: daggerfall-unity-il2cpp-64bit.apk (Unity IL2CPP), daggerfall-unity-mono-32bit.apk (Unity Mono)
 //   LocalSend, Apache-2.0, https://github.com/localsend/localsend, F-Droid build org.localsend.localsend_app_643.apk (Flutter)
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { inflateRawSync } from 'node:zlib';
@@ -22,18 +23,28 @@ const TARGETS = [
     url: 'https://github.com/Vwing/daggerfall-unity-android/releases/download/v1.1.1.2/daggerfall-unity-il2cpp-64bit.apk',
     license: 'MIT',
     members: ['AndroidManifest.xml', 'assets/bin/Data/Managed/Metadata/global-metadata.dat'],
+    sha256: {
+      'AndroidManifest.xml': 'a567e6a11b6a4f4f80c4a737d5bb67121d40a7cab48704aadf4d8b33a8533cbb',
+      'assets/bin/Data/Managed/Metadata/global-metadata.dat': 'baaff1bb4e826659e85db6eceb85cfd48671e4cec14e19d1acdea78a78c58dd8',
+    },
   },
   {
     id: 'daggerfall-mono-32',
     url: 'https://github.com/Vwing/daggerfall-unity-android/releases/download/v1.1.1.2/daggerfall-unity-mono-32bit.apk',
     license: 'MIT',
     members: ['AndroidManifest.xml'],
+    sha256: { 'AndroidManifest.xml': 'a567e6a11b6a4f4f80c4a737d5bb67121d40a7cab48704aadf4d8b33a8533cbb' },
   },
   {
     id: 'localsend-flutter',
     url: 'https://f-droid.org/repo/org.localsend.localsend_app_643.apk',
     license: 'Apache-2.0',
     members: ['AndroidManifest.xml', 'resources.arsc'],
+    sha256: {
+      'AndroidManifest.xml': '12cc84245ecbd9d47c70ead8f5dc8d229ac3cda96cd6024d8ddb458139b97109',
+      'resources.arsc': 'ea2275e556f26ef9d277d99d1c6604ef476f615cc8a16f269ae0d04134fb154a',
+      'lib/arm64-v8a/libapp.so': '5b995c8b67d6da4f91e34377afe773641b6a03bfa7f4c10645a6b295b25b703e',
+    },
     // only the head of the AOT library, which holds the Dart VM snapshot header
     partial: { 'lib/arm64-v8a/libapp.so': 1024 * 1024 },
   },
@@ -84,8 +95,14 @@ async function fetchTarget(t) {
     const n = e.cap ? Math.min(e.cap, e.csize) : e.csize;
     const raw = await range(t.url, dataStart, dataStart + n - 1);
     const data = e.method === 0 ? raw : inflateRawSync(raw);
+    // Only bytes that match the pinned SHA-256 are kept (the APKs are fixed release builds).
+    const got = createHash('sha256').update(data).digest('hex');
+    if (got !== t.sha256[name]) throw new Error(`${t.id}: ${name} SHA-256 ${got} does not match the pinned ${t.sha256[name]}`);
     const file = join(outDir, name.replace(/\//g, '__'));
-    await writeFile(file, data);
+    const tmp = `${file}.${process.pid}.tmp`;
+    await rm(tmp, { force: true });
+    await writeFile(tmp, data, { flag: 'wx' });
+    await rename(tmp, file);
     console.log(`  ${t.id}: ${name} (${data.length} bytes)`);
   }
 }

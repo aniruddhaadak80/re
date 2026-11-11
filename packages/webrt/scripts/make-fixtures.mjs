@@ -1,7 +1,7 @@
 // Regenerates the real test fixtures in samples/webrt with real toolchains:
 //   javascript-obfuscator (BSD-2-Clause), webpack (MIT), @electron/asar (MIT), python3 sqlite3.
 // Run from the repo root: node packages/webrt/scripts/make-fixtures.mjs
-import { readFileSync, writeFileSync, rmSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

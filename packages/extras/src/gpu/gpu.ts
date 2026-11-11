@@ -279,7 +279,7 @@ export function inspectGpu(b: Uint8Array): GpuObject | null {
     }
   }
   const head = utf8(b.subarray(0, Math.min(b.length, 1 << 16)));
-  if (ptxStartsWithVersion(head) || /\n\s*\.target\s+sm_\d/.test(head)) return { kind: 'ptx', ptx: parsePtx(utf8(b)) };
+  if (ptxStartsWithVersion(head) || /\n[^\S\n]*\.target[^\S\n]+sm_\d/.test(head)) return { kind: 'ptx', ptx: parsePtx(utf8(b)) };
   const fatbins = findFatbins(b);
   const offloadBundles = findOffloadBundles(b);
   if (fatbins.length || offloadBundles.length) return { kind: 'host-binary', fatbins, offloadBundles };

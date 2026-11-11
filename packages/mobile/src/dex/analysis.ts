@@ -299,7 +299,7 @@ export interface SecretPattern { id: string; title: string; re: RegExp; severity
 export const SECRET_PATTERNS: SecretPattern[] = [
   { id: 'aws-access-key', title: 'AWS access key id', re: /\b(AKIA|ASIA)[0-9A-Z]{16}\b/, severity: 'high' },
   { id: 'google-api-key', title: 'Google API key', re: /\bAIza[0-9A-Za-z_-]{35}\b/, severity: 'medium' },
-  { id: 'firebase-db', title: 'Firebase Realtime Database URL', re: /\bhttps:\/\/[a-z0-9-]{1,80}\.firebaseio\.com\b/, severity: 'low' },
+  { id: 'firebase-db', title: 'Firebase Realtime Database URL', re: /\bhttps:\/\/[a-z0-9-]{1,80}\.firebaseio\.com(?=$|[^\w.-])/, severity: 'low' },
   { id: 'private-key', title: 'PEM private key', re: /-----BEGIN (RSA |EC |DSA |OPENSSH |)PRIVATE KEY-----/, severity: 'high' },
   { id: 'slack-token', title: 'Slack token', re: /\bxox[abprs]-[0-9A-Za-z-]{10,80}\b/, severity: 'high' },
   { id: 'stripe-secret', title: 'Stripe secret key', re: /\b[sr]k_live_[0-9A-Za-z]{16,99}\b/, severity: 'high' },

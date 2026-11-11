@@ -1,12 +1,18 @@
 // Downloads a real Electron release (MIT) and extracts the executable into samples/.cache/webrt/
 // so tests can check version detection and fuse reading against @electron/fuses.
 // Run from the repo root: node packages/webrt/scripts/fetch-fixtures.mjs
-import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, readFileSync, renameSync, rmSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { inflateRawSync } from 'node:zlib';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const VERSION = '33.2.1';
+// SHA-256 of the extracted files from the official v33.2.1 linux-x64 release; anything else is refused.
+const SHA256 = {
+  electron: '20828dd41e2247931844e04fc4af25b1ca0bca8469c4536e2cd2a8f9e115ac35',
+  version: '30317a6c28602246343ef9b6f07f1ef0f046817b942f57b2d9851e393e8ebf00',
+};
 const here = dirname(fileURLToPath(import.meta.url));
 const out = resolve(here, '../../../samples/.cache/webrt');
 const exe = join(out, `electron-v${VERSION}-linux-x64`, 'electron');
@@ -33,7 +39,15 @@ for (let i = 0; i < count; i++) {
   if (name === 'electron' || name === 'version') {
     const lnlen = zip.readUInt16LE(lho + 26), lxlen = zip.readUInt16LE(lho + 28);
     const data = zip.subarray(lho + 30 + lnlen + lxlen, lho + 30 + lnlen + lxlen + csize);
-    writeFileSync(join(dirname(exe), name), method === 8 ? inflateRawSync(data) : data);
+    const bytes = method === 8 ? inflateRawSync(data) : data;
+    const got = createHash('sha256').update(bytes).digest('hex');
+    if (got !== SHA256[name]) throw new Error(`${name}: SHA-256 ${got} does not match the pinned ${SHA256[name]}`);
+    // verified bytes go to a fresh temp file (created exclusively) and are renamed into place
+    const dest = join(dirname(exe), name);
+    const tmp = `${dest}.${process.pid}.tmp`;
+    rmSync(tmp, { force: true });
+    writeFileSync(tmp, bytes, { flag: 'wx' });
+    renameSync(tmp, dest);
     console.log('wrote', join(dirname(exe), name));
   }
   p += 46 + nlen + xlen + clen;

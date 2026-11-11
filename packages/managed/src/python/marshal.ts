@@ -230,7 +230,7 @@ function floatRepr(x: number): string {
   if (!Number.isFinite(x)) return x > 0 ? 'inf' : '-inf';
   if (Number.isInteger(x) && Math.abs(x) < 1e16) return x.toFixed(1);
   const s = String(x);
-  return s.replace(/e\+?(-?)(\d)$/, 'e$10$2').replace(/e\+/, 'e+');
+  return s.replace(/e\+?(-?)(\d)$/, 'e$10$2');
 }
 
 function reprStr(s: string, bytes = false): string {
