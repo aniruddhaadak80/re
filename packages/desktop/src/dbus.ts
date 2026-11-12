@@ -69,7 +69,7 @@ export class DBusClient {
         sock.off('error', fail);
         sock.on('error', (e) => c.shutdown(e));
         sock.on('close', () => c.shutdown(new Error('D-Bus connection closed')));
-        sock.on('data', (b) => c.onData(b));
+        sock.on('data', (b: Buffer) => c.onData(b));
         const rest = Buffer.from(text.slice(nl + 2), 'latin1');
         if (rest.length) c.onData(rest);
         c.call({ destination: 'org.freedesktop.DBus', path: '/org/freedesktop/DBus', interface: 'org.freedesktop.DBus', member: 'Hello' }, timeoutMs)

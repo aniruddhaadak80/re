@@ -11,6 +11,7 @@ import { replyValue, parseAccessibleRefs, type UiNode } from './gvariant.js';
 import { compareSnapshots, type ProcessSnapshot } from './compare.js';
 import { run, powershell, requireExecution, psQuote } from './exec.js';
 import { BROWSER_TOOLS, type ToolDef } from './tools.js';
+import { Atspi } from './atspi.js';
 
 export * from './index.js';
 export { run, executionAllowed, psQuote } from './exec.js';
@@ -257,10 +258,23 @@ export async function listApps(opts: AppListOptions = {}): Promise<{ platform: s
 
 // ---------------- native UI tree ----------------
 
-export interface UiTreeOptions { allowExecution?: boolean; app?: string; pid?: number; maxNodes?: number; maxDepth?: number; timeoutMs?: number; /** Linux: AT-SPI bus address; default AT_SPI_BUS_ADDRESS or org.a11y.Bus on the session bus */ busAddress?: string }
+export interface UiTreeOptions { allowExecution?: boolean; app?: string; pid?: number; maxNodes?: number; maxDepth?: number; timeoutMs?: number; /** Linux: AT-SPI bus address; default AT_SPI_BUS_ADDRESS or org.a11y.Bus on the session bus */ busAddress?: string; /** Linux: also read states, actions, text and values of each element */ details?: boolean; /** Linux: 'dbus' (built-in D-Bus client, default) or 'gdbus' (one gdbus process per call, the older path) */ transport?: 'dbus' | 'gdbus' }
 export interface UiTree { platform: string; backend: 'at-spi' | 'macos-ax' | 'uia'; app?: string; pid?: number; nodes: UiNode[]; truncated: boolean; warnings: string[] }
 
 async function atspiTree(o: Required<Pick<UiTreeOptions, 'maxNodes' | 'maxDepth'>> & UiTreeOptions): Promise<UiTree> {
+  if (o.transport === 'gdbus') return atspiTreeGdbus(o);
+  let a: Atspi;
+  try { a = await Atspi.open(o.busAddress); }
+  catch (e) { if (e instanceof InputError && /no accessibility bus/.test(e.message)) throw e; return atspiTreeGdbus(o); }
+  try {
+    const r = await a.tree({ app: o.app, pid: o.pid, maxNodes: o.maxNodes, maxDepth: o.maxDepth, details: o.details });
+    const tree: UiTree = { platform: PLATFORM, backend: 'at-spi', app: o.app, pid: o.pid, nodes: r.nodes, truncated: r.truncated, warnings: [] };
+    if (!r.apps) tree.warnings.push('the accessibility registry lists no applications');
+    return tree;
+  } finally { a.close(); }
+}
+
+async function atspiTreeGdbus(o: Required<Pick<UiTreeOptions, 'maxNodes' | 'maxDepth'>> & UiTreeOptions): Promise<UiTree> {
   const tree: UiTree = { platform: PLATFORM, backend: 'at-spi', app: o.app, pid: o.pid, nodes: [], truncated: false, warnings: [] };
   let address = o.busAddress ?? process.env.AT_SPI_BUS_ADDRESS;
   if (!address) {

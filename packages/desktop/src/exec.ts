@@ -30,3 +30,16 @@ export function psQuote(s: string): string {
 export function powershell(script: string, timeoutMs = 30_000): Promise<RunResult> {
   return run('powershell.exe', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', script], { timeoutMs });
 }
+
+export interface BufferResult { code: number; stdout: Uint8Array; stderr: string; timedOut: boolean }
+
+/** Like run, but stdout comes back as bytes (screenshots, binary dumps). */
+export function runBuffer(cmd: string, args: string[], opts: { timeoutMs?: number; maxBytes?: number; env?: NodeJS.ProcessEnv } = {}): Promise<BufferResult> {
+  return new Promise((resolve, reject) => {
+    execFile(cmd, args, { timeout: Math.max(500, Math.min(opts.timeoutMs ?? 15_000, 300_000)), maxBuffer: opts.maxBytes ?? 256 * 1024 * 1024, windowsHide: true, shell: false, encoding: 'buffer', env: opts.env ?? process.env }, (err, stdout, stderr) => {
+      const e = err as (NodeJS.ErrnoException & { killed?: boolean; signal?: string; code?: number | string }) | null;
+      if (e && e.code === 'ENOENT') { reject(new InputError(`${cmd} is not installed or not on PATH`)); return; }
+      resolve({ code: e ? (typeof e.code === 'number' ? e.code : 1) : 0, stdout: new Uint8Array(stdout ?? []), stderr: String(stderr ?? '').slice(0, 4000), timedOut: !!e?.killed && e?.signal === 'SIGTERM' });
+    });
+  });
+}
