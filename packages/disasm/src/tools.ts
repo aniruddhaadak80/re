@@ -5,6 +5,7 @@ import {
 } from './api.js';
 import { disasmTraceValues, disasmIndirectTargets } from './flowapi.js';
 import { disasmMatchFunctions, disasmCompareFunctions } from './matchapi.js';
+import { R3_TOOLS } from './tools-r3.js';
 
 export interface ToolParam { type: 'string' | 'number' | 'boolean' | 'array' | 'object'; description: string; optional?: boolean }
 export interface Tool { name: string; description: string; inputSchema: Record<string, ToolParam>; run: (input: any) => Promise<unknown> } // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -16,7 +17,7 @@ const limit = (d: number, max: number): ToolParam => ({ type: 'number', descript
 const fn: ToolParam = { type: 'string', description: 'Function name (exact or without leading underscore/version suffix) or address like 0x401000' };
 const budget: ToolParam = { type: 'number', description: 'Time budget in ms for program wide indexing (default 8000); results say complete:false when it ran out', optional: true };
 
-export const TOOLS: Tool[] = [
+const BASE_TOOLS: Tool[] = [
   {
     name: 'disasm_info',
     description: 'Overview of a native binary for disassembly: format, architecture, entry point, sections, symbol/import/function counts and decoder in use.',
@@ -164,3 +165,6 @@ export const TOOLS: Tool[] = [
     run: (i) => disasmCompareFunctions(i),
   },
 ];
+
+/** Every disasm tool: the base set plus the round 3 navigation, debug info, export and annotation tools. */
+export const TOOLS: Tool[] = [...BASE_TOOLS, ...R3_TOOLS];

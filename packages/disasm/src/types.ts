@@ -79,6 +79,10 @@ export interface BinaryImage {
   slices?: { arch: Arch; offset: number; size: number }[];
   /** pointer values the dynamic loader writes (ELF RELATIVE relocations), keyed by address */
   relocPtrs?: Map<number, number>;
+  /** non loaded sections with debug info (ELF .debug_*), by file offset */
+  debugSections?: { name: string; offset: number; size: number }[];
+  /** debug sections stored compressed (SHF_COMPRESSED), not decoded */
+  debugCompressed?: string[];
   /** Go build detected through a pclntab */
   goVersionHint?: string;
   warnings: string[];

@@ -1,0 +1,1142 @@
+{
+ "types-dwarf4-arm64-O0.elf": {
+  "enums": {
+   "color": {
+    "BLUE": -3,
+    "GREEN": 5,
+    "RED": 0
+   }
+  },
+  "functions": {
+   "cmp_int": {
+    "high": "0x1010880",
+    "locals": [],
+    "low": "0x1010858",
+    "params": [
+     {
+      "name": "a",
+      "type": "const void *"
+     },
+     {
+      "name": "b",
+      "type": "const void *"
+     }
+    ],
+    "returns": "int"
+   },
+   "main": {
+    "high": "0x1010858",
+    "locals": [
+     "v"
+    ],
+    "low": "0x101074c",
+    "params": [
+     {
+      "name": "argc",
+      "type": "int"
+     },
+     {
+      "name": "argv",
+      "type": "char **"
+     }
+    ],
+    "returns": "int"
+   },
+   "node_weight": {
+    "high": "0x1010720",
+    "locals": [
+     "w",
+     "it"
+    ],
+    "low": "0x101066c",
+    "params": [
+     {
+      "name": "n",
+      "type": "node *"
+     },
+     {
+      "name": "scale",
+      "type": "int"
+     },
+     {
+      "name": "c",
+      "type": "color_t"
+     }
+    ],
+    "returns": "int"
+   },
+   "point_sum": {
+    "high": "0x101066c",
+    "locals": [],
+    "low": "0x1010648",
+    "params": [
+     {
+      "name": "p",
+      "type": "point_t *"
+     }
+    ],
+    "returns": "int"
+   },
+   "value_mix": {
+    "high": "0x101074c",
+    "locals": [],
+    "low": "0x1010720",
+    "params": [
+     {
+      "name": "v",
+      "type": "value"
+     },
+     {
+      "name": "k",
+      "type": "float"
+     }
+    ],
+    "returns": "double"
+   }
+  },
+  "globals": {
+   "g_points": {
+    "addr": "0x1030b14",
+    "type": "point_t[3]"
+   },
+   "g_root": {
+    "addr": "0x1030b30",
+    "type": "node"
+   }
+  },
+  "structs": {
+   "struct flags": {
+    "members": [
+     {
+      "bitOffset": 0,
+      "bitSize": 3,
+      "name": "a",
+      "type": "unsigned int"
+     },
+     {
+      "bitOffset": 3,
+      "bitSize": 5,
+      "name": "b",
+      "type": "unsigned int"
+     },
+     {
+      "bitOffset": 8,
+      "bitSize": 1,
+      "name": "c",
+      "type": "unsigned int"
+     }
+    ],
+    "size": 4
+   },
+   "struct node": {
+    "members": [
+     {
+      "name": "next",
+      "offset": 0,
+      "type": "node *"
+     },
+     {
+      "name": "name",
+      "offset": 8,
+      "type": "const char *"
+     },
+     {
+      "name": "pos",
+      "offset": 16,
+      "type": "point_t"
+     },
+     {
+      "name": "color",
+      "offset": 24,
+      "type": "color_t"
+     },
+     {
+      "name": "val",
+      "offset": 32,
+      "type": "value"
+     },
+     {
+      "name": "fl",
+      "offset": 40,
+      "type": "flags"
+     },
+     {
+      "name": "ids",
+      "offset": 44,
+      "type": "u32_t[4]"
+     },
+     {
+      "name": "compare",
+      "offset": 64,
+      "type": "cmp_fn"
+     },
+     {
+      "name": "counter",
+      "offset": 72,
+      "type": "volatile long"
+     }
+    ],
+    "size": 80
+   },
+   "struct point": {
+    "members": [
+     {
+      "name": "x",
+      "offset": 0,
+      "type": "int"
+     },
+     {
+      "name": "y",
+      "offset": 4,
+      "type": "int"
+     }
+    ],
+    "size": 8
+   },
+   "union value": {
+    "members": [
+     {
+      "name": "i",
+      "offset": 0,
+      "type": "int"
+     },
+     {
+      "name": "f",
+      "offset": 0,
+      "type": "float"
+     },
+     {
+      "name": "d",
+      "offset": 0,
+      "type": "double"
+     },
+     {
+      "name": "bytes",
+      "offset": 0,
+      "type": "char[8]"
+     }
+    ],
+    "size": 8
+   }
+  },
+  "typedefs": {
+   "cmp_fn": "int (*)(const void *, const void *)",
+   "color_t": "color",
+   "point_t": "point",
+   "u32_t": "unsigned int"
+  },
+  "version": 4
+ },
+ "types-dwarf4-x64.elf": {
+  "enums": {
+   "color": {
+    "BLUE": -3,
+    "GREEN": 5,
+    "RED": 0
+   }
+  },
+  "functions": {
+   "cmp_int": {
+    "high": "0x10016ea",
+    "locals": [],
+    "low": "0x10016e0",
+    "params": [
+     {
+      "name": "a",
+      "type": "const void *"
+     },
+     {
+      "name": "b",
+      "type": "const void *"
+     }
+    ],
+    "returns": "int"
+   },
+   "main": {
+    "high": "0x10016de",
+    "locals": [
+     "v"
+    ],
+    "low": "0x1001630",
+    "params": [
+     {
+      "name": "argc",
+      "type": "int"
+     },
+     {
+      "name": "argv",
+      "type": "char **"
+     }
+    ],
+    "returns": "int"
+   },
+   "node_weight": {
+    "high": "0x1001609",
+    "locals": [
+     "w",
+     "it"
+    ],
+    "low": "0x1001590",
+    "params": [
+     {
+      "name": "n",
+      "type": "node *"
+     },
+     {
+      "name": "scale",
+      "type": "int"
+     },
+     {
+      "name": "c",
+      "type": "color_t"
+     }
+    ],
+    "returns": "int"
+   },
+   "point_sum": {
+    "high": "0x100158b",
+    "locals": [],
+    "low": "0x1001580",
+    "params": [
+     {
+      "name": "p",
+      "type": "point_t *"
+     }
+    ],
+    "returns": "int"
+   },
+   "value_mix": {
+    "high": "0x100162e",
+    "locals": [],
+    "low": "0x1001610",
+    "params": [
+     {
+      "name": "v",
+      "type": "value"
+     },
+     {
+      "name": "k",
+      "type": "float"
+     }
+    ],
+    "returns": "double"
+   }
+  },
+  "globals": {
+   "g_points": {
+    "addr": "0x1003880",
+    "type": "point_t[3]"
+   },
+   "g_root": {
+    "addr": "0x1003898",
+    "type": "node"
+   }
+  },
+  "structs": {
+   "struct flags": {
+    "members": [
+     {
+      "bitOffset": 0,
+      "bitSize": 3,
+      "name": "a",
+      "type": "unsigned int"
+     },
+     {
+      "bitOffset": 3,
+      "bitSize": 5,
+      "name": "b",
+      "type": "unsigned int"
+     },
+     {
+      "bitOffset": 8,
+      "bitSize": 1,
+      "name": "c",
+      "type": "unsigned int"
+     }
+    ],
+    "size": 4
+   },
+   "struct node": {
+    "members": [
+     {
+      "name": "next",
+      "offset": 0,
+      "type": "node *"
+     },
+     {
+      "name": "name",
+      "offset": 8,
+      "type": "const char *"
+     },
+     {
+      "name": "pos",
+      "offset": 16,
+      "type": "point_t"
+     },
+     {
+      "name": "color",
+      "offset": 24,
+      "type": "color_t"
+     },
+     {
+      "name": "val",
+      "offset": 32,
+      "type": "value"
+     },
+     {
+      "name": "fl",
+      "offset": 40,
+      "type": "flags"
+     },
+     {
+      "name": "ids",
+      "offset": 44,
+      "type": "u32_t[4]"
+     },
+     {
+      "name": "compare",
+      "offset": 64,
+      "type": "cmp_fn"
+     },
+     {
+      "name": "counter",
+      "offset": 72,
+      "type": "volatile long"
+     }
+    ],
+    "size": 80
+   },
+   "struct point": {
+    "members": [
+     {
+      "name": "x",
+      "offset": 0,
+      "type": "int"
+     },
+     {
+      "name": "y",
+      "offset": 4,
+      "type": "int"
+     }
+    ],
+    "size": 8
+   },
+   "union value": {
+    "members": [
+     {
+      "name": "i",
+      "offset": 0,
+      "type": "int"
+     },
+     {
+      "name": "f",
+      "offset": 0,
+      "type": "float"
+     },
+     {
+      "name": "d",
+      "offset": 0,
+      "type": "double"
+     },
+     {
+      "name": "bytes",
+      "offset": 0,
+      "type": "char[8]"
+     }
+    ],
+    "size": 8
+   }
+  },
+  "typedefs": {
+   "cmp_fn": "int (*)(const void *, const void *)",
+   "color_t": "color",
+   "point_t": "point",
+   "u32_t": "unsigned int"
+  },
+  "version": 4
+ },
+ "types-dwarf5-arm64.elf": {
+  "enums": {
+   "color": {
+    "BLUE": -3,
+    "GREEN": 5,
+    "RED": 0
+   }
+  },
+  "functions": {
+   "cmp_int": {
+    "high": "0x10106ec",
+    "locals": [],
+    "low": "0x10106dc",
+    "params": [
+     {
+      "name": "a",
+      "type": "const void *"
+     },
+     {
+      "name": "b",
+      "type": "const void *"
+     }
+    ],
+    "returns": "int"
+   },
+   "main": {
+    "high": "0x10106dc",
+    "locals": [
+     "v"
+    ],
+    "low": "0x101062c",
+    "params": [
+     {
+      "name": "argc",
+      "type": "int"
+     },
+     {
+      "name": "argv",
+      "type": "char **"
+     }
+    ],
+    "returns": "int"
+   },
+   "node_weight": {
+    "high": "0x1010618",
+    "locals": [
+     "w",
+     "it"
+    ],
+    "low": "0x1010594",
+    "params": [
+     {
+      "name": "n",
+      "type": "node *"
+     },
+     {
+      "name": "scale",
+      "type": "int"
+     },
+     {
+      "name": "c",
+      "type": "color_t"
+     }
+    ],
+    "returns": "int"
+   },
+   "point_sum": {
+    "high": "0x1010594",
+    "locals": [],
+    "low": "0x1010588",
+    "params": [
+     {
+      "name": "p",
+      "type": "point_t *"
+     }
+    ],
+    "returns": "int"
+   },
+   "value_mix": {
+    "high": "0x101062c",
+    "locals": [],
+    "low": "0x1010618",
+    "params": [
+     {
+      "name": "v",
+      "type": "value"
+     },
+     {
+      "name": "k",
+      "type": "float"
+     }
+    ],
+    "returns": "double"
+   }
+  },
+  "globals": {
+   "g_points": {
+    "addr": "0x1030920",
+    "type": "point_t[3]"
+   },
+   "g_root": {
+    "addr": "0x1030938",
+    "type": "node"
+   }
+  },
+  "structs": {
+   "struct flags": {
+    "members": [
+     {
+      "bitOffset": 0,
+      "bitSize": 3,
+      "name": "a",
+      "type": "unsigned int"
+     },
+     {
+      "bitOffset": 3,
+      "bitSize": 5,
+      "name": "b",
+      "type": "unsigned int"
+     },
+     {
+      "bitOffset": 8,
+      "bitSize": 1,
+      "name": "c",
+      "type": "unsigned int"
+     }
+    ],
+    "size": 4
+   },
+   "struct node": {
+    "members": [
+     {
+      "name": "next",
+      "offset": 0,
+      "type": "node *"
+     },
+     {
+      "name": "name",
+      "offset": 8,
+      "type": "const char *"
+     },
+     {
+      "name": "pos",
+      "offset": 16,
+      "type": "point_t"
+     },
+     {
+      "name": "color",
+      "offset": 24,
+      "type": "color_t"
+     },
+     {
+      "name": "val",
+      "offset": 32,
+      "type": "value"
+     },
+     {
+      "name": "fl",
+      "offset": 40,
+      "type": "flags"
+     },
+     {
+      "name": "ids",
+      "offset": 44,
+      "type": "u32_t[4]"
+     },
+     {
+      "name": "compare",
+      "offset": 64,
+      "type": "cmp_fn"
+     },
+     {
+      "name": "counter",
+      "offset": 72,
+      "type": "volatile long"
+     }
+    ],
+    "size": 80
+   },
+   "struct point": {
+    "members": [
+     {
+      "name": "x",
+      "offset": 0,
+      "type": "int"
+     },
+     {
+      "name": "y",
+      "offset": 4,
+      "type": "int"
+     }
+    ],
+    "size": 8
+   },
+   "union value": {
+    "members": [
+     {
+      "name": "i",
+      "offset": 0,
+      "type": "int"
+     },
+     {
+      "name": "f",
+      "offset": 0,
+      "type": "float"
+     },
+     {
+      "name": "d",
+      "offset": 0,
+      "type": "double"
+     },
+     {
+      "name": "bytes",
+      "offset": 0,
+      "type": "char[8]"
+     }
+    ],
+    "size": 8
+   }
+  },
+  "typedefs": {
+   "cmp_fn": "int (*)(const void *, const void *)",
+   "color_t": "color",
+   "point_t": "point",
+   "u32_t": "unsigned int"
+  },
+  "version": 5
+ },
+ "types-dwarf5-x64-O0.elf": {
+  "enums": {
+   "color": {
+    "BLUE": -3,
+    "GREEN": 5,
+    "RED": 0
+   }
+  },
+  "functions": {
+   "cmp_int": {
+    "high": "0x10017ba",
+    "locals": [],
+    "low": "0x10017a0",
+    "params": [
+     {
+      "name": "a",
+      "type": "const void *"
+     },
+     {
+      "name": "b",
+      "type": "const void *"
+     }
+    ],
+    "returns": "int"
+   },
+   "main": {
+    "high": "0x1001796",
+    "locals": [
+     "v"
+    ],
+    "low": "0x10016a0",
+    "params": [
+     {
+      "name": "argc",
+      "type": "int"
+     },
+     {
+      "name": "argv",
+      "type": "char **"
+     }
+    ],
+    "returns": "int"
+   },
+   "node_weight": {
+    "high": "0x100166d",
+    "locals": [
+     "w",
+     "it"
+    ],
+    "low": "0x10015f0",
+    "params": [
+     {
+      "name": "n",
+      "type": "node *"
+     },
+     {
+      "name": "scale",
+      "type": "int"
+     },
+     {
+      "name": "c",
+      "type": "color_t"
+     }
+    ],
+    "returns": "int"
+   },
+   "point_sum": {
+    "high": "0x10015e7",
+    "locals": [],
+    "low": "0x10015d0",
+    "params": [
+     {
+      "name": "p",
+      "type": "point_t *"
+     }
+    ],
+    "returns": "int"
+   },
+   "value_mix": {
+    "high": "0x100169a",
+    "locals": [],
+    "low": "0x1001670",
+    "params": [
+     {
+      "name": "v",
+      "type": "value"
+     },
+     {
+      "name": "k",
+      "type": "float"
+     }
+    ],
+    "returns": "double"
+   }
+  },
+  "globals": {
+   "g_points": {
+    "addr": "0x10039f0",
+    "type": "point_t[3]"
+   },
+   "g_root": {
+    "addr": "0x1003a08",
+    "type": "node"
+   }
+  },
+  "structs": {
+   "struct flags": {
+    "members": [
+     {
+      "bitOffset": 0,
+      "bitSize": 3,
+      "name": "a",
+      "type": "unsigned int"
+     },
+     {
+      "bitOffset": 3,
+      "bitSize": 5,
+      "name": "b",
+      "type": "unsigned int"
+     },
+     {
+      "bitOffset": 8,
+      "bitSize": 1,
+      "name": "c",
+      "type": "unsigned int"
+     }
+    ],
+    "size": 4
+   },
+   "struct node": {
+    "members": [
+     {
+      "name": "next",
+      "offset": 0,
+      "type": "node *"
+     },
+     {
+      "name": "name",
+      "offset": 8,
+      "type": "const char *"
+     },
+     {
+      "name": "pos",
+      "offset": 16,
+      "type": "point_t"
+     },
+     {
+      "name": "color",
+      "offset": 24,
+      "type": "color_t"
+     },
+     {
+      "name": "val",
+      "offset": 32,
+      "type": "value"
+     },
+     {
+      "name": "fl",
+      "offset": 40,
+      "type": "flags"
+     },
+     {
+      "name": "ids",
+      "offset": 44,
+      "type": "u32_t[4]"
+     },
+     {
+      "name": "compare",
+      "offset": 64,
+      "type": "cmp_fn"
+     },
+     {
+      "name": "counter",
+      "offset": 72,
+      "type": "volatile long"
+     }
+    ],
+    "size": 80
+   },
+   "struct point": {
+    "members": [
+     {
+      "name": "x",
+      "offset": 0,
+      "type": "int"
+     },
+     {
+      "name": "y",
+      "offset": 4,
+      "type": "int"
+     }
+    ],
+    "size": 8
+   },
+   "union value": {
+    "members": [
+     {
+      "name": "i",
+      "offset": 0,
+      "type": "int"
+     },
+     {
+      "name": "f",
+      "offset": 0,
+      "type": "float"
+     },
+     {
+      "name": "d",
+      "offset": 0,
+      "type": "double"
+     },
+     {
+      "name": "bytes",
+      "offset": 0,
+      "type": "char[8]"
+     }
+    ],
+    "size": 8
+   }
+  },
+  "typedefs": {
+   "cmp_fn": "int (*)(const void *, const void *)",
+   "color_t": "color",
+   "point_t": "point",
+   "u32_t": "unsigned int"
+  },
+  "version": 5
+ },
+ "types-dwarf5-x64.elf": {
+  "enums": {
+   "color": {
+    "BLUE": -3,
+    "GREEN": 5,
+    "RED": 0
+   }
+  },
+  "functions": {
+   "cmp_int": {
+    "high": "0x10016ea",
+    "locals": [],
+    "low": "0x10016e0",
+    "params": [
+     {
+      "name": "a",
+      "type": "const void *"
+     },
+     {
+      "name": "b",
+      "type": "const void *"
+     }
+    ],
+    "returns": "int"
+   },
+   "main": {
+    "high": "0x10016de",
+    "locals": [
+     "v"
+    ],
+    "low": "0x1001630",
+    "params": [
+     {
+      "name": "argc",
+      "type": "int"
+     },
+     {
+      "name": "argv",
+      "type": "char **"
+     }
+    ],
+    "returns": "int"
+   },
+   "node_weight": {
+    "high": "0x1001609",
+    "locals": [
+     "w",
+     "it"
+    ],
+    "low": "0x1001590",
+    "params": [
+     {
+      "name": "n",
+      "type": "node *"
+     },
+     {
+      "name": "scale",
+      "type": "int"
+     },
+     {
+      "name": "c",
+      "type": "color_t"
+     }
+    ],
+    "returns": "int"
+   },
+   "point_sum": {
+    "high": "0x100158b",
+    "locals": [],
+    "low": "0x1001580",
+    "params": [
+     {
+      "name": "p",
+      "type": "point_t *"
+     }
+    ],
+    "returns": "int"
+   },
+   "value_mix": {
+    "high": "0x100162e",
+    "locals": [],
+    "low": "0x1001610",
+    "params": [
+     {
+      "name": "v",
+      "type": "value"
+     },
+     {
+      "name": "k",
+      "type": "float"
+     }
+    ],
+    "returns": "double"
+   }
+  },
+  "globals": {
+   "g_points": {
+    "addr": "0x1003880",
+    "type": "point_t[3]"
+   },
+   "g_root": {
+    "addr": "0x1003898",
+    "type": "node"
+   }
+  },
+  "structs": {
+   "struct flags": {
+    "members": [
+     {
+      "bitOffset": 0,
+      "bitSize": 3,
+      "name": "a",
+      "type": "unsigned int"
+     },
+     {
+      "bitOffset": 3,
+      "bitSize": 5,
+      "name": "b",
+      "type": "unsigned int"
+     },
+     {
+      "bitOffset": 8,
+      "bitSize": 1,
+      "name": "c",
+      "type": "unsigned int"
+     }
+    ],
+    "size": 4
+   },
+   "struct node": {
+    "members": [
+     {
+      "name": "next",
+      "offset": 0,
+      "type": "node *"
+     },
+     {
+      "name": "name",
+      "offset": 8,
+      "type": "const char *"
+     },
+     {
+      "name": "pos",
+      "offset": 16,
+      "type": "point_t"
+     },
+     {
+      "name": "color",
+      "offset": 24,
+      "type": "color_t"
+     },
+     {
+      "name": "val",
+      "offset": 32,
+      "type": "value"
+     },
+     {
+      "name": "fl",
+      "offset": 40,
+      "type": "flags"
+     },
+     {
+      "name": "ids",
+      "offset": 44,
+      "type": "u32_t[4]"
+     },
+     {
+      "name": "compare",
+      "offset": 64,
+      "type": "cmp_fn"
+     },
+     {
+      "name": "counter",
+      "offset": 72,
+      "type": "volatile long"
+     }
+    ],
+    "size": 80
+   },
+   "struct point": {
+    "members": [
+     {
+      "name": "x",
+      "offset": 0,
+      "type": "int"
+     },
+     {
+      "name": "y",
+      "offset": 4,
+      "type": "int"
+     }
+    ],
+    "size": 8
+   },
+   "union value": {
+    "members": [
+     {
+      "name": "i",
+      "offset": 0,
+      "type": "int"
+     },
+     {
+      "name": "f",
+      "offset": 0,
+      "type": "float"
+     },
+     {
+      "name": "d",
+      "offset": 0,
+      "type": "double"
+     },
+     {
+      "name": "bytes",
+      "offset": 0,
+      "type": "char[8]"
+     }
+    ],
+    "size": 8
+   }
+  },
+  "typedefs": {
+   "cmp_fn": "int (*)(const void *, const void *)",
+   "color_t": "color",
+   "point_t": "point",
+   "u32_t": "unsigned int"
+  },
+  "version": 5
+ }
+}

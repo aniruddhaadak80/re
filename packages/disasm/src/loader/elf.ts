@@ -157,6 +157,15 @@ export function loadElf(bytes: Uint8Array): BinaryImage {
     }
   }
 
+  const debugSections: { name: string; offset: number; size: number }[] = [];
+  const debugCompressed: string[] = [];
+  for (const s of shdrs) {
+    if ((s.flags & 2) !== 0 || s.type === 8 || !/^\.(z?debug_)/.test(s.name)) continue;
+    if (s.offset >= bytes.length) continue;
+    debugSections.push({ name: s.name, offset: s.offset, size: Math.min(s.size, bytes.length - s.offset) });
+    if ((s.flags & 0x800) !== 0) debugCompressed.push(s.name);
+  }
+
   const entryThumb = arch === 'arm' && (entryRaw & 1) === 1;
   return {
     format: 'elf', arch, bits, endian: r.le ? 'le' : 'be',
@@ -166,5 +175,7 @@ export function loadElf(bytes: Uint8Array): BinaryImage {
     segments, sections, symbols, imports, hints,
     bytes, fileOffset: 0, warnings,
     ...(relocPtrs.size ? { relocPtrs } : {}),
+    ...(debugSections.length ? { debugSections } : {}),
+    ...(debugCompressed.length ? { debugCompressed } : {}),
   };
 }

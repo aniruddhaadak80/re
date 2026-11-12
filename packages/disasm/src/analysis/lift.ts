@@ -4,7 +4,8 @@ import type { AnalyzedFunction, Arch, BasicBlock, Insn } from '../types.js';
 import type { Program } from './program.js';
 import { hx, parseImm, splitOperands } from '../util.js';
 import type { FlowResult, StackVar } from './dataflow.js';
-import { canon } from './regs.js';
+import { canon, writes } from './regs.js';
+import { declare } from '../debug/dwarf.js';
 
 interface Cond { lhs: string; rhs: string; op: string; text?: string }
 
@@ -37,6 +38,20 @@ function canonReg(arch: Arch, r: string): string {
   return r;
 }
 
+/** Names and types from debug info (DWARF) for one function. */
+export interface LiftDebug {
+  /** C prototype that replaces the guessed signature */
+  prototype?: string;
+  /** parameter names keyed by canonical argument register */
+  paramByReg: Map<string, { name: string; typeRef?: number }>;
+  /** variable names and types keyed by offset from the stack pointer at entry */
+  varByOff: Map<number, { name: string; type: string; typeRef?: number; param?: boolean }>;
+  /** "->field" text for a pointer typed value plus a byte offset */
+  field(typeRef: number | undefined, off: number): string | undefined;
+  /** where the names came from, for the header comment */
+  source: string;
+}
+
 export interface LiftResult {
   name: string;
   addr: number;
@@ -65,12 +80,23 @@ class Lifter {
   /** register parameter count of another function, when known */
   paramsOf?: (addr: number) => number | undefined;
   private readonly vars = new Map<number, StackVar>();
+  private readonly dbg: LiftDebug | undefined;
+  /** typeRef of named values (parameters, typed locals) */
+  private readonly typed = new Map<string, number>();
+  /** registers that hold a copy of a typed named value inside the current block */
+  private readonly typedRegs = new Map<string, string>();
 
-  constructor(p: Program, af: AnalyzedFunction, maxLines: number, fl?: FlowResult) {
+  constructor(p: Program, af: AnalyzedFunction, maxLines: number, fl?: FlowResult, dbg?: LiftDebug) {
     this.p = p;
     this.af = af;
     this.fl = fl;
-    if (fl) for (const v of fl.stackVars) this.vars.set(v.off, v);
+    this.dbg = dbg;
+    if (fl) for (const v of fl.stackVars) {
+      const d = dbg?.varByOff.get(v.off);
+      this.vars.set(v.off, d && v.kind !== 'saved-reg' ? { ...v, name: d.name } : v);
+      if (d?.typeRef !== undefined) this.typed.set(d.name, d.typeRef);
+    }
+    if (dbg) for (const pr of dbg.paramByReg.values()) if (pr.typeRef !== undefined) this.typed.set(pr.name, pr.typeRef);
     this.arch = p.arch;
     this.maxLines = maxLines;
     this.conv = this.arch === 'x86_64' ? (p.img.format === 'pe' ? ARGS.win64! : ARGS.sysv!) : this.arch === 'arm64' ? ARGS.arm64! : this.arch === 'arm' ? ARGS.arm! : [];
@@ -98,6 +124,7 @@ class Lifter {
     if (sv) return asAddress ? '&' + sv : sv;
     if (ins.memAddr !== undefined && !ins.viaMemory) return this.refText(ins, ins.memAddr, asAddress);
     const inner = op.slice(b + 1, op.lastIndexOf(']')).replace(/#/g, '').split(',').map((s) => s.trim()).filter(Boolean);
+    if (this.dbg) { const f = this.fieldText(ins, inner); if (f) return asAddress ? '&' + f : f; }
     // [x8, x9, lsl 2] -> x8 + x9 * 4 ; [x1, w0, uxtw] -> x1 + x0
     const parts: string[] = [];
     for (const t of inner) {
@@ -107,6 +134,50 @@ class Lifter {
     }
     const expr = parts.join(' + ').replace(/\+ -/g, '- ');
     return asAddress ? `(${expr})` : `*(${expr})`;
+  }
+
+  /** typed base register plus constant displacement: "n->field" from debug info types */
+  private fieldText(ins: Insn, inner: string[]): string | undefined {
+    let base: string | undefined, disp = 0;
+    if (inner.length === 1) {
+      const m = /^([a-z][a-z0-9]*) ?(?:([+-]) ?(0x[0-9a-f]+|\d+))?$/.exec(inner[0]!);
+      if (!m) return undefined;
+      base = m[1]; if (m[3]) disp = (m[2] === '-' ? -1 : 1) * parseImm(m[3])!;
+    } else if (inner.length === 2) {
+      const k = parseImm(inner[1]);
+      if (k === undefined) return undefined;
+      base = inner[0]; disp = k;
+    } else return undefined;
+    if (!base || disp < 0) return undefined;
+    const name = this.typedName(ins, base);
+    if (!name) return undefined;
+    const path = this.dbg!.field(this.typed.get(name), disp);
+    return path ? name + path : undefined;
+  }
+
+  private typedName(ins: Insn, reg: string): string | undefined {
+    const c = canon(this.arch, reg) ?? reg;
+    const n = this.regName(ins, reg);
+    if (this.typed.has(n)) return n;
+    return this.typedRegs.get(c);
+  }
+
+  /** keep track of registers that copy a typed value (mov r14, rdi; ldr x8, [sp, #8]) until overwritten */
+  private trackTyped(ins: Insn): void {
+    if (!this.dbg) return;
+    const ops = splitOperands(ins.operands);
+    const m = ins.mnemonic;
+    const dst = ops[0];
+    const isMove = (m === 'mov' || m === 'ldr' || m === 'ldur') && ops.length === 2;
+    let src: string | undefined;
+    if (isMove && dst && !dst.includes('[')) {
+      const o = ops[1]!;
+      if (o.includes('[')) { const sv = this.stackVarAt(ins); if (sv && this.typed.has(sv)) src = sv; }
+      else { const n = this.typedName(ins, o.replace(/^#/, '')); if (n) src = n; }
+    }
+    for (const w of writes(this.arch, ins)) this.typedRegs.delete(w);
+    if (src && dst) { const c = canon(this.arch, dst); if (c) this.typedRegs.set(c, src); }
+    if (ins.flow === 'call' || ins.flow === 'icall') this.typedRegs.clear();
   }
 
   /** the stack variable a memory operand of ins resolves to (value tracker), or undefined */
@@ -125,7 +196,7 @@ class Lifter {
     const c = canon(this.arch, r);
     if (c && this.fl) {
       const reads = this.fl.argReads.get(ins.address);
-      if (reads && reads.includes(c)) { const i = this.fl.argRegs.indexOf(c); if (i >= 0) return 'a' + (i + 1); }
+      if (reads && reads.includes(c)) { const i = this.fl.argRegs.indexOf(c); if (i >= 0) return this.dbg?.paramByReg.get(c)?.name ?? 'a' + (i + 1); }
     }
     if (this.arch === 'arm64' && /^w\d+$/.test(r)) return 'x' + r.slice(1);
     if (this.arch === 'arm64' && (r === 'wzr' || r === 'xzr')) return '0';
@@ -363,6 +434,7 @@ class Lifter {
     this.inBody = b.start !== this.af.addr;
     this.blockRet = b.exit === 'ret' || b.exit === 'tail';
     this.lastCond = undefined;
+    this.typedRegs.clear();
     const n = b.insns.length;
     for (let k = 0; k < n; k++) {
       const ins = b.insns[k]!;
@@ -386,6 +458,7 @@ class Lifter {
       if (ins.flow === 'invalid') { this.push(indent, `__invalid(); // undecodable bytes at ${hx(ins.address)}`); continue; }
       const s = this.stmt(ins);
       if (s) this.push(indent, s);
+      this.trackTyped(ins);
     }
     if (b.exit === 'noreturn') this.push(indent, '// does not return');
   }
@@ -504,7 +577,7 @@ class Lifter {
     const fl = this.fl;
     const params = fl ? fl.params.map((_r, i) => `int64_t a${i + 1}`) : [];
     const voidRet = fl ? fl.returns.length > 0 && fl.returns.every((r) => r.value.t === 'entry' && r.value.r === this.retReg) : false;
-    const sig = `${voidRet ? 'void' : 'int64_t'} ${af.name}(${params.join(', ')})`;
+    const sig = this.dbg?.prototype ?? `${voidRet ? 'void' : 'int64_t'} ${af.name}(${params.join(', ')})`;
     this.emitRange(0, this.blocks.length, 1);
     // drop labels nobody jumps to
     let lines = this.out.filter((l) => {
@@ -512,15 +585,21 @@ class Lifter {
       return !m || this.gotoTargets.has(parseInt(m[1]!, 16));
     });
     lines = polish(lines, this.arch, (l) => this.negate(l));
+    // a parameter stored to its own stack home reads "n = n;" once named: drop it
+    if (this.dbg) lines = lines.filter((l) => { const m = /^\s*([A-Za-z_]\w*) = ([A-Za-z_]\w*);$/.exec(l); return !m || m[1] !== m[2]; });
     if (this.emittedLines > this.maxLines) lines.push(`  // ... truncated after ${this.maxLines} lines`);
     const decls: string[] = [];
     if (fl) for (const v of fl.stackVars) {
       if (v.kind === 'saved-reg') continue;
       const ty = v.width === 1 ? 'int8_t' : v.width === 2 ? 'int16_t' : v.width === 4 ? 'int32_t' : v.width === 8 ? 'int64_t' : `uint8_t[${v.width}]`;
+      const dv = this.dbg?.varByOff.get(v.off);
+      if (dv?.param) continue;
+      if (dv) { decls.push(`  ${declare(dv.type, dv.name)}; // ${v.kind === 'stack-arg' ? 'stack argument' : 'stack'} ${v.off < 0 ? '-' : '+'}${hx(Math.abs(v.off))} from entry sp, ${v.reads} reads, ${v.writes} writes`); continue; }
       decls.push(`  ${ty} ${v.name}; // ${v.kind === 'stack-arg' ? 'stack argument' : 'stack'} ${v.off < 0 ? '-' : '+'}${hx(Math.abs(v.off))} from entry sp, ${v.reads} reads, ${v.writes} writes`);
     }
     const header = [
       `// ${af.name} at ${hx(af.addr)}, ${af.insnCount} instructions, ${af.blocks.length} blocks${af.truncated ? ' (analysis truncated)' : ''}`,
+      ...(this.dbg ? [`// names and types from ${this.dbg.source}`] : []),
       `// light lift: registers stand in for temporaries; a1..aN are register arguments (${this.arch === 'x86' ? 'cdecl stack' : this.conv.slice(0, Math.max(1, params.length)).join(', ')}); locals are named by their offset from the stack pointer at entry`,
       `${sig} {`,
     ];
@@ -631,8 +710,8 @@ function closing(lines: string[], open: number): number {
 }
 
 /** Lift one analyzed function to readable pseudo code. */
-export function liftFunction(p: Program, af: AnalyzedFunction, maxLines = 400, fl?: FlowResult): LiftResult {
-  const l = new Lifter(p, af, maxLines, fl);
+export function liftFunction(p: Program, af: AnalyzedFunction, maxLines = 400, fl?: FlowResult, dbg?: LiftDebug): LiftResult {
+  const l = new Lifter(p, af, maxLines, fl, dbg);
   l.paramsOf = (a) => { try { return p.flow(a)?.params.length; } catch { return undefined; } };
   return l.run();
 }

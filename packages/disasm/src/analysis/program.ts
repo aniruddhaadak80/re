@@ -9,6 +9,7 @@ import { loadDecoders, type DecoderOptions } from '../backends/index.js';
 import { stringAt } from './strings.js';
 import { trackBlock } from './refs.js';
 import { Budget, hx } from '../util.js';
+import { readDwarf, DwarfTypes, type DwarfInfo, type DwarfFunction } from '../debug/dwarf.js';
 
 export interface OpenOptions extends LoadOptions, DecoderOptions {
   /** time budget for whole program function discovery, ms (default 4000) */
@@ -19,6 +20,8 @@ export interface OpenOptions extends LoadOptions, DecoderOptions {
   maxFunctionInsns?: number;
   /** analyzed functions kept in memory, counted in instructions (default 60000); whole program passes do not fill it */
   cacheInsns?: number;
+  /** use DWARF names and types in pseudo code (default true) */
+  debugInfo?: boolean;
 }
 
 const NORETURN = new Set([
@@ -92,6 +95,35 @@ export class Program {
   }
 
   get arch() { return this.img.arch; }
+
+  // ---------- debug info ----------
+  private dwarfCache: DwarfInfo | undefined;
+  private dwarfTypesCache: DwarfTypes | undefined;
+  private dwarfByAddr: Map<number, DwarfFunction> | undefined;
+
+  /** DWARF types, functions and globals (read once, lazily). */
+  dwarf(): DwarfInfo {
+    if (!this.dwarfCache) {
+      try { this.dwarfCache = readDwarf(this.img, { budgetMs: 20000 }); }
+      catch (e) { this.dwarfCache = { present: false, units: [], types: [], functions: [], globals: [], sections: [], warnings: ['dwarf: ' + (e as Error).message], complete: false }; }
+    }
+    return this.dwarfCache;
+  }
+
+  debugTypes(): DwarfTypes {
+    if (!this.dwarfTypesCache) this.dwarfTypesCache = new DwarfTypes(this.dwarf());
+    return this.dwarfTypesCache;
+  }
+
+  /** DWARF function record whose low_pc is addr (definitions only). */
+  debugFunction(addr: number): DwarfFunction | undefined {
+    if (this.opts.debugInfo === false) return undefined;
+    if (!this.dwarfByAddr) {
+      this.dwarfByAddr = new Map();
+      for (const f of this.dwarf().functions) if (f.low !== undefined && f.low > 0 && !this.dwarfByAddr.has(f.low)) this.dwarfByAddr.set(f.low, f);
+    }
+    return this.dwarfByAddr.get(addr) ?? (this.img.arch === 'arm' ? this.dwarfByAddr.get(addr | 1) : undefined);
+  }
 
   // ---------- decoding ----------
 

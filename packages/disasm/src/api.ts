@@ -3,6 +3,7 @@
 import type { AnalyzedFunction, FunctionInfo, Insn, SwitchTable } from './types.js';
 import { Program, normName, type OpenOptions } from './analysis/program.js';
 import { liftFunction } from './analysis/lift.js';
+import { liftDebugFor } from './debug/liftdebug.js';
 import { stringAt } from './analysis/strings.js';
 import { Budget, clampInt, globMatch, hx, parseAddr } from './util.js';
 
@@ -229,14 +230,17 @@ export async function disasmFunction(input: BinaryInput & { function: string | n
 }
 
 /** Readable pseudo code plus a function summary. */
-export async function disasmPseudocode(input: BinaryInput & { function: string | number; maxLines?: number }) {
+export async function disasmPseudocode(input: BinaryInput & { function: string | number; maxLines?: number; debugInfo?: boolean }) {
   const p = await openProgram(input);
   const f = need(resolveFunction(p, input.function), `function not found: ${input.function}`);
   const af = need(p.resolveIndirect(f.addr), `cannot analyze ${f.name}`);
   const fl = p.flow(f.addr);
-  const lift = liftFunction(p, af, clampInt(input.maxLines, 300, 10, 5000), fl);
+  const dbg = input.debugInfo === false ? undefined : liftDebugFor(p, af, fl);
+  const lift = liftFunction(p, af, clampInt(input.maxLines, 300, 10, 5000), fl, dbg);
+  const df = dbg ? p.debugFunction(af.addr) : undefined;
   return {
     function: fnJson(p, af), structured: lift.structured, gotos: lift.gotos, pseudocode: lift.text, summary: summarizeFunction(p, af),
+    ...(df ? { debug: { source: 'dwarf', prototype: df.prototype, returns: df.returns, params: df.params.map((x) => ({ name: x.name, type: x.type, ...(x.location?.reg ? { reg: x.location.reg } : {}) })), locals: df.locals.map((x) => ({ name: x.name, type: x.type })), line: df.line } } : {}),
     ...(fl ? { params: fl.params.map((r, i) => ({ name: 'a' + (i + 1), reg: r })), stackVars: fl.stackVars.filter((v) => v.kind !== 'saved-reg').map((v) => ({ name: v.name, offset: v.off, width: v.width, kind: v.kind, reads: v.reads, writes: v.writes, firstAt: hx(v.firstAt) })) } : {}),
   };
 }

@@ -5,6 +5,7 @@ import {
 } from './api.js';
 import { disasmTraceValues, disasmIndirectTargets } from './flowapi.js';
 import { disasmMatchFunctions, disasmCompareFunctions } from './matchapi.js';
+import { R3_COMMANDS } from './cli-r3.js';
 
 export interface CliCommand { name: string; usage: string; summary: string; run(argv: string[]): Promise<number> }
 
@@ -51,7 +52,7 @@ function wrap(name: string, usage: string, summary: string, minPos: number, body
 
 const common = (p: Parsed) => ({ path: p.pos[0]!, arch: str(p.flags.arch) as never });
 
-export const CLI_COMMANDS: CliCommand[] = [
+const BASE_COMMANDS: CliCommand[] = [
   wrap('disasm-info', 'disasm-info <file> [--arch x86_64|arm64] [--json]', 'Format, arch, entry, sections and function count of a native binary', 1, async (p) => {
     const r = await disasmInfo(common(p));
     return { json: r, text: () => [`${r.format} ${r.arch} ${r.bits}-bit  entry ${r.entry ?? '-'}  decoder ${r.decoder}`, `functions ${r.functions}  symbols ${r.symbols}  imports ${r.imports}${r.go ? '  go ' + r.go : ''}`, ...r.sections.map((s) => `  ${s.name.padEnd(20)} ${s.vaddr.padStart(12)} ${String(s.size).padStart(10)} ${s.exec ? 'x' : '-'}${s.write ? 'w' : '-'}`)].join('\n') };
@@ -174,3 +175,6 @@ export const CLI_COMMANDS: CliCommand[] = [
     };
   }),
 ];
+
+/** Every disasm CLI command. */
+export const CLI_COMMANDS: CliCommand[] = [...BASE_COMMANDS, ...R3_COMMANDS];
