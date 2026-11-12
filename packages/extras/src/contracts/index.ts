@@ -1,13 +1,15 @@
 // One scan for API contracts in a binary or bundle: protobuf descriptors, OpenAPI / Swagger
-// documents and GraphQL schemas and operations.
+// documents, AsyncAPI 2/3 documents and GraphQL schemas and operations.
 
 import { latin1, utf8 } from '../util.js';
 import { findProtoDescriptors, protoToText, type FoundDescriptor } from './protobuf.js';
 import { findOpenApi, type OpenApiSummary } from './openapi.js';
+import { findAsyncApi, type AsyncApiSummary } from './asyncapi.js';
 import { findGraphqlSchemas, findGraphqlOperations, schemaToSdl, type FoundSchema, type FoundOperation } from './graphql.js';
 
 export * from './protobuf.js';
 export * from './openapi.js';
+export * from './asyncapi.js';
 export * from './graphql.js';
 export { parseJsValue, type JsValue } from './jsvalue.js';
 
@@ -15,6 +17,7 @@ export interface ApiContracts {
   size: number;
   protobuf: FoundDescriptor[];
   openapi: OpenApiSummary[];
+  asyncapi: AsyncApiSummary[];
   graphqlSchemas: FoundSchema[];
   graphqlOperations: FoundOperation[];
 }
@@ -30,14 +33,15 @@ export function textView(b: Uint8Array): { text: string; byteOffsets: boolean } 
 }
 
 /** Scan bytes for every supported API contract kind. */
-export async function scanApiContracts(b: Uint8Array, opts: { kinds?: ('protobuf' | 'openapi' | 'graphql')[]; maxBytes?: number } = {}): Promise<ApiContracts> {
-  const kinds = new Set(opts.kinds ?? ['protobuf', 'openapi', 'graphql']);
+export async function scanApiContracts(b: Uint8Array, opts: { kinds?: ('protobuf' | 'openapi' | 'asyncapi' | 'graphql')[]; maxBytes?: number } = {}): Promise<ApiContracts> {
+  const kinds = new Set<string>(opts.kinds ?? ['protobuf', 'openapi', 'asyncapi', 'graphql']);
   const data = b.length > (opts.maxBytes ?? 512 << 20) ? b.subarray(0, opts.maxBytes ?? 512 << 20) : b;
-  const out: ApiContracts = { size: b.length, protobuf: [], openapi: [], graphqlSchemas: [], graphqlOperations: [] };
+  const out: ApiContracts = { size: b.length, protobuf: [], openapi: [], asyncapi: [], graphqlSchemas: [], graphqlOperations: [] };
   if (kinds.has('protobuf')) out.protobuf = await findProtoDescriptors(data);
-  if (kinds.has('openapi') || kinds.has('graphql')) {
+  if (kinds.has('openapi') || kinds.has('asyncapi') || kinds.has('graphql')) {
     const { text } = textView(data);
     if (kinds.has('openapi')) out.openapi = findOpenApi(text);
+    if (kinds.has('asyncapi')) out.asyncapi = findAsyncApi(text);
     if (kinds.has('graphql')) { out.graphqlSchemas = findGraphqlSchemas(text); out.graphqlOperations = findGraphqlOperations(text); }
   }
   return out;

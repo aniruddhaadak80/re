@@ -1,0 +1,706 @@
+{
+ "tool": "ruamel.yaml 0.19.1 (YAML 1.2)",
+ "v2": {
+  "asyncapi": "2.6.0",
+  "channels": {
+   "smartylighting/streetlights/1/0/action/{streetlightId}/dim": {
+    "parameters": {
+     "streetlightId": {
+      "$ref": "#/components/parameters/streetlightId"
+     }
+    },
+    "subscribe": {
+     "message": {
+      "$ref": "#/components/messages/dimLight"
+     },
+     "operationId": "dimLight",
+     "traits": [
+      {
+       "$ref": "#/components/operationTraits/mqtt"
+      }
+     ]
+    }
+   },
+   "smartylighting/streetlights/1/0/action/{streetlightId}/turn/off": {
+    "parameters": {
+     "streetlightId": {
+      "$ref": "#/components/parameters/streetlightId"
+     }
+    },
+    "subscribe": {
+     "message": {
+      "$ref": "#/components/messages/turnOnOff"
+     },
+     "operationId": "turnOff",
+     "traits": [
+      {
+       "$ref": "#/components/operationTraits/mqtt"
+      }
+     ]
+    }
+   },
+   "smartylighting/streetlights/1/0/action/{streetlightId}/turn/on": {
+    "parameters": {
+     "streetlightId": {
+      "$ref": "#/components/parameters/streetlightId"
+     }
+    },
+    "subscribe": {
+     "message": {
+      "$ref": "#/components/messages/turnOnOff"
+     },
+     "operationId": "turnOn",
+     "traits": [
+      {
+       "$ref": "#/components/operationTraits/mqtt"
+      }
+     ]
+    }
+   },
+   "smartylighting/streetlights/1/0/event/{streetlightId}/lighting/measured": {
+    "description": "The topic on which measured values may be produced and consumed.",
+    "parameters": {
+     "streetlightId": {
+      "$ref": "#/components/parameters/streetlightId"
+     }
+    },
+    "publish": {
+     "message": {
+      "$ref": "#/components/messages/lightMeasured"
+     },
+     "operationId": "receiveLightMeasurement",
+     "summary": "Inform about environmental lighting conditions of a particular streetlight.",
+     "traits": [
+      {
+       "$ref": "#/components/operationTraits/mqtt"
+      }
+     ]
+    }
+   }
+  },
+  "components": {
+   "messageTraits": {
+    "commonHeaders": {
+     "headers": {
+      "properties": {
+       "my-app-header": {
+        "maximum": 100,
+        "minimum": 0,
+        "type": "integer"
+       }
+      },
+      "type": "object"
+     }
+    }
+   },
+   "messages": {
+    "dimLight": {
+     "name": "dimLight",
+     "payload": {
+      "$ref": "#/components/schemas/dimLightPayload"
+     },
+     "summary": "Command a particular streetlight to dim the lights.",
+     "title": "Dim light",
+     "traits": [
+      {
+       "$ref": "#/components/messageTraits/commonHeaders"
+      }
+     ]
+    },
+    "lightMeasured": {
+     "contentType": "application/json",
+     "name": "lightMeasured",
+     "payload": {
+      "$ref": "#/components/schemas/lightMeasuredPayload"
+     },
+     "summary": "Inform about environmental lighting conditions of a particular streetlight.",
+     "title": "Light measured",
+     "traits": [
+      {
+       "$ref": "#/components/messageTraits/commonHeaders"
+      }
+     ]
+    },
+    "turnOnOff": {
+     "name": "turnOnOff",
+     "payload": {
+      "$ref": "#/components/schemas/turnOnOffPayload"
+     },
+     "summary": "Command a particular streetlight to turn the lights on or off.",
+     "title": "Turn on/off",
+     "traits": [
+      {
+       "$ref": "#/components/messageTraits/commonHeaders"
+      }
+     ]
+    }
+   },
+   "operationTraits": {
+    "mqtt": {
+     "bindings": {
+      "mqtt": {
+       "qos": 1
+      }
+     }
+    }
+   },
+   "parameters": {
+    "streetlightId": {
+     "description": "The ID of the streetlight.",
+     "schema": {
+      "type": "string"
+     }
+    }
+   },
+   "schemas": {
+    "dimLightPayload": {
+     "properties": {
+      "percentage": {
+       "description": "Percentage to which the light should be dimmed to.",
+       "maximum": 100,
+       "minimum": 0,
+       "type": "integer"
+      },
+      "sentAt": {
+       "$ref": "#/components/schemas/sentAt"
+      }
+     },
+     "type": "object"
+    },
+    "lightMeasuredPayload": {
+     "properties": {
+      "lumens": {
+       "description": "Light intensity measured in lumens.",
+       "minimum": 0,
+       "type": "integer"
+      },
+      "sentAt": {
+       "$ref": "#/components/schemas/sentAt"
+      }
+     },
+     "type": "object"
+    },
+    "sentAt": {
+     "description": "Date and time when the message was sent.",
+     "format": "date-time",
+     "type": "string"
+    },
+    "turnOnOffPayload": {
+     "properties": {
+      "command": {
+       "description": "Whether to turn on or off the light.",
+       "enum": [
+        "on",
+        "off"
+       ],
+       "type": "string"
+      },
+      "sentAt": {
+       "$ref": "#/components/schemas/sentAt"
+      }
+     },
+     "type": "object"
+    }
+   },
+   "securitySchemes": {
+    "apiKey": {
+     "description": "Provide your API key as the user and leave the password empty.",
+     "in": "user",
+     "type": "apiKey"
+    },
+    "openIdConnectWellKnown": {
+     "openIdConnectUrl": "https://authserver.example/.well-known",
+     "type": "openIdConnect"
+    },
+    "supportedOauthFlows": {
+     "description": "Flows to support OAuth 2.0",
+     "flows": {
+      "authorizationCode": {
+       "authorizationUrl": "https://authserver.example/auth",
+       "refreshUrl": "https://authserver.example/refresh",
+       "scopes": {
+        "streetlights:dim": "Ability to dim the lights",
+        "streetlights:off": "Ability to switch lights off",
+        "streetlights:on": "Ability to switch lights on"
+       },
+       "tokenUrl": "https://authserver.example/token"
+      },
+      "clientCredentials": {
+       "scopes": {
+        "streetlights:dim": "Ability to dim the lights",
+        "streetlights:off": "Ability to switch lights off",
+        "streetlights:on": "Ability to switch lights on"
+       },
+       "tokenUrl": "https://authserver.example/token"
+      },
+      "implicit": {
+       "authorizationUrl": "https://authserver.example/auth",
+       "scopes": {
+        "streetlights:dim": "Ability to dim the lights",
+        "streetlights:off": "Ability to switch lights off",
+        "streetlights:on": "Ability to switch lights on"
+       }
+      },
+      "password": {
+       "scopes": {
+        "streetlights:dim": "Ability to dim the lights",
+        "streetlights:off": "Ability to switch lights off",
+        "streetlights:on": "Ability to switch lights on"
+       },
+       "tokenUrl": "https://authserver.example/token"
+      }
+     },
+     "type": "oauth2"
+    }
+   }
+  },
+  "defaultContentType": "application/json",
+  "info": {
+   "description": "The Smartylighting Streetlights API allows you to remotely manage the city lights.\n\n### Check out its awesome features:\n\n* Turn a specific streetlight on/off \ud83c\udf03\n* Dim a specific streetlight \ud83d\ude0e\n* Receive real-time information about environmental lighting conditions \ud83d\udcc8\n",
+   "license": {
+    "name": "Apache 2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+   },
+   "title": "Streetlights MQTT API",
+   "version": "1.0.0"
+  },
+  "servers": {
+   "production": {
+    "description": "Test broker",
+    "protocol": "mqtt",
+    "security": [
+     {
+      "apiKey": []
+     },
+     {
+      "supportedOauthFlows": [
+       "streetlights:on",
+       "streetlights:off",
+       "streetlights:dim"
+      ]
+     },
+     {
+      "openIdConnectWellKnown": []
+     }
+    ],
+    "tags": [
+     {
+      "description": "This environment is meant for production use case",
+      "name": "env:production"
+     },
+     {
+      "description": "This server is a remote server. Not exposed by the application",
+      "name": "kind:remote"
+     },
+     {
+      "description": "This resource is public and available to everyone",
+      "name": "visibility:public"
+     }
+    ],
+    "url": "test.mosquitto.org:{port}",
+    "variables": {
+     "port": {
+      "default": "1883",
+      "description": "Secure connection (TLS) is available through port 8883.",
+      "enum": [
+       "1883",
+       "8883"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "v3": {
+  "asyncapi": "3.0.0",
+  "channels": {
+   "lightTurnOff": {
+    "address": "smartylighting/streetlights/1/0/action/{streetlightId}/turn/off",
+    "messages": {
+     "turnOff": {
+      "$ref": "#/components/messages/turnOnOff"
+     }
+    },
+    "parameters": {
+     "streetlightId": {
+      "$ref": "#/components/parameters/streetlightId"
+     }
+    }
+   },
+   "lightTurnOn": {
+    "address": "smartylighting/streetlights/1/0/action/{streetlightId}/turn/on",
+    "messages": {
+     "turnOn": {
+      "$ref": "#/components/messages/turnOnOff"
+     }
+    },
+    "parameters": {
+     "streetlightId": {
+      "$ref": "#/components/parameters/streetlightId"
+     }
+    }
+   },
+   "lightingMeasured": {
+    "address": "smartylighting/streetlights/1/0/event/{streetlightId}/lighting/measured",
+    "description": "The topic on which measured values may be produced and consumed.",
+    "messages": {
+     "lightMeasured": {
+      "$ref": "#/components/messages/lightMeasured"
+     }
+    },
+    "parameters": {
+     "streetlightId": {
+      "$ref": "#/components/parameters/streetlightId"
+     }
+    }
+   },
+   "lightsDim": {
+    "address": "smartylighting/streetlights/1/0/action/{streetlightId}/dim",
+    "messages": {
+     "dimLight": {
+      "$ref": "#/components/messages/dimLight"
+     }
+    },
+    "parameters": {
+     "streetlightId": {
+      "$ref": "#/components/parameters/streetlightId"
+     }
+    }
+   }
+  },
+  "components": {
+   "messageTraits": {
+    "commonHeaders": {
+     "headers": {
+      "properties": {
+       "my-app-header": {
+        "maximum": 100,
+        "minimum": 0,
+        "type": "integer"
+       }
+      },
+      "type": "object"
+     }
+    }
+   },
+   "messages": {
+    "dimLight": {
+     "name": "dimLight",
+     "payload": {
+      "$ref": "#/components/schemas/dimLightPayload"
+     },
+     "summary": "Command a particular streetlight to dim the lights.",
+     "title": "Dim light",
+     "traits": [
+      {
+       "$ref": "#/components/messageTraits/commonHeaders"
+      }
+     ]
+    },
+    "lightMeasured": {
+     "contentType": "application/json",
+     "name": "lightMeasured",
+     "payload": {
+      "$ref": "#/components/schemas/lightMeasuredPayload"
+     },
+     "summary": "Inform about environmental lighting conditions of a particular streetlight.",
+     "title": "Light measured",
+     "traits": [
+      {
+       "$ref": "#/components/messageTraits/commonHeaders"
+      }
+     ]
+    },
+    "turnOnOff": {
+     "name": "turnOnOff",
+     "payload": {
+      "$ref": "#/components/schemas/turnOnOffPayload"
+     },
+     "summary": "Command a particular streetlight to turn the lights on or off.",
+     "title": "Turn on/off",
+     "traits": [
+      {
+       "$ref": "#/components/messageTraits/commonHeaders"
+      }
+     ]
+    }
+   },
+   "operationTraits": {
+    "mqtt": {
+     "bindings": {
+      "mqtt": {
+       "qos": 1
+      }
+     }
+    }
+   },
+   "parameters": {
+    "streetlightId": {
+     "description": "The ID of the streetlight."
+    }
+   },
+   "schemas": {
+    "dimLightPayload": {
+     "properties": {
+      "percentage": {
+       "description": "Percentage to which the light should be dimmed to.",
+       "maximum": 100,
+       "minimum": 0,
+       "type": "integer"
+      },
+      "sentAt": {
+       "$ref": "#/components/schemas/sentAt"
+      }
+     },
+     "type": "object"
+    },
+    "lightMeasuredPayload": {
+     "properties": {
+      "lumens": {
+       "description": "Light intensity measured in lumens.",
+       "minimum": 0,
+       "type": "integer"
+      },
+      "sentAt": {
+       "$ref": "#/components/schemas/sentAt"
+      }
+     },
+     "type": "object"
+    },
+    "sentAt": {
+     "description": "Date and time when the message was sent.",
+     "format": "date-time",
+     "type": "string"
+    },
+    "turnOnOffPayload": {
+     "properties": {
+      "command": {
+       "description": "Whether to turn on or off the light.",
+       "enum": [
+        "on",
+        "off"
+       ],
+       "type": "string"
+      },
+      "sentAt": {
+       "$ref": "#/components/schemas/sentAt"
+      }
+     },
+     "type": "object"
+    }
+   },
+   "securitySchemes": {
+    "apiKey": {
+     "description": "Provide your API key as the user and leave the password empty.",
+     "in": "user",
+     "type": "apiKey"
+    },
+    "openIdConnectWellKnown": {
+     "openIdConnectUrl": "https://authserver.example/.well-known",
+     "type": "openIdConnect"
+    },
+    "supportedOauthFlows": {
+     "description": "Flows to support OAuth 2.0",
+     "flows": {
+      "authorizationCode": {
+       "authorizationUrl": "https://authserver.example/auth",
+       "availableScopes": {
+        "streetlights:dim": "Ability to dim the lights",
+        "streetlights:off": "Ability to switch lights off",
+        "streetlights:on": "Ability to switch lights on"
+       },
+       "refreshUrl": "https://authserver.example/refresh",
+       "tokenUrl": "https://authserver.example/token"
+      },
+      "clientCredentials": {
+       "availableScopes": {
+        "streetlights:dim": "Ability to dim the lights",
+        "streetlights:off": "Ability to switch lights off",
+        "streetlights:on": "Ability to switch lights on"
+       },
+       "tokenUrl": "https://authserver.example/token"
+      },
+      "implicit": {
+       "authorizationUrl": "https://authserver.example/auth",
+       "availableScopes": {
+        "streetlights:dim": "Ability to dim the lights",
+        "streetlights:off": "Ability to switch lights off",
+        "streetlights:on": "Ability to switch lights on"
+       }
+      },
+      "password": {
+       "availableScopes": {
+        "streetlights:dim": "Ability to dim the lights",
+        "streetlights:off": "Ability to switch lights off",
+        "streetlights:on": "Ability to switch lights on"
+       },
+       "tokenUrl": "https://authserver.example/token"
+      }
+     },
+     "type": "oauth2"
+    }
+   }
+  },
+  "defaultContentType": "application/json",
+  "info": {
+   "description": "The Smartylighting Streetlights API allows you to remotely manage the city lights.\n\n### Check out its awesome features:\n\n* Turn a specific streetlight on/off \ud83c\udf03\n* Dim a specific streetlight \ud83d\ude0e\n* Receive real-time information about environmental lighting conditions \ud83d\udcc8\n",
+   "license": {
+    "name": "Apache 2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+   },
+   "title": "Streetlights MQTT API",
+   "version": "1.0.0"
+  },
+  "operations": {
+   "dimLight": {
+    "action": "send",
+    "channel": {
+     "$ref": "#/channels/lightsDim"
+    },
+    "messages": [
+     {
+      "$ref": "#/channels/lightsDim/messages/dimLight"
+     }
+    ],
+    "traits": [
+     {
+      "$ref": "#/components/operationTraits/mqtt"
+     }
+    ]
+   },
+   "receiveLightMeasurement": {
+    "action": "receive",
+    "channel": {
+     "$ref": "#/channels/lightingMeasured"
+    },
+    "messages": [
+     {
+      "$ref": "#/channels/lightingMeasured/messages/lightMeasured"
+     }
+    ],
+    "summary": "Inform about environmental lighting conditions of a particular streetlight.",
+    "traits": [
+     {
+      "$ref": "#/components/operationTraits/mqtt"
+     }
+    ]
+   },
+   "turnOff": {
+    "action": "send",
+    "channel": {
+     "$ref": "#/channels/lightTurnOff"
+    },
+    "messages": [
+     {
+      "$ref": "#/channels/lightTurnOff/messages/turnOff"
+     }
+    ],
+    "traits": [
+     {
+      "$ref": "#/components/operationTraits/mqtt"
+     }
+    ]
+   },
+   "turnOn": {
+    "action": "send",
+    "channel": {
+     "$ref": "#/channels/lightTurnOn"
+    },
+    "messages": [
+     {
+      "$ref": "#/channels/lightTurnOn/messages/turnOn"
+     }
+    ],
+    "traits": [
+     {
+      "$ref": "#/components/operationTraits/mqtt"
+     }
+    ]
+   }
+  },
+  "servers": {
+   "production": {
+    "description": "Test broker",
+    "host": "test.mosquitto.org:{port}",
+    "protocol": "mqtt",
+    "security": [
+     {
+      "$ref": "#/components/securitySchemes/apiKey"
+     },
+     {
+      "description": "Flows to support OAuth 2.0",
+      "flows": {
+       "authorizationCode": {
+        "authorizationUrl": "https://authserver.example/auth",
+        "availableScopes": {
+         "streetlights:dim": "Ability to dim the lights",
+         "streetlights:off": "Ability to switch lights off",
+         "streetlights:on": "Ability to switch lights on"
+        },
+        "refreshUrl": "https://authserver.example/refresh",
+        "tokenUrl": "https://authserver.example/token"
+       },
+       "clientCredentials": {
+        "availableScopes": {
+         "streetlights:dim": "Ability to dim the lights",
+         "streetlights:off": "Ability to switch lights off",
+         "streetlights:on": "Ability to switch lights on"
+        },
+        "tokenUrl": "https://authserver.example/token"
+       },
+       "implicit": {
+        "authorizationUrl": "https://authserver.example/auth",
+        "availableScopes": {
+         "streetlights:dim": "Ability to dim the lights",
+         "streetlights:off": "Ability to switch lights off",
+         "streetlights:on": "Ability to switch lights on"
+        }
+       },
+       "password": {
+        "availableScopes": {
+         "streetlights:dim": "Ability to dim the lights",
+         "streetlights:off": "Ability to switch lights off",
+         "streetlights:on": "Ability to switch lights on"
+        },
+        "tokenUrl": "https://authserver.example/token"
+       }
+      },
+      "scopes": [
+       "streetlights:on",
+       "streetlights:off",
+       "streetlights:dim"
+      ],
+      "type": "oauth2"
+     },
+     {
+      "$ref": "#/components/securitySchemes/openIdConnectWellKnown"
+     }
+    ],
+    "tags": [
+     {
+      "description": "This environment is meant for production use case",
+      "name": "env:production"
+     },
+     {
+      "description": "This server is a remote server. Not exposed by the application",
+      "name": "kind:remote"
+     },
+     {
+      "description": "This resource is public and available to everyone",
+      "name": "visibility:public"
+     }
+    ],
+    "variables": {
+     "port": {
+      "default": "1883",
+      "description": "Secure connection (TLS) is available through port 8883.",
+      "enum": [
+       "1883",
+       "8883"
+      ]
+     }
+    }
+   }
+  }
+ }
+}

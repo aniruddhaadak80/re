@@ -77,11 +77,21 @@ export function summarizeOpenApi(doc: Obj, where: { offset: number; length: numb
 const printable = (c: number): boolean => c === 9 || c === 10 || c === 13 || (c >= 32 && c < 127) || c >= 160;
 
 /** Parse YAML text that may be followed by unrelated bytes: drop lines from the first error and retry. */
-function yamlPrefix(text: string): { doc: unknown; length: number } | undefined {
+/** When a latin1 view holds UTF-8 bytes (any char 0x80-0xff, none above), decode them as UTF-8. */
+function latin1Utf8(seg: string): string | undefined {
+  let high = false;
+  for (let i = 0; i < seg.length; i++) { const c = seg.charCodeAt(i); if (c > 0xff) return undefined; if (c >= 0x80) high = true; }
+  if (!high) return undefined;
+  const b = new Uint8Array(seg.length);
+  for (let i = 0; i < seg.length; i++) b[i] = seg.charCodeAt(i);
+  return new TextDecoder('utf-8', { fatal: false }).decode(b);
+}
+
+function yamlPrefix(text: string): { doc: unknown; length: number; text: string } | undefined {
   let t = text;
   for (let attempt = 0; attempt < 4 && t.length; attempt++) {
     const d = parseDocument(t, { uniqueKeys: false, prettyErrors: false, strict: false });
-    if (!d.errors.length) return { doc: d.toJS({ maxAliasCount: 100 }), length: t.length };
+    if (!d.errors.length) return { doc: d.toJS({ maxAliasCount: 100 }), length: t.length, text: t };
     const pos = d.errors[0]!.pos[0];
     const cut = t.lastIndexOf('\n', Math.max(0, pos - 1));
     if (cut <= 0) return undefined;
@@ -93,18 +103,26 @@ function yamlPrefix(text: string): { doc: unknown; length: number } | undefined 
 
 /** Find OpenAPI / Swagger documents in text (latin1 decoded bytes or a JS bundle). */
 export function findOpenApi(text: string, opts: { max?: number; maxDocChars?: number } = {}): OpenApiSummary[] {
-  const out: OpenApiSummary[] = [];
+  return scanSpecDocuments(text, 'openapi|swagger', isSpec, (doc, where) => summarizeOpenApi(doc as Obj, where), opts);
+}
+
+/**
+ * Find JSON, YAML, JS literal and JSON-in-JS-string documents whose top level has `<key>: 2.x/3.x`
+ * (key is a regex alternation such as openapi|swagger or asyncapi) and summarize the accepted ones.
+ */
+export function scanSpecDocuments<T>(text: string, keys: string, accept: (doc: unknown) => boolean, summarize: (doc: unknown, where: { offset: number; length: number; format: OpenApiSummary['format'] }) => T, opts: { max?: number; maxDocChars?: number } = {}): T[] {
+  const out: T[] = [];
   const max = opts.max ?? 50, maxDoc = opts.maxDocChars ?? 8 << 20;
   const covered: [number, number][] = [];
   const inCovered = (i: number): boolean => covered.some(([a, b]) => i >= a && i < b);
   const add = (doc: unknown, offset: number, length: number, format: OpenApiSummary['format']): boolean => {
-    if (!isSpec(doc) || out.length >= max) return false;
-    out.push(summarizeOpenApi(doc, { offset, length, format }));
+    if (!accept(doc) || out.length >= max) return false;
+    out.push(summarize(doc, { offset, length, format }));
     covered.push([offset, offset + length]);
     return true;
   };
   // JSON and JS literal forms: "openapi":"3..., openapi:"3..., 'swagger':'2.0'
-  const re = /(["']?)(openapi|swagger)\1\s*:\s*["']?[23]\.\d|\\"(?:openapi|swagger)\\"\s*:\s*\\"[23]\.\d/g;
+  const re = new RegExp(`(["']?)(${keys})\\1\\s*:\\s*["']?[23]\\.\\d|\\\\"(?:${keys})\\\\"\\s*:\\s*\\\\"[23]\\.\\d`, 'g');
   let n = 0;
   for (let m = re.exec(text); m && out.length < max && n < 5000; m = re.exec(text), n++) {
     if (inCovered(m.index)) continue;
@@ -128,7 +146,7 @@ export function findOpenApi(text: string, opts: { max?: number; maxDocChars?: nu
     }
   }
   // YAML form: openapi: 3.x or swagger: "2.0" at the start of a line or of a string region
-  const ry = /(openapi|swagger)[ \t]*:[ \t]*["']?[23]\.\d[\w.\-]*["']?[ \t]*\r?\n/g;
+  const ry = new RegExp(`(${keys})[ \\t]*:[ \\t]*["']?[23]\\.\\d[\\w.\\-]*["']?[ \\t]*\\r?\\n`, 'g');
   n = 0;
   for (let m = ry.exec(text); m && out.length < max && n < 5000; m = ry.exec(text), n++) {
     if (inCovered(m.index)) continue;
@@ -137,14 +155,22 @@ export function findOpenApi(text: string, opts: { max?: number; maxDocChars?: nu
     for (let guard = 0; guard < 200 && start > 0 && text[start - 1] === '\n'; guard++) {
       const prev = text.lastIndexOf('\n', start - 2) + 1;
       const line = text.slice(prev, start - 1);
-      if (!/^(#.*|[A-Za-z_$][\w$-]*:.*|[ \t]+\S.*|---)?\r?$/.test(line) || [...line].some((c) => !printable(c.charCodeAt(0)))) break;
+      if (inCovered(prev) || !/^(#.*|[A-Za-z_$][\w$-]*:.*|[ \t]+\S.*|---)?\r?$/.test(line) || [...line].some((c) => !printable(c.charCodeAt(0)))) break;
       start = prev;
     }
     let end = m.index;
     const lim = Math.min(text.length, m.index + maxDoc);
-    while (end < lim && printable(text.charCodeAt(end))) end++;
-    const r = yamlPrefix(text.slice(start, end));
-    if (r) add(r.doc, start, r.length, 'yaml');
+    // high bytes are allowed so UTF-8 text (emoji, accents) seen through a latin1 view is kept
+    while (end < lim && (printable(text.charCodeAt(end)) || text.charCodeAt(end) >= 0x80)) end++;
+    // a second document of the same kind directly after this one (two embedded files) ends it
+    const next = new RegExp(`\\n(?:${keys})[ \\t]*:`, 'g');
+    next.lastIndex = m.index + 1;
+    const nx = next.exec(text);
+    if (nx && nx.index < end) end = nx.index + 1;
+    const seg = text.slice(start, end);
+    const asUtf8 = latin1Utf8(seg);
+    const r = yamlPrefix(asUtf8 ?? seg);
+    if (r) add(r.doc, start, asUtf8 ? new TextEncoder().encode(r.text).length : r.length, 'yaml');
   }
   return out;
 }

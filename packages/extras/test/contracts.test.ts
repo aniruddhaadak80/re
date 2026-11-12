@@ -182,7 +182,7 @@ test('graphql: operations from gql templates, query strings, Go constants and a 
 test('x_api_contracts tool and x-api-contracts CLI', async () => {
   const tool = TOOLS.find((t) => t.name === 'x_api_contracts')!;
   const r = (await tool.run({ path: join(C, 'app.bundle.min.js'), sdl: true })) as { counts: Record<string, number>; graphqlSchemas: { sdl: string; rootFields: Record<string, string[]> }[] };
-  assert.deepEqual(r.counts, { protobuf: 0, openapi: 1, graphqlSchemas: 1, graphqlOperations: 6 });
+  assert.deepEqual(r.counts, { protobuf: 0, openapi: 1, asyncapi: 0, graphqlSchemas: 1, graphqlOperations: 6 });
   assert.deepEqual(r.graphqlSchemas[0]!.rootFields.Query, ['user(id: ID!): User', 'users(pageSize: Int, pageToken: String): UserPage!', 'search(text: String!): [SearchResult!]!']);
   assert.match(r.graphqlSchemas[0]!.sdl, /type User implements Node \{/);
   const p = (await tool.run({ path: join(C, 'revdemo_pb2.py'), kind: 'protobuf', proto: true })) as { protobuf: { proto: string; services: { methods: string[] }[] }[] };
@@ -221,4 +221,62 @@ test('contracts: hostile input never hangs or throws non-parse errors', async ()
   assert.throws(() => X.decodeFileDescriptor(new Uint8Array([0x0a, 0xff, 0xff, 0xff, 0x0f])), X.ParseError);
   const deep = 'query Q { ' + 'a { '.repeat(300) + 'b' + ' }'.repeat(300) + ' }';
   assert.throws(() => X.parseOperation(deep), X.ParseError);
+});
+
+// AsyncAPI 2.6 and 3.0: the official Streetlights MQTT examples (asyncapi/spec, Apache-2.0)
+// embedded in a Go binary and in a minified bundle; reference load by ruamel.yaml (YAML 1.2).
+const aref = JSON.parse(readFileSync(join(C, 'asyncapi.reference.json'), 'utf8'));
+const aBin = (): Uint8Array => new Uint8Array(gunzipSync(readFileSync(join(C, 'asyncapi-go.elf.gz'))));
+const asrc = (f: string) => readFileSync(join(S, 'src', 'asyncapi', f));
+
+test('asyncapi: two Go-embedded YAML documents (2.6 and 3.0) found at their exact byte ranges and equal to ruamel.yaml', () => {
+  const bin = aBin();
+  const docs = X.findAsyncApi(X.textView(bin).text);
+  assert.equal(docs.length, 2);
+  const [v2, v3] = docs as [X.AsyncApiSummary, X.AsyncApiSummary];
+  for (const [d, f, ref] of [[v2, 'streetlights-mqtt-2.6.yml', aref.v2], [v3, 'streetlights-mqtt-3.0.yml', aref.v3]] as const) {
+    assert.equal(d.format, 'yaml');
+    assert.equal(d.length, asrc(f).length, 'whole file, emoji and all');
+    assert.deepEqual(Buffer.from(bin.subarray(d.offset, d.offset + d.length)), asrc(f), 'offset points at the embedded bytes');
+    assert.deepEqual(d.document, ref);
+    assert.equal(d.title, 'Streetlights MQTT API');
+    assert.deepEqual(d.protocols, ['mqtt']);
+    assert.deepEqual(d.messages, ['lightMeasured', 'turnOnOff', 'dimLight']);
+    assert.deepEqual(d.securitySchemes, ['apiKey', 'supportedOauthFlows', 'openIdConnectWellKnown']);
+  }
+  assert.equal(v2.major, 2); assert.equal(v3.major, 3);
+  assert.deepEqual(v2.operations.map((o) => `${o.id} ${o.action}`), ['receiveLightMeasurement publish', 'turnOn subscribe', 'turnOff subscribe', 'dimLight subscribe']);
+  assert.deepEqual(v3.operations.map((o) => `${o.id} ${o.action} ${o.channel} ${o.messages.join(',')}`), ['receiveLightMeasurement receive lightingMeasured lightMeasured', 'turnOn send lightTurnOn turnOn', 'turnOff send lightTurnOff turnOff', 'dimLight send lightsDim dimLight']);
+  // channel names in 2.x are addresses; in 3.x they are ids with an address field
+  assert.deepEqual(v2.channels.map((c) => c.name).sort(), Object.keys(aref.v2.channels).sort());
+  assert.deepEqual(v3.channels.map((c) => c.address).sort(), Object.values(aref.v3.channels as Record<string, { address: string }>).map((c) => c.address).sort());
+  assert.deepEqual(v3.channels[0]!.parameters, ['streetlightId']);
+  assert.equal(v2.servers[0]!.url, 'test.mosquitto.org:{port}');
+  assert.equal(v3.servers[0]!.url, 'mqtt://test.mosquitto.org:{port}');
+  // the OpenAPI scan does not report AsyncAPI documents
+  assert.equal(X.findOpenApi(X.textView(bin).text).length, 0);
+});
+
+test('asyncapi: JS literal (3.0) and JSON string (2.6) inside a bundle, and x_api_contracts', async () => {
+  const js = readFileSync(join(C, 'asyncapi.bundle.min.js'), 'utf8');
+  const docs = X.findAsyncApi(js);
+  assert.deepEqual(docs.map((d) => `${d.format} ${d.version}`), ['js-literal 3.0.0', 'json-string 2.6.0']);
+  assert.deepEqual(docs[0]!.document, aref.v3);
+  assert.deepEqual(docs[1]!.document, aref.v2);
+  const t = TOOLS.find((x) => x.name === 'x_api_contracts')!;
+  const r = (await t.run({ path: join(C, 'asyncapi.bundle.min.js'), kind: 'asyncapi' })) as { counts: Record<string, number>; asyncapi: { version: string; operations: { total: number } }[] };
+  assert.equal(r.counts.asyncapi, 2);
+  assert.equal(r.asyncapi[0]!.operations.total, 4);
+  const all = (await t.run({ path: join(C, 'asyncapi.bundle.min.js') })) as { counts: Record<string, number> };
+  assert.equal(all.counts.openapi, 0);
+  assert.equal(all.counts.asyncapi, 2);
+});
+
+test('asyncapi: hostile text never throws and stays fast', () => {
+  fc.assert(fc.property(fc.string({ maxLength: 3000 }), fc.constantFrom('asyncapi: 2.6.0\n', '{"asyncapi":"3.0.0","channels":', 'asyncapi: "3.0"\n', '\\"asyncapi\\":\\"2.0.0\\"'), fc.nat(3000), (s, plant, at) => {
+    const text = s.slice(0, at) + plant + s.slice(at);
+    const t = Date.now();
+    X.findAsyncApi(text);
+    assert.ok(Date.now() - t < 2000);
+  }), { numRuns: 200 });
 });
