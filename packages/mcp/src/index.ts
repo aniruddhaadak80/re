@@ -2,9 +2,10 @@
 // RevLens MCP server. stdio by default; --http starts Streamable HTTP on 127.0.0.1 (see http.ts).
 // Bridge sessions (radare2, gdb, lldb, Frida) are closed when the server stops, whichever way it stops.
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { closeAllSessions, killAllSessions } from '@revlens/engine/node';
-import { createServer } from './server.js';
+import { createServer, closeLoadedSessions as closeAllSessions, killLoadedSessions as killAllSessions } from './app.js';
+import { profileFromArgv } from './catalog.js';
 import { httpOptionsFromArgv, startHttpServer } from './http.js';
+
 
 let stopping = false;
 /** Close sessions politely with a time limit, then exit. */
@@ -19,14 +20,18 @@ function shutdown(code: number, extra?: () => Promise<unknown>): void {
 }
 process.once('exit', () => killAllSessions());
 
-const http = httpOptionsFromArgv(process.argv.slice(2));
+const argv = process.argv.slice(2);
+if (argv.includes('--version') || argv.includes('-v')) { process.stdout.write(`${(await import('./generated/tool-manifest.js')).TOOL_MANIFEST.version}\n`); process.exit(0); }
+const profile = profileFromArgv(argv);
+const settingsFile = (() => { const i = argv.indexOf('--settings-file'); return i >= 0 ? argv[i + 1] : argv.find((a) => a.startsWith('--settings-file='))?.slice(16); })();
+const http = httpOptionsFromArgv(argv);
 if (http) {
-  const h = await startHttpServer(http);
+  const h = await startHttpServer({ ...http, profile, settingsFile });
   process.stderr.write(`RevLens MCP listening on ${h.url}${http.token ? ' (bearer token required)' : ''}\n`);
   process.on('SIGINT', () => shutdown(0, () => h.close()));
   process.on('SIGTERM', () => shutdown(0, () => h.close()));
 } else {
-  const { server } = createServer();
+  const { server } = createServer({ profile, file: settingsFile });
   const transport = new StdioServerTransport();
   // the client closing stdin is the usual way a stdio MCP server is told to stop
   process.stdin.once('end', () => shutdown(0, () => server.close()));

@@ -4,8 +4,8 @@
 import { createServer as createHttpServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { randomUUID, timingSafeEqual, createHash } from 'node:crypto';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { createServer } from './server.js';
-import { closeAllSessions } from '@revlens/engine/node';
+import { createServer, closeLoadedSessions as closeAllSessions } from './app.js';
+import type { ToolProfile } from './catalog.js';
 
 export interface HttpOptions {
   /** interface to bind. Default 127.0.0.1. Anything that is not loopback needs allowRemote and a token. */
@@ -28,6 +28,10 @@ export interface HttpOptions {
   maxSessions?: number;
   /** close a session after this many ms without requests. Default 30 minutes. */
   idleMs?: number;
+  /** tool profile for every session: minimal, standard or full (default) */
+  profile?: ToolProfile;
+  /** JSON settings file with launch values for update_analysis_settings */
+  settingsFile?: string;
 }
 
 export interface HttpHandle {
@@ -125,7 +129,7 @@ export async function startHttpServer(opts: HttpOptions = {}): Promise<HttpHandl
           onsessioninitialized: (newId) => { sessions.set(newId, { transport, last: Date.now() }); },
         });
         transport.onclose = () => { if (transport.sessionId) sessions.delete(transport.sessionId); };
-        const { server: mcp } = createServer();
+        const { server: mcp } = createServer({ profile: opts.profile, file: opts.settingsFile });
         await mcp.connect(transport);
         await transport.handleRequest(req, res, body);
         return;
