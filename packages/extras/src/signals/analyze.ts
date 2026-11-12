@@ -49,7 +49,11 @@ export function guessCoding(p: PulsePackage, rate: number): PackageAnalysis['gue
   const r = Math.max(reset, Math.round(dataGapMax * 1.5) + 1);
   const gopt = (gap: number) => (rowGap && rowGap < r ? `,g=${gap}` : '');
   const T = Math.min(P[0]!.meanUs, G[0]?.meanUs ?? Infinity);
-  const multiples = (cs: WidthCluster[]) => cs.every((c) => { const m = c.meanUs / T; return Math.abs(m - Math.round(m)) < 0.2; });
+  // NRZ bit width: pulses run long and gaps short by the same detector bias, so average them
+  const Tn = G[0] ? (P[0]!.meanUs + G[0].meanUs) / 2 : T;
+  const fit = (x: number) => { const m = x / Tn; return Math.round(m) >= 1 && Math.abs(m - Math.round(m)) < 0.3; };
+  const multiples = (cs: WidthCluster[]) => cs.every((c) => fit(c.meanUs) || (fit(c.minUs) && fit(c.maxUs)));
+  const mostlyMultiples = [...pu, ...ga.filter((x) => x <= dataGapMax)].filter(fit).length >= 0.9 * (pu.length + ga.filter((x) => x <= dataGapMax).length);
   const allIn12 = [...P, ...G].every((c) => near(c.meanUs, T) || near(c.meanUs, 2 * T));
   if (P.length >= 1 && G.length >= 1 && allIn12 && [...P, ...G].some((c) => near(c.meanUs, 2 * T)) && p.modulation === 'OOK' && P.length <= 2 && G.length <= 2) {
     return { coding: 'manchester', flex: `n=auto,m=${pre}MC_ZEROBIT,s=${Math.round(T)},l=${Math.round(T)},r=${r}`, reason: `pulses and gaps are one or two half bits of ${Math.round(T)} us` };
@@ -67,8 +71,8 @@ export function guessCoding(p: PulsePackage, rate: number): PackageAnalysis['gue
       return { coding: 'pwm', flex: `n=auto,m=${pre}PWM,s=${s},l=${l}${sync}${gopt(Math.round(dataGapMax * 1.5))},r=${r}`, reason: `two pulse widths (${s}, ${l} us)${sync ? ' plus a sync width' : ''}, steady period` };
     }
   }
-  if (multiples(P) && multiples(G)) {
-    return { coding: 'pcm', flex: `n=auto,m=${pre}PCM,s=${Math.round(T)},l=${Math.round(T)},g=${Math.round(dataGapMax + T)},r=${r}`, reason: `pulses and gaps are whole multiples of ${Math.round(T)} us` };
+  if ((multiples(P) && multiples(G)) || mostlyMultiples) {
+    return { coding: 'pcm', flex: `n=auto,m=${pre}PCM,s=${Math.round(Tn)},l=${Math.round(Tn)},g=${Math.round(dataGapMax + Tn)},r=${r}`, reason: `pulses and gaps are whole multiples of ${Math.round(Tn)} us` };
   }
   if (P.length === 1) {
     const per = clusterWidths(pu.map((x, k) => x + (ga[k] ?? 0)).filter((_, k) => k < ga.length), us);

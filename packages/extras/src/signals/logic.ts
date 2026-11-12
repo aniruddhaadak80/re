@@ -112,7 +112,7 @@ export function channelEdges(cap: LogicCapture, ch: number, maxEdges = 5_000_000
 
 const bitAt = (cap: LogicCapture, ch: number, s: number): number => ((cap.data[s * cap.unitSize + (ch >> 3)] as number) >> (ch & 7)) & 1;
 
-export interface Annotation { decoder: string; startSample: number; endSample: number; type: string; text: string; value?: number }
+export interface Annotation { decoder: string; startSample: number; endSample: number; type: string; text: string; value?: number; dataStartSample?: number; dataEndSample?: number }
 
 /** UART decoder: finds start bits on falling edges, samples data bits at bit centers. */
 export function decodeUart(cap: LogicCapture, o: { rx: string | number; baudrate: number; dataBits?: number; parity?: 'none' | 'even' | 'odd'; stopBits?: number; bitOrder?: 'lsb-first' | 'msb-first'; invert?: boolean; maxFrames?: number }): Annotation[] {
@@ -142,7 +142,7 @@ export function decodeUart(cap: LogicCapture, o: { rx: string | number; baudrate
       const bit = level(start + spb * (1.5 + k));
       if (o.bitOrder === 'msb-first') v = (v << 1) | bit; else v |= bit << k;
     }
-    let ann: Annotation = { decoder: 'uart', startSample: start, endSample: Math.round(frameEnd), type: 'data', text: v.toString(16).padStart(2, '0'), value: v };
+    let ann: Annotation = { decoder: 'uart', startSample: start, endSample: Math.round(frameEnd), type: 'data', text: v.toString(16).padStart(2, '0'), value: v, dataStartSample: Math.round(start + spb), dataEndSample: Math.round(start + spb * (1 + nb)) };
     let pos = 1 + nb;
     if (parity !== 'none') {
       const pb = level(start + spb * (pos + 0.5));
