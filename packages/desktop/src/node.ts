@@ -1,7 +1,7 @@
 // Node entry for @revlens/desktop: live process inspection and comparison, installed app discovery and
 // native UI tree capture on Linux, macOS and Windows. Import as '@revlens/desktop/node'.
 import { open, readFile, readdir, readlink, stat, writeFile, realpath, access } from 'node:fs/promises';
-import { constants as FS } from 'node:fs';
+import { constants as FS, readFileSync, statSync } from 'node:fs';
 import { join, delimiter, isAbsolute, basename } from 'node:path';
 import { homedir } from 'node:os';
 import { parseProcStatus, parseCmdline, parseProcMaps, classifyFdTarget, parseProcNet, parseProcNetUnix, parseLsofF, parsePs, parseWinProcesses, parseWinProcessDetail, InputError, type ProcessInfo, type ModuleInfo, type OpenFile, type SocketInfo } from './proc.js';
@@ -12,9 +12,22 @@ import { compareSnapshots, type ProcessSnapshot } from './compare.js';
 import { run, powershell, requireExecution, psQuote } from './exec.js';
 import { BROWSER_TOOLS, type ToolDef } from './tools.js';
 import { Atspi } from './atspi.js';
+import { startComputer, actOnComputer, checkpointComputer, closeComputer, listComputers, type ComputerAction } from './computer.js';
+import { verifyAuditLog } from './audit.js';
+import { traceUi, runUiScenario } from './uiscenario.js';
+import { captureProcess, compareCaptureFiles } from './capture.js';
+import { appState, appExport, checkTaskFile } from './appstate.js';
 
 export * from './index.js';
 export { run, executionAllowed, psQuote } from './exec.js';
+export { startComputer, actOnComputer, checkpointComputer, closeComputer, listComputers, type ComputerAction, type ComputerStartOptions } from './computer.js';
+export { verifyAuditLog, canonicalJson } from './audit.js';
+export { traceUi, runUiScenario, diffToEvents, type TraceOptions, type ScenarioOptions, type ScenarioStep } from './uiscenario.js';
+export { captureProcess, compareCaptureFiles, type CaptureOptions } from './capture.js';
+export { appState, appExport, checkTaskFile, stateCandidates, homeSource, nodeViewHelpers, type AppStateOptions } from './appstate.js';
+export { Atspi, resolveA11yAddress } from './atspi.js';
+export { DBusClient, parseAddress } from './dbus.js';
+export { XdotoolDriver, YdotoolDriver, MacDriver, WindowsDriver, toolsEnv, findProgram } from './drivers.js';
 
 const PLATFORM = process.platform;
 const MAX_FILE = 64 * 1024 * 1024;
@@ -416,8 +429,90 @@ const NODE_TOOLS: ToolDef[] = [
   {
     name: 'desktop_ui_tree',
     description: 'Capture the native accessibility tree of a running app: AT-SPI over gdbus on Linux, System Events (osascript JXA) on macOS, UIAutomation through PowerShell on Windows. Gives role, name, description, value, automation id and screen bounds per element with parent links. Needs allowExecution; macOS needs Accessibility permission.',
-    inputSchema: { allowExecution: { type: 'boolean', description: 'Must be true: reads another app.' }, busAddress: { type: 'string', description: 'Linux AT-SPI bus address (default: AT_SPI_BUS_ADDRESS or the session a11y bus).', optional: true }, app: { type: 'string', description: 'App name filter (macOS: process name; default frontmost).', optional: true }, pid: { type: 'number', description: 'Process id filter.', optional: true }, maxNodes: { type: 'number', description: 'Node cap (default 300, max 5000).', optional: true }, maxDepth: { type: 'number', description: 'Depth cap (default 8).', optional: true } },
-    run: async (i) => captureUiTree(i),
+    inputSchema: { allowExecution: { type: 'boolean', description: 'Must be true: reads another app.' }, busAddress: { type: 'string', description: 'Linux AT-SPI bus address (default: AT_SPI_BUS_ADDRESS or the session a11y bus).', optional: true }, app: { type: 'string', description: 'App name filter (macOS: process name; default frontmost).', optional: true }, pid: { type: 'number', description: 'Process id filter.', optional: true }, maxNodes: { type: 'number', description: 'Node cap (default 300, max 5000).', optional: true }, maxDepth: { type: 'number', description: 'Depth cap (default 8).', optional: true }, details: { type: 'boolean', description: 'Linux: also read states, actions, text and values.', optional: true }, transport: { type: 'string', description: 'Linux: dbus (built-in client, default) or gdbus.', optional: true }, saveTo: { type: 'string', description: 'Also write the tree JSON here (for desktop_ui_compare).', optional: true } },
+    run: async (i) => { const t = await captureUiTree(i); if (i.saveTo) await writeFile(i.saveTo, JSON.stringify(t, null, 1)); return t; },
+  },
+];
+
+
+const B = (d: string, optional = true) => ({ type: 'boolean' as const, description: d, optional });
+const N = (d: string, optional = true) => ({ type: 'number' as const, description: d, optional });
+const S = (d: string, optional = true) => ({ type: 'string' as const, description: d, optional });
+const A = (d: string, optional = true) => ({ type: 'array' as const, description: d, optional });
+const O = (d: string, optional = true) => ({ type: 'object' as const, description: d, optional });
+
+const COMPUTER_TOOLS: ToolDef[] = [
+  {
+    name: 'desktop_computer_start',
+    description: 'Start a computer an agent can drive. Linux default: an isolated private Xvfb display with a window manager and a private accessibility bus (so desktop_ui_* tools see its apps), optionally launching an app. mode attach with attachCurrentDisplay: true drives the current display instead (X11 xdotool, Wayland ydotool, macOS cliclick or CoreGraphics, Windows SendInput). Needs consent: true and allowExecution: true. Every action goes to a hash-chained audit log.',
+    inputSchema: { consent: B('Must be true: a person agreed to let the agent drive a desktop.', false), allowExecution: B('Must be true: starts and drives programs.', false), mode: S('isolated (Linux, default) or attach.'), attachCurrentDisplay: B('Must be true for mode attach.'), width: N('Screen width (isolated, default 1280).'), height: N('Screen height (isolated, default 800).'), windowManager: S('true, false or a window manager name (isolated).'), accessibility: B('Start a private AT-SPI bus (isolated, default true).'), launch: A('Program and arguments to start in the session.'), env: O('Extra environment for programs in the session.'), workDir: S('Folder for the audit log, screenshots and checkpoints.'), idleTimeoutMs: N('Close after this long without actions (default 30 minutes).') },
+    run: async (i) => startComputer({ ...i, windowManager: i.windowManager === 'true' ? true : i.windowManager === 'false' ? false : i.windowManager }),
+  },
+  {
+    name: 'desktop_computer_act',
+    description: 'Send one action to a computer session: move, click, double_click, right_click, drag, type (secret: true keeps the text out of the log), key (ctrl+s, Enter, cmd+q), scroll, wait (ms, untilWindow title or untilElement selector), screenshot (PNG file, includeImage for base64), cursor, windows or launch. Returns the result and the audit entry hash.',
+    inputSchema: { session: S('Session id from desktop_computer_start.', false), action: S('move, click, double_click, right_click, drag, type, key, scroll, wait, screenshot, cursor, windows or launch.', false), x: N('X.'), y: N('Y.'), toX: N('Drag end x.'), toY: N('Drag end y.'), button: S('left, right or middle.'), count: N('Click count.'), text: S('Text to type.'), secret: B('Do not record the typed text.'), delayMs: N('Delay between typed keys.'), key: S('Key combo for key.'), dx: N('Scroll steps right.'), dy: N('Scroll steps down.'), ms: N('Wait time.'), untilWindow: S('Wait until a window title contains this.'), untilElement: O('Wait until an element matching this selector exists.'), timeoutMs: N('Wait limit.'), argv: A('Program and arguments for launch.'), includeImage: B('Return the screenshot as base64 too.'), screenshotAfter: B('Take a screenshot after the action.') },
+    run: async (i) => { const { session, ...a } = i; return actOnComputer(String(session), a as ComputerAction); },
+  },
+  {
+    name: 'desktop_computer_checkpoint',
+    description: 'Save a checkpoint of a computer session: screenshot, accessibility tree with states and text, window list and process snapshots (modules, files, sockets) of every program the session started and their children, with a manifest of SHA-256 digests tied to the audit log head.',
+    inputSchema: { session: S('Session id.', false), label: S('Checkpoint label.'), maxNodes: N('UI tree node cap (default 2000).'), processes: B('Include process snapshots (default true).'), uiTree: B('Include the UI tree (default true).') },
+    run: async (i) => checkpointComputer(String(i.session), i),
+  },
+  {
+    name: 'desktop_computer_close',
+    description: 'Close a computer session: stop the programs it started, its window manager, buses and display, and seal the audit log. Returns the audit log path and head hash.',
+    inputSchema: { session: S('Session id.', false), reason: S('Why it is closed.') },
+    run: async (i) => closeComputer(String(i.session), i),
+  },
+  {
+    name: 'desktop_computer_list',
+    description: 'List open computer sessions with their display, driver, action and checkpoint counts and the programs they run.',
+    inputSchema: {},
+    run: async () => ({ sessions: listComputers() }),
+  },
+  {
+    name: 'desktop_audit_verify',
+    description: 'Verify a computer session audit log: every line parses, sequence numbers run in order and each line hash chains to the one before, so edits, removals and reordering are found. Also counts actions and failures.',
+    inputSchema: { path: S('audit.jsonl path.', false) },
+    run: async (i) => verifyAuditLog(String(i.path)),
+  },
+  {
+    name: 'desktop_ui_trace',
+    description: 'Watch accessibility events for a bounded time: AT-SPI signals on Linux (object state, text, property and children changes, window and focus events) through RevLens\'s own D-Bus client, UIAutomation event handlers on Windows, and tree polling on macOS (or mode poll anywhere). Can perform computer actions (during) or an accessibility action on an element while listening, and diffs the tree before and after. Filters by pid or app name. Needs allowExecution.',
+    inputSchema: { allowExecution: B('Must be true.', false), session: S('Computer session id (uses its bus and lets during drive it).'), busAddress: S('Linux AT-SPI bus address.'), pid: N('Only this process.'), app: S('Only apps whose name contains this.'), durationMs: N('How long to listen (default 3000, max 120000).'), mode: S('events or poll.'), intervalMs: N('Poll interval.'), classes: A('AT-SPI event classes (default object:, window:, focus:).'), maxEvents: N('Event cap (default 2000).'), during: A('Computer actions to run while listening.'), elementAction: O('{selector, action} to run while listening.'), treeDiff: B('Diff the tree before and after (default true).'), maxNodes: N('Tree node cap.') },
+    run: async (i) => traceUi(i),
+  },
+  {
+    name: 'desktop_ui_scenario',
+    description: 'Run a scripted UI scenario on a live app. Steps: find (selector), click (selector; method action, pointer or auto), type (text, into selector; EditableText or keys), key, wait (ms), waitFor (selector, gone), assert (selector with exists, count, name, states, notStates, text, textContains, value), screenshot, computer (any computer action). Selectors match role (platform spellings folded), name, nameContains, namePrefix, automationId, states and index, with no regular expressions. Each step saves the UI tree, a screenshot and the change from the step before. Needs allowExecution.',
+    inputSchema: { allowExecution: B('Must be true.', false), steps: A('Scenario steps.', false), session: S('Computer session id (needed for pointer clicks, keys and screenshots).'), busAddress: S('Linux AT-SPI bus address.'), pid: N('Only this process.'), app: S('Only apps whose name contains this.'), stopOnFailure: B('Skip the rest after a failure (default true).'), outDir: S('Folder for step evidence.'), maxNodes: N('Tree node cap.'), capture: B('Save tree and screenshot per step (default true).') },
+    run: async (i) => runUiScenario(i),
+  },
+  {
+    name: 'desktop_process_capture',
+    description: 'Bounded process capture: start a command (argument list, no shell) or attach to a pid, sample the process tree every intervalMs for durationMs (modules, open files, sockets, child processes, memory, threads, fd counts), record syscalls with strace on Linux when available (files, execs, network endpoints, process tree, errors per syscall), keep stdout and stderr hashes, and write one capture file for desktop_capture_compare. Needs allowExecution.',
+    inputSchema: { allowExecution: B('Must be true.', false), command: A('Program and arguments to start.'), pid: N('Or a running process to watch.'), durationMs: N('Capture time (default 5000, max 600000).'), intervalMs: N('Sample interval (default 200 Linux, 1000 elsewhere).'), strace: B('Linux: record syscalls (default true when strace exists).'), straceTrace: S('strace trace classes (default %file,%network,%process).'), cwd: S('Working folder.'), env: O('Extra environment.'), stdin: S('Text for standard input.'), out: S('Capture file path.'), kill: B('Stop the command at the end (default true).'), maxItems: N('Cap per list.') },
+    run: async (i) => { const r = await captureProcess(i); const c = r.capture; return { path: r.path, exit: c.exit, durationMs: c.durationMs, samples: c.samples, processes: c.processes.length, modules: c.modules.length, files: c.files.length, sockets: c.sockets.length, syscalls: c.syscalls ? { calls: c.syscalls.calls, files: c.syscalls.files.length, execs: c.syscalls.execs.slice(0, 50), network: c.syscalls.network.slice(0, 50), top: Object.entries(c.syscalls.bySyscall).sort((a, b) => b[1].calls - a[1].calls).slice(0, 20).map(([n, v]) => ({ syscall: n, ...v })) } : undefined, stdout: c.stdout, stderr: c.stderr, warnings: c.warnings }; },
+  },
+  {
+    name: 'desktop_app_state',
+    description: 'Find and list an installed app\'s state: Linux XDG config, data, state and cache folders, dotfolders, Flatpak and Snap data and dconf settings; macOS preference plists, Application Support, containers, caches and saved state; Windows AppData folders and HKCU registry keys; Electron userData with Local Storage keys read from its LevelDB log. Each file gets format, size, SHA-256, a summary and a secret flag.',
+    inputSchema: { path: S('.desktop file, .app bundle or Info.plist of the app.'), name: S('App name.'), id: S('App id (desktop id, package id).'), bundleId: S('macOS bundle id.'), publisher: S('Publisher (Windows folders and registry).'), electron: B('Treat as Electron.'), paths: A('More absolute paths to include.'), home: S('Home folder to look in (default this user).'), maxFiles: N('File cap (default 5000).'), maxDepth: N('Folder depth cap (default 12).'), localStorage: B('Read Electron Local Storage (default true).') },
+    run: async (i) => appState(i),
+  },
+  {
+    name: 'desktop_app_export',
+    description: 'Export an app\'s state as a zip with manifest.json (source path, size, SHA-256, format of every file, roots, Electron markers, registry and dconf). Files named like secrets (Cookies, Login Data, Local State, keys, tokens, passwords, credentials) are withheld and secret-looking keys in JSON, plist and key=value files are masked; the manifest records what was redacted.',
+    inputSchema: { out: S('Zip file to write.', false), path: S('.desktop file, .app bundle or Info.plist.'), name: S('App name.'), id: S('App id.'), bundleId: S('macOS bundle id.'), publisher: S('Publisher.'), electron: B('Treat as Electron.'), paths: A('More absolute paths.'), home: S('Home folder.'), redact: B('Redact secrets (default true).'), maxBytes: N('Total size cap.') },
+    run: async (i) => { const r = await appExport(i); return { ...r, manifest: undefined }; },
+  },
+  {
+    name: 'desktop_task_check',
+    description: 'Evaluate a desktop task file ({name, prompt, checks}) against a home folder: file_present, file_absent, lines_present, lines_absent, line_count, value_equals, value_absent, text_equals, text_contains, member_count, row_present, row_absent, row_count on typed views (text, JSON, key files, XML, plist, SQLite, zip, gzip) with JSON pointers and [key=value] selectors, plus ui_element checks on a saved UI tree. Returns per-check results and the answers map for desktop_task_score or x_eval_score.',
+    inputSchema: { task: S('Task JSON file.', false), home: S('Home folder the file paths are under (default this user).'), uiTree: S('Saved UI tree JSON for ui_element checks.') },
+    run: async (i) => checkTaskFile(i),
   },
 ];
 
@@ -435,13 +530,13 @@ async function readRegularFile(path: string, max: number, notFile = `${path} is 
 const readerIO = (path: string, max: number) => readRegularFile(path, max);
 
 /** All desktop tools for Node (file paths supported). */
-export const TOOLS: ToolDef[] = [...BROWSER_TOOLS(readerIO), ...NODE_TOOLS];
+export const TOOLS: ToolDef[] = [...BROWSER_TOOLS(readerIO), ...NODE_TOOLS, ...COMPUTER_TOOLS];
 
 export interface CliCommand { name: string; usage: string; summary: string; run(argv: string[]): Promise<number> }
 
 function parseArgs(argv: string[]) {
   const pos: string[] = []; const flags: Record<string, string | boolean> = {};
-  const BOOL = new Set(['json', 'allow-execution', 'hidden', 'resolve', 'no-modules', 'no-files', 'no-sockets']);
+  const BOOL = new Set(['json', 'allow-execution', 'hidden', 'resolve', 'no-modules', 'no-files', 'no-sockets', 'consent', 'attach', 'no-strace', 'no-redact', 'details', 'local-storage']);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
     if (a.startsWith('--')) { const [k, v] = a.slice(2).split('=', 2) as [string, string | undefined]; if (v !== undefined) flags[k] = v; else if (!BOOL.has(k) && i + 1 < argv.length && !argv[i + 1]!.startsWith('--')) flags[k] = argv[++i]!; else flags[k] = true; }
@@ -474,4 +569,59 @@ export const CLI_COMMANDS: CliCommand[] = [
   cmd('apps', 'desktop_apps_list', 'revlens apps [--filter text] [--hidden] [--resolve] [--dir path] [--json]', (_p, f) => ({ filter: str(f.filter), includeHidden: !!f.hidden, resolve: !!f.resolve, dirs: str(f.dir) ? [str(f.dir)] : undefined, limit: num(f.limit) }), (o) => L([`${o.total} apps on ${o.platform}`, ...o.apps.map((a: any) => `  ${a.name}${a.version ? ' ' + a.version : ''}  [${a.packaging ?? ''}] ${a.executable ?? ''}${a.electron ? ' (Electron)' : ''}${a.publisher ? '  ' + a.publisher : ''}`), ...o.warnings.slice(0, 20).map((w: string) => `  warning: ${w}`)])),
   cmd('app-inspect', 'desktop_app_inspect', 'revlens app-inspect <file.desktop|App.app|Info.plist> [--json]', (p) => ({ path: need(p, 'path') }), (o) => L([`${o.name}${o.version ? ' ' + o.version : ''} (${o.id ?? '?'})`, `  executable: ${o.resolvedExecutable ?? o.executable ?? '?'}`, o.exec ? `  exec: ${o.exec}` : undefined, `  packaging: ${o.packaging ?? '?'}${o.electron ? `, Electron app.asar at ${o.asar}` : ''}`, o.categories ? `  categories: ${o.categories.join(', ')}` : undefined, o.mimeTypes ? `  mime: ${o.mimeTypes.join(', ')}` : undefined, ...Object.entries(o.extra ?? {}).map(([k, v]) => `  ${k}: ${v}`)])),
   cmd('ui-tree', 'desktop_ui_tree', 'revlens ui-tree --allow-execution [--app name] [--pid N] [--max-nodes N] [--max-depth N] [--json]', (_p, f) => ({ allowExecution: !!f['allow-execution'], app: str(f.app), pid: num(f.pid), maxNodes: num(f['max-nodes']), maxDepth: num(f['max-depth']) }), (o) => L([`${o.backend} tree, ${o.nodes.length} nodes${o.truncated ? ' (truncated)' : ''}`, ...o.nodes.map((n: UiNode) => `${'  '.repeat(n.depth + 1)}${n.role}${n.name ? ` "${n.name}"` : ''}${n.automationId ? ` #${n.automationId}` : ''}${n.bounds ? ` [${n.bounds.x},${n.bounds.y} ${n.bounds.width}x${n.bounds.height}]` : ''}`), ...o.warnings.map((w: string) => `  warning: ${w}`)])),
+  cmd('ui-compare', 'desktop_ui_compare', 'revlens ui-compare <a.json> <b.json> [--ignore bounds] [--json]', (p, f) => { if (!p[1]) throw new InputError('give two UI tree files'); return { a: p[0], b: p[1], ignore: str(f.ignore)?.split(',') }; }, (o) => L([`similarity ${o.similarity}: ${o.nodesBefore} -> ${o.nodesAfter} elements, ${o.added.length} added, ${o.removed.length} removed, ${o.changed.length} changed`, ...o.added.slice(0, 100).map((x: any) => `  + ${x.role} "${x.name}"`), ...o.removed.slice(0, 100).map((x: any) => `  - ${x.role} "${x.name}"`), ...o.changed.slice(0, 100).map((c: any) => `  ~ ${c.role} "${c.name}": ${c.changes.map((ch: any) => `${ch.field} ${JSON.stringify(ch.before)} -> ${JSON.stringify(ch.after)}`).join('; ').slice(0, 300)}`)])),
+  cmd('ui-trace', 'desktop_ui_trace', 'revlens ui-trace --allow-execution [--pid N] [--app name] [--duration ms] [--mode events|poll] [--json]', (_p, f) => ({ allowExecution: !!f['allow-execution'], pid: num(f.pid), app: str(f.app), durationMs: num(f.duration), mode: str(f.mode), busAddress: str(f.bus) }), (o) => L([`${o.backend} ${o.mode}: ${o.events.length} events in ${o.durationMs} ms${o.truncated ? ' (truncated)' : ''}`, ...Object.entries(o.summary.byType).map(([k, v]) => `  ${String(v).padStart(5)} ${k}`), ...o.events.slice(0, 200).map((e: any) => `  ${String(e.t).padStart(6)}ms ${e.type} ${e.source.role ?? ''} "${e.source.name ?? ''}"${e.data !== undefined ? ' ' + JSON.stringify(e.data).slice(0, 80) : ''}`), ...o.warnings.map((w: string) => `  warning: ${w}`)])),
+  cmd('ui-scenario', 'desktop_ui_scenario', 'revlens ui-scenario <steps.json> --allow-execution [--pid N] [--app name] [--out dir] [--json]', (p, f) => ({ steps: JSON.parse(readFileSyncSafe(need(p, 'steps file'))), allowExecution: !!f['allow-execution'], pid: num(f.pid), app: str(f.app), outDir: str(f.out), busAddress: str(f.bus) }), (o) => L([`${o.ok ? 'PASS' : 'FAIL'}: ${o.passed} passed, ${o.failed} failed, ${o.skipped} skipped; evidence in ${o.outDir}`, ...o.steps.map((x: any) => `  ${x.ok ? 'ok  ' : 'FAIL'} ${String(x.index + 1).padStart(3)} ${x.kind}${x.element ? ` ${x.element.role} "${x.element.name}"` : ''}${x.how ? ` (${x.how})` : ''}${x.error ? `: ${x.error}` : ''}`)])),
+  {
+    name: 'proc-capture', usage: 'revlens proc-capture --allow-execution [--duration ms] [--interval ms] [--no-strace] [--out file.json] [--json] (--pid N | -- program args...)', summary: 'Bounded process capture: sample a command or pid and record syscalls with strace.',
+    async run(argv) {
+      const dd = argv.indexOf('--');
+      const { flags } = parseArgs(dd >= 0 ? argv.slice(0, dd) : argv);
+      const t = TOOLS.find((x) => x.name === 'desktop_process_capture')!;
+      if (flags.help) { process.stdout.write(`${this.usage}\n\n${t.description}\n`); return 0; }
+      try {
+        const o: any = await t.run({ allowExecution: !!flags['allow-execution'], command: dd >= 0 ? argv.slice(dd + 1) : undefined, pid: num(flags.pid), durationMs: num(flags.duration), intervalMs: num(flags.interval), strace: flags['no-strace'] ? false : undefined, out: str(flags.out) });
+        process.stdout.write((flags.json ? JSON.stringify(o, null, 2) : L([`capture written to ${o.path}`, `  exit ${JSON.stringify(o.exit ?? null)}, ${o.durationMs} ms, ${o.samples} samples, ${o.processes} processes, ${o.modules} modules, ${o.files} files, ${o.sockets} sockets`, o.syscalls ? `  ${o.syscalls.calls} syscalls; top: ${o.syscalls.top.slice(0, 8).map((x: any) => `${x.syscall} ${x.calls}`).join(', ')}` : undefined, ...(o.syscalls?.execs ?? []).map((e: any) => `  exec ${e.argv.join(' ').slice(0, 200)}`), ...(o.syscalls?.network ?? []).map((n: any) => `  ${n.op} ${n.family} ${n.address}${n.port !== undefined ? ':' + n.port : ''}`), ...o.warnings.map((w: string) => `  warning: ${w}`)])) + '\n');
+        return 0;
+      } catch (e) { process.stderr.write(`proc-capture: ${(e as Error).message}\n`); return e instanceof InputError ? 2 : 1; }
+    },
+  },
+  cmd('capture-compare', 'desktop_capture_compare', 'revlens capture-compare <a.json> <b.json> [--json]', (p) => { if (!p[1]) throw new InputError('give two capture files'); return { a: p[0], b: p[1] }; }, (o) => L([`similarity ${o.similarity}; exit ${JSON.stringify(o.exit.before)} -> ${JSON.stringify(o.exit.after)}`, ...['modules', 'files', 'sockets', 'processes', 'execs', 'network', 'syscallFiles'].flatMap((k) => o[k] ? [...o[k].added.slice(0, 50).map((x: string) => `  + ${k} ${x}`), ...o[k].removed.slice(0, 50).map((x: string) => `  - ${k} ${x}`)] : []), ...(o.syscalls?.changed ?? []).slice(0, 30).map((c: any) => `  ~ ${c.syscall} ${c.before} -> ${c.after}`)])),
+  cmd('app-state', 'desktop_app_state', 'revlens app-state (<file.desktop|App.app> | --name N | --id ID | --bundle-id ID) [--home dir] [--json]', (p, f) => ({ path: p[0], name: str(f.name), id: str(f.id), bundleId: str(f['bundle-id']), publisher: str(f.publisher), home: str(f.home), maxFiles: num(f['max-files']) }), (o) => L([`${o.app.name ?? o.app.id ?? o.app.bundleId}: ${o.files.length} files, ${o.totalBytes} bytes${o.truncated ? ' (truncated)' : ''}`, ...o.roots.filter((r: any) => r.exists).map((r: any) => `  ${r.role}: ${r.path}`), ...o.files.slice(0, 300).map((f: any) => `    ${f.format.padEnd(9)} ${String(f.size).padStart(9)} ${f.secret ? 'secret ' : ''}${f.rel}`), ...(o.electron ?? []).flatMap((e: any) => [`  Electron userData ${e.userData} (${e.markers.join(', ')})`, ...(e.localStorage ?? []).slice(0, 50).map((x: any) => `    localStorage ${x.origin} ${x.key} = ${String(x.value ?? '').slice(0, 80)}`)]), ...(o.registry ?? []).slice(0, 50).map((r: any) => `  registry ${r.key}`), ...(o.dconf ?? []).map((d: any) => `  dconf ${d.path}`), ...o.warnings.slice(0, 20).map((w: string) => `  warning: ${w}`)])),
+  cmd('app-export', 'desktop_app_export', 'revlens app-export (<file.desktop|App.app> | --name N | --id ID | --bundle-id ID) --out state.zip [--no-redact] [--home dir] [--json]', (p, f) => ({ path: p[0], name: str(f.name), id: str(f.id), bundleId: str(f['bundle-id']), publisher: str(f.publisher), home: str(f.home), out: str(f.out), redact: !f['no-redact'] }), (o) => L([`wrote ${o.out} (${o.bytes} bytes, sha256 ${o.sha256})`, `  ${o.files} files, ${o.withheld} withheld, ${o.redactedFiles} with masked values`])),
+  cmd('task-check', 'desktop_task_check', 'revlens task-check <task.json> [--home dir] [--ui-tree tree.json] [--json]', (p, f) => ({ task: need(p, 'task file'), home: str(f.home), uiTree: str(f['ui-tree']) }), (o) => L([o.problems.length ? `invalid task: ${o.problems.join('; ')}` : `${o.task}: ${o.pass ? 'PASS' : 'FAIL'} (${o.passed} passed, ${o.failed} failed${o.undecided ? `, ${o.undecided} undecided` : ''})`, ...o.results.map((r: any) => `  ${r.pass ? 'pass' : 'fail'} ${r.id} ${r.kind}${r.file ? ` ${r.file}` : ''}: ${r.detail}`)])),
+  cmd('audit-verify', 'desktop_audit_verify', 'revlens audit-verify <audit.jsonl> [--json]', (p) => ({ path: need(p, 'audit log') }), (o) => L([`${o.ok ? 'intact' : 'BROKEN'}: ${o.entries} entries, head ${o.head}, ${o.failures} failed actions`, ...Object.entries(o.actions).map(([k, v]) => `  ${String(v).padStart(5)} ${k}`), ...o.problems.map((p: any) => `  line ${p.line}: ${p.problem}`)])),
+  {
+    name: 'computer-run', usage: 'revlens computer-run <script.json> --consent --allow-execution [--json]', summary: 'Start a computer, run a list of actions, checkpoints, traces and scenario steps from a JSON script, then close it.',
+    async run(argv) {
+      const { pos, flags } = parseArgs(argv);
+      if (flags.help || !pos[0]) { process.stdout.write(`${this.usage}\n\nScript: {"start": {start options}, "steps": [{"act": {action}}, {"checkpoint": {"label": "x"}}, {"trace": {trace options}}, {"scenario": [steps]}]}\n`); return pos[0] ? 0 : 2; }
+      let id: string | undefined;
+      const log: unknown[] = [];
+      try {
+        const script = JSON.parse(readFileSyncSafe(pos[0]));
+        const st: any = await startComputer({ ...(script.start ?? {}), consent: !!flags.consent, allowExecution: !!flags['allow-execution'] });
+        id = st.id; log.push({ start: st });
+        for (const s of (script.steps ?? []).slice(0, 1000)) {
+          if (s.act) log.push({ act: await actOnComputer(id!, s.act) });
+          else if (s.checkpoint) log.push({ checkpoint: await checkpointComputer(id!, s.checkpoint) });
+          else if (s.trace) log.push({ trace: await traceUi({ ...s.trace, session: id, allowExecution: true }) });
+          else if (s.scenario) log.push({ scenario: await runUiScenario({ steps: s.scenario, session: id, allowExecution: true }) });
+          else throw new InputError('each step needs act, checkpoint, trace or scenario');
+        }
+        const c = await closeComputer(id!); id = undefined; log.push({ close: c });
+        process.stdout.write((flags.json ? JSON.stringify(log, null, 2) : L(log.map((x: any) => { const [k, v] = Object.entries(x)[0] as [string, any]; return `${k}: ${JSON.stringify(v).slice(0, 300)}`; }))) + '\n');
+        return 0;
+      } catch (e) {
+        if (id) await closeComputer(id, { reason: 'script failed' }).catch(() => undefined);
+        process.stderr.write(`computer-run: ${(e as Error).message}\n`); return e instanceof InputError ? 2 : 1;
+      }
+    },
+  },
 ];
+
+function readFileSyncSafe(p: string): string {
+  const st = statSync(p);
+  if (!st.isFile() || st.size > 16 * 1024 * 1024) throw new InputError(`${p} is not a JSON file under 16 MiB`);
+  return readFileSync(p, 'utf8');
+}

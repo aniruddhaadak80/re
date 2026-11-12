@@ -11,6 +11,14 @@ export { parseDesktopFile, splitExec, desktopEntryToApp, infoPlistToApp, parseRe
 export { parseGVariant, replyValue, parseAccessibleRefs, type GValue, type UiNode } from './gvariant.js';
 export { compareSnapshots, socketKey, type ProcessSnapshot, type SnapshotDiff } from './compare.js';
 export { BROWSER_TOOLS, type ToolDef } from './tools.js';
+export { ATSPI_STATES, decodeAtspiStates, normalizeRole, checkSelector, findNode, findNodes, describeSelector, compareUiTrees, nodeKeys, atspiEventType, summarizeEvents, type UiSelector, type UiTreeDiff, type UiEvent, type UiTreeLike } from './uimodel.js';
+export { encodeMessage, decodeMessage, messageLength, splitSignature, Variant, MSG, type DMessage, type DValue } from './dbuswire.js';
+export { parseStrace, splitArgs, unquote, compareCaptures, type StraceSummary, type ProcessCapture } from './strace.js';
+export { readLevelLog, decodeLocalStorage, type LevelRecord } from './leveldb.js';
+export { parseXml, wholeText, parseKeyFile, detectFormat, viewOf, isSecretFile, isSecretKey, redactValue, redactLines, validateTask, resolvePointer, pointerSegments, parseSelectorSegment, runCheck, runTask, toEvalTasks, scoreTaskAnswers, type DesktopTask, type TaskCheck, type CheckResult, type TaskRun, type ViewHelpers, type FileSource } from './views.js';
+export { writeZip, listZip, readZipEntry, type ZipEntry } from './zip.js';
+export { decodeXwd, encodePng, pngInfo, crop, diffImages, crc32, type Rgba } from './image.js';
+export { parseKeyCombo, toXdotool, toYdotool, winVk, MAC_KEYCODE, EVDEV, type KeyCombo } from './keys.js';
 
 /** Parse-only tools (bytes or text input). The Node entry adds live process, app and UI tools. */
 export const TOOLS = BROWSER_TOOLS();
