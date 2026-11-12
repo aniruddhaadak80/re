@@ -56,6 +56,10 @@ export class Program {
   readonly symAt = new Map<number, Sym>();
   private sortedSyms: Sym[] = [];
   readonly functions = new Map<number, FunctionInfo>();
+  /** analyst names set through disasm_set_name (shared with the annotation store of these bytes) */
+  userNames = new Map<number, string>();
+  /** identity of the loaded bytes for annotation stores (set by openProgram) */
+  contentKey?: string;
   private sortedFuncs: number[] | undefined;
   private readonly cache = new Map<number, AnalyzedFunction>();
   /** end address of every function built so far (kept after its analysis is evicted) */
@@ -215,6 +219,8 @@ export class Program {
 
   /** Name for an address: function, symbol, import stub or slot. */
   nameOf(addr: number): string | undefined {
+    const user = this.userNames.get(addr);
+    if (user) return user;
     const stub = this.importByStub.get(addr);
     if (stub) return stub.name;
     const f = this.functions.get(addr);
@@ -223,6 +229,9 @@ export class Program {
     if (s) return s.name;
     return undefined;
   }
+
+  /** sorted symbol list (one best symbol per address) */
+  symbolsSorted(): Sym[] { return this.sortedSyms; }
 
   /** "name" or "name+0x10" for any address near a symbol, else undefined. */
   symbolize(addr: number): string | undefined {

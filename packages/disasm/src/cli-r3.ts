@@ -6,7 +6,7 @@ import { R3_TOOLS } from './tools-r3.js';
 const out = (s: string) => { (globalThis as { process?: { stdout: { write(s: string): void } } }).process?.stdout.write(s + '\n'); };
 const err = (s: string) => { (globalThis as { process?: { stderr: { write(s: string): void } } }).process?.stderr.write(s + '\n'); };
 
-const BOOL = new Set(['json', 'include-anonymous', 'all', 'debug-info', 'no-debug-info', 'regex', 'case-sensitive', 'clear', 'with-pseudocode']);
+const BOOL = new Set(['json', 'force', 'merge', 'unresolved', 'include-anonymous', 'all', 'debug-info', 'no-debug-info', 'regex', 'case-sensitive', 'clear', 'with-pseudocode']);
 
 function parse(argv: string[]) {
   const pos: string[] = [];
@@ -75,4 +75,15 @@ function toolCommand(name: string, tool: string, positional: string[], summary: 
 
 export const R3_COMMANDS: CliCommand[] = [
   toolCommand('disasm-debug-info', 'disasm_debug_info', ['path', 'view', 'name'], 'DWARF types, prototypes, parameters, locals and globals'),
+  toolCommand('disasm-context', 'disasm_context', ['path', 'address'], 'Navigation context of an address or file offset'),
+  toolCommand('disasm-name', 'disasm_address_name', ['path', 'address'], 'Name at an address (null when unnamed)'),
+  toolCommand('disasm-containing', 'disasm_containing_function', ['path', 'address'], 'Function containing an address'),
+  toolCommand('disasm-next', 'disasm_next_address', ['path', 'address'], 'Next analyzed object after an address'),
+  toolCommand('disasm-prev', 'disasm_prev_address', ['path', 'address'], 'Previous analyzed object before an address'),
+  toolCommand('disasm-names', 'disasm_list_names', ['path'], 'Functions, data symbols, imports, exports and analyst names'),
+  toolCommand('disasm-search-functions', 'disasm_search_functions', ['path', 'pattern'], 'Search function names by substring or linear time regex (--regex)'),
+  toolCommand('disasm-insn', 'disasm_instruction', ['path', 'address'], 'One instruction with operand tokens and references'),
+  toolCommand('disasm-function-info', 'disasm_function_info', ['path', 'function'], 'Signature, locals, size and body ranges of a function'),
+  toolCommand('function', 'disasm_analyze_function', ['path', 'function'], 'One call function dossier (pseudo code, assembly, calls, callers, strings, comments)'),
+  toolCommand('disasm-api-boundary', 'disasm_api_boundary', ['path', 'function'], 'Jump table dispatch, default target, import calls and unknowns of a function'),
 ];

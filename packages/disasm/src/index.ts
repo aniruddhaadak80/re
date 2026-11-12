@@ -22,6 +22,8 @@ export { R3_TOOLS } from './tools-r3.js';
 export { readDwarf, dwarfSections, declare, typeDecl, DwarfTypes, type DwarfInfo, type DwarfType, type DwarfFunction, type DwarfGlobal, type DwarfVar, type DwarfMember, type DwarfLocation, type DwarfUnit } from './debug/dwarf.js';
 export { liftDebugFor } from './debug/liftdebug.js';
 export { disasmDebugInfo } from './debugapi.js';
+export * from './navapi.js';
+export { SafeRegex, SafeRegexError } from './saferegex.js';
 export { CLI_COMMANDS, type CliCommand } from './cli.js';
 export { disasmAnalyzer } from './analyzer.js';
 import { disasmAnalyzer } from './analyzer.js';
