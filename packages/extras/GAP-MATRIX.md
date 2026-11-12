@@ -137,10 +137,10 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | rea feature | where in rea | RevLens owner | before | after | how RevLens is better, or what is left |
 |---|---|---|---|---|---|
 | Frida: list devices/processes, instrument, load/unload script, sessions | src/frida | bridges | partial | covered | persistent Frida sessions: attach or spawn, load templates or scripts, post, collect events, unload, resume |
-| capture_process_scenario / compare_process_captures / prepare_bounded_process_capture | src/process | desktop | missing | partial | desktop_process_inspect snapshots modules, files and sockets on Linux, macOS and Windows and desktop_process_compare diffs them; left: a bounded scenario runner |
-| desktop application capture/state/export/tasks | src/desktop | desktop | missing | partial | desktop_apps_list and desktop_app_inspect find installed apps (.desktop, .app, uninstall keys) and flag Electron apps; left: state export and tasks |
-| build computer (start/act/close, checkpoints, capture, consent) | src/desktop | none | missing | missing | left |
-| observe_native_ui / trace_native_ui_action / capture_native_ui_scenario | src/native | desktop | missing | partial | desktop_ui_tree reads the accessibility tree through AT-SPI, macOS AX and Windows UIA; left: action tracing and scenarios |
+| capture_process_scenario / compare_process_captures / prepare_bounded_process_capture | src/process | desktop | missing | covered | desktop_process_capture runs a command (argument list, no shell) or attaches to a pid for a bounded time, samples modules, files, sockets, children, memory and threads on Linux, macOS and Windows and records syscalls with strace on Linux (counts equal strace -C); desktop_capture_compare diffs two captures, and the strace parser and comparison run in a browser worker |
+| desktop application capture/state/export/tasks | src/desktop | desktop | missing | covered | desktop_app_state finds XDG, dconf, Flatpak, Snap, macOS Library, Windows AppData and HKCU registry state and Electron userData with Local Storage read from LevelDB logs; desktop_app_export writes a zip with a SHA-256 manifest and secrets withheld or masked by name; desktop_task_check runs task files with rea check kinds and selectors plus ui_element checks, scored like x_eval_score; checked against Python readers and real Chromium userData |
+| build computer (start/act/close, checkpoints, capture, consent) | src/desktop | desktop | missing | covered | desktop_computer_start/act/checkpoint/close need no Docker or agentenv: a private Xvfb display with a window manager and private AT-SPI bus on Linux, or the current X11, Wayland, macOS or Windows desktop after consent; checkpoints hold screenshot, UI tree, windows and process snapshots with digests; every action is in a hash-chained audit log checked by desktop_audit_verify; tested live with Chromium |
+| observe_native_ui / trace_native_ui_action / capture_native_ui_scenario | src/native | desktop | missing | covered | desktop_ui_tree (own D-Bus client, states, actions, text), desktop_ui_trace (AT-SPI events, UIAutomation handlers, macOS polling, actions while listening, before and after diff), desktop_ui_scenario (role and name selectors, accessibility or pointer clicks, typing, asserts, tree and screenshot per step) and desktop_ui_compare on Linux, Windows and macOS |
 
 ## Platform, packaging and process
 
@@ -169,7 +169,7 @@ Regenerate with `python3 packages/extras/scripts/gap_matrix.py packages/extras/G
 | state | covered | partial | missing |
 |---|---|---|---|
 | before | 49 | 26 | 42 |
-| after | 85 | 27 | 5 |
+| after | 89 | 24 | 4 |
 
 ## Where RevLens already exceeds rea
 

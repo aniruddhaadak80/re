@@ -398,7 +398,7 @@ test('consent and execution gates', async () => {
 
 // ---------------- small pure pieces ----------------
 
-test('key combos, selectors, roles, states and redaction', () => {
+test('key combos, selectors, roles, states, ui_element checks and redaction', async () => {
   assert.equal(toXdotool(parseKeyCombo('ctrl+shift+a')), 'ctrl+shift+a');
   assert.equal(toXdotool(parseKeyCombo('Enter')), 'Return');
   assert.equal(toXdotool(parseKeyCombo('cmd+PageDown')), 'super+Next');
@@ -414,6 +414,8 @@ test('key combos, selectors, roles, states and redaction', () => {
   assert.throws(() => checkSelector({ index: 2 }), InputError);
   const d = compareUiTrees({ nodes }, { nodes: [nodes[0]!, { ...nodes[1]!, states: [] }, { id: 3, parent: 0, depth: 1, role: 'label', name: 'New' }] });
   assert.equal(d.removed.length, 1); assert.equal(d.added[0]!.name, 'New'); assert.deepEqual(d.changed[0]!.changes, [{ field: 'states', before: ['enabled'], after: [] }]);
+  const ui = await runTask({ name: 'ui-check', prompt: 'Turn the OK button off.', checks: [{ id: 'ok-off', kind: 'ui_element', selector: { role: 'button', name: 'OK', index: 1 }, notStates: ['enabled'] }, { id: 'gone', kind: 'ui_element', selector: { name: 'Cancel' }, exists: false }, { id: 'ok-on', kind: 'ui_element', selector: { role: 'button', name: 'OK' }, states: ['focused'] }] }, { read: async () => undefined }, {}, nodes);
+  assert.deepEqual(ui.results.map((r) => r.pass), [true, true, false]);
   const masked: string[] = [];
   assert.deepEqual(redactValue({ a: 1, Password: 'x', nested: { api_key: 'k', ok: 'v' } }, '', masked), { a: 1, Password: '[redacted]', nested: { api_key: '[redacted]', ok: 'v' } });
   assert.deepEqual(masked, ['/Password', '/nested/api_key']);
