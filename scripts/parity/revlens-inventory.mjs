@@ -102,9 +102,11 @@ function staticPass() {
 const live = await livePass().then((v) => ({ ok: true, ...v }), (e) => ({ ok: false, error: String(e?.stack ?? e).slice(0, 2000) }));
 const stat = staticPass();
 let head = '';
+let mainCommit = '';
 try { head = execFileSync('git', ['-C', ROOT, 'rev-parse', 'HEAD']).toString().trim(); } catch { /* not git */ }
+try { mainCommit = execFileSync('git', ['-C', ROOT, 'merge-base', 'HEAD', 'origin/main']).toString().trim(); } catch { /* no origin */ }
 const result = {
-  generatedFrom: { path: ROOT, commit: head, live: live.ok, liveError: live.ok ? undefined : live.error },
+  generatedFrom: { path: ROOT, commit: head, mainCommit, live: live.ok, liveError: live.ok ? undefined : live.error },
   counts: live.ok ? { tools: live.tools.length, commands: live.commands.length + stat.coreCommands.length, analyzers: live.analyzers.length, formatIds: stat.formatIds.length, envNames: stat.envNames.length } : undefined,
   ...(live.ok ? { tools: live.tools, prompts: live.prompts, resources: live.resources, commands: live.commands, analyzers: live.analyzers, toolEffects: live.toolEffects } : {}),
   ...stat,

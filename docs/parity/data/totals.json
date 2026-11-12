@@ -1,0 +1,56 @@
+{
+ "MCP tools (rea-tools.md)": {
+  "rows": 252,
+  "equal": 106,
+  "better": 16,
+  "partial": 61,
+  "missing": 69,
+  "inProgress": 54,
+  "covered": 122
+ },
+ "CLI commands (rea-cli.md)": {
+  "rows": 194,
+  "equal": 82,
+  "better": 16,
+  "partial": 46,
+  "missing": 50,
+  "inProgress": 42,
+  "covered": 98
+ },
+ "Input formats (formats.md)": {
+  "rows": 72,
+  "equal": 47,
+  "better": 2,
+  "partial": 7,
+  "missing": 16,
+  "inProgress": 9,
+  "covered": 49
+ },
+ "Output formats (formats.md)": {
+  "rows": 7,
+  "equal": 2,
+  "better": 0,
+  "partial": 0,
+  "missing": 5,
+  "inProgress": 0,
+  "covered": 2
+ },
+ "Settings (config.md)": {
+  "rows": 96,
+  "equal": 16,
+  "better": 0,
+  "partial": 13,
+  "missing": 67,
+  "inProgress": 22,
+  "covered": 16
+ },
+ "CLI flags (config.md)": {
+  "rows": 8,
+  "equal": 5,
+  "better": 0,
+  "partial": 2,
+  "missing": 1,
+  "inProgress": 0,
+  "covered": 5
+ }
+}
