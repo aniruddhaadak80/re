@@ -126,4 +126,6 @@ export const CLI_COMMANDS: CliCommand[] = [
   command('x-objc-swift', 'x_native_dispatch_metadata', 'Objective-C classes, categories, protocols and Swift types, fields, vtables and conformances of a Mach-O'),
   command('x-hermes', 'x_hermes_bytecode', 'Hermes bytecode 84 to 99: strings, functions, disassembly, string xrefs and closures'),
   command('x-dart-aot', 'x_dart_aot', 'Dart AOT snapshots (Flutter libapp.so): headers, string pool, libraries, functions'),
+  command('x-pdb', 'x_pdb_types', 'PDB types (TPI and IPI), typedefs, globals and procedures with parameters and locals'),
+  command('x-typelib', 'x_com_typelib', 'COM type libraries (.tlb and TYPELIB resources in PE): interfaces, DISPIDs, coclasses, enums, records'),
 ];

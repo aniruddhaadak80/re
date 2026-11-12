@@ -1,0 +1,468 @@
+{
+ "shapes-x64.pdb": {
+  "age": 1,
+  "funcIds": [
+   {
+    "name": "revlens_entry",
+    "typeIndex": 4097
+   }
+  ],
+  "guid": "EA024C9B-14A2-6BD5-4C4C-44205044422E",
+  "procedures": {
+   "0x1001": {
+    "params": 1,
+    "returnType": 116
+   }
+  },
+  "procs": [
+   {
+    "kind": "S_GPROC32",
+    "locals": [
+     {
+      "name": "argc",
+      "param": true
+     }
+    ],
+    "name": "revlens_entry",
+    "offset": 0,
+    "segment": 1,
+    "size": 29,
+    "typeIndex": 4097
+   }
+  ],
+  "types": {
+   "geo::Mode": {
+    "index": 4121,
+    "leaf": "LF_ENUM",
+    "members": [
+     {
+      "kind": "enumerate",
+      "name": "Off",
+      "value": 0
+     },
+     {
+      "kind": "enumerate",
+      "name": "On",
+      "value": 1
+     },
+     {
+      "kind": "enumerate",
+      "name": "Auto",
+      "value": 200
+     }
+    ],
+    "size": null,
+    "underlying": 32
+   },
+   "geo::Rect": {
+    "index": 4109,
+    "leaf": "LF_CLASS",
+    "members": [
+     {
+      "kind": "base",
+      "offset": 0,
+      "typeIndex": 4099
+     },
+     {
+      "kind": "member",
+      "name": "w_",
+      "offset": 20,
+      "typeIndex": 116
+     },
+     {
+      "kind": "member",
+      "name": "h_",
+      "offset": 24,
+      "typeIndex": 116
+     },
+     {
+      "kind": "method",
+      "name": "Rect"
+     },
+     {
+      "kind": "method",
+      "name": "area"
+     },
+     {
+      "kind": "method",
+      "name": "sides"
+     },
+     {
+      "kind": "method",
+      "name": "scaled"
+     }
+    ],
+    "size": 32,
+    "underlying": null
+   },
+   "geo::Shape": {
+    "index": 4117,
+    "leaf": "LF_CLASS",
+    "members": [
+     {
+      "kind": "vfptr"
+     },
+     {
+      "kind": "member",
+      "name": "id",
+      "offset": 8,
+      "typeIndex": 116
+     },
+     {
+      "kind": "static",
+      "name": "count"
+     },
+     {
+      "kind": "member",
+      "name": "origin",
+      "offset": 12,
+      "typeIndex": 4112
+     },
+     {
+      "kind": "method",
+      "name": "area"
+     },
+     {
+      "kind": "method",
+      "name": "sides"
+     }
+    ],
+    "size": 24,
+    "underlying": null
+   },
+   "geo::Vec": {
+    "index": 4119,
+    "leaf": "LF_STRUCTURE",
+    "members": [
+     {
+      "kind": "member",
+      "name": "x",
+      "offset": 0,
+      "typeIndex": 64
+     },
+     {
+      "kind": "member",
+      "name": "y",
+      "offset": 4,
+      "typeIndex": 64
+     }
+    ],
+    "size": 8,
+    "underlying": null
+   }
+  }
+ },
+ "types-x64.pdb": {
+  "age": 1,
+  "funcIds": [
+   {
+    "name": "point_sum",
+    "typeIndex": 4099
+   },
+   {
+    "name": "node_weight",
+    "typeIndex": 4107
+   },
+   {
+    "name": "value_mix",
+    "typeIndex": 4130
+   },
+   {
+    "name": "revlens_entry",
+    "typeIndex": 4133
+   },
+   {
+    "name": "cmp_int",
+    "typeIndex": 4116
+   }
+  ],
+  "guid": "5E885094-DB82-E63A-4C4C-44205044422E",
+  "procedures": {
+   "0x1003": {
+    "params": 1,
+    "returnType": 116
+   },
+   "0x100b": {
+    "params": 3,
+    "returnType": 116
+   },
+   "0x1014": {
+    "params": 2,
+    "returnType": 116
+   },
+   "0x1022": {
+    "params": 2,
+    "returnType": 65
+   },
+   "0x1025": {
+    "params": 2,
+    "returnType": 116
+   }
+  },
+  "procs": [
+   {
+    "kind": "S_GPROC32",
+    "locals": [
+     {
+      "name": "p",
+      "param": true
+     }
+    ],
+    "name": "point_sum",
+    "offset": 0,
+    "segment": 1,
+    "size": 11,
+    "typeIndex": 4099
+   },
+   {
+    "kind": "S_GPROC32",
+    "locals": [
+     {
+      "name": "n",
+      "param": true
+     },
+     {
+      "name": "scale",
+      "param": true
+     },
+     {
+      "name": "c",
+      "param": true
+     },
+     {
+      "name": "it",
+      "param": false
+     }
+    ],
+    "name": "node_weight",
+    "offset": 16,
+    "segment": 1,
+    "size": 115,
+    "typeIndex": 4107
+   },
+   {
+    "kind": "S_GPROC32",
+    "locals": [
+     {
+      "name": "v",
+      "param": true
+     },
+     {
+      "name": "k",
+      "param": true
+     }
+    ],
+    "name": "value_mix",
+    "offset": 144,
+    "segment": 1,
+    "size": 30,
+    "typeIndex": 4130
+   },
+   {
+    "kind": "S_GPROC32",
+    "locals": [
+     {
+      "name": "argc",
+      "param": true
+     },
+     {
+      "name": "argv",
+      "param": true
+     },
+     {
+      "name": "v",
+      "param": false
+     }
+    ],
+    "name": "revlens_entry",
+    "offset": 176,
+    "segment": 1,
+    "size": 191,
+    "typeIndex": 4133
+   },
+   {
+    "kind": "S_LPROC32",
+    "locals": [
+     {
+      "name": "a",
+      "param": true
+     },
+     {
+      "name": "b",
+      "param": true
+     }
+    ],
+    "name": "cmp_int",
+    "offset": 368,
+    "segment": 1,
+    "size": 10,
+    "typeIndex": 4116
+   }
+  ],
+  "types": {
+   "color": {
+    "index": 4105,
+    "leaf": "LF_ENUM",
+    "members": [
+     {
+      "kind": "enumerate",
+      "name": "RED",
+      "value": 0
+     },
+     {
+      "kind": "enumerate",
+      "name": "GREEN",
+      "value": 5
+     },
+     {
+      "kind": "enumerate",
+      "name": "BLUE",
+      "value": 4294967293
+     }
+    ],
+    "size": null,
+    "underlying": 116
+   },
+   "flags": {
+    "index": 4128,
+    "leaf": "LF_STRUCTURE",
+    "members": [
+     {
+      "kind": "member",
+      "name": "a",
+      "offset": 0,
+      "typeIndex": 4124
+     },
+     {
+      "kind": "member",
+      "name": "b",
+      "offset": 0,
+      "typeIndex": 4125
+     },
+     {
+      "kind": "member",
+      "name": "c",
+      "offset": 0,
+      "typeIndex": 4126
+     }
+    ],
+    "size": 4,
+    "underlying": null
+   },
+   "node": {
+    "index": 4120,
+    "leaf": "LF_STRUCTURE",
+    "members": [
+     {
+      "kind": "member",
+      "name": "next",
+      "offset": 0,
+      "typeIndex": 4103
+     },
+     {
+      "kind": "member",
+      "name": "name",
+      "offset": 8,
+      "typeIndex": 4109
+     },
+     {
+      "kind": "member",
+      "name": "pos",
+      "offset": 16,
+      "typeIndex": 4096
+     },
+     {
+      "kind": "member",
+      "name": "color",
+      "offset": 24,
+      "typeIndex": 4105
+     },
+     {
+      "kind": "member",
+      "name": "val",
+      "offset": 32,
+      "typeIndex": 4110
+     },
+     {
+      "kind": "member",
+      "name": "fl",
+      "offset": 40,
+      "typeIndex": 4111
+     },
+     {
+      "kind": "member",
+      "name": "ids",
+      "offset": 44,
+      "typeIndex": 4112
+     },
+     {
+      "kind": "member",
+      "name": "compare",
+      "offset": 64,
+      "typeIndex": 4117
+     },
+     {
+      "kind": "member",
+      "name": "counter",
+      "offset": 72,
+      "typeIndex": 4118
+     }
+    ],
+    "size": 80,
+    "underlying": null
+   },
+   "point": {
+    "index": 4101,
+    "leaf": "LF_STRUCTURE",
+    "members": [
+     {
+      "kind": "member",
+      "name": "x",
+      "offset": 0,
+      "typeIndex": 116
+     },
+     {
+      "kind": "member",
+      "name": "y",
+      "offset": 4,
+      "typeIndex": 116
+     }
+    ],
+    "size": 8,
+    "underlying": null
+   },
+   "value": {
+    "index": 4123,
+    "leaf": "LF_UNION",
+    "members": [
+     {
+      "kind": "member",
+      "name": "i",
+      "offset": 0,
+      "typeIndex": 116
+     },
+     {
+      "kind": "member",
+      "name": "f",
+      "offset": 0,
+      "typeIndex": 64
+     },
+     {
+      "kind": "member",
+      "name": "d",
+      "offset": 0,
+      "typeIndex": 65
+     },
+     {
+      "kind": "member",
+      "name": "bytes",
+      "offset": 0,
+      "typeIndex": 4121
+     }
+    ],
+    "size": 8,
+    "underlying": null
+   }
+  }
+ }
+}

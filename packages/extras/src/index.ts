@@ -37,6 +37,8 @@ export * from './contracts/index.js';
 export * from './ledger/ledger.js';
 export * from './eval/harness.js';
 export * from './native-meta/index.js';
+export { readPdb, pdbTypeDecl, isPdb, Msf, type PdbInfo, type PdbType, type PdbProc, type PdbMember } from './native-meta/pdb.js';
+export { readTypeLib, typeLibsIn, typeInfoIdl, isTypeLib, type TypeLib, type TlbTypeInfo, type TlbFunc, type TlbVar } from './native-meta/typelib.js';
 export { NATIVE_META_TOOLS } from './native-meta/tools.js';
 export * as hermes from './hermes/index.js';
 export { hermesView, hermesRawListing, HbcFile, isHbc, opcodeTable, SUPPORTED_HBC_VERSIONS } from './hermes/index.js';

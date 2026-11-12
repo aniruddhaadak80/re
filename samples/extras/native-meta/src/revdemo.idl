@@ -1,0 +1,44 @@
+// COM type library fixture for RevLens (written for this repo, CC0). Self contained: the base
+// interfaces are declared here with their standard IIDs so no system IDL files are needed.
+typedef long HRESULT;
+typedef unsigned long ULONG;
+typedef struct _GUID { unsigned long Data1; unsigned short Data2; unsigned short Data3; unsigned char Data4[8]; } GUID;
+typedef unsigned short *BSTR;
+typedef struct tagVARIANT { unsigned short vt; unsigned short r1; unsigned short r2; unsigned short r3; double value; } VARIANT;
+
+[object, uuid(00000000-0000-0000-C000-000000000046), pointer_default(unique)]
+interface IUnknown {
+  HRESULT QueryInterface([in] const GUID *riid, [out, iid_is(riid)] void **ppv);
+  ULONG AddRef();
+  ULONG Release();
+}
+
+[uuid(7A3F0C11-5B2E-4C8A-9D21-0E5F6A7B8C90), version(1.2), helpstring("RevLens demo type library"), lcid(0)]
+library RevDemoLib
+{
+  typedef [uuid(7A3F0C12-5B2E-4C8A-9D21-0E5F6A7B8C90)] enum Shade { ShadeRed = 1, ShadeGreen = 2, ShadeBlue = -5 } Shade;
+
+  typedef [uuid(7A3F0C13-5B2E-4C8A-9D21-0E5F6A7B8C90)] struct Point { long x; long y; double weight; } Point;
+
+  [object, uuid(7A3F0C14-5B2E-4C8A-9D21-0E5F6A7B8C90), helpstring("Painter interface"), oleautomation]
+  interface IPainter : IUnknown
+  {
+    HRESULT Paint([in] long count, [in] BSTR label, [out, retval] long *painted);
+    HRESULT SetShade([in] Shade s);
+    [propget] HRESULT Name([out, retval] BSTR *value);
+    [propput] HRESULT Name([in] BSTR value);
+    HRESULT Move([in] Point *where, [in, optional] VARIANT hint);
+  }
+
+  [uuid(7A3F0C15-5B2E-4C8A-9D21-0E5F6A7B8C90), helpstring("Painter object")]
+  coclass Painter
+  {
+    [default] interface IPainter;
+  }
+
+  [dllname("revdemo.dll"), uuid(7A3F0C16-5B2E-4C8A-9D21-0E5F6A7B8C90)]
+  module RevDemoFns
+  {
+    [entry("RevAdd")] long __stdcall RevAdd([in] long a, [in] long b);
+  }
+}
