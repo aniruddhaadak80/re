@@ -1,0 +1,7 @@
+{
+  "name": "revlens-electron-live-fixture",
+  "version": "1.0.0",
+  "description": "Tiny Electron app for the RevLens webrt Electron scenario tests. Written for RevLens (MIT).",
+  "main": "main.js",
+  "license": "MIT"
+}

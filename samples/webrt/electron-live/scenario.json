@@ -1,0 +1,11 @@
+{
+  "name": "electron fixture ping and load",
+  "steps": [
+    { "action": "wait", "selector": "#ping", "expect": [{ "title": "RevLens fixture", "mode": "equals" }] },
+    { "action": "fill", "selector": "#who", "text": "revlens" },
+    { "action": "click", "selector": "#ping" },
+    { "action": "wait", "selector": "#out:has-text('pong')", "expect": [{ "selector": "#out", "textEquals": "pong from main to revlens" }] },
+    { "action": "click", "selector": "#load" },
+    { "action": "wait", "selector": ".item >> nth=1", "expect": [{ "selector": ".item", "count": 2 }, { "request": "/api/items", "method": "GET", "status": 200 }, { "noPageErrors": true }] }
+  ]
+}
