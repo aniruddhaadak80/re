@@ -1,0 +1,42 @@
+{
+ "tiny-zlib.dmg": {
+  "sha256": "f18e16187668b4f26ebf8799534153ce3fcf46ee72997c19e6e6ee9cd64f228a",
+  "partitionCrc32": "1ff6de10",
+  "partitionSize": 163840,
+  "sevenZipFile": "0.hfs",
+  "sevenZipCrc32": "1ff6de10",
+  "sha256OfPartition": "401abb370b76bf4b82107f7b8403d1e60d143199d84992246c64bd36282fadb3"
+ },
+ "tiny-bzip2.dmg": {
+  "sha256": "c3e5cc70ea742e461fd842633c829eb74cb3e21afb63e796d8b03479a45f25b4",
+  "partitionCrc32": "1ff6de10",
+  "partitionSize": 163840,
+  "sevenZipFile": "0.hfs",
+  "sevenZipCrc32": "1ff6de10",
+  "sha256OfPartition": "401abb370b76bf4b82107f7b8403d1e60d143199d84992246c64bd36282fadb3"
+ },
+ "tiny-adc.dmg": {
+  "sha256": "06178db66ed43eb793e1cfcca1b48ef74ab7d0e3d0b1792262b5609027b7c454",
+  "partitionCrc32": "1ff6de10",
+  "partitionSize": 163840,
+  "sevenZipFile": "0.hfs",
+  "sevenZipCrc32": "1ff6de10",
+  "sha256OfPartition": "401abb370b76bf4b82107f7b8403d1e60d143199d84992246c64bd36282fadb3"
+ },
+ "tiny-lzfse.dmg": {
+  "sha256": "7cdb156fa8d16a1cc279270469290ccdc51c42b270be148f25fc206d52ca252c",
+  "partitionCrc32": "1ff6de10",
+  "partitionSize": 163840,
+  "sevenZipFile": "0.hfs",
+  "sevenZipCrc32": "1ff6de10",
+  "sha256OfPartition": "401abb370b76bf4b82107f7b8403d1e60d143199d84992246c64bd36282fadb3"
+ },
+ "tiny-raw.dmg": {
+  "sha256": "03e44dcd0854b68254effb8b036fae38415842369bd00eb758c4b77e2beb18e7",
+  "partitionCrc32": "1ff6de10",
+  "partitionSize": 163840,
+  "sevenZipFile": "0.hfs",
+  "sevenZipCrc32": "1ff6de10",
+  "sha256OfPartition": "401abb370b76bf4b82107f7b8403d1e60d143199d84992246c64bd36282fadb3"
+ }
+}

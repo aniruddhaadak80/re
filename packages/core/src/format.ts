@@ -44,6 +44,8 @@ function zipFlavor(bytes: Uint8Array, name: string): FormatId {
 /** Identify a file by magic bytes first, then by name and content sniffing. */
 export function detectFormat(bytes: Uint8Array, name = ''): FormatId {
   const e = ext(name);
+  // A disk image trailer wins: a raw first chunk can start with any other magic.
+  if (hasKolyTrailer(bytes)) return 'dmg';
   if (startsWith(bytes, [0x7f, 0x45, 0x4c, 0x46])) return 'elf';
   if (startsWith(bytes, [0x4d, 0x5a]) && bytes.length > 0x40) {
     const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -63,7 +65,6 @@ export function detectFormat(bytes: Uint8Array, name = ''): FormatId {
   }
   if (startsWith(bytes, [0x00, 0x61, 0x73, 0x6d])) return 'wasm';
   if (startsWith(bytes, [0x78, 0x61, 0x72, 0x21]) && bytes.length >= 28) return e === 'xip' || e === 'safariextz' || e === 'xar' ? 'xar' : 'pkg';
-  if (hasKolyTrailer(bytes)) return 'dmg';
   for (const m of [[0xd4, 0xc3, 0xb2, 0xa1], [0xa1, 0xb2, 0xc3, 0xd4], [0x4d, 0x3c, 0xb2, 0xa1], [0xa1, 0xb2, 0x3c, 0x4d]]) {
     if (startsWith(bytes, m) && bytes.length >= 24) return 'pcap';
   }
