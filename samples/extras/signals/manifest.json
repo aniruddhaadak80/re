@@ -1,0 +1,171 @@
+[
+  {
+    "file": "pwm_433.92M_250k.cu8",
+    "format": "cu8",
+    "sampleRate": 250000,
+    "centerFreq": 433920000.0,
+    "modulation": "OOK_PWM",
+    "short": 300,
+    "long": 900,
+    "gap": 1500,
+    "reset": 5000,
+    "rows": 3,
+    "bits": 24,
+    "hex": "a5c3f1",
+    "flex": "n=pwm,m=OOK_PWM,s=300,l=900,r=5000,g=1500",
+    "sha256": "2254fd29741a239cc80c5416358105cd62b3644dd0011bc5f516a9952695e3af",
+    "size": 65200,
+    "rtl_433": {
+      "version": "25.02",
+      "command": "rtl_433 -R 0 -X \"n=pwm,m=OOK_PWM,s=300,l=900,r=5000,g=1500\" -r pwm_433.92M_250k.cu8 -F json",
+      "codes": [
+        "{24}a5c3f1",
+        "{24}a5c3f1",
+        "{24}a5c3f1"
+      ]
+    }
+  },
+  {
+    "file": "ppm_315M_250k.cs16",
+    "format": "cs16",
+    "sampleRate": 250000,
+    "centerFreq": 315000000.0,
+    "modulation": "OOK_PPM",
+    "short": 1000,
+    "long": 2000,
+    "gap": 3000,
+    "reset": 6000,
+    "rows": 2,
+    "bits": 16,
+    "hex": "5aa5",
+    "flex": "n=ppm,m=OOK_PPM,s=1000,l=2000,g=3000,r=6000",
+    "sha256": "90202e8f531ae3f4544ef65ad41b424be2ebaa77a658234c31ecc72215f7907e",
+    "size": 100000,
+    "rtl_433": {
+      "version": "25.02",
+      "command": "rtl_433 -R 0 -X \"n=ppm,m=OOK_PPM,s=1000,l=2000,g=3000,r=6000\" -r ppm_315M_250k.cs16 -F json",
+      "codes": [
+        "{16}5aa5",
+        "{16}5aa5"
+      ]
+    }
+  },
+  {
+    "file": "pcm_868.3M_250k.cf32",
+    "format": "cf32",
+    "sampleRate": 250000,
+    "centerFreq": 868300000.0,
+    "modulation": "OOK_PCM",
+    "short": 400,
+    "long": 400,
+    "reset": 4000,
+    "rows": 2,
+    "bits": 24,
+    "hex": "aaf0b7",
+    "flex": "n=pcm,m=OOK_PCM,s=400,l=400,r=4000",
+    "sha256": "e51ec430d1e914df008b56946ad829f448f30ee850f8f45861d6bca684c1ff90",
+    "size": 110400,
+    "rtl_433": {
+      "version": "25.02",
+      "command": "rtl_433 -R 0 -X \"n=pcm,m=OOK_PCM,s=400,l=400,r=4000\" -r pcm_868.3M_250k.cf32 -F json",
+      "codes": [
+        "{34}aaf0b7000",
+        "{34}aaf0b7000"
+      ]
+    }
+  },
+  {
+    "file": "mc_433.92M_250k.cs8",
+    "format": "cs8",
+    "sampleRate": 250000,
+    "centerFreq": 433920000.0,
+    "modulation": "OOK_MC_ZEROBIT",
+    "short": 250,
+    "long": 250,
+    "reset": 3000,
+    "rows": 2,
+    "bits": 16,
+    "hex": "9e3d",
+    "flex": "n=mc,m=OOK_MC_ZEROBIT,s=250,l=250,r=3000",
+    "sha256": "68528e7797f2de06c52f2d84b6a60e26f056fd4194f770f161b627879fbe96b4",
+    "size": 25432,
+    "rtl_433": {
+      "version": "25.02",
+      "command": "rtl_433 -R 0 -X \"n=mc,m=OOK_MC_ZEROBIT,s=250,l=250,r=3000\" -r mc_433.92M_250k.cs8 -F json",
+      "codes": [
+        "{17}4f1e8",
+        "{17}4f1e8"
+      ]
+    }
+  },
+  {
+    "file": "fsk-pcm_868.3M_250k.cu8",
+    "format": "cu8",
+    "sampleRate": 250000,
+    "centerFreq": 868300000.0,
+    "modulation": "FSK_PCM",
+    "short": 100,
+    "long": 100,
+    "reset": 1000,
+    "rows": 2,
+    "bits": 64,
+    "hex": "aaaa2dd4c0ffee42",
+    "sync": "2dd4",
+    "flex": "n=fsk,m=FSK_PCM,s=100,l=100,r=1000",
+    "sha256": "50d00f590969137d46293ecbbd32e3d111c5fcbeb13375e1639b8d928bf8876c",
+    "size": 28400,
+    "rtl_433": {
+      "version": "25.02",
+      "command": "rtl_433 -R 0 -X \"n=fsk,m=FSK_PCM,s=100,l=100,r=1000\" -r fsk-pcm_868.3M_250k.cu8 -F json",
+      "codes": [
+        "{64}aaaa2dd4c0ffee42",
+        "{64}aaaa2dd4c0ffee42"
+      ]
+    }
+  },
+  {
+    "file": "pwm-iq_250k.wav",
+    "format": "wav",
+    "sampleRate": 250000,
+    "modulation": "OOK_PWM",
+    "short": 300,
+    "long": 900,
+    "gap": 1500,
+    "reset": 5000,
+    "rows": 2,
+    "bits": 24,
+    "hex": "a5c3f1",
+    "flex": "n=pwm,m=OOK_PWM,s=300,l=900,r=5000,g=1500",
+    "sha256": "f2aa150f958c604686e6c59b637beb0cf489ca509aec6dde509658611fe20ae6",
+    "size": 92644
+  },
+  {
+    "file": "ppm.sigmf-meta",
+    "format": "sigmf",
+    "sampleRate": 250000,
+    "centerFreq": 315000000.0,
+    "modulation": "OOK_PPM",
+    "short": 1000,
+    "long": 2000,
+    "gap": 3000,
+    "reset": 6000,
+    "rows": 2,
+    "bits": 16,
+    "hex": "5aa5",
+    "flex": "n=ppm,m=OOK_PPM,s=1000,l=2000,g=3000,r=6000",
+    "sha256": "9c3fd44ff5ddfece51f76b146b47810a9b5dbca0a8637b933d9271a360f705b3",
+    "size": 705
+  },
+  {
+    "file": "tones_100M_250k.cf32",
+    "format": "cf32",
+    "sampleRate": 250000,
+    "centerFreq": 100000000.0,
+    "tones": [
+      50000,
+      -80000
+    ],
+    "sha256": "426ebd7fd70de1e814cb3b41589e7d24208ee9963cbfa8c77ac8e0dacd18839a",
+    "size": 131072
+  }
+]
