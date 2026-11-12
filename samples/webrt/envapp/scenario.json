@@ -1,0 +1,14 @@
+{
+  "name": "envapp add and search",
+  "steps": [
+    { "action": "wait", "selector": "#dyn:has-text('part-7')", "expect": [{ "selector": ".item", "count": 2 }, { "selector": "#user", "textEquals": "demo" }] },
+    { "action": "fill", "selector": "#name", "text": "gamma" },
+    { "action": "click", "selector": "#add" },
+    { "action": "wait", "selector": ".item >> nth=2", "expect": [{ "selector": ".item", "count": 3 }, { "selector": "#total", "textEquals": "12" }, { "request": "/api/items", "method": "POST", "status": 201 }] },
+    { "action": "click", "selector": ".item >> nth=0" },
+    { "action": "wait", "selector": "#detail:has-text('costs')", "expect": [{ "selector": "#detail", "textEquals": "alpha costs 3" }] },
+    { "action": "fill", "selector": "#q", "text": "a" },
+    { "action": "click", "selector": "#search" },
+    { "action": "wait", "selector": "#hits:has-text('1')", "expect": [{ "selector": "#hits", "textEquals": "1,2,3" }, { "noPageErrors": true }] }
+  ]
+}

@@ -70,6 +70,16 @@ export interface ScenarioOptions {
   maxRequests?: number;
   maxSteps?: number;
   launchArgs?: string[];
+  /** keep request bodies and response bodies (text or base64) in the HAR entries, for replay environments (default false) */
+  recordBodies?: boolean;
+  /** cap for one recorded body (default 2 MiB) and for all of them together (default 64 MiB) */
+  maxBodyBytes?: number;
+  maxTotalBodyBytes?: number;
+  /**
+   * Drive an already running browser instead of launching one (used for Electron windows reached over
+   * CDP). The page and its context are not closed at the end; `close` is called instead when given.
+   */
+  attach?: { browser: any; context: any; page: any; kind?: string; version?: string; close?: () => Promise<void> };
 }
 
 export interface AssertionResult { assertion: ScenarioAssertion; pass: boolean; actual?: unknown; error?: string }
@@ -169,15 +179,25 @@ export async function runScenario(specIn: unknown, opts: ScenarioOptions = {}): 
   const cap: ScenarioCapture = { kind: 'revlens-scenario', version: 1, name: spec.name, browser: kind, startedAt: new Date(t0).toISOString(), durationMs: 0, outDir, passed: false, steps: [], har: { log: { version: '1.2', creator: { name: 'RevLens webrt', version: '1.0.0' }, entries: [] } }, scripts: [], console: [], pageErrors: [], warnings: [] };
   let browser: any;
   let stepNo = 0;
-  const hard = setTimeout(() => { cap.warnings.push('hard timeout reached, closing browser'); browser?.close().catch(() => undefined); }, budget + 10_000);
+  const hard = setTimeout(() => { cap.warnings.push('hard timeout reached, closing browser'); browser?.close().catch(() => undefined); opts.attach?.close?.().catch(() => undefined); }, budget + 10_000);
   const traces = opts.traces !== false, shots = opts.screenshots !== false, dom = opts.dom !== false;
   try {
-    const args = [...(kind === 'chromium' ? ['--disable-dev-shm-usage', '--no-first-run', '--enable-blink-features=WebMCP', '--enable-features=WebMCPTesting'] : []), ...(opts.launchArgs ?? [])];
-    browser = await pw[kind].launch({ headless: opts.headless ?? true, executablePath: opts.executablePath, timeout: left(), args: args.length ? args : undefined });
-    cap.browserVersion = browser.version();
-    const context = await browser.newContext({ acceptDownloads: false, viewport: spec.viewport ?? { width: 1280, height: 800 }, userAgent: spec.userAgent, serviceWorkers: 'block', deviceScaleFactor: 1 });
-    if (traces) await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
-    const page = await context.newPage();
+    let context: any, page: any;
+    if (opts.attach) {
+      browser = undefined;
+      context = opts.attach.context; page = opts.attach.page;
+      cap.browser = opts.attach.kind ?? kind; cap.browserVersion = opts.attach.version;
+      if (traces) await context.tracing.start({ screenshots: true, snapshots: true, sources: false }).catch((e: Error) => { cap.warnings.push(`tracing: ${e.message.slice(0, 120)}`); });
+    } else {
+      const args = [...(kind === 'chromium' ? ['--disable-dev-shm-usage', '--no-first-run', '--enable-blink-features=WebMCP', '--enable-features=WebMCPTesting'] : []), ...(opts.launchArgs ?? [])];
+      browser = await pw[kind].launch({ headless: opts.headless ?? true, executablePath: opts.executablePath, timeout: left(), args: args.length ? args : undefined });
+      cap.browserVersion = browser.version();
+      context = await browser.newContext({ acceptDownloads: false, viewport: spec.viewport ?? { width: 1280, height: 800 }, userAgent: spec.userAgent, serviceWorkers: 'block', deviceScaleFactor: 1 });
+      if (traces) await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
+      page = await context.newPage();
+    }
+    const maxBody = Math.max(0, Math.min(opts.maxBodyBytes ?? 2 * 1024 * 1024, 64 * 1024 * 1024));
+    let bodyBudget = Math.max(0, Math.min(opts.maxTotalBodyBytes ?? 64 * 1024 * 1024, 1024 * 1024 * 1024));
     page.setDefaultTimeout(stepBudget);
     const pending: Promise<unknown>[] = [];
     const reqStart = new Map<unknown, number>();
@@ -196,6 +216,24 @@ export async function runScenario(specIn: unknown, opts: ScenarioOptions = {}): 
         const qh: Record<string, string> = await rq.allHeaders().catch(() => rq.headers());
         entry.request.headers = redactHeaders(qh); entry.response.headers = redactHeaders(rh);
         entry.response.content.mimeType = rh['content-type'] ?? '';
+        if (opts.recordBodies) {
+          try { const u = new URL(rq.url()); entry.request.queryString = [...u.searchParams].slice(0, 200).map(([name, value]) => ({ name, value: value.slice(0, 4000) })); } catch { /* not a URL */ }
+          const post: string | null = rq.postData();
+          if (post !== null && post !== undefined) entry.request.postData = { mimeType: qh['content-type'] ?? '', text: String(post).slice(0, maxBody) };
+          const status = resp.status();
+          if (!(status >= 300 && status < 400)) {
+            const body: Buffer | undefined = await resp.body().catch(() => undefined);
+            if (body) {
+              entry.response.content.size = body.length;
+              if (body.length <= maxBody && body.length <= bodyBudget) {
+                bodyBudget -= body.length;
+                const text = body.toString('utf8');
+                if (Buffer.from(text, 'utf8').equals(body)) entry.response.content.text = text;
+                else { entry.response.content.text = body.toString('base64'); entry.response.content.encoding = 'base64'; }
+              } else entry.response.content._truncated = true;
+            }
+          }
+        }
         if ((rq.resourceType() === 'script' || /javascript|ecmascript/i.test(rh['content-type'] ?? '')) && !scriptSeen.has(resp.url()) && cap.scripts.length < 500) {
           scriptSeen.add(resp.url());
           const body: Buffer | undefined = await resp.body().catch(() => undefined);
@@ -324,6 +362,7 @@ export async function runScenario(specIn: unknown, opts: ScenarioOptions = {}): 
   } finally {
     clearTimeout(hard);
     await browser?.close().catch(() => undefined);
+    if (opts.attach?.close) await opts.attach.close().catch(() => undefined);
   }
   cap.durationMs = Date.now() - t0;
   cap.passed = cap.steps.length === steps.length && cap.steps.every((s) => s.ok);
