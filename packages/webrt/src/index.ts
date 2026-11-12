@@ -22,6 +22,7 @@ export { makeTools, loadBytes, type ToolDef, type ToolIO } from './tools.js';
 export { makeR3Tools } from './tools-r3.js';
 export { compareStaticAndObservedEndpoints, staticEndpoints, observedEndpoints, matchTemplate, type EndpointJoin, type StaticEndpoint, type ObservedEndpoint, type JoinedEndpoint } from './endpointjoin.js';
 export { buildEnvironment, EnvMatcher, templateOf, ENV_HOST_PREFIX, type EnvManifest, type EnvRoute, type EvalTaskFile, type BuiltEnvironment, type EnvMatch } from './env.js';
+export { reconcileJavaScriptRuntime, type LocalBundle, type Reconciliation, type ReconciledScript, type ReconciledModule } from './reconcile.js';
 export { ANALYZERS, webJsAnalyzer, webSourcemapAnalyzer, webElectronAnalyzer, webPcapAnalyzer, webSqliteAnalyzer, webHarAnalyzer, obfuscationScore } from './analyzers.js';
 
 import { makeTools } from './tools.js';

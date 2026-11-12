@@ -7,6 +7,7 @@ import { traceSourceLocation, compareSourceToBundle } from './js/sourcecompare.j
 import { moduleExportShapes, packageExportShapes, bundleExportShapes, compareExportShapes, type ExportShape } from './js/exportshape.js';
 import { compareStaticAndObservedEndpoints } from './endpointjoin.js';
 import { buildEnvironment } from './env.js';
+import { reconcileJavaScriptRuntime, type LocalBundle } from './reconcile.js';
 import { inlineSourceMap, sourceMapUrl } from './sourcemap.js';
 import { InputError, decodeUtf8, base64ToBytes, bytesToBase64, page, clampLimit } from './util.js';
 
@@ -168,6 +169,39 @@ export function makeR3Tools(io: IO = {}): ToolDef[] {
         const scripts: { url?: string; code: string }[] = Array.isArray(i.scripts) ? i.scripts.map((s: { url?: string; code: string }) => ({ url: s.url, code: String(s.code) })) : [];
         for (const p of Array.isArray(i.scriptPaths) ? i.scriptPaths.slice(0, 200) : []) scripts.push({ url: String(p), code: await textOf({ path: String(p) }, io, 16 * 1024 * 1024) });
         return compareStaticAndObservedEndpoints({ capture, scripts, origin: i.origin, includeAssets: i.includeAssets, limit: i.limit });
+      },
+    },
+    {
+      name: 'web_reconcile_runtime',
+      description: 'Reconcile runtime observations with static bundles (rea reconcile_javascript_runtime): takes a web_trace_semantics result, a web_node_inspect report or a scenario capture with coverage, matches each runtime script to a local bundle by SHA-256, then file name, then length, places every traced entry, exit, request initiator, timer and covered function in the bundle module that holds it, maps it through the source map to the original file and line, and lists modules that never ran (cold).',
+      inputSchema: {
+        runtime: { type: 'object', description: 'Runtime JSON: trace, inspector report or capture.', optional: true },
+        runtimePath: { type: 'string', description: 'Runtime JSON file (Node).', optional: true },
+        runtimeText: { type: 'string', description: 'Runtime JSON text.', optional: true },
+        bundles: { type: 'array', description: '[{ name, code?, path?, sourceMap?, sourceMapPath? }] local bundles; a path reads the file and its sibling or inline source map (Node).', optional: true },
+        bundlePaths: { type: 'array', description: 'Shortcut: bundle file paths, or folders whose .js, .cjs and .mjs files are all used (Node).', optional: true },
+        ...LIM,
+      },
+      run: async (i) => {
+        let runtime: unknown = i.runtime;
+        if (runtime === undefined) {
+          const text = typeof i.runtimeText === 'string' ? i.runtimeText : typeof i.runtimePath === 'string' ? await textOf({ path: i.runtimePath }, io, 512 * 1024 * 1024) : undefined;
+          if (text === undefined) throw new InputError('give runtime, runtimePath or runtimeText');
+          try { runtime = JSON.parse(text.replace(/^\uFEFF/, '')); } catch { throw new InputError('runtime is not JSON'); }
+        }
+        const bundles: LocalBundle[] = [];
+        const add = async (b: { name?: string; code?: string; path?: string; sourceMap?: string; sourceMapPath?: string }) => {
+          const code = typeof b.code === 'string' ? b.code : await textOf({ path: b.path }, io, 64 * 1024 * 1024);
+          const sourceMap = await mapOf({ sourceMap: b.sourceMap, sourceMapPath: b.sourceMapPath, bundlePath: b.path }, io, code);
+          bundles.push({ name: String(b.name ?? b.path ?? `bundle${bundles.length}`), code, sourceMap });
+        };
+        for (const b of Array.isArray(i.bundles) ? i.bundles.slice(0, 200) : []) await add(b ?? {});
+        for (const p of Array.isArray(i.bundlePaths) ? i.bundlePaths.slice(0, 200).map(String) : []) {
+          if (io.isDir && io.readTree && await io.isDir(p)) {
+            for (const f of (await io.readTree(p, { exts: /\.(?:c|m)?js$/i, maxFiles: 200 })).slice(0, 200)) await add({ name: f.path, code: f.code, path: `${p.replace(/[\\/]$/, '')}/${f.path}` });
+          } else await add({ path: p });
+        }
+        return reconcileJavaScriptRuntime(runtime, bundles, { limit: i.limit });
       },
     },
     {

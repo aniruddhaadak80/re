@@ -14,9 +14,9 @@ const tool = (n: string) => TOOLS.find((t) => t.name === n)!;
 // Round 1 and 2 tools.
 const R1 = ['web_js_beautify', 'web_js_deobfuscate', 'web_bundle_modules', 'web_js_endpoints', 'web_sourcemap_recover', 'web_asar_list', 'web_asar_extract', 'web_electron_audit', 'web_browser_capture', 'web_pcap_summary', 'web_pcap_flows', 'web_sqlite_tables', 'web_sqlite_query', 'web_har_summary', 'web_webmcp_scan', 'web_wellknown_classify', 'web_capture_compare', 'web_browser_scenario', 'web_trace_inspect', 'web_cdp_targets', 'web_webmcp_discover', 'web_node_inspect'];
 // Round 3 tools that run anywhere (browser worker or Node).
-const R3_ANY = ['web_trace_module_imports', 'web_trace_source_location', 'web_compare_source_to_bundle', 'web_export_shapes', 'web_compare_export_shapes', 'web_endpoint_join', 'web_env_build'];
+const R3_ANY = ['web_trace_module_imports', 'web_trace_source_location', 'web_compare_source_to_bundle', 'web_export_shapes', 'web_compare_export_shapes', 'web_endpoint_join', 'web_env_build', 'web_reconcile_runtime'];
 // Round 3 tools that need Node (processes, sockets, files).
-const R3_NODE = ['web_env_serve', 'web_env_stop', 'web_env_export'];
+const R3_NODE = ['web_env_serve', 'web_env_stop', 'web_env_export', 'web_trace_semantics'];
 const EXPECTED = [...R1, ...R3_ANY, ...R3_NODE];
 const NODE_ONLY = ['web_browser_capture', 'web_browser_scenario', 'web_trace_inspect', 'web_cdp_targets', 'web_webmcp_discover', 'web_node_inspect', ...R3_NODE];
 

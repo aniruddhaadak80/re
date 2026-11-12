@@ -14,6 +14,7 @@ import { cdpTargets } from './cdp.js';
 import { attachNodeInspector, type InspectorOptions } from './inspector.js';
 import { discoverWebMcp, type WebMcpDiscoveryOptions } from './webmcp-node.js';
 import { buildEnvironmentFromFile, serveEnvironment, stopEnvironment, runningEnvironments, exportEnvironment } from './env-node.js';
+import { nodeR3Tools } from './tools-node-r3.js';
 import { inflateSync } from 'node:zlib';
 import { constants as fsConstants } from 'node:fs';
 import { isAbsolute } from 'node:path';
@@ -39,6 +40,7 @@ export async function compareCaptureFiles(aPath: string, bPath: string, opts: { 
   return { a: resolve(aPath), b: resolve(bPath), ...r };
 }
 export type { CaptureOptions, CaptureResult } from './capture.js';
+export { traceNodeSemantics, traceBrowserSemantics, SemanticTracer, findFunctions, type SemanticTrace, type TraceEvent, type TraceOptions, type FunctionSelector, type TracedFunction, type PageAction } from './semantics.js';
 
 /** Read a file with a size cap. */
 export async function readFileCapped(path: string, maxBytes = LIMITS.maxInputBytes): Promise<Uint8Array> {
@@ -303,6 +305,8 @@ nodeExtra.push(
     run: async (i: { path: string; outZip: string; name?: string }) => exportEnvironment(String(i.path), String(i.outZip), i),
   },
 );
+
+nodeExtra.push(...nodeR3Tools());
 
 const io: ToolIO = { readFile: (p, max) => readFileCapped(p, max), extra: nodeExtra, readTree: (p, o) => readSourceTree(p, o), isDir: async (p) => { try { return (await stat(p)).isDirectory(); } catch { return false; } } };
 

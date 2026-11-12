@@ -100,6 +100,8 @@ export function findFunctions(code: string): { name: string; aliases: string[]; 
       if (cls?.id && k.type === 'Identifier') names.push(`${cls.id.name}.${k.name}`);
     }
     if (!names.length) return undefined;
+    // esbuild and rollup rename clashing bindings to name2, name3: keep the plain name as an alias
+    for (const nm of [...names]) { const plain = /^([A-Za-z_$][\w$]*?[A-Za-z_$])\d{1,3}$/.exec(nm)?.[1]; if (plain && !names.includes(plain)) names.push(plain); }
     const body = n.body;
     const first = body.type === 'BlockStatement' ? body.body[0] : body;
     const at = first?.loc?.start ?? (body.loc ? { line: body.loc.start.line, column: body.loc.start.column + 1 } : node.loc.start);
@@ -403,6 +405,7 @@ export class SemanticTracer {
  */
 export async function traceNodeSemantics(opts: TraceOptions & { allowExecution?: boolean; script?: string; args?: string[]; cwd?: string; port?: number; wsUrl?: string; timeoutMs?: number }): Promise<SemanticTrace & { exitCode?: number | null; stdout?: string; stderr?: string }> {
   if (!executionAllowed(opts.allowExecution)) throw new InputError('tracing a Node program needs allowExecution: true (or REVLENS_ALLOW_EXECUTION=1)');
+  if (!Array.isArray(opts.functions) || !opts.functions.length) throw new InputError('give at least one function to trace');
   const duration = Math.max(100, Math.min(opts.durationMs ?? 5_000, 120_000));
   let child: ChildProcess | undefined;
   let wsUrl = opts.wsUrl;
@@ -428,8 +431,10 @@ export async function traceNodeSemantics(opts: TraceOptions & { allowExecution?:
     wsUrl = t.targets.find((x) => x.webSocketDebuggerUrl)?.webSocketDebuggerUrl;
     if (!wsUrl) throw new InputError(`no inspector target on port ${port}`);
   } else checkDevtoolsEndpoint(wsUrl);
-  const client = await CdpClient.connect(wsUrl!, 5_000);
-  const tracer = new SemanticTracer(client, opts, 'node');
+  let client: CdpClient;
+  try { client = await CdpClient.connect(wsUrl!, 5_000); } catch (e) { child?.kill('SIGKILL'); throw e; }
+  let tracer: SemanticTracer;
+  try { tracer = new SemanticTracer(client, opts, 'node'); } catch (e) { client.close(); child?.kill('SIGKILL'); throw e; }
   const t0 = Date.now();
   let version: string | undefined;
   try {
@@ -446,7 +451,7 @@ export async function traceNodeSemantics(opts: TraceOptions & { allowExecution?:
     await Promise.race([exited, sleep(10)]);
   }
   const r = tracer.result({ kind: 'node', url: opts.script, version }, Date.now() - t0);
-  return { ...r, exitCode, stdout: opts.script ? stdout.slice(0, 20_000) : undefined, stderr: opts.script ? stderr.replace(/Debugger (listening|attached)[^\n]*\n?|For help, see[^\n]*\n?|Waiting for the debugger[^\n]*\n?/g, '').slice(0, 20_000) : undefined };
+  return { ...r, exitCode, stdout: opts.script ? stdout.split('\n').filter((l) => !l.startsWith('\u0001revlens-trace')).join('\n').slice(0, 20_000) : undefined, stderr: opts.script ? stderr.replace(/Debugger (listening|attached)[^\n]*\n?|For help, see[^\n]*\n?|Waiting for the debugger[^\n]*\n?/g, '').slice(0, 20_000) : undefined };
 }
 
 export type PageAction = { action: 'click' | 'fill' | 'wait' | 'press' | 'goto'; selector?: string; text?: string; ms?: number; key?: string; url?: string };
@@ -456,6 +461,7 @@ export async function traceBrowserSemantics(url: string, opts: TraceOptions & { 
   let u: URL;
   try { u = new URL(url); } catch { throw new InputError(`not a valid URL: ${url}`); }
   if (!/^https?:$/.test(u.protocol) && !(opts.allowFileUrls && u.protocol === 'file:')) throw new InputError('only http and https pages can be traced');
+  if (!Array.isArray(opts.functions) || !opts.functions.length) throw new InputError('give at least one function to trace');
   let pw: any;
   try { pw = await import('playwright' as string); } catch { throw new InputError('browser tracing needs the optional "playwright" package'); }
   const duration = Math.max(100, Math.min(opts.durationMs ?? 3_000, 120_000));
