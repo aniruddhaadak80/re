@@ -1,7 +1,7 @@
 // CLI commands for the revlens binary: `doctor`, `setup` and `bridge <tool>`. Human text by
 // default, JSON with --json. Node only.
 import { formatInventory, inventory } from './doctor.js';
-import { MCP_CLIENTS, setupClient, type McpClient } from './setup.js';
+import { MCP_CLIENTS, setupClient, uninstall, type McpClient } from './setup.js';
 import { TOOLS } from './tools.js';
 import type { BridgeTool, CliCommand } from './types.js';
 
@@ -187,4 +187,27 @@ const bridge: CliCommand = {
   },
 };
 
-export const CLI_COMMANDS: CliCommand[] = [doctor, setup, bridge];
+const uninstallCmd: CliCommand = {
+  name: 'uninstall',
+  usage: `revlens uninstall [${MCP_CLIENTS.join('|')}] [--scope user|project|both] [--name N] [--skill S] [--purge] [--write] [--json]`,
+  summary: 'Remove the MCP server from agent client configs and the skill folders (dry run unless --write)',
+  async run(argv) {
+    const p = parseArgv(argv);
+    const client = p.positional[0] as McpClient | undefined;
+    if (client && !MCP_CLIENTS.includes(client)) { process.stderr.write(`usage: ${uninstallCmd.usage}\n`); return 2; }
+    const scope = p.flags.scope === 'user' || p.flags.scope === 'project' ? p.flags.scope : 'both';
+    try {
+      const r = await uninstall({ client, scope, name: typeof p.flags.name === 'string' ? p.flags.name : undefined, skills: typeof p.flags.skill === 'string' ? p.flags.skill.split(',') : undefined, purge: p.flags.purge === true, write: p.flags.write === true });
+      if (p.flags.json) { json(r); return 0; }
+      if (!r.steps.length) { process.stdout.write('Nothing to remove.\n'); return 0; }
+      for (const s of r.steps) process.stdout.write(`${r.dryRun ? 'would remove' : 'removed'} ${s.kind === 'config' ? 'server entry from' : s.kind === 'skill' ? 'skill folder' : 'data folder'} ${s.path}${'backup' in s && s.backup ? ` (backup ${s.backup})` : ''}\n`);
+      if (r.dryRun) process.stdout.write('Dry run. Run again with --write to do it.\n');
+      return 0;
+    } catch (e) {
+      process.stderr.write(`uninstall failed: ${(e as Error).message}\n`);
+      return 1;
+    }
+  },
+};
+
+export const CLI_COMMANDS: CliCommand[] = [doctor, setup, bridge, uninstallCmd];

@@ -254,3 +254,134 @@ export async function setupClient(o: SetupOptions & { write?: boolean }) {
   const res = await applySetup(plan);
   return { dryRun: false, ...plan, ...res };
 }
+
+// ---------------------------------------------------------------- uninstall
+
+/** Remove one server entry from a JSON or JSONC config. Returns the text unchanged when it is not there. */
+export function removeJsonServer(text: string, key: string, name: string): string {
+  if (!text.trim()) return text;
+  let parsed: unknown;
+  try { parsed = JSON.parse(text); } catch {
+    try { parsed = JSON.parse(stripJsonc(text)); } catch { throw new SetupError('the existing config is not valid JSON, refusing to edit it'); }
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new SetupError('the existing config is not a JSON object');
+  const data = parsed as Record<string, unknown>;
+  const cur = data[key];
+  if (!cur || typeof cur !== 'object' || Array.isArray(cur) || !Object.prototype.hasOwnProperty.call(cur, name)) return text;
+  const servers = { ...(cur as Record<string, unknown>) };
+  delete servers[name];
+  return JSON.stringify({ ...data, [key]: servers }, null, 2) + '\n';
+}
+
+/** Remove `[mcp_servers.<name>]` and its sub tables from a Codex config.toml. */
+export function removeTomlServer(text: string, name: string): string {
+  const src = text.split(/\r?\n/);
+  const kept: string[] = [];
+  let skipping = false;
+  let found = false;
+  for (const line of src) {
+    const h = tableHeader(line);
+    if (h) { skipping = h.length >= 2 && h[0] === 'mcp_servers' && h[1] === name; if (skipping) found = true; }
+    if (!skipping) kept.push(line);
+  }
+  if (!found) return text;
+  while (kept.length && kept[kept.length - 1]!.trim() === '') kept.pop();
+  return kept.length ? kept.join('\n') + '\n' : '';
+}
+
+export interface UninstallOptions {
+  /** one client, or every client when left out */
+  client?: McpClient;
+  /** user, project or both (default both) */
+  scope?: 'user' | 'project' | 'both';
+  /** server name in the configs, default revlens */
+  name?: string;
+  /** skill folder names to remove from the agents' skill folders, default `<name>-reverse-engineer` */
+  skills?: string[];
+  /** also remove the data folder (~/.<name>: Cutter plugin announcements, caches) */
+  purge?: boolean;
+  home?: string;
+  cwd?: string;
+  platform?: NodeJS.Platform;
+  env?: NodeJS.ProcessEnv;
+}
+
+export interface UninstallStep { kind: 'config' | 'skill' | 'data'; client?: McpClient; scope?: 'user' | 'project'; path: string; before?: string; after?: string; changed: boolean }
+
+/** Folders where agents look for skills, user and project level. */
+export function skillRoots(home: string, cwd: string, platform: NodeJS.Platform): string[] {
+  const join = platform === 'win32' ? win32.join : posix.join;
+  return [join(home, '.agents', 'skills'), join(home, '.claude', 'skills'), join(home, '.codex', 'skills'), join(cwd, '.agents', 'skills'), join(cwd, '.claude', 'skills')];
+}
+
+/** True when a folder holds a SKILL.md whose front matter name matches; only such folders are removed. */
+async function isOurSkill(dir: string, skill: string): Promise<boolean> {
+  try {
+    const text = await readFile(join(dir, 'SKILL.md'), 'utf8');
+    const fm = /^---\r?\n([\s\S]{0,4000}?)\r?\n---/.exec(text);
+    const m = fm ? /^name:\s*["']?([^"'\r\n]+)["']?\s*$/m.exec(fm[1]!) : null;
+    return !!m && m[1]!.trim() === skill;
+  } catch { return false; }
+}
+
+/** Work out what uninstall would remove, without changing anything. */
+export async function planUninstall(o: UninstallOptions = {}): Promise<UninstallStep[]> {
+  const name = o.name ?? 'revlens';
+  if (!NAME_RE.test(name)) throw new SetupError('name may only use letters, digits, _ and -');
+  const platform = o.platform ?? process.platform;
+  const env = o.env ?? process.env;
+  const home = o.home ?? env.HOME ?? env.USERPROFILE ?? homedir();
+  const cwd = o.cwd ?? process.cwd();
+  const clients = o.client ? [o.client] : MCP_CLIENTS;
+  if (o.client && !MCP_CLIENTS.includes(o.client)) throw new SetupError(`client must be one of ${MCP_CLIENTS.join(', ')}`);
+  const scopes: ('user' | 'project')[] = o.scope === 'user' ? ['user'] : o.scope === 'project' ? ['project'] : ['user', 'project'];
+  const steps: UninstallStep[] = [];
+  const seen = new Set<string>();
+  for (const client of clients) for (const scope of scopes) {
+    const s = (client === 'codex' || client === 'windsurf') ? 'user' : scope;
+    const { path, format, key } = configPath(client, s, { home, cwd, platform, env });
+    if (seen.has(path) || !existsSync(path)) continue;
+    seen.add(path);
+    const before = await readFile(path, 'utf8');
+    if (before.length > 16 * 1024 * 1024) throw new SetupError(`${path} is larger than 16 MiB, refusing to edit it`);
+    let after: string;
+    try { after = format === 'toml' ? removeTomlServer(before, name) : removeJsonServer(before, key, name); } catch (e) { throw new SetupError(`${path}: ${(e as Error).message}`); }
+    if (after !== before) steps.push({ kind: 'config', client, scope: s, path, before, after, changed: true });
+  }
+  const join = platform === 'win32' ? win32.join : posix.join;
+  for (const skill of o.skills ?? [`${name}-reverse-engineer`]) {
+    if (!NAME_RE.test(skill)) throw new SetupError(`bad skill name ${skill}`);
+    for (const rootDir of skillRoots(home, cwd, platform)) {
+      const dir = join(rootDir, skill);
+      if (existsSync(dir) && await isOurSkill(dir, skill)) steps.push({ kind: 'skill', path: dir, changed: true });
+    }
+  }
+  if (o.purge) {
+    const dir = join(home, `.${name}`);
+    if (existsSync(dir)) steps.push({ kind: 'data', path: dir, changed: true });
+  }
+  return steps;
+}
+
+/** Apply an uninstall plan: configs are rewritten with a backup (like setup), skill and data folders removed. */
+export async function applyUninstall(steps: UninstallStep[], now: Date = new Date()): Promise<{ path: string; kind: string; backup: string | null }[]> {
+  const done: { path: string; kind: string; backup: string | null }[] = [];
+  for (const s of steps) {
+    if (s.kind === 'config') {
+      const r = await applySetup({ client: s.client!, scope: s.scope!, path: s.path, format: s.path.endsWith('.toml') ? 'toml' : 'json', exists: true, changed: true, before: s.before!, after: s.after!, entry: { command: '', args: [] }, name: '' }, now);
+      done.push({ path: s.path, kind: s.kind, backup: r.backup });
+    } else {
+      await rm(s.path, { recursive: true, force: true });
+      done.push({ path: s.path, kind: s.kind, backup: null });
+    }
+  }
+  return done;
+}
+
+/** Plan and, when `write` is true, apply. */
+export async function uninstall(o: UninstallOptions & { write?: boolean } = {}) {
+  const steps = await planUninstall(o);
+  if (!o.write) return { dryRun: true, steps: steps.map(({ before, after, ...rest }) => { void before; void after; return rest; }) };
+  const done = await applyUninstall(steps);
+  return { dryRun: false, steps: done };
+}
