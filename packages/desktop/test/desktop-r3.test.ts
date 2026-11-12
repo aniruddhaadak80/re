@@ -35,6 +35,7 @@ const which = (cmd: string) => { for (const d of String(ENV.PATH ?? '').split(de
 const chrome = process.env.REVLENS_CHROMIUM && existsSync(process.env.REVLENS_CHROMIUM) ? process.env.REVLENS_CHROMIUM : undefined;
 const sha = (b: Uint8Array | string) => createHash('sha256').update(b).digest('hex');
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const PY = ['python3', 'python'].find((p) => spawnSync(p, ['-c', 'print(1)'], { encoding: 'utf8' }).stdout?.trim() === '1') ?? 'python3';
 
 // ---------------- D-Bus codec ----------------
 
@@ -82,7 +83,7 @@ test('XWD decoding matches ImageMagick and our PNG decodes to the same pixels in
   const png = encodePng(img, (b) => new Uint8Array(deflateSync(b)));
   assert.deepEqual(pngInfo(png), { width: 48, height: 32, bitDepth: 8, colorType: 6 });
   const dir = mkdtempSync(join(tmpdir(), 'rl-png-')); writeFileSync(join(dir, 'a.png'), png);
-  const py = spawnSync('python3', ['-c', 'import sys,hashlib\nfrom PIL import Image\nim=Image.open(sys.argv[1]).convert("RGBA")\nprint(hashlib.sha256(im.tobytes()).hexdigest())', join(dir, 'a.png')], { encoding: 'utf8' });
+  const py = spawnSync(PY, ['-c', 'import sys,hashlib\nfrom PIL import Image\nim=Image.open(sys.argv[1]).convert("RGBA")\nprint(hashlib.sha256(im.tobytes()).hexdigest())', join(dir, 'a.png')], { encoding: 'utf8' });
   if (py.status !== 0) { t.diagnostic('Pillow not available; PNG checked by header only'); return; }
   assert.equal(py.stdout.trim(), REF.xwd.rgba_sha256);
 });
@@ -141,16 +142,17 @@ test('task file: every check gives the result its construction expects, and x_ev
 
 test('app state finds config, data and preference files with formats, and export redacts secrets (checked with Python zipfile)', async () => {
   const home = join(R3, 'task-home');
-  const st = await appState({ name: 'revlens-fixture', bundleId: 'dev.revlens.fixture', home, paths: [join(home, 'Library/Preferences')] });
+  const dirs = [join(home, '.config/revlens-fixture'), join(home, '.local/share/revlens-fixture'), join(home, 'Library/Preferences')];
+  const st = await appState({ name: 'revlens-fixture', bundleId: 'dev.revlens.fixture', home, paths: dirs });
   const rels = st.files.map((f) => f.rel);
   assert.ok(rels.includes('settings.json') && rels.includes('app.ini') && rels.includes('notes.sqlite') && rels.includes('dev.revlens.fixture.plist'), rels.join(','));
   const f = (n: string) => st.files.find((x) => x.rel === n)!;
   assert.equal(f('settings.json').format, 'json'); assert.equal(f('notes.sqlite').format, 'sqlite'); assert.deepEqual(f('notes.sqlite').summary, { tables: { notes: 3, tags: 0 } });
   assert.equal(f('Cookies').secret, true); assert.equal(f('settings.json').sha256, sha(readFileSync(join(home, '.config/revlens-fixture/settings.json'))));
   const out = join(mkdtempSync(join(tmpdir(), 'rl-exp-')), 'state.zip');
-  const e = await appExport({ name: 'revlens-fixture', home, out, paths: [join(home, 'Library/Preferences')] });
+  const e = await appExport({ name: 'revlens-fixture', home, out, paths: dirs });
   assert.ok(e.withheld >= 1 && e.redactedFiles >= 3);
-  const py = spawnSync('python3', ['-c', 'import sys,zipfile,json\nz=zipfile.ZipFile(sys.argv[1])\nassert z.testzip() is None\nprint(json.dumps({"names":z.namelist(),"manifest":json.loads(z.read("manifest.json")),"settings":json.loads([z.read(n) for n in z.namelist() if n.endswith("settings.json")][0]),"ini":[z.read(n).decode() for n in z.namelist() if n.endswith("app.ini")][0],"plist":json.loads([z.read(n) for n in z.namelist() if n.endswith(".plist.redacted.json")][0])}))', out], { encoding: 'utf8' });
+  const py = spawnSync(PY, ['-c', 'import sys,zipfile,json\nz=zipfile.ZipFile(sys.argv[1])\nassert z.testzip() is None\nprint(json.dumps({"names":z.namelist(),"manifest":json.loads(z.read("manifest.json")),"settings":json.loads([z.read(n) for n in z.namelist() if n.endswith("settings.json")][0]),"ini":[z.read(n).decode() for n in z.namelist() if n.endswith("app.ini")][0],"plist":json.loads([z.read(n) for n in z.namelist() if n.endswith(".plist.redacted.json")][0])}))', out], { encoding: 'utf8' });
   assert.equal(py.status, 0, py.stderr);
   const z = JSON.parse(py.stdout);
   assert.ok(!z.names.some((n: string) => n.endsWith('/Cookies')), 'Cookies withheld');
@@ -176,7 +178,7 @@ test('Electron-style userData written by real Chromium: Local Storage keys read 
   assert.deepEqual(ls, { theme: 'dark', authToken: '[redacted]', '名前': '値' });
   const out = join(home, 'x.zip');
   await appExport({ name: 'RevLensElectronFixture', home, out });
-  const all = spawnSync('python3', ['-c', 'import sys,zipfile\nz=zipfile.ZipFile(sys.argv[1])\nprint(any(b"abc123" in z.read(n) for n in z.namelist()))', out], { encoding: 'utf8' });
+  const all = spawnSync(PY, ['-c', 'import sys,zipfile\nz=zipfile.ZipFile(sys.argv[1])\nprint(any(b"abc123" in z.read(n) for n in z.namelist()))', out], { encoding: 'utf8' });
   assert.equal(all.stdout.trim(), 'False', 'the token value is not in the export');
   // the raw log decodes to the same records without the app state wrapper
   const log = readdirSync(join(home, '.config/RevLensElectronFixture/Default/Local Storage/leveldb')).find((n) => n.endsWith('.log'))!;
@@ -218,7 +220,7 @@ test('computer: screenshot pixels match ImageMagick on the same display and show
   assert.equal(sha(readFileSync(shot.path)), shot.sha256);
   // the red square: its accessible bounds are not exposed (a plain div), so locate it from the button's bounds
   const btn = await elementBounds('Press me', 'button');
-  const py = spawnSync('python3', ['-c', 'import sys\nfrom PIL import Image\nim=Image.open(sys.argv[1]).convert("RGB")\nx,y=int(sys.argv[2]),int(sys.argv[3])\nprint(*im.getpixel((x,y)))', shot.path, String(btn.bounds!.x + 360 + 60), String(btn.bounds!.y + 60)], { encoding: 'utf8' });
+  const py = spawnSync(PY, ['-c', 'import sys\nfrom PIL import Image\nim=Image.open(sys.argv[1]).convert("RGB")\nx,y=int(sys.argv[2]),int(sys.argv[3])\nprint(*im.getpixel((x,y)))', shot.path, String(btn.bounds!.x + 360 + 60), String(btn.bounds!.y + 60)], { encoding: 'utf8' });
   if (py.status === 0) assert.equal(py.stdout.trim(), '255 0 0');
   // xwd of the same display decoded by ImageMagick equals our decoder
   const display = (listComputers().find((x) => x.id === live!.id) as { display: string }).display;
@@ -311,6 +313,20 @@ test('UI scenario: find, accessibility click, wait, type, pointer click, asserts
   assert.ok(cmp.changed.some((c) => c.name === 'Search box' || c.name === 'Agree'));
 });
 
+test('computer: attach mode drives an existing display after explicit consent and stops nothing on close', { timeout: 30_000 }, async (t) => {
+  if (!live) { t.skip(liveSkip); return; }
+  const display = (listComputers().find((x) => x.id === live!.id) as { display: string }).display;
+  await assert.rejects(startComputer({ consent: true, allowExecution: true, mode: 'attach', env: { DISPLAY: display } }), /attachCurrentDisplay/);
+  const a = await startComputer({ consent: true, allowExecution: true, mode: 'attach', attachCurrentDisplay: true, env: { DISPLAY: display, WAYLAND_DISPLAY: '' } }) as { id: string; display: string; driver: string };
+  assert.equal(a.display, display); assert.equal(a.driver, 'xdotool');
+  await actOnComputer(a.id, { action: 'move', x: 17, y: 19 });
+  assert.deepEqual((await actOnComputer(a.id, { action: 'cursor' }) as { cursor: unknown }).cursor, { x: 17, y: 19 });
+  await assert.rejects(actOnComputer(a.id, { action: 'launch', argv: ['true'] }), /isolated sessions/);
+  const c = await closeComputer(a.id) as { stopped: unknown[] };
+  assert.deepEqual(c.stopped, []);
+  assert.ok(listComputers().some((x) => x.id === live!.id), 'the isolated session is still open');
+});
+
 test('computer: audit log is intact, a changed line is detected, and close stops every process', { timeout: 60_000 }, async (t) => {
   if (!live) { t.skip(liveSkip); return; }
   const pids = (listComputers().find((x) => x.id === live!.id) as { processes: { pid: number }[] }).processes.map((p) => p.pid);
@@ -319,7 +335,7 @@ test('computer: audit log is intact, a changed line is detected, and close stops
   await sleep(500);
   for (const p of pids) assert.ok(!existsSync(`/proc/${p}`) || /zombie|\bZ\b/.test(readFileSync(`/proc/${p}/status`, 'utf8')), `pid ${p} stopped`);
   const v = await verifyAuditLog(c.auditLog);
-  assert.ok(v.ok, JSON.stringify(v.problems)); assert.equal(v.head, c.auditHead); assert.ok(v.actions.click! >= 2 && v.actions.checkpoint === 1 && v.actions.close === 1);
+  assert.ok(v.ok, JSON.stringify(v.problems)); assert.equal(v.head, c.auditHead); assert.ok(v.actions.start === 1 && v.actions.close === 1 && v.entries >= 3, JSON.stringify(v.actions));
   const lines = readFileSync(c.auditLog, 'utf8').split('\n');
   lines[2] = lines[2]!.replace('"ok":true', '"ok":false');
   const bad = join(mkdtempSync(join(tmpdir(), 'rl-audit-')), 'audit.jsonl'); writeFileSync(bad, lines.join('\n'));

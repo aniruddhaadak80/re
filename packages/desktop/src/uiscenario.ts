@@ -115,7 +115,7 @@ export async function traceUi(o: TraceOptions): Promise<TraceResult> {
   } else if (mode === 'events' && platform === 'win32') {
     backend = 'uia';
     const p = uiaTrace({ pid: o.pid, durationMs: dur, maxEvents });
-    await sleep(800); // let the handlers attach before acting
+    await sleep(3000); // PowerShell compiles the helper and attaches the handlers before the actions run
     await runActions();
     const r = await p;
     events = r.events; truncated = r.truncated; warnings.push(...r.warnings);
@@ -177,7 +177,7 @@ public class RevLensUiaTrace {
     Automation.AddAutomationEventHandler(WindowPattern.WindowOpenedEvent, root, TreeScope.Subtree, (s, a) => Add("window:create", s as AutomationElement, ""));
   }
 }`;
-  const script = `$ErrorActionPreference='Stop'; Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes; Add-Type -ReferencedAssemblies UIAutomationClient, UIAutomationTypes, WindowsBase -TypeDefinition @'\n${cs}\n'@; $t = New-Object RevLensUiaTrace(${o.pid ?? 0}, ${o.maxEvents}); $t.Start(); Start-Sleep -Milliseconds ${o.durationMs}; [System.Windows.Automation.Automation]::RemoveAllEventHandlers(); '[' + ($t.Lines -join ',') + ']'`;
+  const script = `$ErrorActionPreference='Stop'; Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes, WindowsBase; $refs = @([System.Windows.Automation.AutomationElement].Assembly.Location, [System.Windows.Automation.ControlType].Assembly.Location, [System.Windows.Threading.Dispatcher].Assembly.Location); Add-Type -ReferencedAssemblies $refs -TypeDefinition @'\n${cs}\n'@; $t = New-Object RevLensUiaTrace(${o.pid ?? 0}, ${o.maxEvents}); $t.Start(); Start-Sleep -Milliseconds ${o.durationMs}; [System.Windows.Automation.Automation]::RemoveAllEventHandlers(); '[' + ($t.Lines -join ',') + ']'`;
   const r = await powershell(script, o.durationMs + 60_000);
   if (r.code !== 0) throw new InputError(`UIAutomation trace failed: ${r.stderr.trim().slice(0, 300)}`);
   let arr: { t: number; type: string; role: string; name: string; pid: number; data: string }[] = [];
