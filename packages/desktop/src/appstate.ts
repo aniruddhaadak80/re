@@ -11,7 +11,8 @@ import { InputError } from './proc.js';
 import { run } from './exec.js';
 import { parseRegQuery } from './apps.js';
 import { writeZip } from './zip.js';
-import { readLevelLog, decodeLocalStorage } from './leveldb.js';
+import { readLevelDb, decodeLocalStorage } from './leveldb.js';
+import { dconfDump, isGvdb } from './gvdb.js';
 import { viewOf, detectFormat, isSecretFile, redactValue, redactLines, runTask, validateTask, type ViewHelpers, type DesktopTask, type FileSource } from './views.js';
 import { parsePlist } from './plist.js';
 import type { UiNode } from './gvariant.js';
@@ -101,7 +102,8 @@ export interface AppStateResult {
   app: AppIdentity; platform: string; roots: StateRoot[]; files: StateFile[]; totalBytes: number; truncated: boolean;
   electron?: { userData: string; localStorage?: { origin?: string; key: string; value?: string }[]; markers: string[] }[];
   registry?: { key: string; values: Record<string, string> }[];
-  dconf?: { path: string; dump: string }[];
+  /** source: the dconf program (user plus system databases) or the user's binary database read directly */
+  dconf?: { path: string; dump: string; source: 'dconf' | 'gvdb'; file?: string }[];
   warnings: string[];
 }
 
@@ -174,6 +176,8 @@ export async function appState(o: AppStateOptions): Promise<AppStateResult> {
   const h = await nodeViewHelpers();
   const res: AppStateResult = { app, platform: process.platform, roots, files: [], totalBytes: 0, truncated: false, warnings: [] };
   const seenReal = new Set<string>();
+  const dconfUser = join(o.home === undefined ? (process.env.XDG_CONFIG_HOME || join(home, '.config')) : join(home, '.config'), 'dconf', 'user');
+  let userDb: Uint8Array | null | undefined;
   for (const r of roots) {
     if (r.kind === 'registry') {
       if (process.platform !== 'win32') continue;
@@ -183,8 +187,18 @@ export async function appState(o: AppStateOptions): Promise<AppStateResult> {
     }
     if (r.kind === 'dconf') {
       if (process.platform !== 'linux') continue;
-      const d = await run('dconf', ['dump', r.path], { timeoutMs: 10_000 }).catch(() => undefined);
-      if (d && d.code === 0 && d.stdout.trim()) { r.exists = true; (res.dconf ??= []).push({ path: r.path, dump: d.stdout.slice(0, 200_000) }); }
+      // with an explicit home, read that home's database; otherwise ask dconf first (it merges the
+      // system databases), then fall back to reading the user database file without dconf
+      if (o.home === undefined) {
+        const cmd = process.env.REVLENS_DCONF_COMMAND || 'dconf';
+        const d = await run(cmd, ['dump', r.path], { timeoutMs: 10_000 }).catch(() => undefined);
+        if (d && d.code === 0 && d.stdout.trim()) { r.exists = true; (res.dconf ??= []).push({ path: r.path, dump: d.stdout.slice(0, 200_000), source: 'dconf' }); continue; }
+      }
+      userDb ??= await readCapped(dconfUser, 64 * 1024 * 1024).catch(() => null);
+      if (userDb && isGvdb(userDb)) {
+        try { const dump = dconfDump(userDb, r.path); if (dump.trim()) { r.exists = true; (res.dconf ??= []).push({ path: r.path, dump: dump.slice(0, 200_000), source: 'gvdb', file: dconfUser }); } }
+        catch (e) { res.warnings.push(`${dconfUser}: ${(e as Error).message}`); }
+      }
       continue;
     }
     const st = await lstat(r.path).catch(() => undefined);
@@ -213,8 +227,20 @@ export async function appState(o: AppStateOptions): Promise<AppStateResult> {
       if (markers.length >= 2) {
         const e: NonNullable<AppStateResult['electron']>[number] = { userData: r.path, markers };
         if (o.localStorage !== false) {
-          for (const f of res.files.filter((x) => x.root === r.path && /^(Default\/)?Local Storage\/leveldb\/[^/]+\.log$/.test(x.rel))) {
-            try { const lg = readLevelLog(await readCapped(f.path, 64 * 1024 * 1024)); const latest = new Map<string, { origin?: string; key: string; value?: string }>(); for (const rec of lg.records) { const d = decodeLocalStorage(rec.key, rec.value); if (d.meta) continue; const k = `${d.origin} ${d.key}`; if (rec.op === 'delete') latest.delete(k); else latest.set(k, { origin: d.origin, key: d.key, value: d.value === undefined ? undefined : /token|secret|pass|auth|cookie|session/i.test(d.key) ? '[redacted]' : d.value.slice(0, 500) }); } (e.localStorage ??= []).push(...latest.values()); } catch (err) { res.warnings.push(`${f.path}: ${(err as Error).message}`); }
+          // logs and Snappy tables of each Local Storage folder, merged by sequence number
+          const dbFiles = res.files.filter((x) => x.root === r.path && /^(Default\/)?Local Storage\/leveldb\/[^/]+\.(log|ldb|sst)$/.test(x.rel));
+          for (const dir of uniq(dbFiles.map((f) => f.rel.slice(0, f.rel.lastIndexOf('/'))))) {
+            try {
+              const files: { name: string; bytes: Uint8Array }[] = [];
+              for (const f of dbFiles.filter((x) => x.rel.startsWith(dir + '/'))) files.push({ name: basename(f.path), bytes: await readCapped(f.path, 64 * 1024 * 1024) });
+              const db = readLevelDb(files);
+              for (const fr of db.files) if (fr.error) res.warnings.push(`${dir}/${fr.name}: ${fr.error}`);
+              for (const ent of db.entries) {
+                const d = decodeLocalStorage(ent.key, ent.value);
+                if (d.meta) continue;
+                (e.localStorage ??= []).push({ origin: d.origin, key: d.key, value: d.value === undefined ? undefined : /token|secret|pass|auth|cookie|session/i.test(d.key) ? '[redacted]' : d.value.slice(0, 500) });
+              }
+            } catch (err) { res.warnings.push(`${dir}: ${(err as Error).message}`); }
           }
         }
         (res.electron ??= []).push(e);
