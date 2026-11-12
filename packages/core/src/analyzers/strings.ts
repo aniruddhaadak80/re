@@ -14,7 +14,7 @@ const RE = {
 /** Longest prefix of a string that tagging looks at, which keeps regex work bounded on huge strings. */
 const TAG_SCAN = 512;
 
-function tagOf(value: string): string | undefined {
+export function tagOf(value: string): string | undefined {
   const s = value.length > TAG_SCAN ? value.slice(0, TAG_SCAN) : value;
   if (RE.url.test(s)) return 'url';
   if (RE.email.test(s)) return 'email';

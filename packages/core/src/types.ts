@@ -125,6 +125,22 @@ export interface AnalyzeOptions {
    * core analyzers on the same report, and archive members analyzed recursively get them too.
    */
   extraAnalyzers?: Analyzer[];
+  /** Extra secret patterns for the secrets analyzer (checked for safety before use). */
+  secretPatterns?: SecretPattern[];
+  /** Secret rule ids to switch off, built in or custom (for example "jwt" or "generic-secret"). */
+  disabledSecretRules?: string[];
+}
+
+/** A caller supplied secret rule. pattern is a JavaScript regular expression source. */
+export interface SecretPattern {
+  id: string;
+  pattern: string;
+  title?: string;
+  severity?: Severity;
+  /** extra flags, only "i" and "m" are kept */
+  flags?: string;
+  /** minimum Shannon entropy of the match (or of capture group 1), to cut false positives */
+  minEntropy?: number;
 }
 
 /**

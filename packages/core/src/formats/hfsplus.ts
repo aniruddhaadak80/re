@@ -17,6 +17,8 @@ export interface HfsEntry {
   /** file type and creator from the Finder info, when set */
   fileType?: string;
   creator?: string;
+  /** files only: data fork extents in allocation blocks (first eight; more live in the overflow file) */
+  extents?: { start: number; count: number }[];
 }
 
 export interface HfsVolume {
@@ -138,6 +140,9 @@ export function readHfsPlus(bytes: Uint8Array, opts: { maxEntries?: number } = {
         const mode = v.u16be(d + 32 + 10);
         const isLink = (mode & 0xf000) === 0xa000 || (ftype === 0x736c6e6b && creator === 0x72686170);
         const e: HfsEntry = { path: '', name, kind: isLink ? 'symlink' : 'file', id, parentId: parent, size: v.u64be(d + 88), created: hfsDate(v.u32be(d + 12)), modified: hfsDate(v.u32be(d + 16)) };
+        const ext: { start: number; count: number }[] = [];
+        for (let x = 0; x < 8; x++) { const st = v.u32be(d + 88 + 16 + x * 8), ct = v.u32be(d + 88 + 20 + x * 8); if (!ct) break; ext.push({ start: st, count: ct }); }
+        e.extents = ext;
         const ft = fourcc(ftype), cr = fourcc(creator);
         if (ft) e.fileType = ft;
         if (cr) e.creator = cr;
@@ -169,4 +174,22 @@ export function readHfsPlus(bytes: Uint8Array, opts: { maxEntries?: number } = {
     catalog: { nodeSize, treeDepth, leafRecords, extents: extents.length, complete },
     entries: raw, truncated, warnings,
   };
+}
+
+/** Data fork bytes of a file entry. Throws when the fork continues past the eight extents in the record. */
+export function readHfsFile(volume: Uint8Array, vol: Pick<HfsVolume, 'blockSize'>, e: HfsEntry, maxBytes = 256 * 1024 * 1024): Uint8Array {
+  if (e.kind === 'folder') throw new FormatError(`${e.path} is a folder`);
+  const size = e.size ?? 0;
+  if (size > maxBytes) throw new FormatError(`${e.path} is ${size} bytes, over the ${maxBytes} byte limit`);
+  const out = new Uint8Array(size);
+  let o = 0;
+  for (const x of e.extents ?? []) {
+    if (o >= size) break;
+    const start = x.start * vol.blockSize, len = Math.min(x.count * vol.blockSize, size - o);
+    if (start + len > volume.length) throw new FormatError(`${e.path}: extent is outside the volume`, start);
+    out.set(volume.subarray(start, start + len), o);
+    o += len;
+  }
+  if (o < size) throw new FormatError(`${e.path}: data continues in the extents overflow file, which is not read`);
+  return out;
 }
