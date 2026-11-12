@@ -2,14 +2,17 @@
 // value into TOON, YAML, JSON Lines, CSV, TSV, Markdown or JSON. Pure functions, no dependencies, so
 // they also work in a browser.
 //
-// Limits: depth is capped at MAX_DEPTH (deeper values are written as JSON text), strings are written
+// Limits: input nested more than MAX_NESTING levels is refused, strings are written
 // whole (commands already page their output), and cyclic values are refused.
 
 export const OUTPUT_FORMATS = ['text', 'json', 'toon', 'yaml', 'jsonl', 'csv', 'tsv', 'md'] as const;
 export type OutputFormat = (typeof OUTPUT_FORMATS)[number];
 /** Formats a command cannot produce itself: the CLI asks it for JSON and converts. */
 export const CONVERTED_FORMATS: readonly OutputFormat[] = ['toon', 'yaml', 'jsonl', 'csv', 'tsv'];
-export const MAX_DEPTH = 64;
+/** Depth past which TOON and YAML write a value as JSON text; normalize refuses input past MAX_NESTING first. */
+export const MAX_DEPTH = 600;
+/** Deeper input is refused instead of risking the call stack. */
+export const MAX_NESTING = 512;
 
 export function isOutputFormat(s: unknown): s is OutputFormat {
   return typeof s === 'string' && (OUTPUT_FORMATS as readonly string[]).includes(s);
@@ -33,7 +36,7 @@ export function normalize(v: unknown, seen: Set<object> = new Set(), depth = 0):
     if (typeof o.toJSON === 'function' && !(v instanceof Array)) return normalize(o.toJSON(), seen, depth);
     if (v instanceof Uint8Array) return Array.from(v);
     if (seen.has(v)) throw new TypeError('cannot write a cyclic value');
-    if (depth > 4096) throw new RangeError('value is nested too deeply');
+    if (depth > MAX_NESTING) throw new RangeError(`value is nested more than ${MAX_NESTING} levels deep`);
     seen.add(v);
     try {
       if (Array.isArray(v)) return v.map((x) => (x === undefined || typeof x === 'function' || typeof x === 'symbol' ? null : normalize(x, seen, depth + 1)));
@@ -185,7 +188,8 @@ function yamlString(s: string): string {
 function yamlScalar(v: null | boolean | number | string): string {
   if (v === null) return 'null';
   if (typeof v === 'boolean') return v ? 'true' : 'false';
-  if (typeof v === 'number') return numText(v);
+  // YAML 1.1 readers want a dot in a float with an exponent: 6e-323 would read as text
+  if (typeof v === 'number') { const t = numText(v); return /e/i.test(t) && !t.includes('.') ? t.replace(/e/i, '.0e') : t; }
   return yamlString(v);
 }
 const yamlKey = (k: string) => yamlString(k);

@@ -57,7 +57,7 @@ test('YAML reads back the same with the yaml package (1.2) and PyYAML (1.1)', ()
   assert.deepEqual(YAML.parse(toYaml(v)), v);
   fc.assert(fc.property(fc.jsonValue({ maxDepth: 6 }), (x) => isDeepStrictEqual(YAML.parse(toYaml(x)), normalize(x))), { numRuns: 2000 });
   if (pyYaml) {
-    const samples = fc.sample(fc.jsonValue({ maxDepth: 4 }), 300).map(normalize);
+    const samples = fc.sample(fc.jsonValue({ maxDepth: 4 }), 300).map((x) => normalize(x));
     const docs = samples.map((x) => toYaml(x));
     const back = JSON.parse(py('import sys, json, yaml\ndocs = json.load(sys.stdin)\nprint(json.dumps([yaml.safe_load(d) for d in docs]))', JSON.stringify(docs)));
     // PyYAML reads -0.0 and big integers its own way; compare after a JSON round trip on both sides
@@ -97,13 +97,18 @@ test('encoders refuse cycles and survive deep and huge values in time', () => {
   const a: Record<string, unknown> = {}; a.self = a;
   assert.throws(() => toToon(a), /cyclic/);
   let deep: unknown = 1;
-  for (let i = 0; i < 3000; i++) deep = [deep];
+  for (let i = 0; i < 200; i++) deep = [{ k: deep }];
   for (const f of OUTPUT_FORMATS) { const t = performance.now(); render(deep, f); assert.ok(performance.now() - t < 5000, f); }
+  if (toonRef) assert.deepEqual(toonRef.decode(toToon(deep)), normalize(deep));
+  assert.deepEqual(YAML.parse(toYaml(deep), { maxAliasCount: -1 }), normalize(deep));
+  let deeper: unknown = 1;
+  for (let i = 0; i < 100_000; i++) deeper = [deeper];
+  for (const f of OUTPUT_FORMATS) assert.throws(() => render(deeper, f), /nested more than/);
   const wide = Array.from({ length: 50_000 }, (_, i) => ({ i, s: `x${i}` }));
   const t = performance.now();
   for (const f of OUTPUT_FORMATS) render(wide, f);
   assert.ok(performance.now() - t < 15_000);
-  fc.assert(fc.property(fc.anything({ maxDepth: 4 }), (x) => { for (const f of OUTPUT_FORMATS) { try { render(x, f); } catch (e) { if (!/cyclic|deeply/.test((e as Error).message)) throw e; } } return true; }), { numRuns: 300 });
+  fc.assert(fc.property(fc.anything({ maxDepth: 4 }), (x) => { for (const f of OUTPUT_FORMATS) { try { render(x, f); } catch (e) { if (!/cyclic|nested more/.test((e as Error).message)) throw e; } } return true; }), { numRuns: 300 });
 });
 
 test('parseCommandJson reads one document or JSON Lines', () => {
@@ -158,7 +163,11 @@ test('package commands and core lists convert too, and --out gets the converted 
     // a package command (bridges doctor) asked for yaml
     const d = cli(['doctor', '--output-format', 'yaml']);
     assert.equal(d.status, 0, d.stderr);
-    assert.deepEqual(YAML.parse(d.stdout), JSON.parse(cli(['doctor', '--json']).stdout));
+    const dj = JSON.parse(cli(['doctor', '--json']).stdout);
+    const dy = YAML.parse(d.stdout);
+    // two runs: the clock and probe timings differ, the inventory does not
+    assert.equal(dy.schema, dj.schema);
+    assert.deepEqual(dy.tools.map((x: { id: string; available: boolean }) => [x.id, x.available]), dj.tools.map((x: { id: string; available: boolean }) => [x.id, x.available]));
     // discover keeps --format for the file format
     const disc = cli(['discover', 'decompile', '--format', 'elf', '--json']);
     assert.equal(disc.status, 0, disc.stderr);
@@ -184,7 +193,7 @@ test('--evidence-out writes a bundle that evidence-import checks, and tampering 
     assert.equal(b.command, 'verify');
     assert.equal(b.inputs[0].sha256, createHash('sha256').update(readFileSync(ELF)).digest('hex'));
     assert.equal(b.output.sha256, createHash('sha256').update(canonicalJson(b.output.value)).digest('hex'));
-    assert.equal(b.output.value[0].verdict, 'VERIFIED');
+    assert.equal(b.output.value.verdict, 'VERIFIED');
     const ok = cli(['evidence-import', file, '--json']);
     assert.equal(ok.status, 0, ok.stdout + ok.stderr);
     assert.equal(JSON.parse(ok.stdout).outputIntact, true);
@@ -199,7 +208,7 @@ test('--evidence-out writes a bundle that evidence-import checks, and tampering 
     assert.equal(again.status, 0, again.stderr);
     assert.ok(JSON.parse(again.stdout).imported >= 1);
     // edit the result: caught
-    b.output.value[0].verdict = 'REFUTED';
+    b.output.value.verdict = 'REFUTED';
     const bad = join(dir, 'bad.json');
     writeFileSync(bad, JSON.stringify(b));
     const t = cli(['evidence-import', bad, '--json']);
