@@ -1,0 +1,36 @@
+{
+ "tool": "ca65/ld65 2.19, Python zlib and hashlib",
+ "ines-mmc1.nes": {
+  "size": 40976,
+  "prgCrc32": "475056f8",
+  "romCrc32": "15ba8b37",
+  "romSha1": "8dcae6276b33cb7750aefcb5428cf53b9d78c621",
+  "chrCrc32": "bf52fd1f",
+  "format": "iNES",
+  "mapper": 1,
+  "prgRomSize": 32768,
+  "chrRomSize": 8192,
+  "mirroring": "vertical",
+  "battery": true,
+  "trainer": false
+ },
+ "nes2-268.nes": {
+  "size": 131600,
+  "prgCrc32": "6a778516",
+  "romCrc32": "6a778516",
+  "romSha1": "7de6c9ec8ac2f7ca9191e0066506526126c44ba1",
+  "format": "NES 2.0",
+  "mapper": 268,
+  "submapper": 1,
+  "prgRomSize": 131072,
+  "chrRomSize": 0,
+  "chrRamSize": 8192,
+  "prgNvramSize": 8192,
+  "prgRamSize": 0,
+  "mirroring": "four-screen",
+  "battery": true,
+  "trainer": true,
+  "timing": "PAL (RP2C07)",
+  "defaultExpansion": 1
+ }
+}

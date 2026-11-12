@@ -1,0 +1,21 @@
+{
+ "tool": "UnityPy 1.10.18",
+ "dataflags": 65,
+ "nodes": [
+  {
+   "path": "CAB-b9e81384a9071f34af21369e01876050",
+   "size": 2968,
+   "sha256": "ca195d30a09d949a0458a10d4d0275ecd371d62e13c362f115e30247b6364f57"
+  }
+ ],
+ "objects": [
+  {
+   "pathId": "1",
+   "class": "AssetBundle"
+  },
+  {
+   "pathId": "2",
+   "class": "AssetBundleManifest"
+  }
+ ]
+}

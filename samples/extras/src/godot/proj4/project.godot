@@ -1,0 +1,6 @@
+; RevLens Godot pack fixture project (Godot 4)
+config_version=5
+
+[application]
+config/name="RevLensPck"
+run/main_scene=""

@@ -1,0 +1,91 @@
+{
+ "tool": "Godot 3.6, 4.3, 4.4.1, 4.5.1 official linux.arm64 editors and engines",
+ "encryptionKey": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+ "sourceMd5": {
+  "res://data.txt": "c5df6574aa0cf326839959c44386fdff",
+  "res://config.json": "a344748ca155a224ef109c943304d046",
+  "res://levels/level1.txt": "95f33a1fe0f78c83993320c4502e86cd"
+ },
+ "packs": {
+  "godot36.pck": {
+   "engine": "3.6",
+   "formatVersion": 1,
+   "files": [
+    "res://config.json",
+    "res://data.txt",
+    "res://levels/level1.txt",
+    "res://main.gd.remap",
+    "res://main.gdc",
+    "res://project.binary"
+   ],
+   "size": 1056,
+   "mainPackRun": "RevLens Godot pack fixture line one",
+   "embeddedRun": "RevLens Godot pack fixture line one",
+   "embeddedStart": 214512
+  },
+  "godot43.pck": {
+   "engine": "4.3",
+   "formatVersion": 2,
+   "files": [
+    "res://.godot/global_script_class_cache.cfg",
+    "res://config.json",
+    "res://data.txt",
+    "res://levels/level1.txt",
+    "res://main.gd.remap",
+    "res://main.gdc",
+    "res://project.binary"
+   ],
+   "size": 1168,
+   "mainPackRun": "RevLens Godot pack fixture line one",
+   "embeddedRun": "RevLens Godot pack fixture line one",
+   "embeddedStart": 214512
+  },
+  "godot451.pck": {
+   "engine": "4.5.1",
+   "formatVersion": 3,
+   "files": [
+    "res://.godot/global_script_class_cache.cfg",
+    "res://.godot/uid_cache.bin",
+    "res://config.json",
+    "res://data.txt",
+    "res://levels/level1.txt",
+    "res://main.gd.remap",
+    "res://main.gdc",
+    "res://project.binary"
+   ],
+   "size": 1212,
+   "mainPackRun": "RevLens Godot pack fixture line one",
+   "embeddedRun": "RevLens Godot pack fixture line one",
+   "embeddedStart": 214512
+  },
+  "godot43-enc.pck": {
+   "engine": "4.3",
+   "formatVersion": 2,
+   "files": [
+    "res://.godot/global_script_class_cache.cfg",
+    "res://config.json",
+    "res://data.txt",
+    "res://levels/level1.txt",
+    "res://main.gd.remap",
+    "res://main.gdc",
+    "res://project.binary"
+   ],
+   "size": 1264
+  },
+  "godot441-encdir.pck": {
+   "engine": "4.4.1",
+   "formatVersion": 2,
+   "files": [
+    "res://.godot/global_script_class_cache.cfg",
+    "res://.godot/uid_cache.bin",
+    "res://config.json",
+    "res://data.txt",
+    "res://levels/level1.txt",
+    "res://main.gd.remap",
+    "res://main.gdc",
+    "res://project.binary"
+   ],
+   "size": 1328
+  }
+ }
+}

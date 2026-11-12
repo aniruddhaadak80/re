@@ -10,7 +10,9 @@ const MAGIC = 0x43504447; // "GDPC" little endian
 export const PACK_DIR_ENCRYPTED = 1, PACK_REL_FILEBASE = 2, PACK_SPARSE_BUNDLE = 4;
 export const PACK_FILE_ENCRYPTED = 1, PACK_FILE_REMOVAL = 2;
 
-export interface GodotPckEntry { path: string; offset: number; size: number; md5: string; flags: number; encrypted: boolean; removal: boolean; entryOffset: number }
+export interface GodotPckEntry { path: string; offset: number; size: number; md5: string; flags: number; encrypted: boolean; removal: boolean; entryOffset: number;
+  /** For encrypted entries: Godot's FileAccessEncrypted header (MD5 of the plain data, plain size, AES-CFB IV). */
+  encryption?: { plainMd5: string; plainSize: number; iv: string } }
 export interface GodotPck {
   packStart: number; embedded: 'none' | 'trailer' | 'scan'; formatVersion: number; engineVersion: string; packFlags: number;
   flags: { encryptedDirectory: boolean; relativeFileBase: boolean; sparseBundle: boolean };
@@ -92,7 +94,7 @@ export function inspectGodotPck(b: Uint8Array, opts: { maxFiles?: number } = {})
   }
   // Godot 3 stores offsets relative to the pack start while its reader adds the open offset only;
   // for packs not at offset 0, pick the base whose data fits and whose MD5 matches.
-  let rel = version >= 2 ? fileBase === s && s > 0 : false;
+  let rel = version >= 2 ? s > 0 && (version === 3 || (packFlags & PACK_REL_FILEBASE) !== 0) : false;
   if (version < 2 && s > 0 && files.length) {
     const fits = (base: number) => files.every((f) => f.offset + base + f.size <= b.length);
     const probe = files.filter((f) => !f.encrypted && f.size > 0 && f.size < 1 << 20).sort((x, y) => x.size - y.size)[0];
@@ -100,6 +102,11 @@ export function inspectGodotPck(b: Uint8Array, opts: { maxFiles?: number } = {})
     if (!ok(0) && ok(s)) { rel = true; for (const f of files) f.offset += s; }
   }
   for (const f of files) if (f.offset + f.size > b.length) { warnings.push(`${f.path} data runs past the end of the file`); break; }
+  for (const f of files) {
+    if (!f.encrypted || f.offset + 40 > b.length) continue;
+    const hex = (o: number, n: number) => Array.from(b.subarray(o, o + n), (x) => x.toString(16).padStart(2, '0')).join('');
+    try { f.encryption = { plainMd5: hex(f.offset, 16), plainSize: u64(b, f.offset + 16), iv: hex(f.offset + 24, 16) }; } catch { /* size field too large */ }
+  }
   return {
     packStart: s, embedded: loc.embedded, formatVersion: version, engineVersion: engine, packFlags,
     flags: { encryptedDirectory: enc, relativeFileBase: (packFlags & PACK_REL_FILEBASE) !== 0 || version === 3, sparseBundle: (packFlags & PACK_SPARSE_BUNDLE) !== 0 },
