@@ -59,15 +59,43 @@ function ookBursts(env: Float32Array, rate: number, opts: PulseOptions): { burst
   const thrDb = dbOf(thrLin);
   const res = { levelDb: r2(dbOf(high)), noiseDb: r2(dbOf(noise)), snrDb: r2(snr), thresholdDb: r2(thrDb), bursts: [] as Burst[], noiseLin: noise, highLin: high };
   if (opts.levelDb === undefined && snr < (opts.minSnrDb ?? 6)) return res;
-  const hi = thrLin * 1.1, lo = thrLin * 0.9;
   const glitch = Math.max(1, Math.round(((opts.glitchUs ?? 0) * rate) / 1e6) || 2);
-  // raw runs, then fold glitches into the run before them and coalesce
+  // raw runs with an adaptive level: while a pulse is on, a running estimate of its amplitude
+  // sets the end threshold at half way between noise and that amplitude, and the next pulse in
+  // the same package starts at the same midpoint, so slow fades are followed (rtl_433 tracks its
+  // high level estimate the same way). After a long silence the global level applies again.
+  const fixed = opts.levelDb !== undefined;
   const raw: { on: boolean; start: number; len: number }[] = [];
-  let on = (env[0] as number) > hi, start = 0;
-  for (let k = 1; k <= n; k++) {
+  const longQuiet = Math.round(rate * 0.02);
+  let level = high, on = false, start = 0, quiet = 0;
+  const minStart = noise + (high - noise) * 0.35;
+  const mid = () => (fixed ? thrLin : Math.max(minStart, noise + (level - noise) / 2));
+  for (let k = 0; k <= n; k++) {
     const v = k < n ? (env[k] as number) : 0;
-    const next = on ? v >= lo : v > hi;
-    if (k === n || next !== on) { raw.push({ on, start, len: k - start }); on = next; start = k; }
+    let next: boolean;
+    if (on) {
+      next = v >= mid() * 0.95;
+      if (next) level += (v - level) / 16;
+    } else {
+      next = v > mid() * 1.05;
+      if (next) level = Math.max(level, v);
+      else if (++quiet > longQuiet) level = high;
+    }
+    if (k === n || next !== on) {
+      if (on && !fixed && k > start) {
+        // the start was found with the previous pulse's level; move it back to where the
+        // envelope crossed this pulse's own midpoint
+        const m = mid() * 0.95;
+        const prev = raw[raw.length - 1];
+        const floorAt = prev ? prev.start + 1 : 0;
+        let s0 = start;
+        while (s0 > floorAt && (env[s0 - 1] as number) >= m) s0--;
+        if (s0 < start && prev && !prev.on) { prev.len -= start - s0; start = s0; }
+      }
+      if (k > start) raw.push({ on, start, len: k - start });
+      if (next && !on) { level = Math.max(v, noise + (level - noise) * 0.5); quiet = 0; }
+      on = next; start = k;
+    }
   }
   const runs: { on: boolean; start: number; len: number }[] = [];
   for (const run of raw) {

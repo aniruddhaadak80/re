@@ -34,7 +34,7 @@ export function guessCoding(p: PulsePackage, rate: number): PackageAnalysis['gue
   const pu = p.pulses.map((x) => x * us);
   const ga = p.gaps.slice(0, -1).map((x) => x * us);
   if (pu.length < 4) return undefined;
-  const P = clusterWidths(pu, us).filter((c) => c.count >= 2 || pu.length < 8);
+  const P = clusterWidths(pu, us).filter((c) => c.count >= Math.max(2, 0.05 * pu.length) || pu.length < 8);
   const Gall = clusterWidths(ga, us);
   if (!P.length) return undefined;
   // data gaps: clusters within 4x of the smallest gap; larger ones are row or message breaks
@@ -66,7 +66,7 @@ export function guessCoding(p: PulsePackage, rate: number): PackageAnalysis['gue
     const s = P[0]!.meanUs, l = P[1]!.meanUs;
     const periods = pu.map((x, k) => x + (ga[k] ?? 0)).filter((x, k) => k < ga.length);
     const per = clusterWidths(periods, us);
-    if (per.length <= 2) {
+    if (per.filter((c) => c.count >= Math.max(2, 0.05 * periods.length)).length <= 2) {
       const sync = P.length === 3 ? `,y=${P[2]!.meanUs}` : '';
       return { coding: 'pwm', flex: `n=auto,m=${pre}PWM,s=${s},l=${l}${sync}${gopt(Math.round(dataGapMax * 1.5))},r=${r}`, reason: `two pulse widths (${s}, ${l} us)${sync ? ' plus a sync width' : ''}, steady period` };
     }

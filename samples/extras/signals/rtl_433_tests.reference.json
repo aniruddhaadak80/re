@@ -1,0 +1,77 @@
+{
+  "repository": "https://github.com/merbanan/rtl_433_tests",
+  "commit": "1bd5af52f389f0150bda566437e7d5e17e11fc7f",
+  "license": "none stated; recordings are fetched, never committed",
+  "reference": "rtl_433 25.02 (Debian trixie arm64)",
+  "recordings": [
+    {
+      "path": "EV1527-Universal-Remote/g018_433.92M_250k.cu8",
+      "sha256": "15bd7dd777d4832a21c88bce5bbf3b6df3dc428663e9ab0b30c399aef09efee1",
+      "size": 655360,
+      "flex": "n=name,m=OOK_PWM,s=384,l=1112,r=10936,g=1056,t=291,y=0",
+      "rtl_433_codes": [
+        "{1}8",
+        "{25}90c34e8",
+        "{25}90c34e8",
+        "{25}90c34e8",
+        "{25}90c34e8",
+        "{2}8"
+      ],
+      "rtl_433_tests_expected": {
+        "time": "@0.965948s",
+        "model": "Smoke-GS558",
+        "id": 27111,
+        "unit": 22,
+        "learn": 0,
+        "code": "8d3cf6"
+      },
+      "command": "rtl_433 -R 0 -X \"n=name,m=OOK_PWM,s=384,l=1112,r=10936,g=1056,t=291,y=0\" -r g018_433.92M_250k.cu8 -F json"
+    },
+    {
+      "path": "EV1527-Universal-Remote/g026_433.92M_250k.cu8",
+      "sha256": "43b02c499a3440b983266ce8ae24475361f8b746a25bb3125b033485a28be3c0",
+      "size": 262144,
+      "flex": "n=name,m=OOK_PWM,s=384,l=1112,r=10936,g=1056,t=291,y=0",
+      "rtl_433_codes": [
+        "{1}8",
+        "{25}ae6e7b8",
+        "{25}ae6e7b8",
+        "{25}ae6e7b8",
+        "{25}ae6e7b8",
+        "{25}ae6e7b8"
+      ],
+      "rtl_433_tests_expected": {
+        "time": "@0.230364s",
+        "model": "Smoke-GS558",
+        "id": 3148,
+        "unit": 10,
+        "learn": 0,
+        "code": "21898a"
+      },
+      "command": "rtl_433 -R 0 -X \"n=name,m=OOK_PWM,s=384,l=1112,r=10936,g=1056,t=291,y=0\" -r g026_433.92M_250k.cu8 -F json"
+    },
+    {
+      "path": "bresser_5in1/01/g001_868.3M_250k.cu8",
+      "sha256": "87ef982264b782985188ca3f4d03ddb3ea466bd4c065cdc98e8f1e4e6c74431a",
+      "size": 131072,
+      "flex": "n=b5,m=FSK_PCM,s=124,l=124,r=25000,preamble={24}aa2dd4",
+      "rtl_433_codes": [
+        "{222}ea897fe12fdfef7fff6dfbfeff1576801ed020108000920401000000"
+      ],
+      "rtl_433_tests_expected": {
+        "time": "@0.161660s",
+        "model": "Bresser-5in1",
+        "id": 118,
+        "battery_ok": 1,
+        "temperature_C": 8.0,
+        "humidity": 92,
+        "wind_max_m_s": 3.0,
+        "wind_avg_m_s": 2.0,
+        "wind_dir_deg": 292.5,
+        "rain_mm": 10.4,
+        "mic": "CHECKSUM"
+      },
+      "command": "rtl_433 -R 0 -X \"n=b5,m=FSK_PCM,s=124,l=124,r=25000,preamble={24}aa2dd4\" -r g001_868.3M_250k.cu8 -F json"
+    }
+  ]
+}
