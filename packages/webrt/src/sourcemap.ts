@@ -225,6 +225,43 @@ export class SourceMapIndex {
     if (!best || best.genLine !== l || best.source === undefined) return {};
     return { source: part.map.sources?.[best.source] ?? undefined, line: (best.origLine ?? 0) + 1, column: best.origCol, name: best.name !== undefined ? part.map.names?.[best.name] : undefined };
   }
+  /**
+   * Generated positions (1-based line, 0-based column) for an original source and 1-based line. With a
+   * column, only mappings at that column or the nearest one after it on the line are kept, the same rule
+   * as source-map's generatedPositionFor with LEAST_UPPER_BOUND. Sources match exactly or by path suffix.
+   */
+  generatedPositionsFor(source: string, line: number, column?: number, max = 1000): { line: number; column: number; source: string; originalColumn: number }[] {
+    const out: { line: number; column: number; source: string; originalColumn: number }[] = [];
+    for (const part of this.parts) {
+      const srcs = part.map.sources ?? [];
+      const ids: number[] = [];
+      srcs.forEach((s, i) => { const v = String(s ?? ''); if (v === source || v.endsWith('/' + source.replace(/^\.?\//, ''))) ids.push(i); });
+      if (!ids.length) continue;
+      const hits = part.mappings.filter((m) => m.source !== undefined && ids.includes(m.source) && (m.origLine ?? -1) + 1 === line);
+      let keep = hits;
+      if (column !== undefined && hits.length) {
+        const atOrAfter = hits.filter((m) => (m.origCol ?? 0) >= column);
+        const best = atOrAfter.length ? Math.min(...atOrAfter.map((m) => m.origCol ?? 0)) : undefined;
+        keep = best === undefined ? [] : atOrAfter.filter((m) => m.origCol === best);
+      }
+      for (const m of keep) {
+        if (out.length >= max) break;
+        out.push({ line: m.genLine + part.line + 1, column: m.genLine === 0 ? m.genCol + part.column : m.genCol, source: String(srcs[m.source!] ?? ''), originalColumn: m.origCol ?? 0 });
+      }
+    }
+    return out.sort((a, b) => a.line - b.line || a.column - b.column);
+  }
+  /** Every decoded mapping with absolute generated positions and source names, for whole-map analyses. */
+  *eachMapping(): Generator<{ genLine: number; genCol: number; source?: string; origLine?: number; origCol?: number; name?: string; sourceIndex?: number; part: number }> {
+    for (let pi = 0; pi < this.parts.length; pi++) {
+      const part = this.parts[pi]!;
+      for (const m of part.mappings) {
+        yield { genLine: m.genLine + part.line + 1, genCol: m.genLine === 0 ? m.genCol + part.column : m.genCol, source: m.source !== undefined ? String(part.map.sources?.[m.source] ?? '') : undefined, origLine: m.origLine !== undefined ? m.origLine + 1 : undefined, origCol: m.origCol, name: m.name !== undefined ? part.map.names?.[m.name] : undefined, sourceIndex: m.source, part: pi };
+      }
+    }
+  }
+  /** The flattened plain maps (index map sections resolved). */
+  get maps(): RawSourceMap[] { return this.parts.map((p) => p.map); }
   /** First mapped source in a generated range, scanning forward from the start. */
   sourceInRange(startLine: number, startCol: number, endLine: number, endCol: number): string | undefined {
     for (const part of this.parts) {
