@@ -5,6 +5,7 @@ import { existsSync, readdirSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { bundledScriptPath } from './assets.js';
 import { runTool, describeFailure } from './exec.js';
 import { BridgeInputError, int, requireFile } from './providers/common.js';
 
@@ -85,7 +86,7 @@ export async function detectJeb(opts: { env?: NodeJS.ProcessEnv; platform?: Node
 export function jebScriptPath(): string {
   const here = typeof __filename === 'string' ? dirname(__filename) : dirname(fileURLToPath(import.meta.url));
   const c = [join(here, '..', 'scripts', 'jeb', 'RevLensJeb.py'), join(here, '..', '..', 'scripts', 'jeb', 'RevLensJeb.py')];
-  return c.find((p) => existsSync(p)) ?? c[0]!;
+  return bundledScriptPath('bridges/jeb/RevLensJeb.py', c);
 }
 declare const __filename: string | undefined;
 

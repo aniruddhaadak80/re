@@ -7,6 +7,7 @@ import { homedir } from 'node:os';
 import { basename, isAbsolute, join, resolve, dirname } from 'node:path';
 import { request } from 'node:http';
 import { fileURLToPath } from 'node:url';
+import { bundledScriptPath } from './assets.js';
 import { runTool, withTempDir, describeFailure } from './exec.js';
 import { copyFile } from 'node:fs/promises';
 import { detect } from './detect.js';
@@ -241,7 +242,7 @@ export async function listCutterSessions(opts: ListOptions = {}): Promise<{ plat
 export function pluginScriptPath(): string {
   const here = typeof __filename === 'string' ? dirname(__filename) : dirname(fileURLToPath(import.meta.url));
   const candidates = [join(here, '..', 'scripts', 'cutter', 'revlens_cutter_bridge.py'), join(here, '..', '..', 'scripts', 'cutter', 'revlens_cutter_bridge.py')];
-  return candidates.find((p) => existsSync(p)) ?? candidates[0]!;
+  return bundledScriptPath('bridges/cutter/revlens_cutter_bridge.py', candidates);
 }
 declare const __filename: string | undefined;
 

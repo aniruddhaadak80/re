@@ -1,0 +1,10 @@
+{
+  "name": "mutation-testing",
+  "private": true,
+  "description": "Stryker mutation testing for the monorepo. Kept out of the root workspaces so its dependencies do not reach the published packages or the root lockfile.",
+  "type": "module",
+  "devDependencies": {
+    "@stryker-mutator/core": "10.1.1",
+    "@stryker-mutator/tap-runner": "10.1.1"
+  }
+}

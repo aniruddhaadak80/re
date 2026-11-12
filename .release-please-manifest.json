@@ -1,0 +1,13 @@
+{
+  "packages/bridges": "1.0.0",
+  "packages/cli": "1.0.0",
+  "packages/core": "1.0.0",
+  "packages/desktop": "1.0.0",
+  "packages/disasm": "1.0.0",
+  "packages/engine": "1.0.0",
+  "packages/extras": "1.0.0",
+  "packages/managed": "1.0.0",
+  "packages/mcp": "1.0.0",
+  "packages/mobile": "1.0.0",
+  "packages/webrt": "1.0.0"
+}

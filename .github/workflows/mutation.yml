@@ -1,0 +1,70 @@
+name: Mutation testing
+
+# Stryker on core and two more packages (scripts/mutation/targets.json). Weekly and by hand.
+# Each target has a "break" threshold; a score under it fails that job. HTML and JSON reports are
+# kept as artifacts. Stryker is installed from scripts/mutation/package.json, not the root.
+
+on:
+  schedule:
+    - cron: '17 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: Comma separated targets from scripts/mutation/targets.json
+        type: string
+        default: core,bridges,cli
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mutation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      targets: ${{ steps.t.outputs.targets }}
+    steps:
+      - id: t
+        env:
+          WANT: ${{ inputs.targets || 'core,bridges,cli' }}
+        run: echo "targets=$(node -e 'console.log(JSON.stringify(process.env.WANT.split(",").map((s) => s.trim()).filter((s) => /^[a-z0-9-]+$/.test(s))))')" >> "$GITHUB_OUTPUT"
+
+  mutate:
+    needs: plan
+    name: Stryker ${{ matrix.target }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.plan.outputs.targets) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm install --prefix scripts/mutation --no-audit --no-fund
+      - run: npm run build
+      - name: Stryker
+        env:
+          MUTATE_PACKAGE: ${{ matrix.target }}
+          MUTATE_CONCURRENCY: '4'
+        run: node scripts/mutation/run.mjs
+      - name: Score
+        if: always()
+        env:
+          T: ${{ matrix.target }}
+        run: node scripts/mutation/score.mjs "scripts/mutation/reports/$T/mutation.json" >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mutation-${{ matrix.target }}
+          path: scripts/mutation/reports/${{ matrix.target }}
+          retention-days: 30

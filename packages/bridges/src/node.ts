@@ -32,3 +32,4 @@ export { listCutterSessions, cutterCommand, pluginCommand, pluginScriptPath, plu
 export { detectJeb, detectJebSync, jebInfo, jebUnits, jebDecompile, jebArgs, parseJebOutput, jebScriptPath, jebVersionFromName, JEB_INSTALL, type JebDetection, type JebInput } from './jeb.js';
 export { CLI_COMMANDS, parseArgv, toolInput, renderResult } from './cli.js';
 export { ANALYZERS, r2Analyzer, jadxAnalyzer, inventoryAnalyzer } from './analyzer.js';
+export { bundledScriptPath, runningAsSea, materialize, assetDir, privateDir, BUNDLED_SCRIPTS, type BundledScriptKey } from './assets.js';

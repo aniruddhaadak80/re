@@ -1,0 +1,108 @@
+name: Release binaries
+
+# Builds the CLI as a single executable (scripts/build-sea.mjs) on every platform, writes SHA256SUMS
+# and attaches all of it to the GitHub release. The binary name comes from the "bin" field of
+# packages/cli/package.json. Run it by hand (workflow_dispatch) to test the build without a release:
+# the files are then kept as workflow artifacts only.
+#
+# macos-13 was the last Intel macOS image name; GitHub retired it, so macos-15-intel builds the x64
+# macOS binary. windows-11-arm builds the Windows arm64 binary.
+
+on:
+  release:
+    types: [published]
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to attach the binaries to (empty builds the selected ref and keeps artifacts only)
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-assets-${{ inputs.tag || github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: SEA ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-14, macos-15-intel, windows-2022, windows-11-arm]
+    env:
+      REF: ${{ inputs.tag || github.event.release.tag_name || github.ref }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.REF }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Build the single executable
+        shell: bash
+        run: node scripts/build-sea.mjs --out dist-sea | tee dist-sea/build.json
+      - name: Smoke test on a real binary
+        shell: bash
+        run: |
+          bin="$(node -p 'require("./dist-sea/build.json").path')"
+          "$bin" --version
+          "$bin" analyze samples/ls-linux.elf --json > "$RUNNER_TEMP/report.json"
+          node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); const f = r.format ?? r.file?.format; if (f !== "elf") { console.error("format " + f); process.exit(1); } console.log("analyze ok: " + f);' "$RUNNER_TEMP/report.json"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: sea-${{ matrix.os }}
+          path: |
+            dist-sea/*
+            !dist-sea/build.json
+            !dist-sea/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  checksums:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ inputs.tag || github.event.release.tag_name }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: sea-*
+          path: assets
+          merge-multiple: true
+      - name: SHA256SUMS
+        working-directory: assets
+        run: |
+          ls -l
+          sha256sum -- * | sort -k 2 > "$RUNNER_TEMP/SHA256SUMS"
+          mv "$RUNNER_TEMP/SHA256SUMS" SHA256SUMS
+          cat SHA256SUMS
+          # every line must be "<64 hex>  <bin>-<os>-<arch>[.exe]", the form install.sh and install.ps1 read
+          grep -Evq '^[0-9a-f]{64}  [A-Za-z0-9._-]+-(linux|macos|windows)-(x64|arm64)(\.exe)?$' SHA256SUMS && { echo "unexpected SHA256SUMS line"; exit 1; } || true
+          [ "$(wc -l < SHA256SUMS)" -ge 5 ] || { echo "fewer than 5 binaries"; exit 1; }
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-binaries
+          path: assets/*
+          retention-days: 14
+      - name: Attach to the release
+        if: env.TAG != ''
+        run: gh release upload "$TAG" assets/* --clobber --repo "$GITHUB_REPOSITORY"
+      - name: Summary
+        run: |
+          { echo "### Binaries"; echo; echo '```'; cat assets/SHA256SUMS; echo '```'; [ -n "$TAG" ] && echo "Attached to $TAG." || echo "No tag given, kept as the release-binaries artifact."; } >> "$GITHUB_STEP_SUMMARY"

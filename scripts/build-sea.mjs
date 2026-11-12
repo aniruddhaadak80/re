@@ -14,7 +14,7 @@ import { chmodSync, copyFileSync, createReadStream, existsSync, mkdirSync, readF
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve, basename } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(join(root, 'package.json'));
@@ -74,6 +74,10 @@ const assets = {
   'iced_x86_bg.wasm': wasm('iced-x86/package.json', 'iced_x86_bg.wasm'),
   'capstone.wasm': wasm('@alexaltea/capstone-js/dist/capstone.js', 'capstone.wasm'),
 };
+// Scripts the bridges hand to other programs (Cutter plugin, JEB script). The key list lives in the
+// bridges package, so the binary and the code that reads the assets cannot drift apart.
+const { BUNDLED_SCRIPTS } = await import(pathToFileURL(join(root, 'packages/bridges/dist/assets.js')).href);
+for (const [key, rel] of Object.entries(BUNDLED_SCRIPTS)) assets[key] = join(root, 'packages/bridges', rel);
 for (const [k, v] of Object.entries(assets)) if (!existsSync(v)) throw new Error(`asset ${k} not found at ${v}`);
 const blob = join(out, `${binName}.blob`);
 const config = join(out, 'sea-config.json');
@@ -95,6 +99,15 @@ if (process.platform === 'darwin') execFileSync('codesign', ['--sign', '-', targ
 // 4. smoke test and checksum
 const v = execFileSync(target, ['--version'], { encoding: 'utf8' }).trim();
 if (v !== version) throw new Error(`${asset} --version printed "${v}", expected "${version}"`);
+// the embedded Cutter plugin must come out byte for byte, in a private folder
+{
+  const r = JSON.parse(execFileSync(target, ['bridge', 'cutter_sessions', '--json'], { encoding: 'utf8', maxBuffer: 16 << 20 }));
+  const script = r.plugin?.script;
+  const want = readFileSync(join(root, 'packages/bridges', BUNDLED_SCRIPTS['bridges/cutter/revlens_cutter_bridge.py']));
+  if (!script || !existsSync(script) || Buffer.compare(readFileSync(script), want) !== 0) throw new Error(`the embedded Cutter plugin was not written out correctly (got ${script})`);
+  if (process.platform !== 'win32' && (statSync(dirname(script)).mode & 0o077) !== 0) throw new Error(`${dirname(script)} is not private`);
+  log(`embedded Cutter plugin ok at ${script}`);
+}
 const sha = await new Promise((ok, bad) => { const h = createHash('sha256'); createReadStream(target).on('data', (d) => h.update(d)).on('end', () => ok(h.digest('hex'))).on('error', bad); });
 writeFileSync(`${target}.sha256`, `${sha}  ${asset}\n`);
 for (const f of [bundle, blob, config]) rmSync(f, { force: true });

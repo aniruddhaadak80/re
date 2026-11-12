@@ -1,0 +1,113 @@
+name: Publish packages
+
+# Builds every public workspace package and publishes it:
+#   1. to GitHub Packages (npm.pkg.github.com) under the repository owner's scope, for example
+#      @owner/core, with internal dependencies rewritten to npm aliases (scripts/release/packages.mjs);
+#   2. to npmjs under the real names with provenance, only when the NPM_TOKEN secret is set.
+# Package names and versions come from the package.json files, never from this file.
+# A version that a registry already has is skipped, so a run can be repeated.
+
+on:
+  release:
+    types: [published]
+  workflow_call:
+    inputs:
+      tag:
+        description: Release tag to publish, for example v1.2.0
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag or branch to build (empty means the selected ref)
+        type: string
+        required: false
+      dry-run:
+        description: Pack and run npm publish --dry-run without uploading
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ inputs.tag || github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    env:
+      REF: ${{ inputs.tag || github.event.release.tag_name || github.ref }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.REF }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Release script tests (unit and a round trip through a local registry)
+        env:
+          RELEASE_E2E: '1'
+        run: node --test scripts/release/release.test.mjs
+      - name: Tag matches the package versions
+        if: startsWith(env.REF, 'v') || startsWith(env.REF, 'refs/tags/')
+        run: |
+          tag="${REF#refs/tags/}"; tag="${tag#v}"
+          node -e '
+            const list = JSON.parse(require("child_process").execFileSync(process.execPath, ["scripts/release/packages.mjs", "list"], { encoding: "utf8" }));
+            const bad = list.filter((p) => p.version !== process.argv[1]);
+            if (bad.length) { console.error("tag " + process.argv[1] + " does not match: " + bad.map((p) => p.name + "@" + p.version).join(", ")); process.exit(1); }
+            console.log("all " + list.length + " packages are at " + process.argv[1]);
+          ' "$tag"
+
+      - name: Stage for GitHub Packages
+        run: node scripts/release/packages.mjs stage --out .release/github --scope "@${GITHUB_REPOSITORY_OWNER,,}" --registry https://npm.pkg.github.com
+      - name: Publish to GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}\n@%s:registry=https://npm.pkg.github.com\n' "${GITHUB_REPOSITORY_OWNER,,}" > "$RUNNER_TEMP/.npmrc"
+          export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/.npmrc"
+          extra=""; [ "$DRY_RUN" = true ] && extra="--dry-run"
+          node scripts/release/packages.mjs publish --dir .release/github --registry https://npm.pkg.github.com $extra | tee "$RUNNER_TEMP/github-packages.json"
+
+      - name: Stage for npmjs
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        if: env.NPM_TOKEN != ''
+        run: node scripts/release/packages.mjs stage --out .release/npmjs
+      - name: Publish to npmjs with provenance
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        if: env.NPM_TOKEN != ''
+        run: |
+          printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > "$RUNNER_TEMP/.npmrc-npmjs"
+          export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/.npmrc-npmjs"
+          extra=""; [ "$DRY_RUN" = true ] && extra="--dry-run"
+          node scripts/release/packages.mjs publish --dir .release/npmjs --registry https://registry.npmjs.org --provenance $extra | tee "$RUNNER_TEMP/npmjs.json"
+      - name: No npmjs token
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        if: env.NPM_TOKEN == ''
+        run: echo "::notice::NPM_TOKEN is not set, so nothing was published to npmjs. GitHub Packages got the release."
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Published packages"
+            for f in "$RUNNER_TEMP"/github-packages.json "$RUNNER_TEMP"/npmjs.json; do
+              [ -f "$f" ] || continue
+              node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); console.log("\n**" + r.registry + "**" + (r.dryRun ? " (dry run)" : "") + "\n"); for (const p of r.results) console.log("- " + p.name + "@" + p.version + ": " + p.status);' "$f"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"

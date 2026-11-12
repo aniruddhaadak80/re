@@ -1,0 +1,51 @@
+{
+  "core": {
+    "mutate": [
+      "packages/core/src/**/*.ts",
+      "!packages/core/src/rules/yaralite.ts",
+      "packages/core/src/rules/yaralite.ts:1-175",
+      "packages/core/src/rules/yaralite.ts:264-403"
+    ],
+    "testFiles": [
+      "packages/core/test/*.test.ts"
+    ],
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 50
+    },
+    "note": "yaralite.ts lines 176-263 (byte scanning loops) are left out: instrumented, they run more than ten times slower and the hostile-input time budgets in hardening.test.ts fail in the dry run."
+  },
+  "bridges": {
+    "mutate": [
+      "packages/bridges/src/parsers/**/*.ts",
+      "packages/bridges/src/exec.ts",
+      "packages/bridges/src/sessions/guards.ts",
+      "packages/bridges/src/settings.ts"
+    ],
+    "testFiles": [
+      "packages/bridges/test/parsers.test.ts",
+      "packages/bridges/test/safety.test.ts",
+      "packages/bridges/test/settings.test.ts"
+    ],
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 45
+    }
+  },
+  "cli": {
+    "mutate": [
+      "packages/cli/src/formats.ts",
+      "packages/cli/src/completions.ts"
+    ],
+    "testFiles": [
+      "packages/cli/test/formats.test.ts"
+    ],
+    "thresholds": {
+      "high": 85,
+      "low": 70,
+      "break": 60
+    }
+  }
+}

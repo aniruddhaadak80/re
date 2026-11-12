@@ -1,0 +1,190 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "node",
+  "bump-minor-pre-major": true,
+  "include-v-in-tag": true,
+  "separate-pull-requests": false,
+  "pull-request-title-pattern": "chore: release ${version}",
+  "pull-request-header": "This pull request was opened by the release workflow. Merging it tags the release, which builds the binaries and publishes every package.",
+  "changelog-sections": [
+    {
+      "type": "feat",
+      "section": "Features"
+    },
+    {
+      "type": "fix",
+      "section": "Fixes"
+    },
+    {
+      "type": "perf",
+      "section": "Performance"
+    },
+    {
+      "type": "security",
+      "section": "Security"
+    },
+    {
+      "type": "docs",
+      "section": "Documentation"
+    },
+    {
+      "type": "test",
+      "section": "Tests",
+      "hidden": true
+    },
+    {
+      "type": "build",
+      "section": "Build",
+      "hidden": true
+    },
+    {
+      "type": "ci",
+      "section": "CI",
+      "hidden": true
+    },
+    {
+      "type": "chore",
+      "section": "Chores",
+      "hidden": true
+    }
+  ],
+  "plugins": [
+    {
+      "type": "node-workspace",
+      "merge": false
+    },
+    {
+      "type": "linked-versions",
+      "groupName": "workspace",
+      "components": [
+        "bridges",
+        "cli",
+        "core",
+        "desktop",
+        "disasm",
+        "engine",
+        "extras",
+        "managed",
+        "mcp",
+        "mobile",
+        "webrt"
+      ]
+    }
+  ],
+  "packages": {
+    "packages/bridges": {
+      "release-type": "node",
+      "component": "bridges",
+      "package-name": "@revlens/bridges",
+      "changelog-path": "CHANGELOG.md",
+      "skip-github-release": true
+    },
+    "packages/cli": {
+      "release-type": "node",
+      "component": "cli",
+      "package-name": "revlens",
+      "changelog-path": "/CHANGELOG.md",
+      "skip-github-release": false,
+      "include-component-in-tag": false,
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "/server.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
+          "path": "/server.json",
+          "jsonpath": "$.packages[*].version"
+        },
+        {
+          "type": "generic",
+          "path": "/packages/core/src/types.ts"
+        },
+        {
+          "type": "generic",
+          "path": "/packages/webrt/src/capture.ts"
+        },
+        {
+          "type": "generic",
+          "path": "/packages/webrt/src/scenario.ts"
+        },
+        {
+          "type": "generic",
+          "path": "/install.sh"
+        },
+        {
+          "type": "generic",
+          "path": "/install.ps1"
+        },
+        {
+          "type": "generic",
+          "path": "/README.md"
+        }
+      ]
+    },
+    "packages/core": {
+      "release-type": "node",
+      "component": "core",
+      "package-name": "@revlens/core",
+      "changelog-path": "CHANGELOG.md",
+      "skip-github-release": true
+    },
+    "packages/desktop": {
+      "release-type": "node",
+      "component": "desktop",
+      "package-name": "@revlens/desktop",
+      "changelog-path": "CHANGELOG.md",
+      "skip-github-release": true
+    },
+    "packages/disasm": {
+      "release-type": "node",
+      "component": "disasm",
+      "package-name": "@revlens/disasm",
+      "changelog-path": "CHANGELOG.md",
+      "skip-github-release": true
+    },
+    "packages/engine": {
+      "release-type": "node",
+      "component": "engine",
+      "package-name": "@revlens/engine",
+      "changelog-path": "CHANGELOG.md",
+      "skip-github-release": true
+    },
+    "packages/extras": {
+      "release-type": "node",
+      "component": "extras",
+      "package-name": "@revlens/extras",
+      "changelog-path": "CHANGELOG.md",
+      "skip-github-release": true
+    },
+    "packages/managed": {
+      "release-type": "node",
+      "component": "managed",
+      "package-name": "@revlens/managed",
+      "changelog-path": "CHANGELOG.md",
+      "skip-github-release": true
+    },
+    "packages/mcp": {
+      "release-type": "node",
+      "component": "mcp",
+      "package-name": "@revlens/mcp",
+      "changelog-path": "CHANGELOG.md",
+      "skip-github-release": true
+    },
+    "packages/mobile": {
+      "release-type": "node",
+      "component": "mobile",
+      "package-name": "@revlens/mobile",
+      "changelog-path": "CHANGELOG.md",
+      "skip-github-release": true
+    },
+    "packages/webrt": {
+      "release-type": "node",
+      "component": "webrt",
+      "package-name": "@revlens/webrt",
+      "changelog-path": "CHANGELOG.md",
+      "skip-github-release": true
+    }
+  }
+}
