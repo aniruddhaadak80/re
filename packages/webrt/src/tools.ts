@@ -12,6 +12,7 @@ import { SqliteFile, runSelect, sampleRows, jsonValue } from './sqlite.js';
 import { analyzeHar } from './har.js';
 import { scanWebMcpScript, scanHtmlForMcp, classifyWellKnown } from './webmcp.js';
 import { compareCaptures } from './compare.js';
+import { makeR3Tools, type TreeIO } from './tools-r3.js';
 import { InputError, base64ToBytes, bytesToBase64, decodeUtf8, encodeUtf8, page, clampLimit, LIMITS } from './util.js';
 
 export type SchemaType = 'string' | 'number' | 'boolean' | 'array' | 'object';
@@ -27,6 +28,9 @@ export interface ToolIO {
   readFile?: (path: string, maxBytes: number) => Promise<Uint8Array>;
   /** list of extra tools only available on this platform */
   extra?: ToolDef[];
+  /** folder reading for the graph, source compare and export shape tools (Node) */
+  readTree?: TreeIO['readTree'];
+  isDir?: TreeIO['isDir'];
 }
 
 const SRC = {
@@ -274,6 +278,7 @@ export function makeTools(io: ToolIO = {}): ToolDef[] {
       },
     },
   ];
+  tools.push(...makeR3Tools(io));
   for (const e of io.extra ?? []) if (!e.name.startsWith('__')) tools.push(e);
   return tools;
 }

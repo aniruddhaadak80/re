@@ -19,6 +19,9 @@ export { scanModuleImports, buildImportGraph, bundleImportGraph, sourceMapImport
 export { traceSourceLocation, compareSourceToBundle, parseStackTrace, type TracedLocation, type SourceBundleComparison, type SourceFileStatus } from './js/sourcecompare.js';
 export { moduleExportShapes, packageExportShapes, bundleExportShapes, compareExportShapes, arityOf, type ExportShape, type MemberShape, type ModuleShapes, type ShapeComparison } from './js/exportshape.js';
 export { makeTools, loadBytes, type ToolDef, type ToolIO } from './tools.js';
+export { makeR3Tools } from './tools-r3.js';
+export { compareStaticAndObservedEndpoints, staticEndpoints, observedEndpoints, matchTemplate, type EndpointJoin, type StaticEndpoint, type ObservedEndpoint, type JoinedEndpoint } from './endpointjoin.js';
+export { buildEnvironment, EnvMatcher, templateOf, ENV_HOST_PREFIX, type EnvManifest, type EnvRoute, type EvalTaskFile, type BuiltEnvironment, type EnvMatch } from './env.js';
 export { ANALYZERS, webJsAnalyzer, webSourcemapAnalyzer, webElectronAnalyzer, webPcapAnalyzer, webSqliteAnalyzer, webHarAnalyzer, obfuscationScore } from './analyzers.js';
 
 import { makeTools } from './tools.js';

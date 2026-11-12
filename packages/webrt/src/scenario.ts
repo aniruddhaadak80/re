@@ -121,6 +121,8 @@ export interface ScenarioCapture {
   coverage?: { scripts: { url: string; functions: number; calledFunctions: number; top: FunctionCount[] }[]; totalFunctions: number; calledFunctions: number };
   listeners?: { type: string; node: string; count: number; scriptId?: string; line?: number; column?: number }[];
   webmcp?: { tools: { name: string; description?: string; inputSchema?: unknown; frameId?: string; backendNodeId?: number; step: number }[]; removed: string[]; supported: boolean };
+  /** the scenario that was run, so a replay environment can run it again */
+  scenario?: ScenarioSpec;
   warnings: string[];
 }
 
@@ -176,7 +178,7 @@ export async function runScenario(specIn: unknown, opts: ScenarioOptions = {}): 
   const left = () => Math.max(250, t0 + budget - Date.now());
   const kind = opts.browser ?? 'chromium';
   const maxReq = opts.maxRequests ?? 5000;
-  const cap: ScenarioCapture = { kind: 'revlens-scenario', version: 1, name: spec.name, browser: kind, startedAt: new Date(t0).toISOString(), durationMs: 0, outDir, passed: false, steps: [], har: { log: { version: '1.2', creator: { name: 'RevLens webrt', version: '1.0.0' }, entries: [] } }, scripts: [], console: [], pageErrors: [], warnings: [] };
+  const cap: ScenarioCapture = { kind: 'revlens-scenario', version: 1, name: spec.name, browser: kind, startedAt: new Date(t0).toISOString(), durationMs: 0, outDir, passed: false, steps: [], har: { log: { version: '1.2', creator: { name: 'RevLens webrt', version: '1.0.0' }, entries: [] } }, scripts: [], console: [], pageErrors: [], warnings: [], scenario: spec };
   let browser: any;
   let stepNo = 0;
   const hard = setTimeout(() => { cap.warnings.push('hard timeout reached, closing browser'); browser?.close().catch(() => undefined); opts.attach?.close?.().catch(() => undefined); }, budget + 10_000);
@@ -196,6 +198,7 @@ export async function runScenario(specIn: unknown, opts: ScenarioOptions = {}): 
       if (traces) await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
       page = await context.newPage();
     }
+    const cdpBodies = new Map<string, Buffer[]>();
     const maxBody = Math.max(0, Math.min(opts.maxBodyBytes ?? 2 * 1024 * 1024, 64 * 1024 * 1024));
     let bodyBudget = Math.max(0, Math.min(opts.maxTotalBodyBytes ?? 64 * 1024 * 1024, 1024 * 1024 * 1024));
     page.setDefaultTimeout(stepBudget);
@@ -222,7 +225,11 @@ export async function runScenario(specIn: unknown, opts: ScenarioOptions = {}): 
           if (post !== null && post !== undefined) entry.request.postData = { mimeType: qh['content-type'] ?? '', text: String(post).slice(0, maxBody) };
           const status = resp.status();
           if (!(status >= 300 && status < 400)) {
-            const body: Buffer | undefined = await resp.body().catch(() => undefined);
+            // Chromium: the body was taken at the response stage through CDP Fetch, which also works for
+            // responses the page never reads. Elsewhere Playwright's response.body() is used.
+            const q = cdpBodies.get(`${rq.method()} ${rq.url()}`);
+            const fromCdp = q?.shift();
+            const body: Buffer | undefined = fromCdp ?? await Promise.race([resp.body().catch(() => undefined), new Promise<undefined>((ok) => setTimeout(() => ok(undefined), 3_000))]);
             if (body) {
               entry.response.content.size = body.length;
               if (body.length <= maxBody && body.length <= bodyBudget) {
@@ -249,6 +256,24 @@ export async function runScenario(specIn: unknown, opts: ScenarioOptions = {}): 
     if (kind === 'chromium') {
       try {
         cdp = await context.newCDPSession(page);
+        if (opts.recordBodies) {
+          // pause each response before the page sees it, copy the body, let it continue unchanged
+          cdp.on('Fetch.requestPaused', async (ev: any) => {
+            try {
+              const st = Number(ev.responseStatusCode ?? 0);
+              if (st && !(st >= 300 && st < 400) && ev.request?.method !== 'OPTIONS') {
+                const r = await cdp.send('Fetch.getResponseBody', { requestId: ev.requestId }).catch(() => undefined);
+                if (r && typeof r.body === 'string') {
+                  const buf = r.base64Encoded ? Buffer.from(r.body, 'base64') : Buffer.from(r.body, 'utf8');
+                  const k = `${ev.request.method} ${ev.request.url}`;
+                  const l = cdpBodies.get(k) ?? cdpBodies.set(k, []).get(k)!;
+                  if (l.length < 100 && buf.length <= maxBody) l.push(buf);
+                }
+              }
+            } finally { await cdp.send('Fetch.continueResponse', { requestId: ev.requestId }).catch(() => cdp.send('Fetch.continueRequest', { requestId: ev.requestId }).catch(() => undefined)); }
+          });
+          await cdp.send('Fetch.enable', { patterns: [{ urlPattern: '*', requestStage: 'Response' }] }).catch((e: Error) => cap.warnings.push(`body capture: ${e.message.slice(0, 120)}`));
+        }
         if (opts.coverage !== false) { await cdp.send('Profiler.enable'); await cdp.send('Profiler.startPreciseCoverage', { callCount: true, detailed: false, allowTriggeredUpdates: false }); }
         if (opts.webmcp !== false) {
           cap.webmcp = { tools: [], removed: [], supported: false };

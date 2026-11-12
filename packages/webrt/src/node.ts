@@ -13,6 +13,7 @@ import { inspectPlaywrightTrace } from './trace.js';
 import { cdpTargets } from './cdp.js';
 import { attachNodeInspector, type InspectorOptions } from './inspector.js';
 import { discoverWebMcp, type WebMcpDiscoveryOptions } from './webmcp-node.js';
+import { buildEnvironmentFromFile, serveEnvironment, stopEnvironment, runningEnvironments, exportEnvironment } from './env-node.js';
 import { inflateSync } from 'node:zlib';
 import { constants as fsConstants } from 'node:fs';
 import { isAbsolute } from 'node:path';
@@ -24,6 +25,7 @@ export { inspectPlaywrightTrace, listZip, readZipEntry, type TraceSummary } from
 export { cdpTargets, CdpClient, checkDevtoolsEndpoint, type CdpTarget, type CdpVersion } from './cdp.js';
 export { attachNodeInspector, executionAllowed, type InspectorOptions, type InspectorReport } from './inspector.js';
 export { discoverWebMcp, type WebMcpDiscovery, type WebMcpDiscoveryOptions } from './webmcp-node.js';
+export { buildEnvironmentFromFile, serveEnvironment, stopEnvironment, runningEnvironments, exportEnvironment, loadEnvironment, writeZip, crc32, type ServedEnvironment } from './env-node.js';
 
 /** Compare two capture JSON files; screenshot paths are resolved next to each capture and pixel-diffed. */
 export async function compareCaptureFiles(aPath: string, bPath: string, opts: { threshold?: number; limit?: number } = {}) {
@@ -253,7 +255,56 @@ nodeExtra.push(
   },
 );
 
-const io: ToolIO = { readFile: (p, max) => readFileCapped(p, max), extra: nodeExtra };
+/** Read the text files under a folder for the graph, source compare and export shape tools. Links are not followed. */
+export async function readSourceTree(dir: string, opts: { maxFiles?: number; maxFileBytes?: number; exts?: RegExp; includeNodeModules?: boolean } = {}): Promise<{ path: string; code: string }[]> {
+  const root = resolve(dir);
+  const out: { path: string; code: string }[] = [];
+  const max = Math.max(1, Math.min(opts.maxFiles ?? 20_000, 50_000));
+  const exts = opts.exts ?? /\.(?:m?jsx?|cjs|tsx?|mts|cts|json|vue|svelte|css|scss|less|map)$/i;
+  const walkDir = async (d: string, depth: number): Promise<void> => {
+    if (depth > 24 || out.length >= max) return;
+    for (const ent of (await readdir(d, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
+      if (out.length >= max) return;
+      if (ent.name === '.git' || (ent.name === 'node_modules' && !opts.includeNodeModules)) continue;
+      const p = join(d, ent.name);
+      if (ent.isDirectory()) await walkDir(p, depth + 1);
+      else if (ent.isFile() && exts.test(ent.name)) {
+        const fh = await open(p, 'r');
+        try { const st = await fh.stat(); if (st.size <= (opts.maxFileBytes ?? 8 * 1024 * 1024)) out.push({ path: p.slice(root.length + 1).split(sep).join('/'), code: await fh.readFile('utf8') }); } finally { await fh.close(); }
+      }
+    }
+  };
+  await walkDir(root, 0);
+  return out;
+}
+
+nodeExtra.push(
+  { name: '__env_build_dir', description: 'internal', inputSchema: {}, run: async (i: { capturePath?: string; captureText?: string; outDir: string; name?: string; tasks?: boolean; scenarioPath?: string }) => {
+    if (!i.capturePath) throw new InputError('outDir builds need capturePath');
+    const r = await buildEnvironmentFromFile(i.capturePath, i.outDir, i);
+    return { outDir: r.outDir, name: r.manifest.name, origin: r.manifest.origin, routes: r.manifest.routes.length, tasks: r.manifest.tasks.length, files: r.files, warnings: r.manifest.warnings, next: [`revlens env-serve ${r.outDir}`] };
+  } },
+  {
+    name: 'web_env_serve',
+    description: 'Serve a replay environment folder or zip (rea environment-serve) on a loopback address for a limited time: every request is answered only from the recording with the manifest matching rules; other recorded origins are under /__host/<host>/. Returns the URL, an id for web_env_stop and the expiry. GET /__revlens/log lists served requests, POST /__revlens/reset rewinds sequences.',
+    inputSchema: { path: { type: 'string', description: 'Environment folder or zip.' }, port: { type: 'number', description: 'Port (default: any free port).', optional: true }, ttlMs: { type: 'number', description: 'Lifetime in ms (default 600000, max 7200000).', optional: true }, maxRequests: { type: 'number', description: 'Request budget (default 100000).', optional: true } },
+    run: async (i: { path: string; port?: number; ttlMs?: number; maxRequests?: number }) => { const e = await serveEnvironment(String(i.path), i); return { id: e.id, url: e.url, port: e.port, expiresAt: e.expiresAt, name: e.manifest.name, origin: e.manifest.origin, routes: e.manifest.routes.length, scenario: !!e.manifest.scenario }; },
+  },
+  {
+    name: 'web_env_stop',
+    description: 'Stop a served replay environment by id, or all of them, and list what is still running.',
+    inputSchema: { id: { type: 'string', description: 'Environment id from web_env_serve (default: all).', optional: true } },
+    run: async (i: { id?: string }) => ({ stopped: await stopEnvironment(i.id), running: runningEnvironments() }),
+  },
+  {
+    name: 'web_env_export',
+    description: 'Export a replay environment folder, or a capture file built on the fly, as one deterministic zip (rea environment-export) with manifest.json first, response bodies, scenario.json, README.md and tasks/tasks.json (x_eval_score task shape).',
+    inputSchema: { path: { type: 'string', description: 'Environment folder, or a HAR or capture file.' }, outZip: { type: 'string', description: 'Zip file to write.' }, name: { type: 'string', description: 'Name when building from a capture.', optional: true } },
+    run: async (i: { path: string; outZip: string; name?: string }) => exportEnvironment(String(i.path), String(i.outZip), i),
+  },
+);
+
+const io: ToolIO = { readFile: (p, max) => readFileCapped(p, max), extra: nodeExtra, readTree: (p, o) => readSourceTree(p, o), isDir: async (p) => { try { return (await stat(p)).isDirectory(); } catch { return false; } } };
 
 /** Tools with file path support and browser capture. */
 export const TOOLS: ToolDef[] = makeTools(io);
