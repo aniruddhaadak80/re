@@ -1,0 +1,72 @@
+[
+ {
+  "file": "samples/extras/hello-res.exe",
+  "size": 221696,
+  "resources": {
+   "beforeMs": 15.181,
+   "afterMs": 4.794,
+   "speedup": 3.2
+  },
+  "deep": {
+   "beforeMs": 16.453,
+   "afterMs": 3.715,
+   "speedup": 4.4
+  }
+ },
+ {
+  "file": "samples/disasm/hello-x64.exe",
+  "size": 220672,
+  "resources": {
+   "beforeMs": 15.146,
+   "afterMs": 3.253,
+   "speedup": 4.7
+  },
+  "deep": {
+   "beforeMs": 19.499,
+   "afterMs": 4.315,
+   "speedup": 4.5
+  }
+ },
+ {
+  "file": "samples/bridges/hello-dotnet.dll",
+  "size": 4608,
+  "resources": {
+   "beforeMs": 1.743,
+   "afterMs": 0.685,
+   "speedup": 2.5
+  },
+  "deep": {
+   "beforeMs": 2.763,
+   "afterMs": 2.826,
+   "speedup": 1
+  }
+ },
+ {
+  "file": "samples/managed/dotnet/RevDemoLib-1.0.0.dll",
+  "size": 5120,
+  "resources": {
+   "beforeMs": 1.907,
+   "afterMs": 1.847,
+   "speedup": 1
+  },
+  "deep": {
+   "beforeMs": 3.148,
+   "afterMs": 2.094,
+   "speedup": 1.5
+  }
+ },
+ {
+  "file": "samples/managed/dotnet/System.IO.Compression.Brotli.dll",
+  "size": 72504,
+  "resources": {
+   "beforeMs": 10.744,
+   "afterMs": 2.889,
+   "speedup": 3.7
+  },
+  "deep": {
+   "beforeMs": 15.541,
+   "afterMs": 5.754,
+   "speedup": 2.7
+  }
+ }
+]
