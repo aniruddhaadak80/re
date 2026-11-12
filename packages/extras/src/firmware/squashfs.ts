@@ -197,6 +197,7 @@ export function extractSquashfs(b: Uint8Array, off = 0, opts: SquashExtractOptio
   const seenDirs = new Set<string>();
   const walk = (dir: Inode, path: string, depth: number): void => {
     if (depth > 128 || dir.dirBlock === undefined || dir.dirSize === undefined || dir.dirOffset === undefined) return;
+    if (dir.dirSize <= 3) return; // empty directories share one listing position, so they are not loops
     const key = `${dir.dirBlock}:${dir.dirOffset}`;
     if (seenDirs.has(key)) { errors.push(`directory loop at ${path || '/'}`); return; }
     seenDirs.add(key);

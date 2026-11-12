@@ -13,6 +13,7 @@ import fc from 'fast-check';
 import { extractFirmware, sanitizeMemberPath, TOOLS, ParseError, writeExtraction } from '../src/node.js';
 import { efiDecompress } from '../src/compress/efi.js';
 import { S } from './helpers.js';
+import { cachedAt } from './helpers2.js';
 
 const F = join(S, 'firmware');
 const sha = (b: Uint8Array) => createHash('sha256').update(b).digest('hex');
@@ -232,3 +233,38 @@ test('hostile: extractFirmware on random bytes with planted magic ends quickly w
     }), { numRuns: 25 });
   }
 });
+
+// Real OpenWrt 23.05.5 images (GPL-2.0, fetched by scripts/fetch-openwrt.mjs, not committed).
+// References from scripts/gen-openwrt-reference.py: binwalk 2.4.3 offsets, liblzma kernels,
+// unsquashfs 4.6.1 file hashes.
+const OW = join(S, 'firmware', 'openwrt');
+for (const refFile of existsSync(OW) ? readdirSync(OW).filter((f) => f.endsWith('.reference.json')) : []) {
+  const ref = JSON.parse(readFileSync(join(OW, refFile), 'utf8')) as { image: string; sha256: string; binwalk: { offset: number; description: string }[]; lzma: { offset: number; sha256: string; size: number }[]; squashfs: { offset: number; entries: number; files: Record<string, string> }[] };
+  const img = cachedAt('openwrt', ref.image);
+  test(`openwrt: ${ref.image} matches binwalk, liblzma and unsquashfs`, { skip: img ? false : 'run node packages/extras/scripts/fetch-openwrt.mjs', timeout: 120000 }, () => {
+    assert.equal(sha(img!), ref.sha256);
+    const r = extractFirmware(img!, { timeBudgetMs: 110000 });
+    assert.equal(r.truncated, false);
+    // where binwalk sees the kernel and the root filesystem
+    const sqAt = ref.binwalk.find((x) => x.description.startsWith('Squashfs'))!.offset;
+    const top = r.chunks.filter((c) => c.depth === 0);
+    if (top[0]!.type === 'trx') {
+      const parts = /partitions at (.*)$/.exec(top[0]!.description)![1]!.split(', ').map((x) => parseInt(x, 16));
+      assert.ok(parts.includes(sqAt), `TRX partition at the squashfs offset ${sqAt}`);
+      for (const x of ref.binwalk.slice(1)) assert.ok(parts.includes(x.offset), `TRX partition at ${x.offset} (${x.description.slice(0, 30)})`);
+    } else assert.ok(top.some((c) => c.type === 'squashfs' && c.offset === sqAt) || top.some((c) => c.type === 'uimage' && c.end === sqAt), 'squashfs found where binwalk sees it');
+    for (const lz of ref.lzma) assert.ok(r.files.some((f) => f.path.endsWith('lzma.uncompressed') && f.sha256 === lz.sha256 && f.size === lz.size), `kernel LZMA at ${lz.offset} decodes like liblzma`);
+    // every file and symlink unsquashfs creates, with the same bytes
+    const sqDir = r.chunks.find((c) => c.type === 'squashfs')!.path;
+    const got = new Map(r.files.filter((f) => f.path.startsWith(sqDir + '/')).map((f) => [f.path.slice(sqDir.length + 1), f]));
+    let n = 0;
+    for (const [p, w] of Object.entries(ref.squashfs[0]!.files)) {
+      const f = got.get(p);
+      assert.ok(f, `${p} extracted`);
+      if (w === 'dir') assert.equal(f.kind, 'dir', p);
+      else if (w.startsWith('->')) assert.equal(f.target, w.slice(2), p);
+      else { assert.equal(f.sha256, w, p); n++; }
+    }
+    assert.ok(n > 300, `${n} regular files compared`);
+  });
+}

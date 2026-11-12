@@ -471,7 +471,7 @@ function candidates(b: Uint8Array, from: number, to: number, skip: Set<string>):
     switch (c0) {
       case 0x1f: if (b[i + 1] === 0x8b && b[i + 2] === 8 && ((b[i + 3] as number) & 0xe0) === 0) add(i, 'gzip'); break;
       case 0xfd: if (startsAt(b, i, [0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00])) add(i, 'xz'); break;
-      case 0x5d: if (b[i + 1] === 0 && b[i + 2] === 0 && looksLikeLzmaAlone(b, i)) add(i, 'lzma'); break;
+      case 0x5d: case 0x6d: case 0x5e: case 0x2c: if (b[i + 1] === 0 && looksLikeLzmaAlone(b, i)) add(i, 'lzma'); break;
       case 0x28: if (startsAt(b, i, [0x28, 0xb5, 0x2f, 0xfd])) add(i, 'zstd'); break;
       case 0x04: if (startsAt(b, i, [0x04, 0x22, 0x4d, 0x18])) add(i, 'lz4'); break;
       case 0x02: if (startsAt(b, i, [0x02, 0x21, 0x4c, 0x18])) add(i, 'lz4-legacy'); break;
@@ -533,6 +533,8 @@ export function extractFirmware(bytes: Uint8Array, options: ExtractOptions = {})
       let u: Unpacked | undefined;
       try { u = H[c.type]!(b, c.off, ctx); } catch (e) { if (topLevel || depth < 2) { /* not a valid chunk */ } u = undefined; void e; }
       if (!u || u.end <= c.off) continue;
+      // a nested buffer that is itself exactly one leaf file (an ELF inside a squashfs) is not re-emitted
+      if (!topLevel && c.off === 0 && u.end === b.length && u.leaf && u.members.length === 1 && u.members[0]!.data?.length === b.length) { pos = u.end; found++; continue; }
       if (pos < c.off) addUnknown(b, base, pos, c.off, depth, via);
       found++;
       const dir = `${base}${base ? '/' : ''}${c.off.toString(16).padStart(8, '0')}-${c.type}`;
