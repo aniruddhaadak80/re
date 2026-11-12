@@ -125,7 +125,7 @@ const cliRows = rea.commands.map((c) => {
   if (!toolName) return { ...M.CLI_EXTRA[c.path], name: c.path, desc: c.description, args, flags, via: '' };
   const tr = M.TOOLS[toolName];
   const cmds = rlCmdsForTools(tr.rl);
-  if (tr.status === 'missing') return { ...tr, rl: [], name: c.path, desc: c.description, args, flags, via: toolName };
+  if (tr.status === 'missing' || !tr.rl.length) return { ...tr, rl: [], name: c.path, desc: c.description, args, flags, via: toolName };
   if (!cmds.length) return { status: 'partial', wip: tr.wip, owner: tr.owner ?? 'cli', rl: [], name: c.path, desc: c.description, args, flags, via: toolName, note: `MCP only: ${tr.rl.join(', ')} (${tr.status}) have no CLI command. ${tr.note}`.trim() };
   return { ...tr, rl: cmds, name: c.path, desc: c.description, args, flags, via: toolName };
 });
