@@ -49,6 +49,14 @@
       "types": "./dist/server.d.ts",
       "default": "./dist/server.js"
     },
+    "./app": {
+      "types": "./dist/app.d.ts",
+      "default": "./dist/app.js"
+    },
+    "./manifest": {
+      "types": "./dist/generated/tool-manifest.d.ts",
+      "default": "./dist/generated/tool-manifest.js"
+    },
     "./http": {
       "types": "./dist/http.d.ts",
       "default": "./dist/http.js"

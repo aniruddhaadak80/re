@@ -2,12 +2,28 @@
 // RevLens CLI. Core commands plus every package's commands, with plain argument parsing.
 import { readFileSync, writeFileSync, openSync, fstatSync, closeSync } from 'node:fs';
 import { basename } from 'node:path';
-import {
-  diff, verifyClaim, scanRules, STARTER_RULES, toSARIF, toMarkdown, toHTML, toCycloneDX, lookupOSV,
-  REVLENS_VERSION, type Report, type Claim, type Severity, type FormatId,
-} from '@revlens/core';
-import { analyzeAllNode as analyzeAll, ALL_ANALYZERS_NODE as ALL_ANALYZERS, PACKAGES, TOOL_GROUPS, TOP_LEVEL_COMMANDS, packageViews, type PackageCommand } from '@revlens/engine/node';
-import { toolCatalog } from '@revlens/mcp/server';
+import type { Report, Claim, Severity, FormatId } from '@revlens/core';
+import type { PackageCommand } from '@revlens/engine/node';
+import { TOOL_MANIFEST } from '@revlens/mcp/manifest';
+
+// Heavy modules load on demand, so --version, help for the MCP server and `revlens mcp` start fast.
+type CoreMod = typeof import('@revlens/core');
+type EngineMod = typeof import('@revlens/engine/node');
+let core: CoreMod;
+let engine: EngineMod;
+let diff: CoreMod['diff'], verifyClaim: CoreMod['verifyClaim'], scanRules: CoreMod['scanRules'], STARTER_RULES: string, toSARIF: CoreMod['toSARIF'], toMarkdown: CoreMod['toMarkdown'],
+  toHTML: CoreMod['toHTML'], toCycloneDX: CoreMod['toCycloneDX'], lookupOSV: CoreMod['lookupOSV'];
+let analyzeAll: EngineMod['analyzeAllNode'], ALL_ANALYZERS: EngineMod['ALL_ANALYZERS_NODE'], PACKAGES: EngineMod['PACKAGES'], TOOL_GROUPS: EngineMod['TOOL_GROUPS'],
+  TOP_LEVEL_COMMANDS: EngineMod['TOP_LEVEL_COMMANDS'], packageViews: EngineMod['packageViews'];
+const REVLENS_VERSION = TOOL_MANIFEST.version;
+
+/** Load @revlens/core and @revlens/engine (every analysis package) once. */
+async function load(): Promise<void> {
+  if (engine) return;
+  [core, engine] = await Promise.all([import('@revlens/core'), import('@revlens/engine/node')]);
+  ({ diff, verifyClaim, scanRules, STARTER_RULES, toSARIF, toMarkdown, toHTML, toCycloneDX, lookupOSV } = core);
+  ({ analyzeAllNode: analyzeAll, ALL_ANALYZERS_NODE: ALL_ANALYZERS, PACKAGES, TOOL_GROUPS, TOP_LEVEL_COMMANDS, packageViews } = engine);
+}
 
 const C = process.stdout.isTTY && !process.env.NO_COLOR
   ? { gold: (s: string) => `\x1b[38;5;220m${s}\x1b[0m`, teal: (s: string) => `\x1b[38;5;37m${s}\x1b[0m`, dim: (s: string) => `\x1b[2m${s}\x1b[0m`,
@@ -17,7 +33,7 @@ const C = process.stdout.isTTY && !process.env.NO_COLOR
 const SEV_ORDER: Severity[] = ['critical', 'high', 'medium', 'low', 'info'];
 const sevColor = (s: Severity) => (s === 'critical' ? C.red! : s === 'high' ? C.orange! : s === 'medium' ? C.gold! : s === 'low' ? C.teal! : C.dim!)(s.toUpperCase().padEnd(8));
 
-const OPTIONS_HELP = `Options
+const OPTIONS_HELP = () => `Options
   --json  --md  --html  --sarif  --cyclonedx   Output format (default is a readable summary)
   --out <path>        Write output to a file
   --osv               Look up known vulnerabilities on OSV.dev (network, opt in)
@@ -29,9 +45,11 @@ const OPTIONS_HELP = `Options
   --fail-on-match     rules: exit with code 2 when any rule matches
   --max-strings <n>   Strings to keep in the report (default 400)
   --no-recurse        Do not analyze archive members
+  --tool-profile <p>  mcp: minimal, standard or full (default) tool list
+  --settings-file <f> mcp: JSON file with analysis settings for update_analysis_settings
   -h, --help  -v, --version`;
 
-const CORE_COMMANDS = new Set(['analyze', 'scan', 'diff', 'verify', 'rules', 'sbom', 'sarif', 'analyzers', 'tools', 'mcp', 'serve-mcp', 'help', ...TOP_LEVEL_COMMANDS.map((c) => c.name)]);
+const CORE_COMMANDS = () => new Set(['analyze', 'scan', 'diff', 'verify', 'rules', 'sbom', 'sarif', 'analyzers', 'tools', 'mcp', 'serve-mcp', 'help', 'guide', 'discover', 'settings', ...TOP_LEVEL_COMMANDS.map((c) => c.name)]);
 
 /** Argument text of a package usage line, without the leading "revlens" and command name. */
 function usageArgs(c: PackageCommand): string {
@@ -43,7 +61,8 @@ function flatAliases(): Map<string, { group: string; cmd: PackageCommand }> {
   const seen = new Map<string, number>();
   for (const g of TOOL_GROUPS) for (const c of g.commands) seen.set(c.name, (seen.get(c.name) ?? 0) + 1);
   const out = new Map<string, { group: string; cmd: PackageCommand }>();
-  for (const g of TOOL_GROUPS) for (const c of g.commands) if (seen.get(c.name) === 1 && !CORE_COMMANDS.has(c.name)) out.set(c.name, { group: g.id, cmd: c });
+  const core_ = CORE_COMMANDS();
+  for (const g of TOOL_GROUPS) for (const c of g.commands) if (seen.get(c.name) === 1 && !core_.has(c.name)) out.set(c.name, { group: g.id, cmd: c });
   return out;
 }
 
@@ -76,19 +95,23 @@ function fullHelp(): string {
     '  revlens tools [--json]           List every MCP tool the server offers',
     '  revlens mcp [--http]             Start the MCP server on stdio, or Streamable HTTP on 127.0.0.1',
     '                                   --port 7337  --host 127.0.0.1  --token T (or REVLENS_MCP_TOKEN)  --allow-remote',
+    '                                   --tool-profile minimal|standard|full  --settings-file F',
+    '  revlens guide [format]           Playbook for a format, or the guidance overview; --search "words" searches docs',
+    '  revlens discover <goal...>       Ranked tools for a goal; --format F, --keyword K, --limit N',
+    '  revlens settings                 Analysis settings and where each value comes from (--settings-file F)',
     '',
     'Setup and external tools',
     ...TOP_LEVEL_COMMANDS.map((c) => `  ${c.usage.replace(/^revlens\s+/, 'revlens ').split('   ')[0]!.padEnd(32)} ${c.summary}`),
     ''];
   for (const g of TOOL_GROUPS) if (g.commands.length) L.push(`${g.title}  ${C.dim!(`revlens ${g.id} <command>, see revlens help ${g.id}`)}`, '  ' + g.commands.map((c) => c.name).join('  '), '');
-  L.push(C.dim!('Commands with a unique name also work without the area, for example revlens smali app.apk.'), '', OPTIONS_HELP);
+  L.push(C.dim!('Commands with a unique name also work without the area, for example revlens smali app.apk.'), '', OPTIONS_HELP());
   return L.join('\n');
 }
 
 interface Args { _: string[]; flags: Record<string, string | boolean> }
 function parse(argv: string[]): Args {
   const a: Args = { _: [], flags: {} };
-  const valued = new Set(['out', 'rules', 'fail-on', 'max-strings', 'claim', 'packages', 'dir']);
+  const valued = new Set(['out', 'rules', 'fail-on', 'max-strings', 'claim', 'packages', 'dir', 'tool-profile', 'settings-file', 'search', 'format', 'keyword', 'limit', 'port', 'host', 'token']);
   for (let i = 0; i < argv.length; i++) {
     const t = argv[i] as string;
     if (t === '-h') a.flags.help = true;
@@ -173,12 +196,15 @@ async function main(): Promise<number> {
   const a = parse(process.argv.slice(2));
   const [cmd, ...rest] = a._;
   if (a.flags.version && !cmd) { console.log(REVLENS_VERSION); return 0; }
-  if (!cmd) { console.log(fullHelp()); return 0; }
   const f = a.flags;
+  if (cmd === 'mcp' || cmd === 'serve-mcp') return startMcp(f);
+  if (cmd === 'guide' || cmd === 'discover' || cmd === 'settings') return platformCommand(cmd, rest, f);
+  await load();
+  if (!cmd) { console.log(fullHelp()); return 0; }
   if (cmd === 'help') { console.log(rest[0] ? areaHelp(rest[0]) : fullHelp()); return 0; }
   const top = TOP_LEVEL_COMMANDS.find((c) => c.name === cmd);
   if (top) { const raw = process.argv.slice(2); return top.run(raw.slice(raw.indexOf(cmd) + 1)); }
-  if (a.flags.help && CORE_COMMANDS.has(cmd)) { console.log(fullHelp()); return 0; }
+  if (a.flags.help && CORE_COMMANDS().has(cmd)) { console.log(fullHelp()); return 0; }
 
   switch (cmd) {
     case 'analyzers':
@@ -186,6 +212,7 @@ async function main(): Promise<number> {
       for (const x of ALL_ANALYZERS) console.log(`${C.gold!(x.id.padEnd(16))} ${C.teal!(x.package.padEnd(8))} ${x.title.padEnd(30)} ${C.dim!(x.description)}`);
       return 0;
     case 'tools': {
+      const { toolCatalog } = await import('@revlens/mcp/app');
       const all = toolCatalog().map((t) => ({ name: t.name, group: t.group, description: t.description, readOnly: t.annotations.readOnlyHint }));
       if (f.json) { emit(JSON.stringify(all, null, 2), f); return 0; }
       for (const g of ['core', ...TOOL_GROUPS.map((x) => x.id)]) {
@@ -261,35 +288,6 @@ async function main(): Promise<number> {
       else for (const m of matches) console.log(`${C.gold!(m.rule)} ${C.dim!(m.tags.join(' '))}  ${m.meta.description ?? ''}\n${m.strings.slice(0, 4).map((s) => C.dim!(`    ${s.id} @${s.offset} ${s.snippet}`)).join('\n')}`);
       return f['fail-on-match'] && matches.length ? 2 : 0;
     }
-    case 'mcp': case 'serve-mcp': {
-      const { httpOptionsFromArgv, startHttpServer } = await import('@revlens/mcp/http');
-      const http = httpOptionsFromArgv(process.argv.slice(2));
-      if (http) {
-        const h = await startHttpServer(http);
-        console.error(`RevLens MCP listening on ${h.url}${http.token ? ' (bearer token required)' : ''}`);
-        const stop = () => { void h.close().then(() => process.exit(0)); };
-        process.on('SIGINT', stop);
-        process.on('SIGTERM', stop);
-        return -1;
-      }
-      const { StdioServerTransport } = await import('@modelcontextprotocol/sdk/server/stdio.js');
-      const { closeAllSessions, killAllSessions } = await import('@revlens/engine/node');
-      const { server } = (await import('@revlens/mcp/server')).createServer();
-      // bridge sessions (radare2, gdb, lldb, Frida) end with the server
-      let stopping = false;
-      const stop = () => {
-        if (stopping) return;
-        stopping = true;
-        setTimeout(() => { killAllSessions(); process.exit(0); }, 5_000).unref();
-        void server.close().catch(() => undefined).then(() => closeAllSessions().catch(() => 0)).finally(() => process.exit(0));
-      };
-      process.once('exit', () => killAllSessions());
-      process.stdin.once('end', stop);
-      process.on('SIGINT', stop);
-      process.on('SIGTERM', stop);
-      await server.connect(new StdioServerTransport());
-      return -1;
-    }
   }
   const group = TOOL_GROUPS.find((g) => g.id === cmd);
   const raw = process.argv.slice(2);
@@ -306,6 +304,76 @@ async function main(): Promise<number> {
   const alias = flatAliases().get(cmd);
   if (alias) return alias.cmd.run(after);
   throw new Error(`unknown command "${cmd}". Run revlens --help`);
+}
+
+/** revlens mcp: stdio by default, Streamable HTTP with --http. Loads only the MCP server; packages load on first tool call. */
+async function startMcp(f: Args['flags']): Promise<number> {
+  const { createServer, closeLoadedSessions, killLoadedSessions, profileFromArgv } = await import('@revlens/mcp/app');
+  const profile = profileFromArgv(process.argv.slice(2));
+  const settingsFile = typeof f['settings-file'] === 'string' ? f['settings-file'] : undefined;
+  const { httpOptionsFromArgv, startHttpServer } = await import('@revlens/mcp/http');
+  const http = httpOptionsFromArgv(process.argv.slice(2));
+  if (http) {
+    const h = await startHttpServer({ ...http, profile, settingsFile });
+    console.error(`RevLens MCP listening on ${h.url}${http.token ? ' (bearer token required)' : ''}`);
+    const stop = () => { void h.close().then(() => process.exit(0)); };
+    process.on('SIGINT', stop);
+    process.on('SIGTERM', stop);
+    return -1;
+  }
+  const { StdioServerTransport } = await import('@modelcontextprotocol/sdk/server/stdio.js');
+  const { server } = createServer({ profile, file: settingsFile });
+  // bridge sessions (radare2, gdb, lldb, Frida) end with the server
+  let stopping = false;
+  const stop = () => {
+    if (stopping) return;
+    stopping = true;
+    setTimeout(() => { killLoadedSessions(); process.exit(0); }, 5_000).unref();
+    void server.close().catch(() => undefined).then(() => closeLoadedSessions().catch(() => 0)).finally(() => process.exit(0));
+  };
+  process.once('exit', () => killLoadedSessions());
+  process.stdin.once('end', stop);
+  process.on('SIGINT', stop);
+  process.on('SIGTERM', stop);
+  await server.connect(new StdioServerTransport());
+  return -1;
+}
+
+/** revlens guide, discover and settings: the MCP platform tools from the command line. */
+async function platformCommand(cmd: string, rest: string[], f: Args['flags']): Promise<number> {
+  const app = await import('@revlens/mcp/app');
+  const out = (v: unknown, human: () => string) => emit(f.json ? JSON.stringify(v, null, 2) : human(), f);
+  if (cmd === 'guide') {
+    if (typeof f.search === 'string') {
+      const r = await app.searchGuidance({ query: f.search, limit: typeof f.limit === 'string' ? Number(f.limit) : 8 }) as { results: { id: string; title: string; score: number; snippet: string }[] };
+      out(r, () => r.results.map((x) => `${C.gold!(x.id)}  ${C.dim!(String(x.score))}\n  ${x.snippet}`).join('\n') || 'no matches');
+      return 0;
+    }
+    const g = await app.guidance(rest[0] ? (rest[0].includes('.md') || rest[0].includes('-') ? { topic: rest[0] } : { format: rest[0] }) : {}) as Record<string, any>;
+    out(g, () => typeof g.text === 'string' ? g.text : g.found === false ? `No playbook for "${rest[0]}". Known formats: ${(g.known ?? []).join(', ')}` : [
+      C.gold!('How to work'), ...g.howToWork.map((l: string) => `  ${l}`), '', C.gold!('Playbooks'), ...g.playbooks.map((p: { file: string; title: string }) => `  ${p.title.padEnd(28)} ${C.dim!(p.file)}`),
+      '', C.gold!('Workflows'), ...g.workflows.map((w: { id: string; title: string }) => `  ${w.id.padEnd(28)} ${w.title}`)].join('\n'));
+    return 0;
+  }
+  if (cmd === 'discover') {
+    const { createServer } = app;
+    const { server } = createServer();
+    const { Client } = await import('@modelcontextprotocol/sdk/client/index.js');
+    const { InMemoryTransport } = await import('@modelcontextprotocol/sdk/inMemory.js');
+    const [x, y] = InMemoryTransport.createLinkedPair();
+    const client = new Client({ name: 'revlens-cli', version: REVLENS_VERSION });
+    await server.connect(x);
+    await client.connect(y);
+    const r = await client.callTool({ name: 'discover_tools', arguments: { ...(rest.length ? { goal: rest.join(' ') } : {}), ...(typeof f.format === 'string' ? { format: f.format } : {}), ...(typeof f.keyword === 'string' ? { keyword: f.keyword } : {}), limit: typeof f.limit === 'string' ? Number(f.limit) : 10 } }) as { content: { text: string }[] };
+    await client.close();
+    const v = JSON.parse(r.content[0]!.text) as { tools?: { name: string; description: string; contract: { required: string[] } }[] };
+    out(v, () => (v.tools ?? []).map((t) => `${C.gold!(t.name.padEnd(28))} ${t.description.split('. ')[0]!.slice(0, 90)}\n${C.dim!(`  ${' '.repeat(28)}needs ${t.contract.required.join(', ') || 'nothing'}`)}`).join('\n') || 'give a goal, --format or --keyword');
+    return 0;
+  }
+  const s = new app.AnalysisSettings({ file: typeof f['settings-file'] === 'string' ? f['settings-file'] : undefined });
+  const v = s.inspect();
+  out(v, () => [...v.settings.map((x) => `${x.setting.padEnd(18)} ${JSON.stringify(x.value).padEnd(10)} ${C.dim!(`${x.source}  ${x.description}`)}`), ...(v.launchProblems.length ? ['', ...v.launchProblems.map((p) => C.orange!(p))] : [])].join('\n'));
+  return 0;
 }
 
 function need(v: string | undefined): string { if (!v) throw new Error('missing file argument'); return v; }

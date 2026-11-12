@@ -60,6 +60,8 @@ function candidates(env: NodeJS.ProcessEnv, platform: NodeJS.Platform): { dir: s
 export function detectJebSync(opts: { env?: NodeJS.ProcessEnv; platform?: NodeJS.Platform } = {}): JebDetection {
   const env = opts.env ?? process.env;
   const platform = opts.platform ?? process.platform;
+  const off = (env.REVLENS_BRIDGES_DISABLE ?? '').trim().toLowerCase();
+  if (off === 'all' || off === '1' || off.split(',').map((x) => x.trim()).includes('jeb')) return { id: 'jeb', name: 'JEB', available: false, problems: ['disabled by REVLENS_BRIDGES_DISABLE'] };
   const want = LAUNCHERS[platform] ?? 'jeb_linux.sh';
   const problems: string[] = [];
   for (const c of candidates(env, platform)) {

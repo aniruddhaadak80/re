@@ -19,7 +19,7 @@ import { fridaSessionAttach, fridaSessionCollect, fridaSessionLoad, fridaSession
 import { SessionError } from './sessions/manager.js';
 import { ghidraApplyNames, ghidraExportNames, idaApplyNames, idaExportNames, r2ApplyNames, r2ExportNames } from './writeback/providers.js';
 import { NamesError } from './names.js';
-import { detect } from './detect.js';
+import { detect, disabledTools } from './detect.js';
 import { installFor } from './catalog.js';
 import { UnsafeArgumentError } from './exec.js';
 import { listCutterSessions, cutterCommand } from './cutter.js';
@@ -53,6 +53,7 @@ function requiredTool(name: string): ToolId | ToolId[] | undefined {
   if (name.startsWith('bridge_gdb_session_')) return 'gdb';
   if (name.startsWith('bridge_lldb_session_')) return 'lldb';
   if (name.startsWith('bridge_frida_session_')) return 'frida';
+  if (name === 'bridge_cutter_command') return ['cutter', 'rizin', 'radare2'];
   if (name.startsWith('bridge_r2_session_') || name === 'bridge_r2_apply_names' || name === 'bridge_r2_export_names') return ['radare2', 'rizin'];
   return REQUIRES[name];
 }
@@ -525,7 +526,10 @@ const RAW: BridgeTool[] = [
     name: 'bridge_cutter_sessions',
     description: 'Running Cutter windows with their pid, the binaries and rizin project they have open (command line plus open file handles), and whether the RevLens Cutter plugin is live in them for in-window commands. Also called list_cutter_sessions.',
     inputSchema: {},
-    run: () => listCutterSessions(),
+    run: async () => {
+      if (disabledTools().has('cutter')) return { available: false, tool: 'cutter', reason: 'Cutter is disabled by REVLENS_BRIDGES_DISABLE.', install: installFor('cutter') };
+      return listCutterSessions();
+    },
   },
   {
     name: 'bridge_cutter_command',

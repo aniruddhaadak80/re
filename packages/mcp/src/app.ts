@@ -226,9 +226,16 @@ export function createServer(opts: ServerOptions = {}): { server: McpServer; too
     const tool = server.registerTool(name, { description, inputSchema: shape, annotations }, ((a: Record<string, unknown>) => handler(a)) as never);
     const listed = visible.has(name);
     if (!listed) tool.disable();
-    let schema: JsonSchema;
-    try { schema = extra.jsonSchema ?? (z.toJSONSchema(z.object(shape)) as unknown as JsonSchema); } catch { schema = { type: 'object', properties: {}, required: [] }; }
-    const entry: CatalogEntry = { name, group, description, inputSchema: schema, effects, aliasOf: extra.aliasOf };
+    // the JSON schema is built the first time the catalog needs it, not at startup
+    let schema: JsonSchema | undefined = extra.jsonSchema;
+    const entry = { name, group, description, effects, aliasOf: extra.aliasOf } as CatalogEntry;
+    Object.defineProperty(entry, 'inputSchema', {
+      enumerable: true,
+      get: () => {
+        if (!schema) { try { schema = z.toJSONSchema(z.object(shape)) as unknown as JsonSchema; } catch { schema = { type: 'object', properties: {}, required: [] }; } }
+        return schema;
+      },
+    });
     registry.set(name, { name, shape, handler, tool, entry });
     tools.push({ name, group, description, annotations, listed, ...(extra.aliasOf ? { aliasOf: extra.aliasOf } : {}) });
     catalog = undefined;
@@ -507,3 +514,8 @@ export function createServer(opts: ServerOptions = {}): { server: McpServer; too
 
 /** Tool names and groups without starting a server. */
 export function toolCatalog(opts: ServerOptions = {}): ToolInfo[] { return createServer(opts).tools; }
+
+export { AnalysisSettings, SettingsError, SETTING_DEFS, launchSettings } from './settings.js';
+export { profileFromArgv, parseProfile, TOOL_PROFILES, type ToolProfile } from './catalog.js';
+export { guidance, searchGuidance, readGuidanceSection, serverInstructions } from './guidance/index.js';
+export { WORKFLOWS, renderWorkflow } from './guidance/workflows.js';
