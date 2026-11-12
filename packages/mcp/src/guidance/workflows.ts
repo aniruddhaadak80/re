@@ -142,7 +142,7 @@ export const WORKFLOWS: GuidedWorkflow[] = [
     deliverable: 'Changes that matter for security or behavior, each tied to evidence in both files.',
     steps: [
       { tool: 'diff_files', why: 'report level differences', input: { before: '{before}', after: '{after}' } },
-      { tool: 'disasm_match_functions', why: 'matched and changed native functions', input: { a: '{before}', b: '{after}' } },
+      { tool: 'disasm_match_functions', why: 'matched and changed native functions', input: { path: '{before}', path2: '{after}' } },
     ],
   },
   {

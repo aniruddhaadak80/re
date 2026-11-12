@@ -147,7 +147,7 @@ export class AnalysisSettings {
     if (changed) { this.revision++; for (const l of this.listeners) l(); }
     let persisted: string | null = null;
     if (input.persist) persisted = this.persist();
-    return { changed, changes: applied, persisted, ...this.inspect() };
+    return { changed, changes: applied, persisted, scope: 'mcp-session', revision: this.revision, values: structuredClone(this.cur) };
   }
 
   /** Write the current values to the config file (temp file then rename). */

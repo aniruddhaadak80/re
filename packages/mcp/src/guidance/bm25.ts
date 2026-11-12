@@ -45,7 +45,7 @@ const MAX_TOKENS_PER_TEXT = 200_000;
 
 /** Light English stemmer: strips a few common suffixes. Deterministic and linear. */
 export function stem(w: string): string {
-  if (w.length <= 4 || /\d/.test(w)) return w;
+  if (w.length <= 3 || /\d/.test(w)) return w;
   if (w.endsWith('ies') && w.length > 5) return w.slice(0, -3) + 'y';
   if (w.endsWith('ing') && w.length > 6) return w.slice(0, -3);
   if (w.endsWith('ed') && w.length > 5) return w.slice(0, -2);

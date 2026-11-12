@@ -157,21 +157,33 @@ const SAMPLE: Record<string, unknown> = {
   goal: 'find network endpoints', keyword: 'disasm', topic: 'getting-started', id: 'playbooks/elf.md#first-pass', action: 'list', workflow: 'triage_unknown_file',
 };
 
+/** A plausible example value for one JSON schema node. */
+function exampleValue(key: string, p: Record<string, unknown>, depth: number): unknown {
+  if (depth > 6) return null;
+  if (p.const !== undefined) return p.const;
+  if (Array.isArray(p.enum)) return p.enum[0];
+  const alt = (p.oneOf ?? p.anyOf) as Record<string, unknown>[] | undefined;
+  if (Array.isArray(alt) && alt.length) return exampleValue(key, alt.find((x) => x.type !== 'null') ?? alt[0]!, depth + 1);
+  const t = Array.isArray(p.type) ? p.type[0] : p.type;
+  const sample = SAMPLE[key];
+  if (t === 'array') {
+    if (Array.isArray(sample)) return sample;
+    const items = (p.items ?? {}) as Record<string, unknown>;
+    if (items.type === 'object' || items.oneOf || items.anyOf || items.properties) return [exampleValue(key, items, depth + 1)];
+    return [typeof sample === 'string' ? sample : 'main'];
+  }
+  if (t === 'number' || t === 'integer') return typeof sample === 'number' ? sample : typeof p.minimum === 'number' ? p.minimum : 1;
+  if (t === 'boolean') return typeof sample === 'boolean' ? sample : false;
+  if (t === 'object' || p.properties) {
+    const props = (p.properties ?? {}) as Record<string, Record<string, unknown>>;
+    const out: Record<string, unknown> = {};
+    for (const k of (p.required as string[] | undefined) ?? []) if (props[k]) out[k] = exampleValue(k, props[k]!, depth + 1);
+    return out;
+  }
+  return sample ?? `<${key}>`;
+}
+
 /** A plausible example input for a schema: required fields only, typed from the schema. */
 export function exampleFor(schema: JsonSchema): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
-  for (const k of schema.required ?? []) {
-    const p = schema.properties[k] ?? {};
-    const t = Array.isArray(p.type) ? p.type[0] : p.type;
-    const enumV = Array.isArray(p.enum) ? p.enum[0] : undefined;
-    const sample = SAMPLE[k];
-    if (enumV !== undefined) out[k] = enumV;
-    else if (t === 'array') out[k] = Array.isArray(sample) ? sample : [typeof sample === 'string' ? sample : 'main'];
-    else if (t === 'number' || t === 'integer') out[k] = typeof sample === 'number' ? sample : typeof p.minimum === 'number' ? p.minimum : 1;
-    else if (t === 'boolean') out[k] = typeof sample === 'boolean' ? sample : false;
-    else if (t === 'object') out[k] = {};
-    else if (p.anyOf || p.oneOf) out[k] = sample ?? null;
-    else out[k] = sample ?? `<${k}>`;
-  }
-  return out;
+  return exampleValue('', schema as unknown as Record<string, unknown>, 0) as Record<string, unknown>;
 }
