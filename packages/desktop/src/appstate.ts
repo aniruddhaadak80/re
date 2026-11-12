@@ -209,11 +209,11 @@ export async function appState(o: AppStateOptions): Promise<AppStateResult> {
     });
     if (truncated) res.truncated = true;
     if (r.kind === 'dir') {
-      const markers = ['Local Storage', 'Session Storage', 'IndexedDB', 'Preferences', 'Cookies', 'Network', 'GPUCache', 'Code Cache', 'blob_storage'].filter((m) => res.files.some((f) => f.root === r.path && (f.rel === m || f.rel.startsWith(`${m}/`))));
+      const markers = ['Local Storage', 'Session Storage', 'IndexedDB', 'Preferences', 'Cookies', 'Network', 'GPUCache', 'Code Cache', 'blob_storage'].filter((m) => res.files.some((f) => f.root === r.path && (f.rel === m || f.rel.startsWith(`${m}/`) || f.rel.startsWith(`Default/${m}`))));
       if (markers.length >= 2) {
         const e: NonNullable<AppStateResult['electron']>[number] = { userData: r.path, markers };
         if (o.localStorage !== false) {
-          for (const f of res.files.filter((x) => x.root === r.path && /^Local Storage\/leveldb\/[^/]+\.log$/.test(x.rel))) {
+          for (const f of res.files.filter((x) => x.root === r.path && /^(Default\/)?Local Storage\/leveldb\/[^/]+\.log$/.test(x.rel))) {
             try { const lg = readLevelLog(await readCapped(f.path, 64 * 1024 * 1024)); const latest = new Map<string, { origin?: string; key: string; value?: string }>(); for (const rec of lg.records) { const d = decodeLocalStorage(rec.key, rec.value); if (d.meta) continue; const k = `${d.origin} ${d.key}`; if (rec.op === 'delete') latest.delete(k); else latest.set(k, { origin: d.origin, key: d.key, value: d.value === undefined ? undefined : /token|secret|pass|auth|cookie|session/i.test(d.key) ? '[redacted]' : d.value.slice(0, 500) }); } (e.localStorage ??= []).push(...latest.values()); } catch (err) { res.warnings.push(`${f.path}: ${(err as Error).message}`); }
           }
         }
@@ -236,10 +236,14 @@ export async function appExport(o: AppStateOptions & { out: string; redact?: boo
   let total = 0, withheld = 0, redactedFiles = 0;
   const rootLabel = new Map<string, string>();
   st.roots.filter((r) => r.exists && r.kind !== 'registry' && r.kind !== 'dconf').forEach((r, i) => rootLabel.set(r.path, `${String(i + 1).padStart(2, '0')}-${r.role.replace(/\W+/g, '-')}-${basename(r.path).replace(/[^\w.-]+/g, '_')}`));
+  // Local Storage logs keep values in the clear: withhold them when any key there looks secret
+  const lsSecret = new Set<string>();
+  for (const e of st.electron ?? []) if (e.localStorage?.some((x) => x.value === '[redacted]')) lsSecret.add(e.userData);
   for (const f of st.files) {
     const zipName = `state/${rootLabel.get(f.root)}/${f.rel}`;
     const rec: Record<string, unknown> = { path: zipName, source: f.path, size: f.size, sha256: f.sha256, format: f.format, mtime: f.mtime };
     if (redact && f.secret) { rec.redacted = 'withheld'; withheld++; manifestFiles.push(rec); continue; }
+    if (redact && lsSecret.has(f.root) && /^(Default\/)?(Local|Session) Storage\/leveldb\/[^/]+\.(log|ldb)$/.test(f.rel)) { rec.redacted = 'withheld: Local Storage holds secret-looking keys (non-secret keys are in the manifest)'; withheld++; manifestFiles.push(rec); continue; }
     if (f.size > 64 * 1024 * 1024 || total + f.size > maxBytes) { rec.redacted = 'skipped-size'; manifestFiles.push(rec); continue; }
     let data: Uint8Array;
     try { data = new Uint8Array(await readFile(f.path)); } catch { rec.redacted = 'unreadable'; manifestFiles.push(rec); continue; }

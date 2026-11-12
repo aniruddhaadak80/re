@@ -330,10 +330,13 @@ test('AT-SPI UI tree of a real Chromium window through gdbus', { timeout: 100_00
 // ---------------- tools, CLI, hostile input ----------------
 
 test('TOOLS and CLI_COMMANDS', () => {
-  assert.deepEqual(TOOLS.map((x) => x.name), ['desktop_plist_parse', 'desktop_entry_parse', 'desktop_reg_uninstall_parse', 'desktop_proc_parse', 'desktop_gvariant_parse', 'desktop_snapshot_compare', 'desktop_process_list', 'desktop_process_inspect', 'desktop_process_compare', 'desktop_apps_list', 'desktop_app_inspect', 'desktop_ui_tree']);
-  assert.equal(WEB_TOOLS.length, 6);
+  // round 3 added tools after each group; the original ones keep their names and order
+  const names = TOOLS.map((x) => x.name);
+  const original = ['desktop_plist_parse', 'desktop_entry_parse', 'desktop_reg_uninstall_parse', 'desktop_proc_parse', 'desktop_gvariant_parse', 'desktop_snapshot_compare', 'desktop_process_list', 'desktop_process_inspect', 'desktop_process_compare', 'desktop_apps_list', 'desktop_app_inspect', 'desktop_ui_tree'];
+  assert.deepEqual(names.filter((n) => original.includes(n)), original);
+  assert.deepEqual(WEB_TOOLS.slice(0, 6).map((x) => x.name), original.slice(0, 6));
   for (const x of TOOLS) { assert.match(x.name, /^desktop_[a-z_]+$/); for (const [k, v] of Object.entries(x.inputSchema)) assert.ok(v.description, `${x.name}.${k}`); }
-  assert.deepEqual(CLI_COMMANDS.map((c) => c.name), ['ps', 'proc-inspect', 'proc-compare', 'apps', 'app-inspect', 'ui-tree']);
+  assert.deepEqual(CLI_COMMANDS.map((c) => c.name).slice(0, 6), ['ps', 'proc-inspect', 'proc-compare', 'apps', 'app-inspect', 'ui-tree']);
   const runner = join(dirname(fileURLToPath(import.meta.url)), 'cli-runner.ts');
   const r = spawnSync(process.execPath, ['--import', 'tsx', runner, 'app-inspect', join(S, 'tricky.desktop')], { encoding: 'utf8', timeout: 60_000 });
   assert.equal(r.status, 0, r.stderr);

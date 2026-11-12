@@ -1,0 +1,131 @@
+{
+  "name": "fixture-checks",
+  "prompt": "In the fixture app, add olive oil to the notes and keep the dark theme.",
+  "checks": [
+    {
+      "id": "milk",
+      "kind": "lines_present",
+      "file": "Documents/todo.txt",
+      "lines": [
+        "buy milk"
+      ]
+    },
+    {
+      "id": "no-eggs",
+      "kind": "lines_absent",
+      "file": "Documents/todo.txt",
+      "lines": [
+        "buy eggs"
+      ]
+    },
+    {
+      "id": "buys",
+      "kind": "line_count",
+      "file": "Documents/todo.txt",
+      "contains": "buy",
+      "equals": 2
+    },
+    {
+      "id": "theme",
+      "kind": "value_equals",
+      "file": ".config/revlens-fixture/settings.json",
+      "pointer": "/theme",
+      "value": "dark"
+    },
+    {
+      "id": "pinned",
+      "kind": "value_equals",
+      "file": ".config/revlens-fixture/settings.json",
+      "pointer": "/recent/[name=a.txt]/pinned",
+      "value": true
+    },
+    {
+      "id": "recent-count",
+      "kind": "member_count",
+      "file": ".config/revlens-fixture/settings.json",
+      "pointer": "/recent",
+      "at_least": 2
+    },
+    {
+      "id": "zoom",
+      "kind": "value_equals",
+      "file": ".config/revlens-fixture/app.ini",
+      "pointer": "/groups/General/zoom",
+      "value": 1.25,
+      "tolerance": 0.001
+    },
+    {
+      "id": "no-proxy",
+      "kind": "value_absent",
+      "file": ".config/revlens-fixture/app.ini",
+      "pointer": "/groups/General/proxy"
+    },
+    {
+      "id": "title",
+      "kind": "text_equals",
+      "file": "Documents/doc.xml",
+      "pointer": "/root/children/[name=t:p]",
+      "value": "The meeting is at 3:30 today."
+    },
+    {
+      "id": "item-two",
+      "kind": "text_contains",
+      "file": "Documents/doc.xml",
+      "pointer": "/root/children/[name=item][@id=two]",
+      "value": "Second &"
+    },
+    {
+      "id": "olive",
+      "kind": "row_present",
+      "file": ".local/share/revlens-fixture/notes.sqlite",
+      "table": "notes",
+      "where": {
+        "title": "olive oil",
+        "done": 0
+      }
+    },
+    {
+      "id": "open-notes",
+      "kind": "row_count",
+      "file": ".local/share/revlens-fixture/notes.sqlite",
+      "table": "notes",
+      "where": {
+        "done": 0
+      },
+      "equals": 2
+    },
+    {
+      "id": "subtitle",
+      "kind": "value_equals",
+      "file": "Documents/flyer.zdoc",
+      "pointer": "/entries/[name=content.xml]/view/root/children/[name=body]/children/[name=p][@style=Subtitle]/children/0",
+      "value": "Monday 24 November"
+    },
+    {
+      "id": "gz-count",
+      "kind": "value_equals",
+      "file": "Documents/data.json.gz",
+      "pointer": "/count",
+      "value": 5
+    },
+    {
+      "id": "sidebar",
+      "kind": "value_equals",
+      "file": "Library/Preferences/dev.revlens.fixture.plist",
+      "pointer": "/ShowSidebar",
+      "value": true
+    },
+    {
+      "id": "missing",
+      "kind": "file_absent",
+      "file": "Documents/missing.txt"
+    },
+    {
+      "id": "wrong-theme",
+      "kind": "value_equals",
+      "file": ".config/revlens-fixture/settings.json",
+      "pointer": "/theme",
+      "value": "light"
+    }
+  ]
+}

@@ -193,6 +193,8 @@ export interface ScenarioStep {
   find?: UiSelector;
   click?: UiSelector; method?: 'action' | 'pointer' | 'auto'; action?: string;
   type?: string; into?: UiSelector; secret?: boolean;
+  /** keep the field's current text and add to it (default: replace it) */
+  append?: boolean;
   key?: string;
   wait?: number;
   waitFor?: UiSelector; gone?: boolean; timeoutMs?: number;
@@ -278,7 +280,8 @@ export async function runUiScenario(o: ScenarioOptions): Promise<{ ok: boolean; 
               } else if (driver && n.bounds) { const c = center(n.bounds); await driver.click({ x: c.x, y: c.y, button: 'left', count: 1 }); }
             }
             if (!driver) throw new InputError('typing with keys needs a computer session (session)');
-            await driver.type(text, 12); r.how = r.how ? `${r.how}, then keys` : 'keys';
+            if (s.into && !s.append) { await driver.key(parseKeyCombo(process.platform === 'darwin' ? 'cmd+a' : 'ctrl+a')); r.how = 'select all, then keys'; }
+            await driver.type(text, 12); r.how = r.how ?? 'keys';
             break;
           }
           case 'key': { if (!driver) throw new InputError('key presses need a computer session (session)'); const c = parseKeyCombo(String(s.key)); await driver.key(c); r.how = [...c.mods, c.key].join('+'); break; }

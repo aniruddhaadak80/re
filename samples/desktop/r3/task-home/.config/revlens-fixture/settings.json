@@ -1,0 +1,19 @@
+{
+  "theme": "dark",
+  "fontSize": 14,
+  "recent": [
+    {
+      "name": "a.txt",
+      "pinned": true
+    },
+    {
+      "name": "b.txt",
+      "pinned": false
+    }
+  ],
+  "sync": {
+    "apiToken": "tok-123",
+    "password": "hunter2",
+    "server": "example.org"
+  }
+}

@@ -1,0 +1,158 @@
+{
+ "todo_lines": [
+  "buy milk",
+  "walk the dog",
+  "buy bread"
+ ],
+ "settings": {
+  "theme": "dark",
+  "fontSize": 14,
+  "recent": [
+   {
+    "name": "a.txt",
+    "pinned": true
+   },
+   {
+    "name": "b.txt",
+    "pinned": false
+   }
+  ],
+  "sync": {
+   "apiToken": "tok-123",
+   "password": "hunter2",
+   "server": "example.org"
+  }
+ },
+ "ini": {
+  "General": {
+   "language": "en",
+   "zoom": "1.25"
+  },
+  "Account": {
+   "user": "ada",
+   "password": "s3cret"
+  }
+ },
+ "xml_title_text": "The meeting is at 3:30 today.",
+ "xml_item_two_text": "Second & more",
+ "notes_rows": [
+  [
+   1,
+   "olive oil",
+   0
+  ],
+  [
+   2,
+   "milk",
+   1
+  ],
+  [
+   3,
+   "bread",
+   0
+  ]
+ ],
+ "notes_open": 2,
+ "zip_names": [
+  "mimetype",
+  "content.xml",
+  "meta.json"
+ ],
+ "zip_subtitle": "Monday 24 November",
+ "gz": {
+  "count": 5,
+  "items": [
+   "x",
+   "y"
+  ]
+ },
+ "plist": {
+  "AuthToken": "plist-secret",
+  "ShowSidebar": true,
+  "WindowWidth": 1024
+ },
+ "expected_pass": {
+  "milk": true,
+  "no-eggs": true,
+  "buys": true,
+  "theme": true,
+  "pinned": true,
+  "recent-count": true,
+  "zoom": true,
+  "no-proxy": true,
+  "title": true,
+  "item-two": true,
+  "olive": true,
+  "open-notes": true,
+  "subtitle": true,
+  "gz-count": true,
+  "sidebar": true,
+  "missing": true,
+  "wrong-theme": false
+ },
+ "xwd": {
+  "width": 48,
+  "height": 32,
+  "rgba_sha256": "fb35583b625351d68e7922817596205fe1d89a20416a8279baee976fdeaa88d4",
+  "pixel_15_12": [
+   0,
+   255,
+   0,
+   255
+  ]
+ },
+ "strace_summary": {
+  "newfstatat": {
+   "calls": 174,
+   "errors": 20
+  },
+  "openat": {
+   "calls": 68,
+   "errors": 18
+  },
+  "getcwd": {
+   "calls": 25,
+   "errors": 0
+  },
+  "wait4": {
+   "calls": 1,
+   "errors": 0
+  },
+  "getsockname": {
+   "calls": 1,
+   "errors": 0
+  },
+  "getpeername": {
+   "calls": 1,
+   "errors": 1
+  },
+  "faccessat": {
+   "calls": 2,
+   "errors": 2
+  },
+  "readlinkat": {
+   "calls": 3,
+   "errors": 1
+  },
+  "socket": {
+   "calls": 1,
+   "errors": 0
+  },
+  "connect": {
+   "calls": 1,
+   "errors": 1
+  },
+  "getsockopt": {
+   "calls": 1,
+   "errors": 0
+  },
+  "clone": {
+   "calls": 1,
+   "errors": 0
+  },
+  "execve": {
+   "calls": 2,
+   "errors": 0
+  }
+ }
+}

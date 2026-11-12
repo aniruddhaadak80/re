@@ -69,10 +69,12 @@ export class Atspi {
     ]);
     const d: NodeDetails = { role, name: String(props.Name ?? ''), description: props.Description ? String(props.Description) : undefined, childCount: Number(props.ChildCount ?? 0), states: state, interfaces: ifaces };
     const extra: Promise<void>[] = [];
-    if (ifaces.includes('Component')) extra.push(this.call(r, 'Component', 'GetExtents', 'u', [0]).then((v) => { const e = v[0]; if (Array.isArray(e) && e.length === 4) d.bounds = { x: Number(e[0]), y: Number(e[1]), width: Number(e[2]), height: Number(e[3]) }; }).catch(() => undefined));
-    if (ifaces.includes('Action')) extra.push(this.call(r, 'Action', 'GetActions').then((v) => { if (Array.isArray(v[0])) d.actions = (v[0] as DValue[]).slice(0, 32).map((a) => String(Array.isArray(a) ? a[0] : a)); }).catch(() => undefined));
-    if (opts.text !== false && ifaces.includes('Text')) extra.push(this.call(r, 'Text', 'GetText', 'ii', [0, -1]).then((v) => { d.text = String(v[0] ?? '').slice(0, 4000); }).catch(() => undefined));
-    if (ifaces.includes('Value')) extra.push(this.client.getProperty(r.bus, r.path, I('Value'), 'CurrentValue').then((v) => { if (typeof v === 'number') d.value = v; }).catch(() => undefined));
+    const has = (x: string) => !ifaces.length || ifaces.includes(x); // an empty list means the query failed: try them all
+    const extents = () => this.call(r, 'Component', 'GetExtents', 'u', [0]).then((v) => { const e = v[0]; if (Array.isArray(e) && e.length === 4) d.bounds = { x: Number(e[0]), y: Number(e[1]), width: Number(e[2]), height: Number(e[3]) }; });
+    if (has('Component')) extra.push(extents().catch(() => extents()).catch(() => undefined)); // one retry: busy apps time out under load
+    if (has('Action')) extra.push(this.call(r, 'Action', 'GetActions').then((v) => { if (Array.isArray(v[0])) d.actions = (v[0] as DValue[]).slice(0, 32).map((a) => String(Array.isArray(a) ? a[0] : a)); }).catch(() => undefined));
+    if (opts.text !== false && has('Text')) extra.push(this.call(r, 'Text', 'GetText', 'ii', [0, -1]).then((v) => { d.text = String(v[0] ?? '').slice(0, 4000); }).catch(() => undefined));
+    if (has('Value')) extra.push(this.client.getProperty(r.bus, r.path, I('Value'), 'CurrentValue').then((v) => { if (typeof v === 'number') d.value = v; }).catch(() => undefined));
     await Promise.all(extra);
     return d;
   }
@@ -89,7 +91,7 @@ export class Atspi {
     const nodes: UiNode[] = [];
     const seen = new Set<string>();
     while (queue.length && nodes.length < o.maxNodes) {
-      const batch = queue.splice(0, Math.min(32, o.maxNodes - nodes.length));
+      const batch = queue.splice(0, Math.min(o.details ? 12 : 32, o.maxNodes - nodes.length));
       const res = await Promise.all(batch.map(async (cur) => {
         const [d, kids] = await Promise.all([
           o.details ? this.details(cur) : this.basic(cur),
