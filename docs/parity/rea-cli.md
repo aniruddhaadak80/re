@@ -6,7 +6,7 @@ rea is used for scope only. RevLens is not REA and is not affiliated with it.
 
 Every command in rea's incur CLI tree (194 commands; rea has no nested subcommands). For a command that wraps an MCP tool the status follows the tool row in rea-tools.md, and drops to partial when the RevLens tool has no CLI command (`revlens bridge <tool>` runs any bridge tool).
 
-**Totals.** 194 rows: 82 equal, 16 better, 46 partial, 50 missing (42 of the partial or missing rows are in progress on a round-3 branch). Covered (equal or better): 98 of 194.
+**Totals.** 194 rows: 82 equal, 16 better, 46 partial, 50 missing (43 of the partial or missing rows are in progress on a round-3 branch). Covered (equal or better): 98 of 194.
 
 Status: equal means a RevLens tool does the same job; better means the same job and more; partial means part of the job, with the gap in the note; missing means no RevLens tool does it. "in progress" names the round-3 branch adding it.
 
@@ -54,7 +54,7 @@ Status: equal means a RevLens tool does the same job; better means the same job 
 | `rea demangle-swift` | Demangle Swift symbols without Hopper | <path> <symbols> --native-command-timeout-ms | `revlens extras x-swift-demangle` | equal | Matches swift-demangle 6.0.3 text. |
 | `rea observe-native-calls` | Launch a Mach-O under LLDB and record entries into selected functions or Objective-C methods | <path> <inputJson> | `revlens bridge frida_run`, `revlens bridge lldb_session_open`, `revlens bridge lldb_session_cmd` | partial | Frida trace templates and lldb sessions can record calls; no single tool that launches under LLDB and records each entry with registers, selector and receiver class. |
 | `rea observe-native-ui` | Observe one already-running native application window by PID and window ID | <path> --pid --window-id --screenshot --accessibility --max-nodes --native-ui-deadline-ms | `revlens desktop ui-tree` | partial, in progress (feat/r3-desktop) | Accessibility tree on Linux, macOS and Windows; no window screenshot and no binding to the active Mach-O. |
-| `rea capture-native-ui-scenario` | Run declarative AX actions or waits in one exact native application window | <path> --pid --window-id --screenshot --accessibility --max-nodes --native-ui-deadline-ms --steps | - | missing | No press, scroll and text-entry scenario against a native window with before and after captures. |
+| `rea capture-native-ui-scenario` | Run declarative AX actions or waits in one exact native application window | <path> --pid --window-id --screenshot --accessibility --max-nodes --native-ui-deadline-ms --steps | - | missing, in progress (feat/r3-desktop) | No press, scroll and text-entry scenario against a native window with before and after captures. |
 | `rea import-reference-source` | Import a source tree as historical reference only | <root> --exclude-paths --detail --outline-depth | - | missing, in progress (feat/r3-web) | No historical reference source import. |
 | `rea inspect-elf-notes` | Inspect ELF PT_NOTE and SHT_NOTE identities without executing the image | <path> --max-file-bytes --max-entries | `revlens extras x-elf` | equal |  |
 | `rea inspect-native-initializers` | List ELF and Mach-O initializer and finalizer functions without executing the image | <path> --max-file-bytes --offset --limit --architecture | `revlens extras x-elf` | partial | ELF init and fini arrays are listed; Mach-O __mod_init_func and __init_offsets are not. |

@@ -5,7 +5,7 @@
   "better": 16,
   "partial": 61,
   "missing": 69,
-  "inProgress": 54,
+  "inProgress": 55,
   "covered": 122
  },
  "CLI commands (rea-cli.md)": {
@@ -14,7 +14,7 @@
   "better": 16,
   "partial": 46,
   "missing": 50,
-  "inProgress": 42,
+  "inProgress": 43,
   "covered": 98
  },
  "Input formats (formats.md)": {

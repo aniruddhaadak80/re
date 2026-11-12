@@ -117,7 +117,7 @@ export const TOOLS = {
 
   // native
   observe_native_ui: p(['desktop_ui_tree'], 'Accessibility tree on Linux, macOS and Windows; no window screenshot and no binding to the active Mach-O.', 'desktop', 'uitrace'),
-  capture_native_ui_scenario: m('No press, scroll and text-entry scenario against a native window with before and after captures.', 'desktop'),
+  capture_native_ui_scenario: m('No press, scroll and text-entry scenario against a native window with before and after captures.', 'desktop', 'uitrace'),
   observe_native_calls: p(['bridge_frida_run', 'bridge_lldb_session_open', 'bridge_lldb_session_cmd'], 'Frida trace templates and lldb sessions can record calls; no single tool that launches under LLDB and records each entry with registers, selector and receiver class.', 'bridges'),
   inspect_macho: e(['x_macho_inspect', 'x_container', 'get_imports'], 'Load commands, dylibs, build version, segments and sections, imports and exports.'),
   inspect_signature: e(['x_macho_inspect'], 'Code directories, cdhash, entitlements, CMS signer, hardened runtime. Designated requirement text is not rendered.'),

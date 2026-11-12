@@ -1,0 +1,510 @@
+{
+ "note": "Warm in-process medians over 5 runs after 2 warm-up runs, linux arm64, Node v22.23.3. rea 6.8.0 runs from TypeScript source through its own tsx (its compiled runtime could not be built here: the compile step needs the tsrs native binary, which its optional dependencies did not provide for this platform, and the package asks for Node ^22.23.4 while the host has v22.23.3); RevLens runs from its tsc output. Warm medians exclude transpiling and module loading, so the comparison is fair for the work itself; import time is shown per side. Both sides read the same file and print JSON; rea output includes Evidence identity and source ranges, so byte counts differ.",
+ "rows": [
+  {
+   "operation": "ELF notes",
+   "fixture": "samples/ls-linux.elf",
+   "rea": "16.1 ms (exit 0, 8926 B out, import 17627 ms, RSS 259 MiB)",
+   "revlens": "3.6 ms (exit 0, 3507 B out, import 2454 ms, RSS 52 MiB)",
+   "ratio": "4.5x",
+   "raw": {
+    "rea": {
+     "importMs": 17626.69519,
+     "times": [
+      141.08350699999937,
+      25.676174000000174,
+      20.533778000000893,
+      17.462451999999757,
+      16.121118999999453,
+      4.611808999998175,
+      5.90154800000164
+     ],
+     "bytes": 8926,
+     "exitCode": 0,
+     "cpuMs": 6236.547,
+     "maxRssKiB": 265652
+    },
+    "revlens": {
+     "importMs": 2453.637078,
+     "times": [
+      21.68128999999999,
+      7.344515000000229,
+      5.704584000000068,
+      5.0446960000003855,
+      3.5602309999999306,
+      1.5550319999997555,
+      2.9996900000001006
+     ],
+     "bytes": 3507,
+     "exitCode": 0,
+     "cpuMs": 722.944,
+     "maxRssKiB": 53412
+    }
+   },
+   "note": "RevLens also returns the dynamic section and init arrays."
+  },
+  {
+   "operation": "binary hardening",
+   "fixture": "samples/ls-linux.elf",
+   "rea": "14.6 ms (exit 0, 6782 B out, import 15204 ms, RSS 270 MiB)",
+   "revlens": "1.9 ms (exit 0, 1336 B out, import 1133 ms, RSS 50 MiB)",
+   "ratio": "7.6x",
+   "raw": {
+    "rea": {
+     "importMs": 15203.796246,
+     "times": [
+      35.0489779999989,
+      22.358620999999403,
+      7.64342299999953,
+      27.44629200000054,
+      30.968503999998575,
+      14.577702999999019,
+      8.11964799999987
+     ],
+     "bytes": 6782,
+     "exitCode": 0,
+     "cpuMs": 6730.897,
+     "maxRssKiB": 276700
+    },
+    "revlens": {
+     "importMs": 1133.429742,
+     "times": [
+      12.963383999999905,
+      2.0067280000000665,
+      1.4153380000000197,
+      1.4591279999999642,
+      2.6044090000000324,
+      2.784550000000081,
+      1.9125429999999142
+     ],
+     "bytes": 1336,
+     "exitCode": 0,
+     "cpuMs": 632.023,
+     "maxRssKiB": 50776
+    }
+   }
+  },
+  {
+   "operation": "ELF unwind ranges",
+   "fixture": "samples/ls-linux.elf",
+   "rea": "35.5 ms (exit 0, 125977 B out, import 12550 ms, RSS 278 MiB)",
+   "revlens": "2.8 ms (exit 0, 51691 B out, import 1590 ms, RSS 56 MiB)",
+   "ratio": "12.9x",
+   "raw": {
+    "rea": {
+     "importMs": 12549.819366,
+     "times": [
+      96.07265299999926,
+      50.85069800000019,
+      31.613538999999946,
+      58.010840000000826,
+      35.47430399999939,
+      29.196712000000844,
+      53.105993999999555
+     ],
+     "bytes": 125977,
+     "exitCode": 0,
+     "cpuMs": 6442.119,
+     "maxRssKiB": 285156
+    },
+    "revlens": {
+     "importMs": 1590.373737,
+     "times": [
+      5.246376000000055,
+      3.373446999999942,
+      2.757778000000144,
+      5.063378999999941,
+      2.603697000000011,
+      6.389306000000033,
+      1.779211000000032
+     ],
+     "bytes": 51691,
+     "exitCode": 0,
+     "cpuMs": 647.239,
+     "maxRssKiB": 57760
+    }
+   }
+  },
+  {
+   "operation": "Python pyc",
+   "fixture": "samples/managed/python/sample_mod.3.12.pyc",
+   "rea": "25.8 ms (exit 0, 19199 B out, import 15058 ms, RSS 256 MiB)",
+   "revlens": "8.8 ms (exit 0, 12371 B out, import 3678 ms, RSS 56 MiB)",
+   "ratio": "2.9x",
+   "raw": {
+    "rea": {
+     "importMs": 15058.372049,
+     "times": [
+      510.58084600000075,
+      44.647235000000364,
+      21.328997000000527,
+      35.12072199999966,
+      17.611527000000933,
+      39.900564999999915,
+      25.779490999997506
+     ],
+     "bytes": 19199,
+     "exitCode": 0,
+     "cpuMs": 6644.629,
+     "maxRssKiB": 262312
+    },
+    "revlens": {
+     "importMs": 3678.112155,
+     "times": [
+      18.326346999999714,
+      9.623667000000296,
+      15.372943999999734,
+      8.765928000000258,
+      10.075228000000152,
+      7.5998130000002675,
+      2.4744620000001305
+     ],
+     "bytes": 12371,
+     "exitCode": 0,
+     "cpuMs": 827.798,
+     "maxRssKiB": 57312
+    }
+   },
+   "note": "RevLens also disassembles every code object."
+  },
+  {
+   "operation": "Erlang BEAM",
+   "fixture": "samples/managed/beam/elixir_sup.beam",
+   "rea": "19.9 ms (exit 0, 8895 B out, import 29722 ms, RSS 284 MiB)",
+   "revlens": "9.5 ms (exit 0, 5718 B out, import 3030 ms, RSS 45 MiB)",
+   "ratio": "2.1x",
+   "raw": {
+    "rea": {
+     "importMs": 29721.989417,
+     "times": [
+      86.94718199999988,
+      29.71104700000069,
+      15.079917999999452,
+      19.85599799999909,
+      22.558517999998003,
+      7.6593250000005355,
+      24.082493999998405
+     ],
+     "bytes": 8895,
+     "exitCode": 0,
+     "cpuMs": 7614.512,
+     "maxRssKiB": 290312
+    },
+    "revlens": {
+     "importMs": 3030.294152,
+     "times": [
+      13.326966999999968,
+      12.46255199999996,
+      9.49350000000004,
+      12.827843999999914,
+      8.721051999999872,
+      16.81190000000015,
+      1.2322220000000925
+     ],
+     "bytes": 5718,
+     "exitCode": 0,
+     "cpuMs": 775.94,
+     "maxRssKiB": 46216
+    }
+   }
+  },
+  {
+   "operation": ".NET metadata summary",
+   "fixture": "samples/managed/dotnet/RevDemoLib-1.0.0.dll",
+   "rea": "48.9 ms (exit 0, 10462 B out, import 27617 ms, RSS 303 MiB)",
+   "revlens": "3.3 ms (exit 0, 5149 B out, import 3360 ms, RSS 43 MiB)",
+   "ratio": "14.7x",
+   "raw": {
+    "rea": {
+     "importMs": 27617.247036,
+     "times": [
+      20914.878596999995,
+      91.1615129999991,
+      121.73504699999467,
+      48.900472999994236,
+      41.717413999998826,
+      84.80139399999462,
+      22.40573399999994
+     ],
+     "bytes": 10462,
+     "exitCode": 0,
+     "cpuMs": 9935.507,
+     "maxRssKiB": 309908
+    },
+    "revlens": {
+     "importMs": 3360.15281,
+     "times": [
+      31.494244999999864,
+      16.24078099999997,
+      1.9163690000000315,
+      3.5392539999998007,
+      8.088204000000133,
+      3.0591660000000047,
+      3.323225000000093
+     ],
+     "bytes": 5149,
+     "exitCode": 0,
+     "cpuMs": 747.261,
+     "maxRssKiB": 44504
+    }
+   }
+  },
+  {
+   "operation": "PE resources",
+   "fixture": "samples/extras/hello-res.exe",
+   "rea": "14.6 ms (exit 0, 8928 B out, import 20226 ms, RSS 247 MiB)",
+   "revlens": "18.4 ms (exit 0, 2556 B out, import 1058 ms, RSS 61 MiB)",
+   "ratio": "0.8x",
+   "raw": {
+    "rea": {
+     "importMs": 20226.37813,
+     "times": [
+      133.5064330000023,
+      107.10116600000038,
+      13.780205999999453,
+      14.600553999996919,
+      19.71795199999906,
+      18.640987999999197,
+      13.291071999999986
+     ],
+     "bytes": 8928,
+     "exitCode": 0,
+     "cpuMs": 7067.284,
+     "maxRssKiB": 253104
+    },
+    "revlens": {
+     "importMs": 1057.574456,
+     "times": [
+      34.837399000000005,
+      30.14306600000009,
+      26.42168199999992,
+      18.389189000000215,
+      10.421405999999934,
+      32.83755700000006,
+      17.940957000000026
+     ],
+     "bytes": 2556,
+     "exitCode": 0,
+     "cpuMs": 686.514,
+     "maxRssKiB": 62544
+    }
+   }
+  },
+  {
+   "operation": "PE imports (deep PE view)",
+   "fixture": "samples/disasm/hello-x64.exe",
+   "rea": "18.2 ms (exit 0, 14200 B out, import 19419 ms, RSS 279 MiB)",
+   "revlens": "16.1 ms (exit 0, 2017 B out, import 1543 ms, RSS 51 MiB)",
+   "ratio": "1.1x",
+   "raw": {
+    "rea": {
+     "importMs": 19418.578033,
+     "times": [
+      99.54119100000025,
+      19.76439500000197,
+      14.0481609999988,
+      18.233557999999903,
+      13.272954000000027,
+      36.678390000000945,
+      27.88908900000024
+     ],
+     "bytes": 14200,
+     "exitCode": 0,
+     "cpuMs": 6761.362,
+     "maxRssKiB": 285452
+    },
+    "revlens": {
+     "importMs": 1542.960021,
+     "times": [
+      27.144976000000042,
+      16.463471000000027,
+      16.102020999999922,
+      15.760686000000078,
+      17.155647000000044,
+      17.758287999999993,
+      12.428030999999919
+     ],
+     "bytes": 2017,
+     "exitCode": 0,
+     "cpuMs": 770.838,
+     "maxRssKiB": 52120
+    }
+   },
+   "note": "x-pe returns the whole deep PE view, not only imports."
+  },
+  {
+   "operation": "Windows shortcut",
+   "fixture": "samples/extras/notepad.lnk",
+   "rea": "14.1 ms (exit 0, 6566 B out, import 12517 ms, RSS 278 MiB)",
+   "revlens": "1.0 ms (exit 0, 1208 B out, import 1551 ms, RSS 45 MiB)",
+   "ratio": "14.1x",
+   "raw": {
+    "rea": {
+     "importMs": 12516.926183,
+     "times": [
+      55.714404000000286,
+      8.603787000000011,
+      23.776927999999316,
+      27.005472000000736,
+      14.059683999999834,
+      11.290178999999625,
+      6.0974089999999705
+     ],
+     "bytes": 6566,
+     "exitCode": 0,
+     "cpuMs": 6481.848,
+     "maxRssKiB": 284616
+    },
+    "revlens": {
+     "importMs": 1550.661164,
+     "times": [
+      4.415142999999944,
+      0.7740390000001298,
+      1.1179489999999532,
+      0.9958759999999529,
+      1.2514219999998204,
+      0.693623000000116,
+      0.9500570000000153
+     ],
+     "bytes": 1208,
+     "exitCode": 0,
+     "cpuMs": 690.692,
+     "maxRssKiB": 45920
+    }
+   }
+  },
+  {
+   "operation": "devicetree",
+   "fixture": "samples/extras/board.dtb",
+   "rea": "18.1 ms (exit 0, 7922 B out, import 12165 ms, RSS 252 MiB)",
+   "revlens": "0.9 ms (exit 0, 2321 B out, import 1471 ms, RSS 52 MiB)",
+   "ratio": "19.9x",
+   "raw": {
+    "rea": {
+     "importMs": 12165.302773,
+     "times": [
+      59.66780900000049,
+      102.62233800000104,
+      18.09831900000063,
+      29.623773999999685,
+      16.223243000000366,
+      7.779939000000013,
+      44.24220299999979
+     ],
+     "bytes": 7922,
+     "exitCode": 0,
+     "cpuMs": 6422.493,
+     "maxRssKiB": 257836
+    },
+    "revlens": {
+     "importMs": 1470.89487,
+     "times": [
+      9.976367999999866,
+      0.9736849999999322,
+      0.9083510000000388,
+      1.6545710000000327,
+      1.1547700000000987,
+      0.4673659999998563,
+      0.6103989999999158
+     ],
+     "bytes": 2321,
+     "exitCode": 0,
+     "cpuMs": 693.694,
+     "maxRssKiB": 53252
+    }
+   }
+  },
+  {
+   "operation": "GGUF model header",
+   "fixture": "samples/extras/tiny.gguf",
+   "rea": "18.1 ms (exit 0, 7442 B out, import 11050 ms, RSS 277 MiB)",
+   "revlens": "1.9 ms (exit 0, 1439 B out, import 1504 ms, RSS 50 MiB)",
+   "ratio": "9.7x",
+   "raw": {
+    "rea": {
+     "importMs": 11050.274004,
+     "times": [
+      56.15633700000035,
+      14.072402000001603,
+      23.371946999999636,
+      18.92422699999952,
+      17.059782999998788,
+      18.10838100000001,
+      16.906387000000905
+     ],
+     "bytes": 7442,
+     "exitCode": 0,
+     "cpuMs": 6194.06,
+     "maxRssKiB": 283600
+    },
+    "revlens": {
+     "importMs": 1504.405074,
+     "times": [
+      9.603138000000172,
+      1.2999500000000808,
+      2.140226999999868,
+      1.8737909999999829,
+      1.3257330000001275,
+      0.8467920000000504,
+      2.0660539999998946
+     ],
+     "bytes": 1439,
+     "exitCode": 0,
+     "cpuMs": 720.029,
+     "maxRssKiB": 51180
+    }
+   }
+  },
+  {
+   "operation": "V8 code cache",
+   "fixture": "samples/extras/add.jsc",
+   "rea": "8.7 ms (exit 0, 5153 B out, import 10877 ms, RSS 278 MiB)",
+   "revlens": "0.5 ms (exit 0, 954 B out, import 1838 ms, RSS 51 MiB)",
+   "ratio": "15.9x",
+   "raw": {
+    "rea": {
+     "importMs": 10877.424095,
+     "times": [
+      54.45409699999982,
+      20.563132999999652,
+      7.612187000000631,
+      14.143880999999965,
+      17.181203000000096,
+      8.68019600000116,
+      6.414289000000281
+     ],
+     "bytes": 5153,
+     "exitCode": 0,
+     "cpuMs": 6167.044,
+     "maxRssKiB": 284168
+    },
+    "revlens": {
+     "importMs": 1838.459663,
+     "times": [
+      10.790507000000161,
+      4.047129999999925,
+      0.5472819999999956,
+      0.6873189999998885,
+      0.5526879999999892,
+      0.5159390000001167,
+      0.3902860000000601
+     ],
+     "bytes": 954,
+     "exitCode": 0,
+     "cpuMs": 639.057,
+     "maxRssKiB": 52376
+    }
+   }
+  }
+ ],
+ "notes": [
+  "This sandbox has slow file system reads, so cold process start times swing by seconds; they are not used for the ratio.",
+  "Operations that need external programs on one side only (TShark, sigrok, WABT, Ghidra, Hopper, swift-demangle) are not compared.",
+  "ELF notes: RevLens also returns the dynamic section and init arrays.",
+  "Python pyc: RevLens also disassembles every code object.",
+  "PE imports (deep PE view): x-pe returns the whole deep PE view, not only imports.",
+  "PE resources: RevLens is not clearly faster here (0.8x); worth profiling in round 4.",
+  "PE imports (deep PE view): RevLens is not clearly faster here (1.1x); worth profiling in round 4.",
+  "Import time and memory: rea loads its whole CLI (and here, transpiles it); RevLens loads its engine. Resident memory after the runs is listed per row."
+ ]
+}

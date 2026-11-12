@@ -6,7 +6,7 @@ rea is used for scope only. RevLens is not REA and is not affiliated with it.
 
 Every MCP tool in rea's TOOL_CONTRACTS (252 tools), grouped by rea tool family.
 
-**Totals.** 252 rows: 106 equal, 16 better, 61 partial, 69 missing (54 of the partial or missing rows are in progress on a round-3 branch). Covered (equal or better): 122 of 252.
+**Totals.** 252 rows: 106 equal, 16 better, 61 partial, 69 missing (55 of the partial or missing rows are in progress on a round-3 branch). Covered (equal or better): 122 of 252.
 
 Status: equal means a RevLens tool does the same job; better means the same job and more; partial means part of the job, with the gap in the note; missing means no RevLens tool does it. "in progress" names the round-3 branch adding it.
 
@@ -82,12 +82,12 @@ Status: equal means a RevLens tool does the same job; better means the same job 
 
 ## native (37)
 
-37 rows: 21 equal, 2 better, 7 partial, 7 missing (3 of the partial or missing rows are in progress on a round-3 branch). Covered (equal or better): 23 of 37.
+37 rows: 21 equal, 2 better, 7 partial, 7 missing (4 of the partial or missing rows are in progress on a round-3 branch). Covered (equal or better): 23 of 37.
 
 | rea tool | what it does | inputs | RevLens tool(s) | status | note |
 |---|---|---|---|---|---|
 | `observe_native_ui` | Observe an already-running native app by PID and window ID, bound to the active Mach-O target. | pid*, window_id*, screenshot, accessibility, max_nodes, native_ui_deadline_ms | `desktop_ui_tree` | partial, in progress (feat/r3-desktop) | Accessibility tree on Linux, macOS and Windows; no window screenshot and no binding to the active Mach-O. |
-| `capture_native_ui_scenario` | Run selected-element press, increment/decrement scroll, AXValue text entry and bounded wait steps in one exact native app window. | pid*, window_id*, screenshot, accessibility, max_nodes, native_ui_deadline_ms, steps* | - | missing | No press, scroll and text-entry scenario against a native window with before and after captures. |
+| `capture_native_ui_scenario` | Run selected-element press, increment/decrement scroll, AXValue text entry and bounded wait steps in one exact native app window. | pid*, window_id*, screenshot, accessibility, max_nodes, native_ui_deadline_ms, steps* | - | missing, in progress (feat/r3-desktop) | No press, scroll and text-entry scenario against a native window with before and after captures. |
 | `observe_native_calls` | Launch the active Mach-O as an owned process under LLDB and record each entry into caller-selected functions or Objective-C methods: thread, module, symbol, load and... | breakpoints*, arguments, environment, working_directory, duration_ms, max_events, argument_registers, backtrace_frames | `bridge_frida_run`, `bridge_lldb_session_open`, `bridge_lldb_session_cmd` | partial | Frida trace templates and lldb sessions can record calls; no single tool that launches under LLDB and records each entry with registers, selector and receiver class. |
 | `inspect_macho` | Inspect Mach-O slices, load commands, imports, exports, dependencies, build metadata, segments, sections, permissions, and exact command provenance without launching... | detail, native_command_timeout_ms | `x_macho_inspect`, `x_container`, `get_imports` | equal | Load commands, dylibs, build version, segments and sections, imports and exports. |
 | `inspect_signature` | Inspect the selected Mach-O architecture's code-signing identity, hashes, authorities, designated requirement, entitlements and hardened-runtime state from a... | native_command_timeout_ms | `x_macho_inspect` | equal | Code directories, cdhash, entitlements, CMS signer, hardened runtime. Designated requirement text is not rendered. |

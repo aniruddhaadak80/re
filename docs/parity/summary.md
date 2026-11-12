@@ -12,8 +12,8 @@ Status: equal means a RevLens tool does the same job; better means the same job 
 
 | table | rows | equal | better | partial | missing | in progress | covered |
 |---|---|---|---|---|---|---|---|
-| MCP tools (rea-tools.md) | 252 | 106 | 16 | 61 | 69 | 54 | 122 (48%) |
-| CLI commands (rea-cli.md) | 194 | 82 | 16 | 46 | 50 | 42 | 98 (51%) |
+| MCP tools (rea-tools.md) | 252 | 106 | 16 | 61 | 69 | 55 | 122 (48%) |
+| CLI commands (rea-cli.md) | 194 | 82 | 16 | 46 | 50 | 43 | 98 (51%) |
 | Input formats (formats.md) | 72 | 47 | 2 | 7 | 16 | 9 | 49 (68%) |
 | Output formats (formats.md) | 7 | 2 | 0 | 0 | 5 | 0 | 2 (29%) |
 | Settings (config.md) | 96 | 16 | 0 | 13 | 67 | 22 | 16 (17%) |
@@ -21,7 +21,7 @@ Status: equal means a RevLens tool does the same job; better means the same job 
 
 RevLens has 203 MCP tools; 38 of them have no rea counterpart (listed at the end of rea-tools.md).
 
-## Round 4 work list (164 rows: partial or missing and not in progress)
+## Round 4 work list (163 rows: partial or missing and not in progress)
 
 Grouped by proposed owner package.
 
@@ -120,11 +120,10 @@ Grouped by proposed owner package.
 | Settings | `REA_REFERENCE_SECRET_PATTERNS_JSON` | partial | Secrets analyzer has built in patterns and yara-lite rules; no reference-source secret pattern list. |
 | Settings | `REA_WABT_BIN_DIRECTORY` | missing | No WABT validation. |
 
-### desktop (5)
+### desktop (4)
 
 | table | rea item | status | gap |
 |---|---|---|---|
-| MCP tools | `capture_native_ui_scenario` | missing | No press, scroll and text-entry scenario against a native window with before and after captures. |
 | MCP tools | `inspect_desktop_application` | partial | Electron and installed app records; no directory scan for Unity, Unreal, Godot, GameMaker and .NET candidates. |
 | Settings | `REA_WINDOWS_CHANGE_TIME_DRIFT_MS` | missing | Windows change-time settling is not modeled. |
 | Settings | `REA_WINDOWS_CHANGE_TIME_SETTLE_POLL_MS` | missing | Windows change-time settling is not modeled. |
@@ -239,15 +238,16 @@ Grouped by proposed owner package.
 | Settings | `REA_JAVASCRIPT_PRLIMIT_COMMAND` | missing | No external Wakaru, so no prlimit. |
 | Settings | `REA_MITMDUMP_COMMAND` | missing | No mitmproxy capture. |
 
-## In progress on round-3 branches (99 rows)
+## In progress on round-3 branches (100 rows)
 
 
-### feat/r3-desktop (24)
+### feat/r3-desktop (25)
 
 | table | rea item | status | area | owner |
 |---|---|---|---|---|
 | MCP tools | `trace_native_ui_action` | missing | UI tracing | desktop |
 | MCP tools | `observe_native_ui` | partial | UI tracing | desktop |
+| MCP tools | `capture_native_ui_scenario` | missing | UI tracing | desktop |
 | MCP tools | `start_build_computer` | missing | build computer | desktop |
 | MCP tools | `act_on_build_computer` | missing | build computer | desktop |
 | MCP tools | `start_build_capture` | missing | build computer | desktop |
@@ -367,3 +367,31 @@ Grouped by proposed owner package.
 | Settings | `REA_ELECTRON_CAPTURE_ARGV` | missing | Electron scenarios | webrt |
 
 In-progress areas with no matching rea row (RevLens-only work or process work): Hermes (feat/r3-native), AsyncAPI (feat/r3-formats), mutation tests (feat/r3-platform), single binary (feat/r3-platform).
+
+## Efficiency
+
+Warm in-process medians over 5 runs after 2 warm-up runs, linux arm64, Node v22.23.3. rea 6.8.0 runs from TypeScript source through its own tsx (its compiled runtime could not be built here: the compile step needs the tsrs native binary, which its optional dependencies did not provide for this platform, and the package asks for Node ^22.23.4 while the host has v22.23.3); RevLens runs from its tsc output. Warm medians exclude transpiling and module loading, so the comparison is fair for the work itself; import time is shown per side. Both sides read the same file and print JSON; rea output includes Evidence identity and source ranges, so byte counts differ.
+
+| operation | fixture | rea | RevLens | ratio (rea / RevLens) |
+|---|---|---|---|---|
+| ELF notes | samples/ls-linux.elf | 16.1 ms (exit 0, 8926 B out, import 17627 ms, RSS 259 MiB) | 3.6 ms (exit 0, 3507 B out, import 2454 ms, RSS 52 MiB) | 4.5x |
+| binary hardening | samples/ls-linux.elf | 14.6 ms (exit 0, 6782 B out, import 15204 ms, RSS 270 MiB) | 1.9 ms (exit 0, 1336 B out, import 1133 ms, RSS 50 MiB) | 7.6x |
+| ELF unwind ranges | samples/ls-linux.elf | 35.5 ms (exit 0, 125977 B out, import 12550 ms, RSS 278 MiB) | 2.8 ms (exit 0, 51691 B out, import 1590 ms, RSS 56 MiB) | 12.9x |
+| Python pyc | samples/managed/python/sample_mod.3.12.pyc | 25.8 ms (exit 0, 19199 B out, import 15058 ms, RSS 256 MiB) | 8.8 ms (exit 0, 12371 B out, import 3678 ms, RSS 56 MiB) | 2.9x |
+| Erlang BEAM | samples/managed/beam/elixir_sup.beam | 19.9 ms (exit 0, 8895 B out, import 29722 ms, RSS 284 MiB) | 9.5 ms (exit 0, 5718 B out, import 3030 ms, RSS 45 MiB) | 2.1x |
+| .NET metadata summary | samples/managed/dotnet/RevDemoLib-1.0.0.dll | 48.9 ms (exit 0, 10462 B out, import 27617 ms, RSS 303 MiB) | 3.3 ms (exit 0, 5149 B out, import 3360 ms, RSS 43 MiB) | 14.7x |
+| PE resources | samples/extras/hello-res.exe | 14.6 ms (exit 0, 8928 B out, import 20226 ms, RSS 247 MiB) | 18.4 ms (exit 0, 2556 B out, import 1058 ms, RSS 61 MiB) | 0.8x |
+| PE imports (deep PE view) | samples/disasm/hello-x64.exe | 18.2 ms (exit 0, 14200 B out, import 19419 ms, RSS 279 MiB) | 16.1 ms (exit 0, 2017 B out, import 1543 ms, RSS 51 MiB) | 1.1x |
+| Windows shortcut | samples/extras/notepad.lnk | 14.1 ms (exit 0, 6566 B out, import 12517 ms, RSS 278 MiB) | 1.0 ms (exit 0, 1208 B out, import 1551 ms, RSS 45 MiB) | 14.1x |
+| devicetree | samples/extras/board.dtb | 18.1 ms (exit 0, 7922 B out, import 12165 ms, RSS 252 MiB) | 0.9 ms (exit 0, 2321 B out, import 1471 ms, RSS 52 MiB) | 19.9x |
+| GGUF model header | samples/extras/tiny.gguf | 18.1 ms (exit 0, 7442 B out, import 11050 ms, RSS 277 MiB) | 1.9 ms (exit 0, 1439 B out, import 1504 ms, RSS 50 MiB) | 9.7x |
+| V8 code cache | samples/extras/add.jsc | 8.7 ms (exit 0, 5153 B out, import 10877 ms, RSS 278 MiB) | 0.5 ms (exit 0, 954 B out, import 1838 ms, RSS 51 MiB) | 15.9x |
+
+- This sandbox has slow file system reads, so cold process start times swing by seconds; they are not used for the ratio.
+- Operations that need external programs on one side only (TShark, sigrok, WABT, Ghidra, Hopper, swift-demangle) are not compared.
+- ELF notes: RevLens also returns the dynamic section and init arrays.
+- Python pyc: RevLens also disassembles every code object.
+- PE imports (deep PE view): x-pe returns the whole deep PE view, not only imports.
+- PE resources: RevLens is not clearly faster here (0.8x); worth profiling in round 4.
+- PE imports (deep PE view): RevLens is not clearly faster here (1.1x); worth profiling in round 4.
+- Import time and memory: rea loads its whole CLI (and here, transpiles it); RevLens loads its engine. Resident memory after the runs is listed per row.
