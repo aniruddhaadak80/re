@@ -9,7 +9,7 @@ import { demangleSwift } from '../demangle/swift/index.js';
 export interface ObjcMethod { name: string; types: string; imp?: string; impSymbol?: string }
 export interface ObjcIvar { name: string; type: string; offset?: number; size: number; alignment: number }
 export interface ObjcProperty { name: string; attributes: string }
-export interface ObjcClassRef { name: string; addr?: string; external?: boolean }
+export interface ObjcClassRef { name: string; demangledName?: string; addr?: string; external?: boolean }
 export interface ObjcClass {
   addr: string; name: string; demangledName?: string; superclass?: ObjcClassRef; metaclass?: string;
   flags: number; flagNames: string[]; instanceStart: number; instanceSize: number; swift: boolean;
@@ -58,9 +58,10 @@ class Reader {
   /** Pointer to a class: local address, or an external class bound by name. */
   classRef(a: number): ObjcClassRef | undefined {
     const p = this.img.readPointer(a);
-    if (p.bind) return { name: p.bind.replace(/^_OBJC_CLASS_\$_/, '').replace(/^_OBJC_METACLASS_\$_/, ''), external: true };
+    const named = (name: string, extra: Partial<ObjcClassRef>): ObjcClassRef => { const d = objcDisplayName(name); return { name, ...(d ? { demangledName: d } : {}), ...extra }; };
+    if (p.bind) return named(p.bind.replace(/^_OBJC_CLASS_\$_/, '').replace(/^_OBJC_METACLASS_\$_/, ''), { external: true });
     if (!p.addr) return undefined;
-    return { name: this.classNameAt(p.addr), addr: hx(p.addr) };
+    return named(this.classNameAt(p.addr), { addr: hx(p.addr) });
   }
   classNameAt(cls: number): string {
     const sym = this.img.symbolAt(cls);

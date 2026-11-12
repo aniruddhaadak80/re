@@ -48,7 +48,17 @@ const jobs = [
   ['maccy-Maccy.macho', async () => unzipMember(await maccy(), 'Maccy.app/Contents/MacOS/Maccy')],
   // CardExample-Unity (MIT, https://github.com/rygo6/CardExample-Unity): a 1.2 MB Unity 5.5 asset bundle with 52 textures
   ['unity-cards.unity3d', async () => get('https://raw.githubusercontent.com/rygo6/CardExample-Unity/master/ExternalAssets/cards')],
+  // Hermes bytecode test files of hermes-dec (https://github.com/P1sec/hermes-dec, AGPL-3.0, used only as test input, not
+  // redistributed): sample.hbc built by hermesc 84, 94 and 99, with the official hbcdump -raw-disassemble output for 94 and 99
+  // and the hermes-dec disassembly for 84 (an independent implementation).
+  ...[
+    ['hermes/84-sample.hbc', 'version-84/sample.hbc'], ['hermes/84-sample.hermes_dec_hasm', 'version-84/sample.hermes_dec_hasm'],
+    ['hermes/94-sample.hbc', 'version-94/sample.hbc'], ['hermes/94-sample.hermes_raw_hasm', 'version-94/sample.hermes_raw_hasm'],
+    ['hermes/94-sample.js', 'version-94/sample.js'],
+    ['hermes/99-sample.hbc', 'version-99-202602/sample.hbc'], ['hermes/99-sample.hermes_raw_hasm', 'version-99-202602/sample.hermes_raw_hasm'],
+  ].map(([out, path]) => [out, async () => get(`https://raw.githubusercontent.com/P1sec/hermes-dec/2e796663e1fedb93dca51060797ebf3327b3fedb/tests/${path}`)]),
 ];
+mkdirSync(join(cache, 'hermes'), { recursive: true });
 let maccyZip;
 
 /** Write to a fresh temp file next to dest (created exclusively), then rename it into place. */

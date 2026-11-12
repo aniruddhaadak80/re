@@ -123,4 +123,7 @@ export const CLI_COMMANDS: CliCommand[] = [
   command('x-unity', 'x_unity_bundle', 'Unity UnityFS asset bundles'),
   command('x-standalone-js', 'x_standalone_js', 'Node SEA, Bun and Deno single-file executables'),
   command('x-api-contracts', 'x_api_contracts', 'Protobuf, OpenAPI and GraphQL contracts inside binaries and bundles'),
+  command('x-objc-swift', 'x_native_dispatch_metadata', 'Objective-C classes, categories, protocols and Swift types, fields, vtables and conformances of a Mach-O'),
+  command('x-hermes', 'x_hermes_bytecode', 'Hermes bytecode 84 to 99: strings, functions, disassembly, string xrefs and closures'),
+  command('x-dart-aot', 'x_dart_aot', 'Dart AOT snapshots (Flutter libapp.so): headers, string pool, libraries, functions'),
 ];

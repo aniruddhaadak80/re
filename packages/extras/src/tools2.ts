@@ -17,6 +17,7 @@ import { parseUnityFs, unityNodeBytes, parseSerializedFile } from './containers/
 import { inspectStandaloneJs, standaloneFile } from './containers/standalone.js';
 import { demangleSwift, demangleSwiftTree, Node as SwiftNode } from './demangle/swift/index.js';
 import { scanApiContracts, protoToText, schemaToSdl } from './contracts/index.js';
+import { NATIVE_META_TOOLS } from './native-meta/tools.js';
 
 const P = PATH_INPUT;
 const LIMIT: Record<string, InputSpec> = {
@@ -273,4 +274,4 @@ export const CONTRACT_TOOLS: ToolDef[] = [
   },
 ];
 
-export const GAP_TOOLS: ToolDef[] = [...WINDOWS_TOOLS, ...APPLE_TOOLS, ...CONTAINER_TOOLS, ...SWIFT_TOOLS, ...CONTRACT_TOOLS];
+export const GAP_TOOLS: ToolDef[] = [...WINDOWS_TOOLS, ...APPLE_TOOLS, ...CONTAINER_TOOLS, ...SWIFT_TOOLS, ...CONTRACT_TOOLS, ...NATIVE_META_TOOLS];
