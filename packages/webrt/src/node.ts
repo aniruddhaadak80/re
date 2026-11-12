@@ -316,6 +316,17 @@ export const TOOLS: ToolDef[] = makeTools(io);
 // ---------------- CLI ----------------
 export interface CliCommand { name: string; usage: string; summary: string; run(argv: string[]): Promise<number> }
 
+const BOOL_FLAGS = ['json', 'include-code', 'include-content', 'no-analyze', 'decode-escapes', 'browser', 'allow-remote', 'allow-execution', 'no-traces', 'logpoint', 'no-tasks', 'include-node-modules', 'no-timers', 'no-network', 'no-externals', 'full-page', 'record-bodies', 'no-sandbox', 'stdin'];
+/** Every value of a flag that can repeat (--probe a --probe b, or --probe=a,b). */
+function multi(argv: string[], key: string): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i] as string;
+    if (a === `--${key}` && i + 1 < argv.length) out.push(argv[++i] as string);
+    else if (a.startsWith(`--${key}=`)) out.push(...a.slice(key.length + 3).split(','));
+  }
+  return out.filter(Boolean);
+}
 function parseArgs(argv: string[]): { pos: string[]; flags: Record<string, string | boolean> } {
   const pos: string[] = [];
   const flags: Record<string, string | boolean> = {};
@@ -324,7 +335,7 @@ function parseArgs(argv: string[]): { pos: string[]; flags: Record<string, strin
     if (a.startsWith('--')) {
       const [k, v] = a.slice(2).split('=', 2) as [string, string | undefined];
       if (v !== undefined) flags[k] = v;
-      else if (i + 1 < argv.length && !(argv[i + 1] as string).startsWith('--') && !['json', 'include-code', 'include-content', 'no-analyze', 'decode-escapes', 'browser', 'allow-remote', 'allow-execution', 'no-traces'].includes(k)) flags[k] = argv[++i] as string;
+      else if (i + 1 < argv.length && !(argv[i + 1] as string).startsWith('--') && !BOOL_FLAGS.includes(k)) flags[k] = argv[++i] as string;
       else flags[k] = true;
     } else pos.push(a);
   }
@@ -335,7 +346,7 @@ const num = (v: unknown) => (v === undefined || v === true ? undefined : Number(
 type Human = (out: any) => string;
 const tool = (n: string) => TOOLS.find((t) => t.name === n) as ToolDef;
 
-function cmd(name: string, toolName: string, usage: string, build: (pos: string[], f: Record<string, string | boolean>) => Record<string, unknown>, human: Human): CliCommand {
+function cmd(name: string, toolName: string, usage: string, build: (pos: string[], f: Record<string, string | boolean>, argv: string[]) => Record<string, unknown> | Promise<Record<string, unknown>>, human: Human): CliCommand {
   const t = tool(toolName);
   return {
     name, usage, summary: t.description.split('. ')[0] + '.',
@@ -343,7 +354,7 @@ function cmd(name: string, toolName: string, usage: string, build: (pos: string[
       const { pos, flags } = parseArgs(argv);
       if (flags.help || flags.h) { process.stdout.write(`${usage}\n\n${t.description}\n`); return 0; }
       try {
-        const out = await t.run(build(pos, flags));
+        const out = await t.run(await build(pos, flags, argv));
         process.stdout.write(flags.json ? JSON.stringify(out, (_k, v) => (typeof v === 'bigint' ? v.toString() : v), 2) + '\n' : human(out) + '\n');
         return 0;
       } catch (e) {
@@ -378,5 +389,50 @@ export const CLI_COMMANDS: CliCommand[] = [
   cmd('sqlite-query', 'web_sqlite_query', 'revlens sqlite-query <db.sqlite> "<SELECT ...>" [--max-rows N] [--json]', (p, f) => ({ path: needPath(p), sql: p[1], maxRows: num(f['max-rows']) }), (o) => lines([o.columns.join('\t'), ...o.rows.map((r: unknown[]) => r.map((v) => (v && typeof v === 'object' ? JSON.stringify(v) : String(v))).join('\t')), `(${o.rowCount} rows${o.truncated ? ', truncated' : ''})`])),
   cmd('har-summary', 'web_har_summary', 'revlens har-summary <file.har> [--json]', (p, f) => ({ path: needPath(p), limit: num(f.limit) }), (o) => lines([`${o.entries} entries${o.creator ? ` from ${o.creator}` : ''}, ${o.totalResponseBytes} response bytes`, `statuses: ${Object.entries(o.statuses).map(([k, v]) => `${k}=${v}`).join(' ')}`, ...o.hosts.map((h: any) => `  ${h.thirdParty ? '3p ' : '   '}${h.host} ${h.requests} req`), ...o.endpoints.map((e: any) => `  api ${e.method} ${e.host}${e.pattern} x${e.count}`), ...o.redirects.map((r: any) => `  redirect ${r.status} ${r.from} -> ${r.to}`), ...o.missingSecurityHeaders.map((m: any) => `  missing headers on ${m.url}: ${m.missing.join(', ')}`)])),
 ];
+
+const str = (v: unknown) => (typeof v === 'string' ? v : undefined);
+const alias = (name: string, c: CliCommand): CliCommand => ({ ...c, name, usage: c.usage.replace(`revlens ${c.name}`, `revlens ${name}`), summary: `${c.summary} (alias of ${c.name})` });
+const pos2 = (s: string): { line: number; column: number } => { const m = /^(\d{1,9}):(\d{1,9})$/.exec(s); if (!m) throw new InputError(`position ${s} is not line:column`); return { line: Number(m[1]), column: Number(m[2]) }; };
+const isMapPath = (p: string) => /\.map$/i.test(p);
+
+/** Round 3 commands: one for every round 3 tool, with the rea command names as aliases. */
+export const CLI_COMMANDS_R3: CliCommand[] = [
+  cmd('module-imports', 'web_trace_module_imports', 'revlens module-imports <folder|bundle|file.map> [--mode auto|files|chunks|bundle|sourcemap] [--map file.map] [--entry path ...] [--no-externals] [--limit N] [--json]', (p, f, argv) => ({ path: needPath(p), mode: str(f.mode), sourceMapPath: str(f.map), entries: multi(argv, 'entry').length ? multi(argv, 'entry') : undefined, includeExternals: f['no-externals'] ? false : undefined, limit: num(f.limit) }), (o) => lines([`${o.mode}: ${o.stats.modules} modules, ${o.stats.edges} edges, ${o.stats.externals} externals, ${o.stats.cycles} cycles, depth ${o.stats.maxDepth}`, ...o.entryPoints.map((e: any) => `  entry ${e.id} (${e.reason})`), ...o.edges.items.slice(0, 200).map((e: any) => `  ${e.from} -> ${e.to} [${e.kind}${e.line ? ' line ' + e.line : ''}]`), ...o.cycles.map((c: any) => `  cycle ${c.loop.join(' -> ')}`), o.unresolved.length ? `unresolved: ${o.unresolved.map((u: any) => u.specifier ?? u).join(', ')}` : undefined, o.externals.length ? `externals: ${o.externals.map((x: any) => x.name).join(', ')}` : undefined, o.unreachable.length ? `unreachable: ${o.unreachable.join(', ')}` : undefined, ...o.warnings.map((w: string) => `  warning: ${w}`)])),
+  cmd('source-location', 'web_trace_source_location', 'revlens source-location <bundle.js|file.map> (--pos line:col ... | --stack file | --original source:line) [--json]', async (p, f, argv) => {
+    const file = needPath(p);
+    const o: Record<string, unknown> = isMapPath(file) ? { sourceMapPath: file } : { bundlePath: file };
+    const ps = multi(argv, 'pos'); if (ps.length) o.positions = ps.map(pos2);
+    if (typeof f.stack === 'string') o.stack = new TextDecoder().decode(await readFileCapped(f.stack, 4 * 1024 * 1024));
+    if (typeof f.original === 'string') { const m = /^(.+):(\d{1,9})(?::(\d{1,9}))?$/.exec(f.original); if (!m) throw new InputError('--original is source:line[:column]'); o.original = { source: m[1], line: Number(m[2]), column: m[3] === undefined ? undefined : Number(m[3]) }; }
+    return o;
+  }, (o) => lines([...(o.locations ?? []).map((l: any) => `${l.generated.url ? l.generated.url + ':' : ''}${l.generated.line}:${l.generated.column}${l.generated.functionName ? ' ' + l.generated.functionName : ''} -> ${l.original ? `${l.original.source}:${l.original.line}:${l.original.column}${l.original.name ? ' ' + l.original.name : ''}${l.original.enclosingFunction ? ' in ' + l.original.enclosingFunction : ''}${l.bundleModule ? ' [module ' + (l.bundleModule.path ?? l.bundleModule.id) + ']' : ''}${l.original.lineText ? '\n      ' + String(l.original.lineText).trim().slice(0, 160) : ''}` : l.note ?? '?'}`), ...(o.generated ?? []).map((g: any) => `generated ${g.line}:${g.column}`)])),
+  cmd('source-compare', 'web_compare_source_to_bundle', 'revlens source-compare <bundle.js|file.map> <source folder> [--include-node-modules] [--limit N] [--json]', (p, f) => { const file = needPath(p); if (!p[1]) throw new InputError('give the source folder'); return { ...(isMapPath(file) ? { sourceMapPath: file } : { bundlePath: file }), folder: p[1], includeNodeModules: !!f['include-node-modules'], limit: num(f.limit) }; }, (o) => lines([`${o.sources} bundle sources: ${Object.entries(o.summary).map(([k, v]) => `${k}=${v}`).join(' ')}`, ...o.files.filter((x: any) => x.status !== 'same').map((x: any) => `  ${x.status.padEnd(16)} ${x.path}${x.firstDifferentLine ? ' first difference at line ' + x.firstDifferentLine : ''}${x.linesAdded !== undefined ? ` +${x.linesAdded} -${x.linesRemoved}` : ''}`), ...o.missingFromBundle.slice(0, 200).map((m: string) => `  not in bundle    ${m}`), ...o.warnings.map((w: string) => `  warning: ${w}`)])),
+  cmd('export-shapes', 'web_export_shapes', 'revlens export-shapes <file|package folder> [--kind auto|module|package|bundle] [--json]', (p, f) => ({ path: needPath(p), kind: str(f.kind) }), (o) => lines([`${o.kind}: ${Object.keys(o.exports).length} exports`, ...Object.entries(o.exports).map(([k, v]: [string, any]) => `  ${k}: ${v.kind}${v.arity !== undefined ? '/' + v.arity : ''}${v.async ? ' async' : ''}${v.generator ? ' generator' : ''}${v.keys?.length ? ' {' + v.keys.slice(0, 12).join(', ') + (v.keys.length > 12 ? ', ...' : '') + '}' : ''}${v.from ? '  (' + v.from + ')' : ''}`), o.modules ? `${o.modules.length} bundle modules with exports` : undefined])),
+  cmd('export-shapes-compare', 'web_compare_export_shapes', 'revlens export-shapes-compare <a> <b> [--kind auto|module|package|bundle] [--json]', (p, f) => { if (!p[1]) throw new InputError('give two sides'); return { a: { path: p[0] }, b: { path: p[1] }, kind: str(f.kind), limit: num(f.limit) }; }, (o) => lines([`${o.a.kind} (${o.a.exports}) vs ${o.b.kind} (${o.b.exports}): similarity ${o.score}, ${o.breaking} breaking, ${o.same} same`, ...o.added.map((x: string) => `  + ${x}`), ...o.removed.map((x: string) => `  - ${x}`), ...o.changed.map((c: any) => `  ~ ${c.name} ${c.change}${c.before !== undefined ? ` ${JSON.stringify(c.before)} -> ${JSON.stringify(c.after)}` : ''}${c.membersAdded?.length ? ' +' + c.membersAdded.join(' +') : ''}${c.membersRemoved?.length ? ' -' + c.membersRemoved.join(' -') : ''}`), ...(o.modules ?? []).map((m: any) => `  module ${m.path}: +${m.comparison.added.length} -${m.comparison.removed.length} ~${m.comparison.changed.length}`)])),
+  cmd('endpoint-join', 'web_endpoint_join', 'revlens endpoint-join <capture.json|file.har> [--script file.js ...] [--origin url] [--json]', (p, f, argv) => ({ capturePath: needPath(p), scriptPaths: multi(argv, 'script').length ? multi(argv, 'script') : undefined, origin: str(f.origin), limit: num(f.limit) }), (o) => lines([`static ${o.summary.static}, observed ${o.summary.observed}, matched ${o.summary.matched}, static only ${o.summary.staticOnly}, observed only ${o.summary.observedOnly}`, ...o.matched.map((m: any) => `  = ${m.static.method ?? '*'} ${m.static.template}${Object.keys(m.params).length ? '  ' + Object.entries(m.params).map(([k, v]: [string, any]) => `${k}=${v.join('|')}`).join(' ') : ''}`), ...o.staticOnly.map((s: any) => `  S ${s.method ?? '*'} ${s.template} (${s.reason})`), ...o.observedOnly.map((s: any) => `  O ${s.method} ${s.host}${s.template} (${s.reason})`), ...o.warnings.map((w: string) => `  warning: ${w}`)])),
+  cmd('env-build', 'web_env_build', 'revlens env-build <capture.json|file.har> --out dir [--name name] [--no-tasks] [--json]', (p, f) => { if (typeof f.out !== 'string') throw new InputError('give --out folder'); return { capturePath: needPath(p), outDir: f.out, name: str(f.name), tasks: f['no-tasks'] ? false : undefined }; }, (o) => lines([`environment ${o.name} for ${o.origin}: ${o.routes} routes, ${o.tasks} tasks, written to ${o.outDir}`, ...(o.warnings ?? []).map((w: string) => `  warning: ${w}`), ...(o.next ?? []).map((n: string) => `  next: ${n}`)])),
+  cmd('env-serve', 'web_env_serve', 'revlens env-serve <env folder|zip> [--port N] [--ttl ms] [--max-requests N] [--json]', (p, f) => ({ path: needPath(p), port: num(f.port), ttlMs: num(f.ttl), maxRequests: num(f['max-requests']) }), (o) => lines([`serving ${o.name} (${o.routes} routes, recorded from ${o.origin}) at ${o.url} until ${o.expiresAt}`, `  log: ${o.url}__revlens/log   reset: POST ${o.url}__revlens/reset   stop: Ctrl-C`])),
+  cmd('env-stop', 'web_env_stop', 'revlens env-stop [--id id] [--json]', (_p, f) => ({ id: str(f.id) }), (o) => lines([`stopped ${o.stopped.length ? o.stopped.join(', ') : 'nothing'}`, ...o.running.map((r: any) => `  running ${r.id} ${r.url}`)])),
+  cmd('env-export', 'web_env_export', 'revlens env-export <env folder|capture> <out.zip> [--name name] [--json]', (p, f) => { if (!p[1]) throw new InputError('give the zip to write'); return { path: needPath(p), outZip: p[1], name: str(f.name) }; }, (o) => `wrote ${o.zip}: ${o.files} files, ${o.bytes} bytes, ${o.routes} routes, ${o.tasks} tasks, sha256 ${o.sha256}`),
+  cmd('env-compare', 'web_env_compare', 'revlens env-compare <env folder|zip> --probe capture.json [--probe ...] [--json]', (p, _f, argv) => ({ path: needPath(p), probes: multi(argv, 'probe') }), (o) => lines([`${o.environment.name}: agreement ${o.summary.agreement} (${o.summary.agreed}/${o.summary.compared} compared calls), ${o.summary.noTool} with no route`, ...o.probes.flatMap((pr: any) => [`  probe ${pr.name}: ${pr.agreed}/${pr.compared} agree, ${pr.mappedIds} ids mapped, ${pr.skipped.length} skipped`, ...pr.calls.filter((c: any) => c.outcome !== 'agree').map((c: any) => `    ${c.outcome.padEnd(12)} ${c.method} ${c.path}${c.difference ? `  ${c.difference.path}: app ${c.difference.app} env ${c.difference.env}` : c.reason ? '  ' + c.reason : ''}`)]), ...o.summary.byTemplate.filter((t: any) => t.agreed < t.compared).map((t: any) => `  template ${t.method} ${t.template}: ${t.agreed}/${t.compared}`)])),
+  cmd('reconcile-runtime', 'web_reconcile_runtime', 'revlens reconcile-runtime <runtime.json> <bundle.js|folder> [more bundles] [--limit N] [--json]', (p, f) => { if (!p[1]) throw new InputError('give the runtime JSON and at least one bundle'); return { runtimePath: p[0], bundlePaths: p.slice(1), limit: num(f.limit) }; }, (o) => lines([`${o.summary.matched}/${o.summary.scripts} runtime scripts matched, ${o.summary.placed}/${o.summary.locations} locations placed, ${o.summary.mappedToSource} mapped to source`, ...o.scripts.flatMap((sc: any) => [`  ${sc.url} = ${sc.bundle} (${sc.matchedBy}, ${sc.bundler ?? '?'})`, ...sc.modules.slice(0, 50).map((m: any) => `    hot  ${m.path ?? m.id}  enter ${m.enter} covered ${m.covered} requests ${m.requests} timers ${m.timers}${m.functions.length ? '  ' + m.functions.slice(0, 8).join(', ') : ''}`), `    cold ${sc.coldModules.length} modules`]), o.unmatchedScripts.length ? `unmatched: ${o.unmatchedScripts.join(', ')}` : undefined, o.unusedBundles.length ? `unused bundles: ${o.unusedBundles.join(', ')}` : undefined, ...o.warnings.map((w: string) => `  warning: ${w}`)])),
+  cmd('trace-semantics', 'web_trace_semantics', 'revlens trace-semantics (--script file.js [-- args] | --port N | --ws url | --url page) --fn name[,name] [--logpoint] [--duration ms] [--max-events N] --allow-execution [--json]', (p, f, argv) => { const fns = multi(argv, 'fn').flatMap((x) => x.split(',')).map((x) => x.trim()).filter(Boolean); const dd = argv.indexOf('--'); return { functions: fns, script: str(f.script), args: dd >= 0 ? argv.slice(dd + 1) : undefined, port: num(f.port), wsUrl: str(f.ws), url: str(f.url) ?? (p[0] && /^https?:/.test(p[0]) ? p[0] : undefined), mode: f.logpoint ? 'logpoint' : undefined, durationMs: num(f.duration), maxEvents: num(f['max-events']), timers: f['no-timers'] ? false : undefined, network: f['no-network'] ? false : undefined, executablePath: str(f.executable), allowExecution: !!f['allow-execution'] }; }, (o) => lines([`${o.target.kind} ${o.target.version ?? ''} ${o.target.url ?? ''}: ${o.eventCount} events in ${o.durationMs} ms (${o.mode})`, ...o.functions.map((fn: any) => `  fn ${fn.name} ${fn.url}:${fn.line} calls ${fn.calls} returns ${fn.returns}`), ...o.events.slice(0, 500).map((e: any) => `  ${String(e.t).padStart(6)}ms ${'  '.repeat(Math.max(0, (e.depth ?? 1) - 1))}${e.kind === 'enter' ? `-> ${e.fn}(${Object.entries(e.args ?? {}).map(([k, v]) => `${k}=${v}`).join(', ')})` : e.kind === 'exit' ? `<- ${e.fn} = ${e.returnValue}` : e.kind === 'request' ? `request ${e.request.method} ${e.request.url}${e.stack?.[0] ? '  from ' + e.stack[0] : ''}` : e.kind === 'timer' ? `timer ${e.timer}${e.stack?.[0] ? '  from ' + e.stack[0] : ''}` : e.kind}`), o.summary.unmatchedSelectors.length ? `not found: ${o.summary.unmatchedSelectors.join(', ')}` : undefined, o.exitCode !== undefined ? `exit code ${o.exitCode}` : undefined, ...o.warnings.map((w: string) => `  warning: ${w}`)])),
+];
+const r3 = (n: string) => CLI_COMMANDS_R3.find((c) => c.name === n)!;
+// rea command names
+CLI_COMMANDS_R3.push(
+  alias('trace-web-module-imports', r3('module-imports')),
+  alias('trace-web-source-location', r3('source-location')),
+  alias('compare-source-to-bundle', r3('source-compare')),
+  alias('compare-javascript-export-shapes', r3('export-shapes-compare')),
+  alias('compare-static-and-observed-endpoints', r3('endpoint-join')),
+  alias('environment-build', r3('env-build')),
+  alias('environment-serve', r3('env-serve')),
+  alias('environment-export', r3('env-export')),
+  alias('environment-compare', r3('env-compare')),
+  alias('reconcile-javascript-runtime', r3('reconcile-runtime')),
+  alias('trace-javascript-semantics', r3('trace-semantics')),
+);
+CLI_COMMANDS.push(...CLI_COMMANDS_R3);
 
 export * from './index.js';

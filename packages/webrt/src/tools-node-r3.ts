@@ -3,6 +3,16 @@
 import type { ToolDef } from './tools.js';
 import { traceNodeSemantics, traceBrowserSemantics, type FunctionSelector, type PageAction } from './semantics.js';
 import { InputError } from './util.js';
+import { loadEnvironment } from './env-node.js';
+import { compareEnvironmentWithProbes } from './envcompare.js';
+import { open } from 'node:fs/promises';
+
+/** Read a file with a size cap through one descriptor. */
+export async function readCapped(path: string, max: number): Promise<Uint8Array> {
+  const fh = await open(path, 'r');
+  try { const st = await fh.stat(); if (!st.isFile()) throw new InputError(`${path} is not a regular file`); if (st.size > max) throw new InputError(`${path} is ${st.size} bytes, over the ${max} byte limit`); return new Uint8Array(await fh.readFile()); } finally { await fh.close(); }
+}
+const readJson = async (path: string, max = 1024 * 1024 * 1024): Promise<unknown> => { const t = new TextDecoder().decode(await readCapped(path, max)).replace(/^\uFEFF/, ''); try { return JSON.parse(t); } catch { throw new InputError(`${path} is not JSON`); } };
 
 const fnList = (v: unknown): (string | FunctionSelector)[] => {
   if (typeof v === 'string') return v.split(',').map((x) => x.trim()).filter(Boolean);
@@ -19,6 +29,24 @@ const fnList = (v: unknown): (string | FunctionSelector)[] => {
 
 export function nodeR3Tools(): ToolDef[] {
   return [
+    {
+      name: 'web_env_compare',
+      description: 'Measure how faithfully a replay environment answers like the application it came from (rea environment-compare): each probe is a HAR or capture of one call sequence recorded against the live application after a reset; the environment is reset before each probe, each request to the probe origin is answered as web_env_serve would answer it, and the answer is compared with the application after ids are mapped (identifier fields of paired answers, arrays paired by a natural key) and timestamps normalised. Reports per call agree, disagree (first differing JSON path), no-tool or not-compared, agreement per probe and per route template. Reads files only, no network.',
+      inputSchema: {
+        path: { type: 'string', description: 'Environment folder or zip (from web_env_build or web_env_export).' },
+        probes: { type: 'array', description: 'Probe capture files (HAR, scenario capture.json or browser capture).' },
+        limit: { type: 'number', description: 'Calls listed per probe (default 5000).', optional: true },
+      },
+      run: async (i) => {
+        if (typeof i.path !== 'string') throw new InputError('give the environment path');
+        const list = Array.isArray(i.probes) ? i.probes.map(String) : typeof i.probes === 'string' ? [i.probes] : [];
+        if (!list.length) throw new InputError('give at least one probe capture');
+        const env = await loadEnvironment(i.path);
+        const probes = [];
+        for (const p of list.slice(0, 200)) probes.push({ name: p, capture: await readJson(p) });
+        return compareEnvironmentWithProbes(env.manifest, env.body, probes, { limit: i.limit });
+      },
+    },
     {
       name: 'web_trace_semantics',
       description: 'Semantic runtime tracing of chosen JavaScript functions through the debugger only (rea trace_javascript_semantics, done live): run a Node script under the inspector, attach to a Node inspector port, or open a page in Chromium, and record every call of the chosen functions with argument values, every return with its value, call depth, stacks with async parents, timers (setTimeout, setInterval, animation frames) and fetch, XHR and http requests with initiator stacks. Functions are picked by name (also Class.method and esbuild renamed name2), URL part, or a line and column. Scripts are caught before they run. Logpoint mode never pauses the program. Nothing is evaluated in the target except argument reads. Node targets need allowExecution.',
