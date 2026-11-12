@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+"""Generate packages/extras/src/hermes/opcodes.ts from Hermes's BytecodeList.def.
+
+Hermes (https://github.com/facebook/hermes) is MIT licensed. For each bytecode version this
+script downloads include/hermes/BCGen/HBC/BytecodeList.def at the commit that set that
+BYTECODE_VERSION (found from the history of BytecodeVersion.h on main and on rn/0.73-stable),
+expands the DEFINE_JUMP_n macros, numbers the opcodes in file order and records operand types
+plus which operands are string, bigint or function ids. Identical tables are stored once.
+
+Run: python3 packages/extras/scripts/gen_hermes_opcodes.py [cache_dir]
+"""
+import json, os, re, sys, urllib.request
+
+VERSIONS = {
+    84: 'c2cd9e385a922f486a55e6bd70db2032f78379ed',
+    85: 'b74eb2d5bff8ffbfa6914746261c4efd2c4223c5',
+    86: 'b8235156c0bfb0eea550243e67c5018661ff3185',
+    87: '41752c6589227694ae3a96a34e932c74c9ce3699',
+    88: '2a55135bce3d41778ec3f56d8b43ad3b57b51b19',
+    89: '498f7cb64a8c59a3e95f074035ad2d23d1fde5cc',
+    90: '0763eee4bf461df30ffefe0180d09835bb6bb58d',
+    91: '4985960686bb33ccf66047b0090e153a7a48a545',
+    92: 'b544ff4a587586a296c5e15e3901c22be45c145f',
+    93: '760d8659d8a8c703831144de4511e0f0ac41e391',
+    94: '1c717488d1799f6153cf6d60c3556ab4ddd9dce6',
+    95: 'f6b56d334467555b634f54bd18900d7ef8408eba',
+    96: '2afc7b09ffc74201b4dd530d9414b48e61a5196f',
+    # Static Hermes era (main branch), included as best effort
+    97: '16b5ada8272d23455ff63fac57353fd0f5041ee3',
+    98: 'c00cc57595b3ef504a323360ba77e7b2e0ac26ce',
+    # 99 stayed the version number while the opcode list moved; this is the list of late February 2026
+    99: 'a6671652a1feed713b2e808672f46fb1f6cb2acc',
+}
+URL = 'https://raw.githubusercontent.com/facebook/hermes/{sha}/include/hermes/BCGen/HBC/BytecodeList.def'
+VERIFY_URL = 'https://raw.githubusercontent.com/facebook/hermes/{sha}/include/hermes/BCGen/HBC/BytecodeVersion.h'
+TYPES = ['Reg8', 'Reg32', 'UInt8', 'UInt16', 'UInt32', 'Addr8', 'Addr32', 'Imm32', 'Double']
+
+
+def fetch(url, cache):
+    name = os.path.join(cache, re.sub(r'[^A-Za-z0-9]', '_', url[-90:]))
+    if os.path.exists(name):
+        return open(name, encoding='utf-8').read()
+    with urllib.request.urlopen(url, timeout=60) as r:
+        text = r.read().decode('utf-8')
+    open(name, 'w', encoding='utf-8').write(text)
+    return text
+
+
+def parse(text):
+    # strip comments, join continuation lines
+    text = re.sub(r'/\*.*?\*/', '', text, flags=re.S)
+    text = re.sub(r'//[^\n]*', '', text)
+    text = text.replace('\\\n', ' ')
+    jumps = {}
+    for m in re.finditer(r'#define\s+(DEFINE_JUMP_\d)\(name\)([^\n]*)', text):
+        body = []
+        for d in re.finditer(r'DEFINE_OPCODE_\d\(\s*name(##Long)?\s*((?:,\s*\w+\s*)*)\)', m.group(2)):
+            body.append((d.group(1) or '', [t.strip() for t in d.group(2).split(',') if t.strip()]))
+        jumps[m.group(1)] = body
+    ops = []
+    ids = {}
+    for line in text.split('\n'):
+        line = line.strip()
+        if line.startswith('#'):
+            continue
+        m = re.match(r'DEFINE_OPCODE_(\d)\(\s*(\w+)\s*((?:,\s*\w+\s*)*)\)', line)
+        if m:
+            ops.append((m.group(2), [t.strip() for t in m.group(3).split(',') if t.strip()]))
+            continue
+        m = re.match(r'(DEFINE_JUMP_\d)\(\s*(\w+)\s*\)', line)
+        if m:
+            for suffix, types in jumps[m.group(1)]:
+                ops.append((m.group(2) + ('Long' if suffix else ''), types))
+            continue
+        m = re.match(r'OPERAND_(STRING|BIGINT|FUNCTION)_ID\(\s*(\w+)\s*,\s*(\d+)\s*\)', line)
+        if m:
+            ids.setdefault(m.group(2), []).append(m.group(1)[0].lower() + m.group(3))
+    out = []
+    for name, types in ops:
+        for t in types:
+            if t not in TYPES:
+                raise SystemExit(f'unknown operand type {t} in {name}')
+        out.append(name + ':' + ','.join(TYPES.index(t).__str__() for t in types) + ('|' + ','.join(ids[name]) if name in ids else ''))
+    return out
+
+
+def main():
+    cache = sys.argv[1] if len(sys.argv) > 1 else '/tmp/hermes-defs'
+    os.makedirs(cache, exist_ok=True)
+    tables = []
+    version_table = {}
+    for v, sha in VERSIONS.items():
+        ver = fetch(VERIFY_URL.format(sha=sha), cache)
+        got = int(re.search(r'BYTECODE_VERSION\s*=\s*(\d+)', ver).group(1))
+        if got != v:
+            raise SystemExit(f'{sha}: BytecodeVersion.h says {got}, expected {v}')
+        ops = parse(fetch(URL.format(sha=sha), cache))
+        if ops in tables:
+            version_table[v] = tables.index(ops)
+        else:
+            tables.append(ops)
+            version_table[v] = len(tables) - 1
+        print(v, sha[:10], len(ops), 'opcodes, table', version_table[v])
+    here = os.path.dirname(os.path.abspath(__file__))
+    dest = os.path.join(here, '..', 'src', 'hermes', 'opcodes.ts')
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    with open(dest, 'w', encoding='utf-8') as f:
+        f.write('// Generated by packages/extras/scripts/gen_hermes_opcodes.py from Hermes BytecodeList.def\n')
+        f.write('// (https://github.com/facebook/hermes, MIT License, Copyright (c) Meta Platforms, Inc. and affiliates).\n')
+        f.write('// Each entry is "Name:operand types|id operands". Types index OPERAND_TYPES; ids are s (string),\n')
+        f.write('// b (bigint) or f (function) followed by the 1 based operand number. Do not edit by hand.\n\n')
+        f.write('export const OPERAND_TYPES = ' + json.dumps(TYPES) + ' as const;\n')
+        f.write('export const SOURCE_COMMITS: Record<number, string> = ' + json.dumps({str(k): v for k, v in VERSIONS.items()}) + ';\n')
+        f.write('export const TABLES: string[][] = [\n')
+        for t in tables:
+            f.write('  ' + json.dumps(t, separators=(',', ':')) + ',\n')
+        f.write('];\n')
+        f.write('export const VERSION_TABLE: Record<number, number> = ' + json.dumps({str(k): v for k, v in version_table.items()}) + ';\n')
+    print('wrote', dest)
+
+
+if __name__ == '__main__':
+    main()
