@@ -36,7 +36,9 @@ export type FormatId =
   | 'zip' | 'jar' | 'apk' | 'crx' | 'xpi' | 'vsix' | 'npm-tgz' | 'gzip' | 'tar' | 'asar'
   | 'js' | 'sourcemap' | 'json' | 'pdf' | 'pyc' | 'dex' | 'class' | 'text' | 'unknown'
   // added in 1.0.0, detected by magic bytes so package analyzers can key off them
-  | 'dotnet' | 'ipa' | 'pcap' | 'pcapng' | 'sqlite' | 'har' | 'lua' | 'beam' | 'il2cpp-metadata';
+  | 'dotnet' | 'ipa' | 'pcap' | 'pcapng' | 'sqlite' | 'har' | 'lua' | 'beam' | 'il2cpp-metadata'
+  // added in round 4: Apple disk images and installers, Windows app packages, plain DOS programs, folders
+  | 'dmg' | 'pkg' | 'xar' | 'msix' | 'appx' | 'dos-mz' | 'directory';
 
 export interface Hashes {
   md5: string;

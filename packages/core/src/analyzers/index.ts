@@ -15,9 +15,10 @@ import { secretsAnalyzer } from './secrets.js';
 import { surfaceAnalyzer } from './surface.js';
 import { capaAnalyzer } from './capa.js';
 import { yaraAnalyzer } from './yara.js';
+import { installersAnalyzer } from './installers.js';
 
 export const ANALYZER_LIST: Analyzer[] = [
-  elfAnalyzer, peAnalyzer, machoAnalyzer, wasmAnalyzer, buildinfoAnalyzer,
+  elfAnalyzer, peAnalyzer, machoAnalyzer, wasmAnalyzer, installersAnalyzer, buildinfoAnalyzer,
   entropyAnalyzer, stringsAnalyzer,
   archiveAnalyzer, extAuditAnalyzer,
   bundleSbomAnalyzer, sourcemapAnalyzer, secretsAnalyzer, surfaceAnalyzer,

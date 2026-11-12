@@ -10,6 +10,8 @@ const MIME: Partial<Record<FormatId, string>> = {
   pdf: 'application/pdf', dotnet: 'application/vnd.microsoft.portable-executable', ipa: 'application/octet-stream',
   pcap: 'application/vnd.tcpdump.pcap', pcapng: 'application/x-pcapng', sqlite: 'application/vnd.sqlite3', har: 'application/json',
   lua: 'application/x-lua-bytecode', beam: 'application/x-erlang-beam', 'il2cpp-metadata': 'application/octet-stream',
+  dmg: 'application/x-apple-diskimage', pkg: 'application/vnd.apple.installer+xml', xar: 'application/x-xar', msix: 'application/msix', appx: 'application/appx',
+  'dos-mz': 'application/x-dosexec', directory: 'inode/directory',
   pyc: 'application/x-python-code', dex: 'application/x-dex', class: 'application/java-vm', text: 'text/plain',
 };
 
@@ -27,6 +29,10 @@ function zipFlavor(bytes: Uint8Array, name: string): FormatId {
   if (e === 'xpi') return 'xpi';
   if (e === 'vsix') return 'vsix';
   if (e === 'crx') return 'crx';
+  if (e === 'appx' || e === 'appxbundle') return 'appx';
+  if (e === 'msix' || e === 'msixbundle') return 'msix';
+  if (indexOf(bytes, asciiBytes('AppxManifest.xml')) >= 0 && indexOf(bytes, asciiBytes('AppxBlockMap.xml')) >= 0) return 'msix';
+  if (indexOf(bytes, asciiBytes('AppxMetadata/AppxBundleManifest.xml')) >= 0) return 'msix';
   // Peek at central directory names without fully parsing.
   if (e === 'ipa' || (indexOf(bytes, asciiBytes('Payload/')) >= 0 && indexOf(bytes, asciiBytes('.app/Info.plist')) >= 0)) return 'ipa';
   if (indexOf(bytes, asciiBytes('AndroidManifest.xml')) >= 0 && indexOf(bytes, asciiBytes('classes.dex')) >= 0) return 'apk';
@@ -44,6 +50,8 @@ export function detectFormat(bytes: Uint8Array, name = ''): FormatId {
     const pe = dv.getUint32(0x3c, true);
     if (pe + 4 <= bytes.length && startsWith(bytes, [0x50, 0x45, 0, 0], pe)) return hasCliDirectory(dv, pe) ? 'dotnet' : 'pe';
   }
+  // MZ without a PE header: a plain DOS program (or an NE, LE or LX image behind a DOS stub).
+  if ((startsWith(bytes, [0x4d, 0x5a]) || startsWith(bytes, [0x5a, 0x4d])) && bytes.length >= 28 && isPlausibleMz(bytes)) return 'dos-mz';
   if (startsWith(bytes, [0xca, 0xfe, 0xba, 0xbe])) {
     // Mach-O fat vs Java class: fat has a small arch count, class has major version >= 45.
     const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -54,6 +62,8 @@ export function detectFormat(bytes: Uint8Array, name = ''): FormatId {
     if (startsWith(bytes, m)) return 'macho';
   }
   if (startsWith(bytes, [0x00, 0x61, 0x73, 0x6d])) return 'wasm';
+  if (startsWith(bytes, [0x78, 0x61, 0x72, 0x21]) && bytes.length >= 28) return e === 'xip' || e === 'safariextz' || e === 'xar' ? 'xar' : 'pkg';
+  if (hasKolyTrailer(bytes)) return 'dmg';
   for (const m of [[0xd4, 0xc3, 0xb2, 0xa1], [0xa1, 0xb2, 0xc3, 0xd4], [0x4d, 0x3c, 0xb2, 0xa1], [0xa1, 0xb2, 0x3c, 0x4d]]) {
     if (startsWith(bytes, m) && bytes.length >= 24) return 'pcap';
   }
@@ -85,6 +95,24 @@ export function detectFormat(bytes: Uint8Array, name = ''): FormatId {
   return 'unknown';
 }
 
+/** UDIF disk images end with a 512 byte trailer that starts with "koly", version 4, header size 512. */
+function hasKolyTrailer(b: Uint8Array): boolean {
+  if (b.length < 1024) return false;
+  const t = b.length - 512;
+  return b[t] === 0x6b && b[t + 1] === 0x6f && b[t + 2] === 0x6c && b[t + 3] === 0x79 && b[t + 8] === 0 && b[t + 9] === 0 && b[t + 10] === 2 && b[t + 11] === 0;
+}
+
+/** An MZ header whose header size and page count make sense; rules out random data that starts with MZ. */
+function isPlausibleMz(b: Uint8Array): boolean {
+  const u16 = (o: number): number => (b[o] as number) | ((b[o + 1] as number) << 8);
+  const lastPage = u16(2), pages = u16(4), hdrPara = u16(8), relocOff = u16(24), nrel = u16(6);
+  if (pages === 0 || lastPage > 511 || hdrPara === 0) return false;
+  const image = pages * 512 - (lastPage ? 512 - lastPage : 0);
+  if (hdrPara * 16 > image) return false;
+  if (nrel && relocOff + nrel * 4 > hdrPara * 16 && relocOff + nrel * 4 > b.length) return false;
+  return true;
+}
+
 export function isTextFormat(f: FormatId): boolean {
   return f === 'js' || f === 'json' || f === 'sourcemap' || f === 'text' || f === 'har';
 }
@@ -95,6 +123,8 @@ export function formatFamily(f: FormatId): FormatId {
   if (f === 'ipa') return 'zip';
   if (f === 'pcapng') return 'pcap';
   if (f === 'har') return 'json';
+  if (f === 'msix' || f === 'appx') return 'zip';
+  if (f === 'pkg') return 'xar';
   return f;
 }
 
