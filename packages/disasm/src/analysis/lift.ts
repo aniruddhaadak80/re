@@ -24,6 +24,7 @@ const ARGS: Record<string, string[]> = {
   win64: ['rcx', 'rdx', 'r8', 'r9'],
   arm64: ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7'],
   arm: ['r0', 'r1', 'r2', 'r3'],
+  ppc: ['r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10'],
 };
 
 const X86_ALIAS: Record<string, string> = {};
@@ -99,8 +100,8 @@ class Lifter {
     if (dbg) for (const pr of dbg.paramByReg.values()) if (pr.typeRef !== undefined) this.typed.set(pr.name, pr.typeRef);
     this.arch = p.arch;
     this.maxLines = maxLines;
-    this.conv = this.arch === 'x86_64' ? (p.img.format === 'pe' ? ARGS.win64! : ARGS.sysv!) : this.arch === 'arm64' ? ARGS.arm64! : this.arch === 'arm' ? ARGS.arm! : [];
-    this.retReg = this.arch === 'x86_64' ? 'rax' : this.arch === 'x86' ? 'eax' : this.arch === 'arm64' ? 'x0' : 'r0';
+    this.conv = this.arch === 'x86_64' ? (p.img.format === 'pe' ? ARGS.win64! : ARGS.sysv!) : this.arch === 'arm64' ? ARGS.arm64! : this.arch === 'arm' ? ARGS.arm! : this.arch === 'ppc' ? ARGS.ppc! : [];
+    this.retReg = this.arch === 'x86_64' ? 'rax' : this.arch === 'x86' ? 'eax' : this.arch === 'x86_16' ? 'ax' : this.arch === 'arm64' ? 'x0' : this.arch === 'ppc' ? 'r3' : 'r0';
     this.blocks = [...af.blocks].sort((a, b) => a.start - b.start);
     this.blocks.forEach((b, i) => this.idx.set(b.start, i));
   }
@@ -256,7 +257,7 @@ class Lifter {
     const ops = splitOperands(ins.operands);
     const [a, b, c] = ops;
     if (ins.flow === 'call' || ins.flow === 'icall') return this.callText(ins) + ';';
-    if (this.arch === 'x86' || this.arch === 'x86_64') return this.stmtX86(ins, m, ops, a, b);
+    if (this.arch === 'x86' || this.arch === 'x86_64' || this.arch === 'x86_16') return this.stmtX86(ins, m, ops, a, b);
     return this.stmtArm(ins, m, ops, a, b, c);
   }
 

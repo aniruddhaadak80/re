@@ -1,6 +1,7 @@
 // @revlens/disasm public entry (browser and worker safe; path inputs need Node or setFileReader).
 export * from './types.js';
-export { loadImage, detectBinFormat, type LoadOptions } from './loader/index.js';
+export { loadImage, detectBinFormat, type LoadOptions, type LoadMode } from './loader/index.js';
+export { loadRaw, loadDosCom, loadDol, isDol } from './loader/rawmodes.js';
 export { Memory } from './loader/memory.js';
 export { loadDecoders, type DecoderOptions, type DecoderSet } from './backends/index.js';
 export { Program, normName, type OpenOptions } from './analysis/program.js';

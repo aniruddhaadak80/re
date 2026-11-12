@@ -1,8 +1,9 @@
 // Shared types for @revlens/disasm. Plain data, JSON friendly. Addresses are JS numbers
 // (exact up to 2^53, which covers every real user space and kernel image layout we load).
 
-export type Arch = 'x86' | 'x86_64' | 'arm64' | 'arm' | 'unknown';
-export type BinFormat = 'elf' | 'pe' | 'macho' | 'raw';
+/** x86_16: real mode code (DOS COM); ppc: 32 bit big endian PowerPC (GameCube Gekko, Wii Broadway) */
+export type Arch = 'x86' | 'x86_64' | 'arm64' | 'arm' | 'x86_16' | 'ppc' | 'unknown';
+export type BinFormat = 'elf' | 'pe' | 'macho' | 'raw' | 'dos-com' | 'gamecube-dol';
 
 export interface Segment {
   name: string;

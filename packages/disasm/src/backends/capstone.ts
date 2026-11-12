@@ -31,7 +31,7 @@ export class CapstoneDecoder implements Decoder {
   private readonly handles = new Map<string, CsModule>();
   constructor(cs: CsModule) { this.cs = cs; }
 
-  supports(arch: Arch): boolean { return arch === 'arm64' || arch === 'arm' || arch === 'x86' || arch === 'x86_64'; }
+  supports(arch: Arch): boolean { return arch === 'arm64' || arch === 'arm' || arch === 'x86' || arch === 'x86_64' || arch === 'x86_16' || arch === 'ppc'; }
 
   private handle(arch: Arch, thumb: boolean): CsModule {
     const key = arch + (thumb ? ':t' : '');
@@ -41,6 +41,8 @@ export class CapstoneDecoder implements Decoder {
       if (arch === 'arm64') h = new cs.Capstone(cs.ARCH_ARM64, cs.MODE_ARM);
       else if (arch === 'arm') h = new cs.Capstone(cs.ARCH_ARM, thumb ? cs.MODE_THUMB : cs.MODE_ARM);
       else if (arch === 'x86_64') h = new cs.Capstone(cs.ARCH_X86, cs.MODE_64);
+      else if (arch === 'x86_16') h = new cs.Capstone(cs.ARCH_X86, cs.MODE_16);
+      else if (arch === 'ppc') h = new cs.Capstone(cs.ARCH_PPC, cs.MODE_32 | cs.MODE_BIG_ENDIAN);
       else h = new cs.Capstone(cs.ARCH_X86, cs.MODE_32);
       this.handles.set(key, h);
     }
@@ -52,7 +54,7 @@ export class CapstoneDecoder implements Decoder {
     if (bytes.length === 0 || maxInsns <= 0) return out;
     const h = this.handle(arch, thumb && arch === 'arm');
     // Capstone decodes the whole buffer; feed it in slices so a cap on instructions caps work too.
-    const maxBytes = Math.min(bytes.length, maxInsns * (arch === 'x86' || arch === 'x86_64' ? 15 : 4));
+    const maxBytes = Math.min(bytes.length, maxInsns * (arch === 'x86' || arch === 'x86_64' || arch === 'x86_16' ? 15 : 4));
     let pos = 0;
     while (pos < maxBytes && out.length < maxInsns) {
       const chunk = bytes.subarray(pos, Math.min(maxBytes, pos + 4096));
@@ -72,7 +74,7 @@ export class CapstoneDecoder implements Decoder {
         // stopped early: invalid bytes (unless the chunk merely cut an instruction)
         const remain = maxBytes - pos;
         if (used > 0 && chunk.length === 4096 && remain > 0 && used >= chunk.length - 16) continue;
-        const w = arch === 'arm64' || (arch === 'arm' && !thumb) ? 4 : arch === 'arm' ? 2 : 1;
+        const w = arch === 'arm64' || arch === 'ppc' || (arch === 'arm' && !thumb) ? 4 : arch === 'arm' ? 2 : 1;
         if (pos < bytes.length) out.push({ address: address + pos, size: w, bytes: hexOf(bytes.subarray(pos, pos + w)), mnemonic: '(bad)', operands: '', flow: 'invalid', imms: [] });
         break;
       }
@@ -86,6 +88,7 @@ export class CapstoneDecoder implements Decoder {
     const ops = splitOperands(operands);
     if (arch === 'arm64') a64Flow(insn, ops);
     else if (arch === 'arm') armFlow(insn, ops, thumb);
+    else if (arch === 'ppc') ppcFlow(insn, ops);
     else x86Flow(insn, ops);
     return insn;
   }
@@ -151,6 +154,25 @@ function armFlow(insn: Insn, ops: string[], thumb: boolean): void {
     } else collectImms(insn, ops);
   }
   if ((flow === 'jump' || flow === 'cjump') && insn.target === undefined) flow = flow === 'jump' ? 'ijump' : 'seq';
+  insn.flow = flow;
+}
+
+const PPC_COND = /^b(dnz|dz|dnzt|dnzf|dzt|dzf|eq|ne|lt|gt|le|ge|so|ns|un|nu|nl|ng|t|f|c)$/;
+
+/** PowerPC branches from capstone text: b/bl/ba/bla, conditional b<cc> and bc, blr (return), bctr, bctrl. */
+function ppcFlow(insn: Insn, ops: string[]): void {
+  const m = insn.mnemonic.replace(/[+-]$/, '');
+  let flow: Flow = 'seq';
+  if (m === 'b' || m === 'ba') { flow = 'jump'; insn.target = lastImm(ops); }
+  else if (m === 'bl' || m === 'bla') { flow = 'call'; insn.target = lastImm(ops); }
+  else if (m === 'blr') flow = 'ret';
+  else if (m === 'blrl' || m === 'bctrl') flow = 'icall';
+  else if (m === 'bctr') flow = 'ijump';
+  else if (m === 'rfi' || m === 'rfid') flow = 'ret';
+  else if (m === 'trap') flow = 'trap';
+  else if (PPC_COND.test(m) || m === 'bca' || m === 'bcl') { flow = m === 'bcl' ? 'call' : 'cjump'; insn.target = lastImm(ops); }
+  else collectImms(insn, ops);
+  if ((flow === 'jump' || flow === 'call' || flow === 'cjump') && insn.target === undefined) flow = flow === 'call' ? 'icall' : flow === 'jump' ? 'ijump' : 'seq';
   insn.flow = flow;
 }
 

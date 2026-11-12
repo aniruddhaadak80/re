@@ -4,6 +4,10 @@ import { loadElf } from './elf.js';
 import { loadPe } from './pe.js';
 import { loadMachO, isFat, fatSlices } from './macho.js';
 import { readGoPclntab } from './gopclntab.js';
+import { loadRaw, loadDosCom, loadDol, isDol } from './rawmodes.js';
+
+/** How to load the bytes: auto (ELF, PE, Mach-O, DOL, else raw when rawArch is set), or a forced mode. */
+export type LoadMode = 'auto' | 'raw' | 'dos-com' | 'gamecube-dol';
 
 export interface LoadOptions {
   /** for fat Mach-O: which slice to load (default: x86_64, then arm64, then the first) */
@@ -13,6 +17,10 @@ export interface LoadOptions {
   rawBase?: number;
   /** read Go pclntab names (default true) */
   goSymbols?: boolean;
+  /** force a load mode; raw needs rawArch (rawBase and rawEntry optional) */
+  loadMode?: LoadMode;
+  /** raw mode: entry address (default rawBase) */
+  rawEntry?: number;
 }
 
 export function detectBinFormat(b: Uint8Array): 'elf' | 'pe' | 'macho' | 'macho-fat' | 'unknown' {
@@ -31,8 +39,16 @@ export function detectBinFormat(b: Uint8Array): 'elf' | 'pe' | 'macho' | 'macho-
 
 /** Load a binary into a BinaryImage. Throws only for unsupported formats. */
 export function loadImage(bytes: Uint8Array, opts: LoadOptions = {}): BinaryImage {
+  const mode = opts.loadMode ?? 'auto';
+  if (mode === 'dos-com') return loadDosCom(bytes);
+  if (mode === 'gamecube-dol') return loadDol(bytes);
+  if (mode === 'raw') {
+    if (!opts.rawArch) throw new Error('raw load mode needs rawArch (x86, x86_64, x86_16, arm, arm64, ppc)');
+    return loadRaw(bytes, opts.rawArch, opts.rawBase ?? 0, opts.rawEntry);
+  }
   const fmt = detectBinFormat(bytes);
   let img: BinaryImage;
+  if (fmt === 'unknown' && isDol(bytes)) return loadDol(bytes);
   if (fmt === 'elf') img = loadElf(bytes);
   else if (fmt === 'pe') img = loadPe(bytes);
   else if (fmt === 'macho') img = loadMachO(bytes);
@@ -44,17 +60,12 @@ export function loadImage(bytes: Uint8Array, opts: LoadOptions = {}): BinaryImag
     img = loadMachO(bytes.subarray(pick.offset, pick.offset + pick.size), pick.offset);
     img.slices = slices;
   } else if (opts.rawArch) {
-    const base = opts.rawBase ?? 0;
-    img = {
-      format: 'raw', arch: opts.rawArch, bits: opts.rawArch === 'x86_64' || opts.rawArch === 'arm64' ? 64 : 32, endian: 'le',
-      entry: base, imageBase: base,
-      segments: [{ name: 'raw', vaddr: base, vsize: bytes.length, offset: 0, fsize: bytes.length, r: true, w: false, x: true }],
-      sections: [], symbols: [], imports: [], hints: [], bytes, fileOffset: 0, warnings: [],
-    };
+    img = loadRaw(bytes, opts.rawArch, opts.rawBase ?? 0, opts.rawEntry);
+    img.sections = [];
   } else {
-    throw new Error('not an ELF, PE or Mach-O file (pass rawArch to disassemble raw code)');
+    throw new Error('not an ELF, PE, Mach-O or DOL file (pass rawArch, or loadMode dos-com / raw, to disassemble headerless code)');
   }
-  if (opts.goSymbols !== false && img.format !== 'raw') {
+  if (opts.goSymbols !== false && img.format !== 'raw' && img.arch !== 'ppc') {
     try {
       const go = readGoPclntab(img);
       if (go.symbols.length) {

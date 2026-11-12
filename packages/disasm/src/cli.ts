@@ -50,7 +50,12 @@ function wrap(name: string, usage: string, summary: string, minPos: number, body
   };
 }
 
-const common = (p: Parsed) => ({ path: p.pos[0]!, arch: str(p.flags.arch) as never });
+const common = (p: Parsed) => ({
+  path: p.pos[0]!, arch: str(p.flags.arch) as never,
+  ...(str(p.flags['load-mode']) ? { loadMode: str(p.flags['load-mode']) as never } : {}),
+  ...(str(p.flags['raw-arch']) ? { rawArch: str(p.flags['raw-arch']) as never } : {}),
+  ...(str(p.flags['raw-base']) ? { rawBase: str(p.flags['raw-base']) as never } : {}),
+});
 
 const BASE_COMMANDS: CliCommand[] = [
   wrap('disasm-info', 'disasm-info <file> [--arch x86_64|arm64] [--json]', 'Format, arch, entry, sections and function count of a native binary', 1, async (p) => {

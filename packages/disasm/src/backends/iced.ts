@@ -41,13 +41,13 @@ export class IcedDecoder implements Decoder {
     this.fmt = f;
   }
 
-  supports(arch: Arch): boolean { return arch === 'x86' || arch === 'x86_64'; }
+  supports(arch: Arch): boolean { return arch === 'x86' || arch === 'x86_64' || arch === 'x86_16'; }
 
   decode(arch: Arch, bytes: Uint8Array, address: number, maxInsns: number): Insn[] {
     const m = this.m;
     const out: Insn[] = [];
     if (bytes.length === 0 || maxInsns <= 0) return out;
-    const bitness = arch === 'x86_64' ? 64 : 32;
+    const bitness = arch === 'x86_64' ? 64 : arch === 'x86_16' ? 16 : 32;
     const dec = new m.Decoder(bitness, bytes, m.DecoderOptions.None);
     const ins = new m.Instruction();
     try {

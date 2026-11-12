@@ -166,5 +166,13 @@ const BASE_TOOLS: Tool[] = [
   },
 ];
 
+/** Load mode parameters every tool accepts (headerless code, DOS COM, GameCube DOL). */
+export const LOAD_PARAMS: Record<string, ToolParam> = {
+  loadMode: { type: 'string', description: 'auto (default: ELF, PE, Mach-O, DOL), raw (needs rawArch), dos-com (16 bit at 0x100) or gamecube-dol', optional: true },
+  rawArch: { type: 'string', description: 'raw mode: x86, x86_64, x86_16, arm, arm64 or ppc', optional: true },
+  rawBase: { type: 'string', description: 'raw mode: load address like 0x7c00 (default 0)', optional: true },
+  rawEntry: { type: 'string', description: 'raw mode: entry address (default rawBase)', optional: true },
+};
+
 /** Every disasm tool: the base set plus the round 3 navigation, debug info, export and annotation tools. */
-export const TOOLS: Tool[] = [...BASE_TOOLS, ...R3_TOOLS];
+export const TOOLS: Tool[] = [...BASE_TOOLS, ...R3_TOOLS].map((t) => ('path' in t.inputSchema ? { ...t, inputSchema: { ...t.inputSchema, ...Object.fromEntries(Object.entries(LOAD_PARAMS).filter(([k]) => !(k in t.inputSchema))) } } : t));

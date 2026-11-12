@@ -67,6 +67,6 @@ export async function loadDecoders(opts: DecoderOptions = {}): Promise<DecoderSe
   const x86 = opts.preferCapstoneX86 ? csDec ?? icedDec : icedDec ?? csDec;
   return {
     x86, arm: csDec, errors,
-    get(arch: Arch) { return arch === 'x86' || arch === 'x86_64' ? x86 : arch === 'arm64' || arch === 'arm' ? csDec : undefined; },
+    get(arch: Arch) { return arch === 'x86' || arch === 'x86_64' || arch === 'x86_16' ? x86 : arch === 'arm64' || arch === 'arm' || arch === 'ppc' ? csDec : undefined; },
   };
 }

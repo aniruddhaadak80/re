@@ -41,12 +41,14 @@ function quickKey(b: Uint8Array): string {
 
 /** Open (or reuse) the analysis session for an input. */
 export async function openProgram(input: BinaryInput): Promise<Program> {
+  if (input.rawBase !== undefined && typeof input.rawBase !== 'number') input = { ...input, rawBase: parseAddr(input.rawBase) };
+  if (input.rawEntry !== undefined && typeof input.rawEntry !== 'number') input = { ...input, rawEntry: parseAddr(input.rawEntry) };
   let bytes: Uint8Array;
   if (input.bytes) bytes = input.bytes instanceof Uint8Array ? input.bytes : new Uint8Array(input.bytes);
   else if (input.path) bytes = await readPath(input.path);
   else throw new Error('pass path or bytes');
   if (bytes.length > MAX_FILE) throw new Error(`file too large (${bytes.length} bytes, limit ${MAX_FILE})`);
-  const key = `${input.path ?? 'bytes'}:${quickKey(bytes)}:${input.arch ?? ''}:${input.rawArch ?? ''}:${input.rawBase ?? ''}`;
+  const key = `${input.path ?? 'bytes'}:${quickKey(bytes)}:${input.arch ?? ''}:${input.rawArch ?? ''}:${input.rawBase ?? ''}:${input.loadMode ?? ''}:${input.rawEntry ?? ''}`;
   let p = cache.get(key);
   if (!p) {
     p = Program.open(bytes, input);

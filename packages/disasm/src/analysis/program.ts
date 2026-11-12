@@ -131,7 +131,7 @@ export class Program {
   decodeAt(addr: number, n: number, thumb?: boolean): Insn[] {
     if (!this.decoder) return [];
     const isThumb = this.img.arch === 'arm' && (thumb ?? this.isThumb(addr));
-    const per = this.img.arch === 'x86' || this.img.arch === 'x86_64' ? 15 : 4;
+    const per = this.img.arch === 'x86' || this.img.arch === 'x86_64' || this.img.arch === 'x86_16' ? 15 : 4;
     const out: Insn[] = [];
     let cur = addr;
     while (out.length < n) {
@@ -711,6 +711,7 @@ export class Program {
 
   /** Value flow facts for a function (cached, bounded). */
   flow(addr: number): FlowResult | undefined {
+    if (this.img.arch === 'ppc' || this.img.arch === 'x86_16' || this.img.arch === 'unknown') return undefined;
     const c = this.flowCache.get(addr);
     if (c) return c;
     const af = this.analyze(addr);
