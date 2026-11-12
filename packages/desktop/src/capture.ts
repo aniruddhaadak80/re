@@ -10,6 +10,7 @@ import { InputError } from './proc.js';
 import { requireExecution } from './exec.js';
 import { toolsEnv, findProgram } from './drivers.js';
 import { socketKey } from './compare.js';
+import { waitExit, release } from './children.js';
 import { parseStrace, compareCaptures, type ProcessCapture } from './strace.js';
 
 export interface CaptureOptions {
@@ -32,6 +33,10 @@ export interface CaptureOptions {
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+const signalGroup = (p: ChildProcess, sig: NodeJS.Signals) => {
+  try { if (p.pid) process.kill(process.platform === 'win32' ? p.pid : -p.pid, sig); else p.kill(sig); } catch { try { p.kill(sig); } catch { /* gone */ } }
+};
 
 async function linuxTree(root: number, limit = 500): Promise<number[]> {
   const out: number[] = [], q = [root], seen = new Set<number>();
@@ -72,6 +77,7 @@ export async function captureProcess(o: CaptureOptions): Promise<{ path: string;
   const out = { stdout: [] as Buffer[], stderr: [] as Buffer[], so: 0, se: 0 };
   let exit: { code: number | null; signal: string | null } | undefined;
   let rootPid: number;
+  let stdioClosed = false;
   const t0 = Date.now();
   if (hasCmd) {
     const [prog, ...args] = o.command!;
@@ -82,8 +88,9 @@ export async function captureProcess(o: CaptureOptions): Promise<{ path: string;
     child.stdout!.on('data', (d: Buffer) => { out.so += d.length; if (out.so <= 1 << 20) out.stdout.push(d); });
     child.stderr!.on('data', (d: Buffer) => { out.se += d.length; if (out.se <= 1 << 20) out.stderr.push(d); });
     child.on('exit', (code, signal) => { exit = { code, signal }; });
+    child.on('close', () => { stdioClosed = true; });
     if (o.stdin !== undefined) child.stdin!.end(String(o.stdin).slice(0, 1 << 20)); else child.stdin!.end();
-    if (!child.pid) { await sleep(50); throw new InputError(`could not start ${prog}: ${warnings.join('; ')}`); }
+    if (!child.pid) { await sleep(50); release(child); throw new InputError(`could not start ${prog}: ${warnings.join('; ')}`); }
     rootPid = child.pid;
   } else {
     const n = Number(o.pid);
@@ -97,12 +104,19 @@ export async function captureProcess(o: CaptureOptions): Promise<{ path: string;
       await sleep(150);
     }
   }
-  const { snapshotProcess } = await import('./node.js');
   const procs = new Map<number, ProcessCapture['processes'][number]>();
   const mods = new Map<string, ProcessCapture['modules'][number]>();
   const files = new Map<string, ProcessCapture['files'][number]>();
   const socks = new Map<string, ProcessCapture['sockets'][number]>();
   const addPid = (list: number[], pid: number) => { if (!list.includes(pid) && list.length < 64) list.push(pid); };
+  const abort = async () => {
+    if (child && o.kill !== false && child.exitCode === null && child.signalCode === null) { signalGroup(child, 'SIGKILL'); await waitExit(child, 2000); }
+    if (tracer && tracer.exitCode === null && tracer.signalCode === null) { tracer.kill('SIGKILL'); await waitExit(tracer, 2000); if (process.platform !== 'win32') { try { process.kill(rootPid, 'SIGCONT'); } catch { /* gone */ } } }
+    release(child); release(tracer);
+    await rm(work, { recursive: true, force: true }).catch(() => undefined);
+  };
+  try {
+  const { snapshotProcess } = await import('./node.js');
   while (Date.now() - t0 < dur) {
     const t = Date.now() - t0;
     let pids: number[];
@@ -134,12 +148,25 @@ export async function captureProcess(o: CaptureOptions): Promise<{ path: string;
   }
   cap.durationMs = Date.now() - t0;
   if (child && !exit && o.kill !== false) {
-    try { if (child.pid) process.kill(process.platform === 'win32' ? child.pid : -child.pid, 'SIGTERM'); } catch { child.kill('SIGTERM'); }
-    await Promise.race([new Promise((r) => child!.once('exit', r)), sleep(3000)]);
-    if (!exit) { try { if (child.pid) process.kill(process.platform === 'win32' ? child.pid : -child.pid, 'SIGKILL'); } catch { child.kill('SIGKILL'); } await Promise.race([new Promise((r) => child!.once('exit', r)), sleep(2000)]); }
+    signalGroup(child, 'SIGTERM');
+    if (!(await waitExit(child, 3000))) { signalGroup(child, 'SIGKILL'); await waitExit(child, 2000); }
     warnings.push('the command was still running at the end and was stopped');
-  } else if (child && !exit) await sleep(50);
-  if (tracer && tracer.exitCode === null) { tracer.kill('SIGINT'); await Promise.race([new Promise((r) => tracer!.once('exit', r)), sleep(3000)]); }
+  } else if (child && !exit) await waitExit(child, 50);
+  if (tracer) {
+    // strace detaches on SIGINT. If it does not go in time it is killed; a tracer that dies while
+    // attached can leave the target in a stopped state, so the target always gets SIGCONT after.
+    if (tracer.exitCode === null && tracer.signalCode === null) {
+      tracer.kill('SIGINT');
+      if (!(await waitExit(tracer, 3000))) { warnings.push('strace did not detach in time and was killed'); tracer.kill('SIGKILL'); await waitExit(tracer, 2000); }
+    }
+    if (process.platform !== 'win32') { try { process.kill(rootPid, 'SIGCONT'); } catch { /* gone */ } }
+  }
+  // the streams were read into out above; close them so leftover grandchildren cannot pin the caller
+  // exit can come before the last stdout chunk; wait briefly for the pipes to drain (a grandchild
+  // that inherited them keeps them open, so this is bounded) before closing our ends
+  if (child) { const t1 = Date.now(); while (!stdioClosed && Date.now() - t1 < 1000) await sleep(20); release(child); }
+  release(tracer);
+  } catch (e) { await abort(); throw e; }
   cap.exit = exit;
   cap.processes = [...procs.values()];
   cap.modules = [...mods.values()].sort((a, b) => a.path.localeCompare(b.path));

@@ -11,6 +11,7 @@ import { tmpdir } from 'node:os';
 import { randomBytes } from 'node:crypto';
 import { InputError } from './proc.js';
 import { run } from './exec.js';
+import { waitExit, release } from './children.js';
 import { AuditLog, redactArgs, sha256Hex } from './audit.js';
 import { XdotoolDriver, YdotoolDriver, MacDriver, WindowsDriver, toolsEnv, findProgram, type Driver, type Button } from './drivers.js';
 import { parseKeyCombo } from './keys.js';
@@ -360,12 +361,18 @@ export async function closeComputer(id: string, o: { reason?: string; keepFiles?
   s.closed = true;
   if (s.idle) clearTimeout(s.idle);
   const stopped: { role: string; pid?: number; exit: number | string | null }[] = [];
+  // Linux: note every descendant first. Programs that start their own session or process group
+  // (some helpers do) are not reached by the group signal and would keep running, holding the
+  // pipes this process reads, which keeps the caller's event loop alive.
+  const extra = new Set<number>();
+  if (process.platform === 'linux') for (const p of s.owned) if (p.proc.pid && p.proc.exitCode === null && p.proc.signalCode === null) for (const d of await descendants(p.proc.pid)) if (d !== p.proc.pid) extra.add(d);
   for (const p of [...s.owned].reverse()) {
     killTree(p.proc);
-    const exited = await Promise.race([new Promise<boolean>((r) => { if (p.proc.exitCode !== null || p.proc.signalCode !== null) r(true); else p.proc.once('exit', () => r(true)); }), sleep(2000).then(() => false)]);
-    if (!exited) killTree(p.proc, 'SIGKILL');
+    if (!(await waitExit(p.proc, 2000))) { killTree(p.proc, 'SIGKILL'); await waitExit(p.proc, 2000); }
     stopped.push({ role: p.role, pid: p.proc.pid, exit: p.proc.exitCode ?? p.proc.signalCode ?? null });
   }
+  for (const d of extra) { try { process.kill(d, 'SIGKILL'); } catch { /* already gone */ } }
+  for (const p of s.owned) release(p.proc);
   const entry = await s.audit.record({ action: 'close', args: { reason: o.reason ?? 'requested' }, ok: true, result: { stopped: stopped.length } });
   SESSIONS.delete(id);
   return { id, closed: true, stopped, auditLog: s.auditPath, auditEntries: entry.seq, auditHead: entry.hash, workDir: s.workDir };

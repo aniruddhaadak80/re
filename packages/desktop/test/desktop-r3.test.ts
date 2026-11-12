@@ -368,14 +368,40 @@ test('process capture of a real program finds the file, connection and child it 
 
 test('process capture attaches to a running pid for a bounded time', { timeout: 30_000 }, async (t) => {
   if (process.platform === 'win32') { t.skip('pid attach sampling is covered by the Windows platform test'); return; }
-  const child = spawn(process.execPath, [join(S, 'proc-target.mjs'), '20000'], { stdio: ['pipe', 'pipe', 'ignore'] });
+  const child = spawn(process.execPath, [join(S, 'proc-target.mjs'), '20000'], { stdio: ['ignore', 'pipe', 'ignore'] });
   try {
-    const info = await new Promise<{ fileA: string; tcpPort: number }>((res) => child.stdout!.once('data', (d) => res(JSON.parse(String(d)))));
+    // read one whole line, bounded, so a slow start fails the test instead of leaving it waiting
+    const info = await new Promise<{ fileA: string; tcpPort: number }>((res, rej) => {
+      let buf = '';
+      const t = setTimeout(() => rej(new Error('proc-target did not report in 15 s')), 15_000);
+      child.stdout!.on('data', (d) => { buf += String(d); const i = buf.indexOf('\n'); if (i >= 0) { clearTimeout(t); res(JSON.parse(buf.slice(0, i))); } });
+      child.once('exit', (c) => { clearTimeout(t); rej(new Error(`proc-target exited ${c}`)); });
+    });
     const r = await captureProcess({ allowExecution: true, pid: child.pid, durationMs: 1500 });
     assert.ok(r.capture.files.some((f) => f.path === info.fileA));
     assert.ok(r.capture.sockets.some((s) => s.key.includes(`:${info.tcpPort} LISTEN`)));
     assert.equal(r.capture.exit, undefined);
-  } finally { child.kill(); }
+    // the target must be left running and not stopped (a tracer that dies while attached can leave it in state T)
+    if (linux) { const state = /State:\s+(\S)/.exec(readFileSync(`/proc/${child.pid}/status`, 'utf8'))?.[1]; assert.ok(state && state !== 'T' && state !== 't', `target state ${state}`); }
+  } finally {
+    child.kill('SIGKILL');
+    await new Promise((r) => { if (child.exitCode !== null || child.signalCode !== null) r(0); else { const t = setTimeout(r, 5000); child.once('exit', () => { clearTimeout(t); r(0); }); } });
+    child.stdout?.destroy();
+  }
+});
+
+test('process capture lets go of pipes a leftover grandchild still holds, so the caller can exit', { timeout: 40_000 }, async (t) => {
+  if (process.platform === 'win32') { t.skip('POSIX sessions only'); return; }
+  const t0 = Date.now();
+  const r = spawnSync(process.execPath, ['--import', 'tsx', join(HERE, 'capture-orphan-runner.ts')], { encoding: 'utf8', timeout: 25_000, cwd: join(HERE, '..') });
+  const elapsed = Date.now() - t0;
+  const line = (r.stdout ?? '').trim().split('\n').pop() ?? '';
+  try {
+    assert.equal(r.status, 0, `runner status ${r.status} signal ${r.signal} after ${elapsed} ms: ${(r.stderr ?? '').slice(-500)}`);
+    // before the fix the runner stayed alive for the grandchild's whole 30 s
+    assert.ok(elapsed < 20_000, `runner took ${elapsed} ms`);
+    assert.ok(JSON.parse(line).returnedMs < 10_000);
+  } finally { try { process.kill(JSON.parse(line).grandchild, 'SIGKILL'); } catch { /* gone or no line */ } }
 });
 
 // ---------------- gates ----------------
