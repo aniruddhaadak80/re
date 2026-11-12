@@ -51,6 +51,8 @@ export interface DwarfVar { name: string; type: string; typeRef?: number; locati
 export interface DwarfFunction {
   id: number;
   name: string;
+  /** C++: name with namespaces and classes, like geo::Rect::area */
+  qualifiedName?: string;
   linkageName?: string;
   low?: number;
   high?: number;
@@ -413,11 +415,11 @@ export function readDwarf(img: BinaryImage, opts: DwarfOptions = {}): DwarfInfo 
     const t = typeRefOf(d);
     switch (tag) {
       case 'base_type': case 'unspecified_type': return n ?? (tag === 'unspecified_type' ? 'void' : '<base>');
-      case 'typedef': return n ?? typeName(t, depth + 1);
-      case 'structure_type': return n ? (d.unit.version > 0 && isCxx(d) ? n : 'struct ' + n) : 'struct <anonymous>';
-      case 'class_type': return n ?? 'class <anonymous>';
-      case 'union_type': return n ? (isCxx(d) ? n : 'union ' + n) : 'union <anonymous>';
-      case 'enumeration_type': return n ? (isCxx(d) ? n : 'enum ' + n) : 'enum <anonymous>';
+      case 'typedef': return n ? (isCxx(d) ? qual(d) + n : n) : typeName(t, depth + 1);
+      case 'structure_type': return n ? (isCxx(d) ? qual(d) + n : 'struct ' + n) : 'struct <anonymous>';
+      case 'class_type': return n ? qual(d) + n : 'class <anonymous>';
+      case 'union_type': return n ? (isCxx(d) ? qual(d) + n : 'union ' + n) : 'union <anonymous>';
+      case 'enumeration_type': return n ? (isCxx(d) ? qual(d) + n : 'enum ' + n) : 'enum <anonymous>';
       case 'const_type': case 'volatile_type': case 'restrict_type': case 'atomic_type': {
         const q = tag === 'const_type' ? 'const' : tag === 'volatile_type' ? 'volatile' : tag === 'restrict_type' ? 'restrict' : '_Atomic';
         const inner = typeName(t, depth + 1);
@@ -432,13 +434,26 @@ export function readDwarf(img: BinaryImage, opts: DwarfOptions = {}): DwarfInfo 
         const td = t !== undefined ? dies.get(t) : undefined;
         if (td && TAG[td.tag] === 'subroutine_type') { const f = fnParts(td, depth); return `${f.ret} (${sym})(${f.params})`; }
         if (td && TAG[td.tag] === 'array_type') { const a = arrParts(td, depth); return `${a.elem} (${sym})${a.dims}`; }
-        return join(typeName(t, depth + 1), sym);
+        const inner = typeName(t, depth + 1);
+        const fp = /^(.*) \((\*+|&|&&)\)(\(.*\))$/.exec(inner);
+        if (fp) return `${fp[1]} (${fp[2]}${sym})${fp[3]}`;
+        return join(inner, sym);
       }
       case 'array_type': { const a = arrParts(d, depth); return a.elem + a.dims; }
       case 'subroutine_type': { const f = fnParts(d, depth); return `${f.ret} (${f.params})`; }
       case 'ptr_to_member_type': return typeName(t, depth + 1) + ' ::*';
       default: return n ?? `<${tag || 'tag 0x' + d.tag.toString(16)}>`;
     }
+  }
+  /** "ns::Outer::" for a C++ entity declared inside namespaces or classes */
+  function qual(d: Die): string {
+    const parts: string[] = [];
+    let cur = d.parent;
+    for (let i = 0; cur && i < 16; i++, cur = cur.parent) {
+      const tg = TAG[cur.tag];
+      if (tg === 'namespace' || tg === 'structure_type' || tg === 'class_type' || tg === 'union_type') parts.unshift(nameOf(cur) ?? (tg === 'namespace' ? '(anonymous namespace)' : '<anonymous>'));
+    }
+    return parts.length ? parts.join('::') + '::' : '';
   }
   function isCxx(d: Die): boolean {
     let u: Die | undefined = d;
@@ -615,6 +630,7 @@ export function readDwarf(img: BinaryImage, opts: DwarfOptions = {}): DwarfInfo 
       const n = nameOf(d);
       if (!n) continue;
       const f: DwarfFunction = { id: d.off, name: n, returns: typeName(typeRefOf(d)), params: [], locals: [], prototype: '', unit: d.unit.off };
+      if (isCxx(d)) { const spec = d.attrs.get(AT.specification) ?? d.attrs.get(AT.abstract_origin); const decl = spec && FORM_REF.has(spec.form) ? dies.get(spec.v) : undefined; const q = qual(decl ?? d); if (q) f.qualifiedName = q + n; }
       const rr = typeRefOf(d); if (rr !== undefined) f.returnsRef = rr;
       const ln = attrDeep(d, AT.linkage_name) ?? attrDeep(d, AT.mips_linkage_name);
       if (ln) { const s = attrStr(ln.die, ln.a === ln.die.attrs.get(AT.linkage_name) ? AT.linkage_name : AT.mips_linkage_name); if (s) f.linkageName = s; }
@@ -631,7 +647,7 @@ export function readDwarf(img: BinaryImage, opts: DwarfOptions = {}): DwarfInfo 
         const tg = TAG[c.tag];
         if (tg === 'formal_parameter') {
           const own = paramSrc === d ? c : c;
-          const pv: DwarfVar = { name: nameOf(own) ?? `p${f.params.length + 1}`, type: typeName(typeRefOf(own)) };
+          const pv: DwarfVar = { name: nameOf(own) ?? (flag(c, AT.artificial) && f.params.length === 0 ? 'this' : `p${f.params.length + 1}`), type: typeName(typeRefOf(own)) };
           const tr2 = typeRefOf(own); if (tr2 !== undefined) pv.typeRef = tr2;
           const l = paramSrc === d ? locOf(c, AT.location) : undefined; if (l) pv.location = l;
           if (flag(c, AT.artificial)) pv.artificial = true;
@@ -642,7 +658,7 @@ export function readDwarf(img: BinaryImage, opts: DwarfOptions = {}): DwarfInfo 
       const proto = attrDeep(d, AT.prototyped);
       const ps = f.params.map((p) => declare(p.type, p.name));
       if (f.variadic) ps.push('...');
-      f.prototype = `${f.returns} ${n}(${ps.length ? ps.join(', ') : proto ? 'void' : ''})`;
+      f.prototype = `${f.returns} ${f.qualifiedName ?? n}(${ps.length ? ps.join(', ') : proto ? 'void' : ''})`;
       if (f.noreturn) f.prototype = '_Noreturn ' + f.prototype;
       out.functions.push(f);
       continue;
@@ -670,7 +686,7 @@ export function readDwarf(img: BinaryImage, opts: DwarfOptions = {}): DwarfInfo 
 
 /** C declaration of a variable of a rendered type: "int x", "char *p", "int (*f)(int)", "int a[4]". */
 export function declare(type: string, name: string): string {
-  const fp = /^(.*) \((\*|&|&&)\)(\(.*\))$/.exec(type);
+  const fp = /^(.*) \((\*+|&|&&)\)(\(.*\))$/.exec(type);
   if (fp) return `${fp[1]} (${fp[2]}${name})${fp[3]}`;
   const ar = /^(.*?)((?:\[\d*\])+)$/.exec(type);
   if (ar && !type.includes('(')) return `${ar[1]} ${name}${ar[2]}`;
@@ -681,9 +697,10 @@ export function declare(type: string, name: string): string {
 export function typeDecl(t: DwarfType): string {
   if ((t.kind === 'struct' || t.kind === 'union' || t.kind === 'class') && t.members) {
     const lines = t.members.map((m) => `  ${declare(m.type, m.name ?? '')}${m.bitSize !== undefined ? ' : ' + m.bitSize : ''}; // offset ${m.offset ?? '?'}${m.bitOffset !== undefined ? `, bit ${m.bitOffset}` : ''}`);
-    return `${t.display} {${t.size !== undefined ? ` // size ${t.size}` : ''}\n${lines.join('\n')}\n};`;
+    const kw = /^(struct|union|class|enum) /.test(t.display) ? '' : (t.kind === 'struct' ? 'struct ' : t.kind === 'union' ? 'union ' : 'class ');
+    return `${kw}${t.display} {${t.size !== undefined ? ` // size ${t.size}` : ''}\n${lines.join('\n')}\n};`;
   }
-  if (t.kind === 'enum' && t.enumerators) return `${t.display} {\n${t.enumerators.map((e) => `  ${e.name} = ${e.value},`).join('\n')}\n};`;
+  if (t.kind === 'enum' && t.enumerators) return `${t.display.startsWith('enum ') ? '' : 'enum '}${t.display} {\n${t.enumerators.map((e) => `  ${e.name} = ${e.value},`).join('\n')}\n};`;
   if (t.kind === 'typedef') return `typedef ${declare(t.aliasOf ?? 'void', t.name ?? '')};`;
   return t.display;
 }

@@ -15,7 +15,7 @@ const dir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'sam
 const P = (n: string) => join(dir, n);
 const REF = JSON.parse(readFileSync(P('dwarf-reference.json'), 'utf8')) as Record<string, any>;
 const strip = (s: string | undefined) => (s ?? 'void').replace(/\b(struct|union|enum) /g, '');
-const FILES = Object.keys(REF);
+const FILES = Object.keys(REF).filter((f) => !REF[f].classes);
 
 for (const f of FILES) {
   const ref = REF[f];
@@ -67,6 +67,26 @@ for (const f of FILES) {
     }
   });
 }
+
+test('shapes-dwarf5-x64.elf (C++): classes, inheritance, vtable pointer, enum class and qualified names match llvm-dwarfdump', () => {
+  const ref = REF['shapes-dwarf5-x64.elf'];
+  const d = readDwarf(loadImage(new Uint8Array(readFileSync(P('shapes-dwarf5-x64.elf')))));
+  for (const [off, c] of Object.entries<any>(ref.classes)) {
+    const t = d.types.find((x) => x.id === parseInt(off, 16))!;
+    assert.equal(t.name, c.name);
+    if (c.enumerators) { assert.deepEqual(Object.fromEntries(t.enumerators!.map((e) => [e.name, e.value])), c.enumerators); continue; }
+    assert.equal(t.size, c.size);
+    assert.deepEqual(t.members!.map((m) => ({ name: m.name, offset: m.offset, type: m.type })), c.members);
+  }
+  assert.equal(d.types.find((x) => x.name === 'Rect' && x.members)!.display, 'geo::Rect');
+  const area = d.functions.find((f) => f.qualifiedName === 'geo::Rect::area')!;
+  assert.equal(area.prototype, 'int geo::Rect::area(const geo::Rect *this)');
+  for (const [lo, f] of Object.entries<any>(ref.functions)) {
+    const x = d.functions.find((y) => y.low === parseInt(lo, 16))!;
+    assert.equal(x.name, f.name);
+    assert.deepEqual(x.params.map((p) => p.type), f.params);
+  }
+});
 
 test('C prototypes and declarations read like the source', () => {
   const d = readDwarf(loadImage(new Uint8Array(readFileSync(P('types-dwarf5-x64.elf')))));

@@ -1,4 +1,82 @@
 {
+ "shapes-dwarf5-x64.elf": {
+  "classes": {
+   "0x135": {
+    "enumerators": {
+     "Auto": 200,
+     "Off": 0,
+     "On": 1
+    },
+    "name": "Mode"
+   },
+   "0x32": {
+    "members": [
+     {
+      "name": "_vptr$Shape",
+      "offset": 0,
+      "type": "int (**)()"
+     },
+     {
+      "name": "id",
+      "offset": 8,
+      "type": "int"
+     },
+     {
+      "name": "origin",
+      "offset": 12,
+      "type": "geo::Vec"
+     }
+    ],
+    "name": "Shape",
+    "size": 24
+   },
+   "0x97": {
+    "members": [
+     {
+      "name": "x",
+      "offset": 0,
+      "type": "float"
+     },
+     {
+      "name": "y",
+      "offset": 4,
+      "type": "float"
+     }
+    ],
+    "name": "Vec",
+    "size": 8
+   },
+   "0xb0": {
+    "members": [
+     {
+      "name": "<base>",
+      "offset": 0,
+      "type": "geo::Shape"
+     },
+     {
+      "name": "w_",
+      "offset": 20,
+      "type": "int"
+     },
+     {
+      "name": "h_",
+      "offset": 24,
+      "type": "int"
+     }
+    ],
+    "name": "Rect",
+    "size": 32
+   }
+  },
+  "functions": {
+   "0x10011f0": {
+    "name": "revlens_entry",
+    "params": [
+     "int"
+    ]
+   }
+  }
+ },
  "types-dwarf4-arm64-O0.elf": {
   "enums": {
    "color": {

@@ -25,7 +25,30 @@ def sname(die):
     v = attr(die, 'DW_AT_name')
     return v.decode() if isinstance(v, bytes) else v
 
+def cxx(path):
+    """C++ units: every class/struct/enum DIE (by .debug_info offset) with members and llvm type names."""
+    tnames = llvm_types(path)
+    res = {'classes': {}, 'functions': {}}
+    with open(path, 'rb') as f:
+        dw = ELFFile(f).get_dwarf_info()
+        for cu in dw.iter_CUs():
+            for die in cu.iter_DIEs():
+                if die.tag in ('DW_TAG_class_type', 'DW_TAG_structure_type') and sname(die) and 'DW_AT_declaration' not in die.attributes:
+                    mem = []
+                    for c in die.iter_children():
+                        if c.tag == 'DW_TAG_member':
+                            mem.append({'name': sname(c), 'offset': attr(c, 'DW_AT_data_member_location'), 'type': tnames.get(c.offset)})
+                        elif c.tag == 'DW_TAG_inheritance':
+                            mem.append({'name': '<base>', 'offset': attr(c, 'DW_AT_data_member_location'), 'type': tnames.get(c.offset)})
+                    res['classes'][hex(die.offset)] = {'name': sname(die), 'size': attr(die, 'DW_AT_byte_size'), 'members': mem}
+                elif die.tag == 'DW_TAG_enumeration_type' and sname(die):
+                    res['classes'][hex(die.offset)] = {'name': sname(die), 'enumerators': {sname(c): c.attributes['DW_AT_const_value'].value for c in die.iter_children() if c.tag == 'DW_TAG_enumerator'}}
+                elif die.tag == 'DW_TAG_subprogram' and 'DW_AT_low_pc' in die.attributes:
+                    res['functions'][hex(die.attributes['DW_AT_low_pc'].value)] = {'name': sname(die), 'params': [tnames.get(c.offset) for c in die.iter_children() if c.tag == 'DW_TAG_formal_parameter']}
+    return res
+
 def one(path):
+    if path.endswith('.cpp.elf') or 'shapes' in path: return cxx(path)
     tnames = llvm_types(path)
     res = {'structs': {}, 'enums': {}, 'typedefs': {}, 'functions': {}, 'globals': {}}
     with open(path, 'rb') as f:
