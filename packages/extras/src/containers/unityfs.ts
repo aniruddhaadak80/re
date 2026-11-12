@@ -1,10 +1,11 @@
-// Unity asset bundles (UnityFS): header, blocks info (none, LZ4 or LZ4HC; LZMA reported),
+// Unity asset bundles (UnityFS): header, blocks info (none, LZMA, LZ4 or LZ4HC),
 // storage blocks and the node (file) table; nodes can be extracted from uncompressed or LZ4
 // blocks. Serialized files inside are summarised: Unity version, target platform, types and
 // objects by class.
 
 import { View, ParseError, latin1, toHex } from '../util.js';
 import { lz4Block } from './lz4.js';
+import { lzmaDecodeRaw, decodeProps } from '../compress/lzma.js';
 
 export interface UnityBlock { uncompressedSize: number; compressedSize: number; flags: number; compression: string; offset: number }
 export interface UnityNode { path: string; offset: number; size: number; flags: number }
@@ -25,6 +26,12 @@ function decompress(kind: number, src: Uint8Array, size: number): Uint8Array {
   const k = kind & 0x3f;
   if (k === 0) return src.subarray(0, size);
   if (k === 2 || k === 3) return lz4Block(src, size);
+  if (k === 1) {
+    // Unity LZMA: 5 byte properties (lc/lp/pb byte and dictionary size), then raw LZMA with a known size
+    if (src.length < 5) throw new ParseError('LZMA block too short');
+    const dict = ((src[1] as number) | ((src[2] as number) << 8) | ((src[3] as number) << 16) | ((src[4] as number) << 24)) >>> 0;
+    return lzmaDecodeRaw(src, decodeProps(src[0] as number, Math.max(dict, 4096)), { start: 5, size, maxOut: size }).data;
+  }
   throw new ParseError(`${compName(kind)} compressed blocks are not decoded (header and node table only)`);
 }
 
