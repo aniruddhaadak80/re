@@ -87,7 +87,9 @@ export function zodShape(schema: Record<string, ManifestParam>): Record<string, 
       default: t = z.record(z.string(), z.unknown()); break;
     }
     t = t.describe(p.description);
-    out[k] = p.optional ? t.optional() : t;
+    // allowExecution stays optional on the wire: the session setting can supply it, and the tool itself
+    // refuses to run code without it
+    out[k] = p.optional || k === 'allowExecution' ? t.optional() : t;
   }
   return out;
 }

@@ -131,7 +131,6 @@ test('guided workflows: every step names a real tool and real input fields', asy
   assert.equal(list.workflows.length, WORKFLOWS.length);
   const known = new Set(staticToolNames());
   for (const w of WORKFLOWS) for (const st of w.steps) {
-    if (st.tool.startsWith('bridge_cutter') || st.tool.endsWith('cutter_sessions') || st.tool === 'cutter_command') continue; // added by the bridges package
     assert.ok(known.has(st.tool), `${w.id}: ${st.tool}`);
     const c = (await s.call('inspect_input_contract', { name: st.tool })).json;
     for (const k of Object.keys(st.input ?? {})) assert.ok(k in c.inputSchema.properties, `${w.id}: ${st.tool}.${k}`);
@@ -260,6 +259,25 @@ test('settings gates: denyExecution, allowNetwork and maxFileMB', async () => {
   const large = await s.call('get_sections', { path: S('extras/go-hello-stripped.elf') });
   assert.equal(large.error, true);
   assert.match(large.text, /maxFileMB/);
+  await s.close();
+});
+
+test('rea compatible Cutter names are aliases of the bridge tools', async () => {
+  const s = await connect({ env: {} });
+  const { tools } = await s.client.listTools();
+  for (const [alias, to] of [['list_cutter_sessions', 'bridge_cutter_sessions'], ['cutter_command', 'bridge_cutter_command']]) {
+    const a = tools.find((t) => t.name === alias);
+    assert.ok(a, alias);
+    assert.match(a.description ?? '', new RegExp(`Same as ${to}`));
+    assert.deepEqual(a.inputSchema, tools.find((t) => t.name === to)!.inputSchema);
+  }
+  const l = (await s.call('list_cutter_sessions')).json;
+  assert.ok(Array.isArray(l.sessions));
+  const gated = (await s.call('cutter_command', { file: S('disasm/hello-x64.elf'), command: 'afl' })).json;
+  assert.equal(gated.needsAllowExecution, true);
+  await s.call('update_analysis_settings', { changes: [{ setting: 'allowExecution', value: true }] });
+  const shell = await s.call('cutter_command', { file: S('disasm/hello-x64.elf'), command: '!id' });
+  assert.match(shell.text, /refuse/);
   await s.close();
 });
 

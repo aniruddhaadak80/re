@@ -534,7 +534,7 @@ const RAW: BridgeTool[] = [
       session: f('string', 'Cutter pid from bridge_cutter_sessions'), file: f('string', 'file to use when there is no session, or which of the session files'),
       project: f('string', 'rizin project (.rzdb) to load'), command: f('string', 'rizin command, for example afl, pdf @ main, axt @ sym.imp.strcpy', false),
       mode: f('string', 'auto (default), live (plugin only) or rizin (separate process)'), analysis: f('string', 'none, aa (default without a project) or aaa'),
-      maxChars: f('number', 'cap on returned characters'), allowExecution: ALLOW, timeoutMs: TIMEOUT,
+      maxChars: f('number', 'cap on returned characters'), allowExecution: f('boolean', 'must be true: commands run in Cutter or rizin on the target'), timeoutMs: TIMEOUT,
     },
     run: (i) => cutterCommand(i),
   },

@@ -5856,7 +5856,8 @@ export const TOOL_MANIFEST: ToolManifest = {
     },
     "allowExecution": {
      "type": "boolean",
-     "description": "must be true: this runs or instruments code, only use on trusted targets or inside a sandbox"
+     "description": "must be true: commands run in Cutter or rizin on the target",
+     "optional": true
     },
     "timeoutMs": {
      "type": "number",
