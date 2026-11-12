@@ -26,3 +26,6 @@ lzop -9 -f -o "$out/plain-9.lzo" "$out/plain.bin"
 lzop -1 -f -o "$out/plain-1.lzo" "$out/plain.bin"
 zstd -q -19 -f -o "$out/plain.zst" "$out/plain.bin"
 gzip -9 -n -c "$out/plain.bin" > "$out/plain.gz"
+# bzip2 1.0.8: one stream at -9, and two streams concatenated at -1 (bzip2 -d reads both)
+bzip2 -9 -c "$out/plain.bin" > "$out/plain.bz2"
+{ bzip2 -1 -c "$out/plain.bin"; printf 'second stream\n' | bzip2 -1 -c; } > "$out/plain-multi.bz2"

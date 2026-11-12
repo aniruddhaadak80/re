@@ -1,0 +1,368 @@
+{
+ "rootfs-gzip.squashfs": {
+  "files": {
+   "bin": {
+    "type": "dir"
+   },
+   "bin/hello": {
+    "sha256": "28660c997a7057ea2da571a3c11404426387ae7e0213c94df0cd2972bc2edab8",
+    "size": 34,
+    "type": "file"
+   },
+   "etc": {
+    "type": "dir"
+   },
+   "etc/config": {
+    "type": "dir"
+   },
+   "etc/config/system": {
+    "sha256": "ba0bd1ac256a714da346bfd5df1d3f7d055c9790a18c995eebe0e34120d2ac1e",
+    "size": 39,
+    "type": "file"
+   },
+   "etc/system.link": {
+    "target": "/etc/config/system",
+    "type": "symlink"
+   },
+   "lib": {
+    "type": "dir"
+   },
+   "lib/libdata.so": {
+    "sha256": "772ab56b5a9fbb0198bfc1846fcc574be4c5df95f33e648f3d97b5fb0e8e96c0",
+    "size": 210000,
+    "type": "file"
+   },
+   "lib/sparse.img": {
+    "sha256": "9667512dc87c9528656b54aa5f6ecae2d0dbc6f8cbb1e780b2cf4326d895126b",
+    "size": 200004,
+    "type": "file"
+   },
+   "lib/zeros.bin": {
+    "sha256": "886715e4051e827f4fe215df3053af3f85ad0d352db2c829c7487af6d78efe30",
+    "size": 300000,
+    "type": "file"
+   },
+   "www": {
+    "type": "dir"
+   },
+   "www/cgi-bin": {
+    "type": "dir"
+   },
+   "www/cgi-bin/hello": {
+    "target": "../bin/hello",
+    "type": "symlink"
+   },
+   "www/index.html": {
+    "sha256": "f3c781f70f3e9a8c02d8697255a8d8d2e2d9fc88247e38efe7ebd464ff690786",
+    "size": 26,
+    "type": "file"
+   }
+  },
+  "tool": "unsquashfs 4.6.1"
+ },
+ "rootfs-lz4.squashfs": {
+  "files": {
+   "bin": {
+    "type": "dir"
+   },
+   "bin/hello": {
+    "sha256": "28660c997a7057ea2da571a3c11404426387ae7e0213c94df0cd2972bc2edab8",
+    "size": 34,
+    "type": "file"
+   },
+   "etc": {
+    "type": "dir"
+   },
+   "etc/config": {
+    "type": "dir"
+   },
+   "etc/config/system": {
+    "sha256": "ba0bd1ac256a714da346bfd5df1d3f7d055c9790a18c995eebe0e34120d2ac1e",
+    "size": 39,
+    "type": "file"
+   },
+   "etc/system.link": {
+    "target": "/etc/config/system",
+    "type": "symlink"
+   },
+   "lib": {
+    "type": "dir"
+   },
+   "lib/libdata.so": {
+    "sha256": "772ab56b5a9fbb0198bfc1846fcc574be4c5df95f33e648f3d97b5fb0e8e96c0",
+    "size": 210000,
+    "type": "file"
+   },
+   "lib/sparse.img": {
+    "sha256": "9667512dc87c9528656b54aa5f6ecae2d0dbc6f8cbb1e780b2cf4326d895126b",
+    "size": 200004,
+    "type": "file"
+   },
+   "lib/zeros.bin": {
+    "sha256": "886715e4051e827f4fe215df3053af3f85ad0d352db2c829c7487af6d78efe30",
+    "size": 300000,
+    "type": "file"
+   },
+   "www": {
+    "type": "dir"
+   },
+   "www/cgi-bin": {
+    "type": "dir"
+   },
+   "www/cgi-bin/hello": {
+    "target": "../bin/hello",
+    "type": "symlink"
+   },
+   "www/index.html": {
+    "sha256": "f3c781f70f3e9a8c02d8697255a8d8d2e2d9fc88247e38efe7ebd464ff690786",
+    "size": 26,
+    "type": "file"
+   }
+  },
+  "tool": "unsquashfs 4.6.1"
+ },
+ "rootfs-lzo.squashfs": {
+  "files": {
+   "bin": {
+    "type": "dir"
+   },
+   "bin/hello": {
+    "sha256": "28660c997a7057ea2da571a3c11404426387ae7e0213c94df0cd2972bc2edab8",
+    "size": 34,
+    "type": "file"
+   },
+   "etc": {
+    "type": "dir"
+   },
+   "etc/config": {
+    "type": "dir"
+   },
+   "etc/config/system": {
+    "sha256": "ba0bd1ac256a714da346bfd5df1d3f7d055c9790a18c995eebe0e34120d2ac1e",
+    "size": 39,
+    "type": "file"
+   },
+   "etc/system.link": {
+    "target": "/etc/config/system",
+    "type": "symlink"
+   },
+   "lib": {
+    "type": "dir"
+   },
+   "lib/libdata.so": {
+    "sha256": "772ab56b5a9fbb0198bfc1846fcc574be4c5df95f33e648f3d97b5fb0e8e96c0",
+    "size": 210000,
+    "type": "file"
+   },
+   "lib/sparse.img": {
+    "sha256": "9667512dc87c9528656b54aa5f6ecae2d0dbc6f8cbb1e780b2cf4326d895126b",
+    "size": 200004,
+    "type": "file"
+   },
+   "lib/zeros.bin": {
+    "sha256": "886715e4051e827f4fe215df3053af3f85ad0d352db2c829c7487af6d78efe30",
+    "size": 300000,
+    "type": "file"
+   },
+   "www": {
+    "type": "dir"
+   },
+   "www/cgi-bin": {
+    "type": "dir"
+   },
+   "www/cgi-bin/hello": {
+    "target": "../bin/hello",
+    "type": "symlink"
+   },
+   "www/index.html": {
+    "sha256": "f3c781f70f3e9a8c02d8697255a8d8d2e2d9fc88247e38efe7ebd464ff690786",
+    "size": 26,
+    "type": "file"
+   }
+  },
+  "tool": "unsquashfs 4.6.1"
+ },
+ "rootfs-xz-bcj.squashfs": {
+  "files": {
+   "bin": {
+    "type": "dir"
+   },
+   "bin/hello": {
+    "sha256": "28660c997a7057ea2da571a3c11404426387ae7e0213c94df0cd2972bc2edab8",
+    "size": 34,
+    "type": "file"
+   },
+   "etc": {
+    "type": "dir"
+   },
+   "etc/config": {
+    "type": "dir"
+   },
+   "etc/config/system": {
+    "sha256": "ba0bd1ac256a714da346bfd5df1d3f7d055c9790a18c995eebe0e34120d2ac1e",
+    "size": 39,
+    "type": "file"
+   },
+   "etc/system.link": {
+    "target": "/etc/config/system",
+    "type": "symlink"
+   },
+   "lib": {
+    "type": "dir"
+   },
+   "lib/libdata.so": {
+    "sha256": "772ab56b5a9fbb0198bfc1846fcc574be4c5df95f33e648f3d97b5fb0e8e96c0",
+    "size": 210000,
+    "type": "file"
+   },
+   "lib/sparse.img": {
+    "sha256": "9667512dc87c9528656b54aa5f6ecae2d0dbc6f8cbb1e780b2cf4326d895126b",
+    "size": 200004,
+    "type": "file"
+   },
+   "lib/zeros.bin": {
+    "sha256": "886715e4051e827f4fe215df3053af3f85ad0d352db2c829c7487af6d78efe30",
+    "size": 300000,
+    "type": "file"
+   },
+   "www": {
+    "type": "dir"
+   },
+   "www/cgi-bin": {
+    "type": "dir"
+   },
+   "www/cgi-bin/hello": {
+    "target": "../bin/hello",
+    "type": "symlink"
+   },
+   "www/index.html": {
+    "sha256": "f3c781f70f3e9a8c02d8697255a8d8d2e2d9fc88247e38efe7ebd464ff690786",
+    "size": 26,
+    "type": "file"
+   }
+  },
+  "tool": "unsquashfs 4.6.1"
+ },
+ "rootfs-xz.squashfs": {
+  "files": {
+   "bin": {
+    "type": "dir"
+   },
+   "bin/hello": {
+    "sha256": "28660c997a7057ea2da571a3c11404426387ae7e0213c94df0cd2972bc2edab8",
+    "size": 34,
+    "type": "file"
+   },
+   "etc": {
+    "type": "dir"
+   },
+   "etc/config": {
+    "type": "dir"
+   },
+   "etc/config/system": {
+    "sha256": "ba0bd1ac256a714da346bfd5df1d3f7d055c9790a18c995eebe0e34120d2ac1e",
+    "size": 39,
+    "type": "file"
+   },
+   "etc/system.link": {
+    "target": "/etc/config/system",
+    "type": "symlink"
+   },
+   "lib": {
+    "type": "dir"
+   },
+   "lib/libdata.so": {
+    "sha256": "772ab56b5a9fbb0198bfc1846fcc574be4c5df95f33e648f3d97b5fb0e8e96c0",
+    "size": 210000,
+    "type": "file"
+   },
+   "lib/sparse.img": {
+    "sha256": "9667512dc87c9528656b54aa5f6ecae2d0dbc6f8cbb1e780b2cf4326d895126b",
+    "size": 200004,
+    "type": "file"
+   },
+   "lib/zeros.bin": {
+    "sha256": "886715e4051e827f4fe215df3053af3f85ad0d352db2c829c7487af6d78efe30",
+    "size": 300000,
+    "type": "file"
+   },
+   "www": {
+    "type": "dir"
+   },
+   "www/cgi-bin": {
+    "type": "dir"
+   },
+   "www/cgi-bin/hello": {
+    "target": "../bin/hello",
+    "type": "symlink"
+   },
+   "www/index.html": {
+    "sha256": "f3c781f70f3e9a8c02d8697255a8d8d2e2d9fc88247e38efe7ebd464ff690786",
+    "size": 26,
+    "type": "file"
+   }
+  },
+  "tool": "unsquashfs 4.6.1"
+ },
+ "rootfs-zstd.squashfs": {
+  "files": {
+   "bin": {
+    "type": "dir"
+   },
+   "bin/hello": {
+    "sha256": "28660c997a7057ea2da571a3c11404426387ae7e0213c94df0cd2972bc2edab8",
+    "size": 34,
+    "type": "file"
+   },
+   "etc": {
+    "type": "dir"
+   },
+   "etc/config": {
+    "type": "dir"
+   },
+   "etc/config/system": {
+    "sha256": "ba0bd1ac256a714da346bfd5df1d3f7d055c9790a18c995eebe0e34120d2ac1e",
+    "size": 39,
+    "type": "file"
+   },
+   "etc/system.link": {
+    "target": "/etc/config/system",
+    "type": "symlink"
+   },
+   "lib": {
+    "type": "dir"
+   },
+   "lib/libdata.so": {
+    "sha256": "772ab56b5a9fbb0198bfc1846fcc574be4c5df95f33e648f3d97b5fb0e8e96c0",
+    "size": 210000,
+    "type": "file"
+   },
+   "lib/sparse.img": {
+    "sha256": "9667512dc87c9528656b54aa5f6ecae2d0dbc6f8cbb1e780b2cf4326d895126b",
+    "size": 200004,
+    "type": "file"
+   },
+   "lib/zeros.bin": {
+    "sha256": "886715e4051e827f4fe215df3053af3f85ad0d352db2c829c7487af6d78efe30",
+    "size": 300000,
+    "type": "file"
+   },
+   "www": {
+    "type": "dir"
+   },
+   "www/cgi-bin": {
+    "type": "dir"
+   },
+   "www/cgi-bin/hello": {
+    "target": "../bin/hello",
+    "type": "symlink"
+   },
+   "www/index.html": {
+    "sha256": "f3c781f70f3e9a8c02d8697255a8d8d2e2d9fc88247e38efe7ebd464ff690786",
+    "size": 26,
+    "type": "file"
+   }
+  },
+  "tool": "unsquashfs 4.6.1"
+ }
+}

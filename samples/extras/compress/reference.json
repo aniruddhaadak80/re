@@ -1,0 +1,87 @@
+{
+ "plain-1.lzo": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "lzop 1.04"
+ },
+ "plain-9.lzo": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "lzop 1.04"
+ },
+ "plain-arm.xz": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain-arm64.xz": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain-armthumb.xz": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain-crc32.xz": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain-crc64.xz": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain-delta.xz": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain-lc4.lzma": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain-multi.bz2": {
+  "sha256": "755f10a4ff801aa63b9c25d6ba4439e48561d2eaf9a991aea2f9c73d4bd9ab03",
+  "size": 61304,
+  "tool": "bzip2 1.0.8 -d"
+ },
+ "plain-powerpc.xz": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain-sparc.xz": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain-x86.xz": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain.bz2": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "bzip2 1.0.8 -d"
+ },
+ "plain.gz": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "gzip -d"
+ },
+ "plain.lzma": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "python3 lzma 3.12.15"
+ },
+ "plain.zst": {
+  "sha256": "021387e7c227e5b3b1b55230c478cd9eb14931502e1e449d46072f6002766ea3",
+  "size": 61290,
+  "tool": "*** Zstandard CLI (64-bit) v1.5.7, by Yann Collet ***"
+ }
+}

@@ -122,5 +122,12 @@ export const CLI_COMMANDS: CliCommand[] = [
   command('x-wxapkg', 'x_wxapkg', 'WeChat mini program packages, with PC decryption'),
   command('x-unity', 'x_unity_bundle', 'Unity UnityFS asset bundles'),
   command('x-standalone-js', 'x_standalone_js', 'Node SEA, Bun and Deno single-file executables'),
-  command('x-api-contracts', 'x_api_contracts', 'Protobuf, OpenAPI and GraphQL contracts inside binaries and bundles'),
+  command('x-api-contracts', 'x_api_contracts', 'Protobuf, OpenAPI, GraphQL and AsyncAPI contracts inside binaries and bundles'),
+  command('x-signal-decoders', 'x_signal_decoders', 'What the RF and logic signal decoders can read and decode'),
+  command('x-signal', 'x_signal_decode', 'Decode an RF recording (IQ, WAV, SigMF) or a sigrok logic session'),
+  command('x-decompress', 'x_decompress', 'Decode gzip, zlib, xz, lzma, lzop, zstd, bzip2 and raw streams'),
+  command('x-squashfs', 'x_squashfs', 'List a squashfs image with file hashes, or read one file'),
+  command('x-firmware-extract', 'x_firmware_extract', 'Recursively unpack a firmware image, optionally to a directory'),
+  command('x-godot', 'x_godot_pck', 'Godot .pck resource packs, standalone or inside a game executable'),
+  command('x-nes', 'x_nes_rom', 'iNES and NES 2.0 ROM headers'),
 ];

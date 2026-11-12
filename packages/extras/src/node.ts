@@ -3,6 +3,8 @@ import { readFile, writeFile, rename, mkdir, open } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { setFileLoader } from './util.js';
 import { setLedgerStore } from './tools.js';
+import { setExtractionWriter } from './tools3.js';
+import { writeExtraction } from './firmware/write-node.js';
 
 const MAX_FILE = 2 * 1024 * 1024 * 1024;
 setFileLoader(async (p) => {
@@ -22,4 +24,7 @@ setLedgerStore({
   async save(p, text) { await mkdir(dirname(p), { recursive: true }); const tmp = `${p}.tmp-${process.pid}`; await writeFile(tmp, text); await rename(tmp, p); },
 });
 
+setExtractionWriter((r, outDir, o) => writeExtraction(r, outDir, o));
+
+export { writeExtraction, type WriteOptions, type WriteReport } from './firmware/write-node.js';
 export * from './index.js';

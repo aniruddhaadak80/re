@@ -21,6 +21,7 @@ import { parseIps } from './apple/ips.js';
 import { Ledger, evidenceFor, type EvidenceRef } from './ledger/ledger.js';
 import { EVAL_TASKS, scoreAnswers, publicTasks } from './eval/harness.js';
 import { sha256 } from '@revlens/core';
+import { FORMAT_R3_TOOLS } from './tools3.js';
 import { GAP_TOOLS } from './tools2.js';
 
 /** Make any value JSON safe: bigint to string, bytes to capped hex, Map and Set to plain values. */
@@ -355,6 +356,7 @@ export const TOOLS: ToolDef[] = [
     async run(i) { return scoreAnswers((i.answers ?? {}) as Record<string, unknown>, { agent: i.agent }); },
   },
   ...GAP_TOOLS,
+  ...FORMAT_R3_TOOLS,
 ];
 
 export { EVAL_TASKS };
