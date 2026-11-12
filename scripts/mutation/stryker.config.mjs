@@ -26,7 +26,8 @@ export default {
     nodeArgs: ['--import', 'tsx', '--test-reporter=tap', '-r', '{{hookFile}}', '{{testFile}}'],
     forceBail: true,
   },
-  mutate: t.mutate,
+  // MUTATE_FILES (comma separated globs) narrows a run, for example to try one file locally
+  mutate: process.env.MUTATE_FILES ? process.env.MUTATE_FILES.split(',').map((x) => x.trim()).filter(Boolean) : t.mutate,
   // Copy only what the tests read into the sandbox; node_modules is linked, not copied.
   ignorePatterns: ['/apps', '/docs', '/content', '/examples', '/dist-sea', '/samples/.cache', '**/dist', '/scripts/mutation/node_modules', '/scripts/mutation/reports', '/scripts/mutation/.stryker-tmp'],
   coverageAnalysis: 'perTest',

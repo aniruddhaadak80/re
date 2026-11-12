@@ -5,6 +5,8 @@ import { basename } from 'node:path';
 import type { Report, Claim, Severity, FormatId } from '@revlens/core';
 import type { PackageCommand } from '@revlens/engine/node';
 import { TOOL_MANIFEST } from '@revlens/mcp/manifest';
+import { CONVERTED_FORMATS, OUTPUT_FORMATS, isOutputFormat, parseCommandJson, render, type OutputFormat } from './formats.js';
+import { SHELLS, completionScript, type Shell } from './completions.js';
 
 // Heavy modules load on demand, so --version, help for the MCP server and `revlens mcp` start fast.
 type CoreMod = typeof import('@revlens/core');
@@ -35,6 +37,9 @@ const sevColor = (s: Severity) => (s === 'critical' ? C.red! : s === 'high' ? C.
 
 const OPTIONS_HELP = () => `Options
   --json  --md  --html  --sarif  --cyclonedx   Output format (default is a readable summary)
+  --format <f>        Any command: ${OUTPUT_FORMATS.join(', ')} (also --toon --yaml --jsonl --csv --tsv)
+  --raw-cells         csv and tsv: do not guard cells that a spreadsheet would run as formulas
+  --evidence-out <p>  Any command: write an evidence bundle (inputs, hashes, result) to a file or folder
   --out <path>        Write output to a file
   --osv               Look up known vulnerabilities on OSV.dev (network, opt in)
   --rules <file>      Extra yara-lite rules
@@ -49,7 +54,8 @@ const OPTIONS_HELP = () => `Options
   --settings-file <f> mcp: JSON file with analysis settings for update_analysis_settings
   -h, --help  -v, --version`;
 
-const CORE_COMMANDS = () => new Set(['analyze', 'scan', 'diff', 'verify', 'rules', 'sbom', 'sarif', 'analyzers', 'tools', 'mcp', 'serve-mcp', 'help', 'guide', 'discover', 'settings', ...TOP_LEVEL_COMMANDS.map((c) => c.name)]);
+const BASE_COMMANDS = ['analyze', 'scan', 'diff', 'verify', 'rules', 'sbom', 'sarif', 'analyzers', 'tools', 'mcp', 'serve-mcp', 'help', 'guide', 'discover', 'settings', 'completions', 'evidence-import'];
+const CORE_COMMANDS = () => new Set([...BASE_COMMANDS, ...TOP_LEVEL_COMMANDS.map((c) => c.name)]);
 
 /** Argument text of a package usage line, without the leading "revlens" and command name. */
 function usageArgs(c: PackageCommand): string {
@@ -99,6 +105,8 @@ function fullHelp(): string {
     '  revlens guide [format]           Playbook for a format, or the guidance overview; --search "words" searches docs',
     '  revlens discover <goal...>       Ranked tools for a goal; --format F, --keyword K, --limit N',
     '  revlens settings                 Analysis settings and where each value comes from (--settings-file F)',
+    `  revlens completions <shell>      Completion script for ${SHELLS.join(', ')}`,
+    '  revlens evidence-import <file>   Check an evidence bundle or an exported ledger; --ledger F records it',
     '',
     'Setup and external tools',
     ...TOP_LEVEL_COMMANDS.map((c) => `  ${c.usage.replace(/^revlens\s+/, 'revlens ').split('   ')[0]!.padEnd(32)} ${c.summary}`),
@@ -111,7 +119,7 @@ function fullHelp(): string {
 interface Args { _: string[]; flags: Record<string, string | boolean> }
 function parse(argv: string[]): Args {
   const a: Args = { _: [], flags: {} };
-  const valued = new Set(['out', 'rules', 'fail-on', 'max-strings', 'claim', 'packages', 'dir', 'tool-profile', 'settings-file', 'search', 'format', 'keyword', 'limit', 'port', 'host', 'token']);
+  const valued = new Set(['out', 'rules', 'fail-on', 'max-strings', 'claim', 'packages', 'dir', 'tool-profile', 'settings-file', 'search', 'format', 'keyword', 'limit', 'port', 'host', 'token', 'ledger', 'alias', 'output-format', 'evidence-out']);
   for (let i = 0; i < argv.length; i++) {
     const t = argv[i] as string;
     if (t === '-h') a.flags.help = true;
@@ -192,7 +200,7 @@ async function run(file: string, flags: Args['flags']): Promise<Report> {
   return r;
 }
 
-async function main(): Promise<number> {
+async function dispatch(): Promise<number> {
   const a = parse(process.argv.slice(2));
   const [cmd, ...rest] = a._;
   if (a.flags.version && !cmd) { console.log(REVLENS_VERSION); return 0; }
@@ -200,6 +208,8 @@ async function main(): Promise<number> {
   if (cmd === 'mcp' || cmd === 'serve-mcp') return startMcp(f);
   if (cmd === 'guide' || cmd === 'discover' || cmd === 'settings') return platformCommand(cmd, rest, f);
   await load();
+  if (cmd === 'completions') return completions(rest, f);
+  if (cmd === 'evidence-import') return evidenceImport(rest, f);
   if (!cmd) { console.log(fullHelp()); return 0; }
   if (cmd === 'help') { console.log(rest[0] ? areaHelp(rest[0]) : fullHelp()); return 0; }
   const top = TOP_LEVEL_COMMANDS.find((c) => c.name === cmd);
@@ -383,6 +393,163 @@ function failCode(reports: Report[], f: Args['flags']): number {
   const limit = SEV_ORDER.indexOf(f['fail-on'] as Severity);
   if (limit < 0) throw new Error(`--fail-on takes one of ${SEV_ORDER.join(', ')}`);
   return reports.some((r) => r.findings.some((x) => SEV_ORDER.indexOf(x.severity) <= limit)) ? 2 : 0;
+}
+
+// ------------------------------------------------------------------ output formats and evidence
+
+const CONVERT_FLAGS = new Set(['toon', 'yaml', 'jsonl', 'csv', 'tsv']);
+const NATIVE_MD = new Set(['analyze', 'scan']);
+const NEVER_CONVERT = new Set(['mcp', 'serve-mcp', 'completions', 'help']);
+
+interface OutputPlan { format?: OutputFormat; convert: boolean; evidence?: string; out?: string; safe: boolean; command?: string; positional: string[] }
+
+/**
+ * Take the output options off the command line. Commands keep their own --json and --md; for the
+ * other formats the command is asked for --json and the CLI converts what it prints. `--format` that
+ * is not an output format (discover --format elf) is left for the command.
+ */
+function planOutput(raw: string[]): { argv: string[]; plan: OutputPlan } {
+  let format: OutputFormat | undefined;
+  let evidence: string | undefined;
+  let out: string | undefined;
+  let safe = true;
+  const drop = new Set<number>();
+  const stop = raw.indexOf('--');
+  const end = stop < 0 ? raw.length : stop;
+  for (let i = 0; i < end; i++) {
+    const t = raw[i]!;
+    if (t.startsWith('--') && CONVERT_FLAGS.has(t.slice(2))) { format = t.slice(2) as OutputFormat; drop.add(i); continue; }
+    if (t === '--raw-cells') { safe = false; drop.add(i); continue; }
+    const m = /^--(format|output-format|evidence-out|out)(?:=([\s\S]*))?$/.exec(t);
+    if (!m) continue;
+    const inline = m[2] !== undefined;
+    const val = inline ? m[2]! : raw[i + 1];
+    if (val === undefined) continue;
+    if (m[1] === 'format' && !isOutputFormat(val)) { if (!inline) i++; continue; }
+    if (m[1] === 'output-format' && !isOutputFormat(val)) throw new Error(`--output-format takes one of ${OUTPUT_FORMATS.join(', ')}`);
+    const idx = inline ? [i] : [i, i + 1];
+    if (m[1] === 'out') { out = val; if (!inline) i++; continue; }
+    idx.forEach((x) => drop.add(x));
+    if (m[1] === 'evidence-out') evidence = val; else format = val as OutputFormat;
+    if (!inline) i++;
+  }
+  const kept = raw.filter((_, i) => !drop.has(i));
+  const a = parse(kept.slice(0, kept.indexOf('--') < 0 ? kept.length : kept.indexOf('--')));
+  const command = a._[0];
+  const positional = a._.slice(1);
+  if (command && NEVER_CONVERT.has(command)) return { argv: kept, plan: { format, convert: false, safe, command, positional } };
+  const convert = (!!format && (CONVERTED_FORMATS.includes(format) || (format === 'md' && !NATIVE_MD.has(command ?? '')))) || !!evidence;
+  let argv = kept;
+  if (!convert) {
+    if (format === 'json' && !argv.includes('--json')) argv = [...argv, '--json'];
+    if (format === 'md' && !argv.includes('--md')) argv = [...argv, '--md'];
+    return { argv, plan: { format, convert, evidence, safe, command, positional } };
+  }
+  // drop --out from what the command sees: the CLI writes the converted result itself
+  const outDropped: string[] = [];
+  for (let i = 0; i < kept.length; i++) {
+    const t = kept[i]!;
+    if (t === '--out') { i++; continue; }
+    if (t.startsWith('--out=')) continue;
+    outDropped.push(t);
+  }
+  argv = outDropped;
+  if (!argv.includes('--json')) { const dd = argv.indexOf('--'); argv = dd < 0 ? [...argv, '--json'] : [...argv.slice(0, dd), '--json', ...argv.slice(dd)]; }
+  return { argv, plan: { format: format ?? 'json', convert, evidence, out, safe, command, positional } };
+}
+
+/** Run fn with everything written to stdout collected instead of printed. */
+async function captured<T>(fn: () => Promise<T>): Promise<{ value?: T; error?: unknown; text: string }> {
+  const chunks: string[] = [];
+  const write = process.stdout.write;
+  let size = 0;
+  const cap = 512 * 1024 * 1024;
+  process.stdout.write = ((c: string | Uint8Array, enc?: unknown, cb?: unknown) => {
+    const t = typeof c === 'string' ? c : Buffer.from(c).toString('utf8');
+    size += t.length;
+    if (size <= cap) chunks.push(t);
+    const done = typeof enc === 'function' ? enc : cb;
+    if (typeof done === 'function') process.nextTick(done as () => void);
+    return true;
+  }) as typeof process.stdout.write;
+  try { return { value: await fn(), text: chunks.join('') }; } catch (error) { return { error, text: chunks.join('') }; } finally { process.stdout.write = write; }
+}
+
+async function main(): Promise<number> {
+  const node = process.argv.slice(0, 2);
+  const { argv, plan } = planOutput(process.argv.slice(2));
+  process.argv = [...node, ...argv];
+  if (!plan.convert) return dispatch();
+  const startedAt = new Date();
+  const r = await captured(dispatch);
+  const finishedAt = new Date();
+  const code = r.error ? 1 : (r.value ?? 0);
+  const parsed = parseCommandJson(r.text);
+  if (plan.evidence) {
+    const { makeBundle, bundlePath } = await import('./evidence.js');
+    const b = makeBundle({ tool: { name: basename(node[1] ?? 'cli').replace(/\.(c?js|mjs|exe)$/i, ''), version: REVLENS_VERSION }, command: plan.command ?? '', argv, startedAt, finishedAt, exitCode: code, positional: plan.positional, json: parsed, text: r.text });
+    const p = bundlePath(plan.evidence, plan.command ?? 'command', startedAt);
+    writeFileSync(p, JSON.stringify(b, null, 2) + '\n');
+    console.error(C.dim!(`evidence written to ${p}`));
+  }
+  if (r.error) throw r.error;
+  if (!parsed.ok) {
+    console.error(C.orange!(`this command printed text, not JSON, so it is shown as is instead of ${plan.format}`));
+    emit(r.text, plan.out ? { out: plan.out } : {});
+    return code;
+  }
+  const fmt = plan.format ?? 'json';
+  emit(render(parsed.value, fmt, { safe: plan.safe, title: fmt === 'md' ? plan.command : undefined }), plan.out ? { out: plan.out } : {});
+  return code;
+}
+
+/** revlens completions <shell> [--alias name]: a completion script built from the live command list. */
+function completions(rest: string[], f: Args['flags']): number {
+  const shell = rest[0] as Shell | undefined;
+  if (!shell || !SHELLS.includes(shell)) { console.error(`usage: completions <${SHELLS.join('|')}> [--alias NAME]`); return 2; }
+  const invoked = basename(process.argv[1] ?? '').replace(/\.(c?js|mjs|exe)$/i, '');
+  const programs = [...new Set([invoked && invoked !== 'index' ? invoked : '', ...String(typeof f.alias === 'string' ? f.alias : '').split(','), 'revlens'].map((x) => x.trim()).filter(Boolean))];
+  const commands = [
+    ...BASE_COMMANDS.filter((c) => c !== 'serve-mcp').map((name) => ({ name, summary: name })),
+    ...TOP_LEVEL_COMMANDS.map((c) => ({ name: c.name, summary: c.summary })),
+    ...TOOL_GROUPS.filter((g) => g.commands.length).map((g) => ({ name: g.id, summary: g.title, sub: g.commands.map((c) => ({ name: c.name, summary: c.summary })) })),
+  ];
+  const flags = ['json', 'md', 'html', 'sarif', 'cyclonedx', 'toon', 'yaml', 'jsonl', 'csv', 'tsv', 'format', 'output-format', 'raw-cells', 'evidence-out', 'out', 'osv', 'rules', 'packages', 'fail-on', 'claim', 'strict', 'fail-on-match', 'max-strings', 'no-recurse', 'tool-profile', 'settings-file', 'help', 'version', 'write', 'scope', 'ledger'];
+  process.stdout.write(completionScript(shell, { programs, commands, flags, formats: [...OUTPUT_FORMATS] }));
+  return 0;
+}
+
+/** revlens evidence-import <bundle or ledger> [--ledger file]: check it, and record it in a ledger file. */
+async function evidenceImport(rest: string[], f: Args['flags']): Promise<number> {
+  const file = need(rest[0]);
+  const text = readFileSync(file, 'utf8');
+  if (text.length > 256 * 1024 * 1024) throw new Error(`${file} is larger than 256 MiB`);
+  const doc = JSON.parse(text) as { schema?: string };
+  const ledgerPath = typeof f.ledger === 'string' && f.ledger ? f.ledger : undefined;
+  const tool = (name: string) => { const t = engine.PACKAGE_TOOLS.find((x) => x.name === name); if (!t) throw new Error(`${name} is not available`); return t; };
+  const out = (v: unknown, human: string) => emit(f.json ? JSON.stringify(v, null, 2) : human, f);
+  if (typeof doc.schema === 'string' && doc.schema.endsWith('/ledger@1')) {
+    const r = await tool('x_ledger_import').run({ ledger: doc, ...(ledgerPath ? { ledgerPath } : {}) }) as { imported: number; summary: unknown };
+    out({ kind: 'ledger', file, ledgerPath: ledgerPath ?? null, ...r }, `ledger ${file}: hash chain ok, ${r.imported} entries${ledgerPath ? `, written to ${ledgerPath}` : ' (checked only; add --ledger F to save it)'}`);
+    return 0;
+  }
+  const { checkBundle } = await import('./evidence.js');
+  const c = checkBundle(doc);
+  const recorded: unknown[] = [];
+  if (ledgerPath && !c.problems.length && c.outputIntact) {
+    for (const i of c.inputs.filter((x) => x.status === 'same')) {
+      recorded.push(await tool('x_ledger_record').run({ path: i.path, statement: `${basename(i.path)} has sha256 ${i.want} (evidence bundle of "${c.command}")`, check: { kind: 'sha256-is', value: i.want }, ledgerPath, tool: 'evidence-import' }));
+    }
+  }
+  const bad = c.problems.length > 0 || !c.outputIntact || c.inputs.some((i) => i.status !== 'same');
+  out({ kind: 'evidence', file, ...c, recorded: recorded.length }, [
+    `evidence bundle ${file}: command "${c.command}"`,
+    `  output ${c.outputIntact ? 'intact' : 'CHANGED'}`,
+    ...c.inputs.map((i) => `  ${i.status.padEnd(10)} ${i.path}`),
+    ...c.problems.map((p) => `  problem: ${p}`),
+    ...(ledgerPath ? [`  ${recorded.length} claims recorded in ${ledgerPath}`] : []),
+  ].join('\n'));
+  return bad ? 3 : 0;
 }
 
 main().then((code) => { if (code >= 0) process.exitCode = code; }, (e: Error) => { console.error(C.red!('error: ') + e.message); process.exitCode = 1; });
