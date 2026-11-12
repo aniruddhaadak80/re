@@ -249,7 +249,8 @@ export class SourceMapIndex {
         out.push({ line: m.genLine + part.line + 1, column: m.genLine === 0 ? m.genCol + part.column : m.genCol, source: String(srcs[m.source!] ?? ''), originalColumn: m.origCol ?? 0 });
       }
     }
-    return out.sort((a, b) => a.line - b.line || a.column - b.column);
+    // the order source-map's allGeneratedPositionsFor uses: original column, then generated column, then line
+    return out.sort((a, b) => a.originalColumn - b.originalColumn || a.column - b.column || a.line - b.line);
   }
   /** Every decoded mapping with absolute generated positions and source names, for whole-map analyses. */
   *eachMapping(): Generator<{ genLine: number; genCol: number; source?: string; origLine?: number; origCol?: number; name?: string; sourceIndex?: number; part: number }> {

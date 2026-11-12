@@ -1,0 +1,7 @@
+{
+  "name": "graph-app",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.js",
+  "bin": { "graph-cli": "src/cli.cjs" }
+}

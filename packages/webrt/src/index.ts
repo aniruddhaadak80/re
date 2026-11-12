@@ -14,7 +14,10 @@ export { analyzeHar, looksLikeHar, type HarSummary } from './har.js';
 export { decodePng, encodePng, diffImages, isPng, type RgbaImage, type PixelDiff } from './png.js';
 export { compareCaptures, endpointPattern, type CaptureComparison, type CaptureLike } from './compare.js';
 export { scanWebMcpScript, scanHtmlForMcp, classifyWellKnown, agentHeaderHints, WELL_KNOWN_PATHS, type WebMcpTool, type WebMcpScriptScan, type HtmlMcpHints, type WellKnownDoc } from './webmcp.js';
-export { md5Hex, safeRelPath, InputError, LIMITS } from './util.js';
+export { md5Hex, sha256Hex, safeRelPath, InputError, LIMITS } from './util.js';
+export { scanModuleImports, buildImportGraph, bundleImportGraph, sourceMapImportGraph, importGraphMermaid, stronglyConnected, sourceKey, normPath, type ImportGraph, type GraphNode, type GraphEdge, type ModuleScan, type ImportKind } from './js/imports.js';
+export { traceSourceLocation, compareSourceToBundle, parseStackTrace, type TracedLocation, type SourceBundleComparison, type SourceFileStatus } from './js/sourcecompare.js';
+export { moduleExportShapes, packageExportShapes, bundleExportShapes, compareExportShapes, arityOf, type ExportShape, type MemberShape, type ModuleShapes, type ShapeComparison } from './js/exportshape.js';
 export { makeTools, loadBytes, type ToolDef, type ToolIO } from './tools.js';
 export { ANALYZERS, webJsAnalyzer, webSourcemapAnalyzer, webElectronAnalyzer, webPcapAnalyzer, webSqliteAnalyzer, webHarAnalyzer, obfuscationScore } from './analyzers.js';
 

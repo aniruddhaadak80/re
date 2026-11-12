@@ -1,0 +1,1597 @@
+{
+ "tool": "node v22.23.3 require() and Object.getOwnPropertyNames reflection",
+ "packages": {
+  "semver-6.3.1": {
+   "Comparator": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "intersects": "method/2",
+     "parse": "method/1",
+     "test": "method/1",
+     "toString": "method/0"
+    },
+    "statics": []
+   },
+   "Range": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "format": "method/0",
+     "intersects": "method/2",
+     "parseRange": "method/1",
+     "test": "method/1",
+     "toString": "method/0"
+    },
+    "statics": []
+   },
+   "SEMVER_SPEC_VERSION": {
+    "kind": "value",
+    "valueType": "string"
+   },
+   "SemVer": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "compare": "method/1",
+     "compareBuild": "method/1",
+     "compareMain": "method/1",
+     "comparePre": "method/1",
+     "format": "method/0",
+     "inc": "method/2",
+     "toString": "method/0"
+    },
+    "statics": [
+     "Comparator",
+     "Range",
+     "SEMVER_SPEC_VERSION",
+     "SemVer",
+     "clean",
+     "cmp",
+     "coerce",
+     "compare",
+     "compareBuild",
+     "compareIdentifiers",
+     "compareLoose",
+     "diff",
+     "eq",
+     "gt",
+     "gte",
+     "gtr",
+     "inc",
+     "intersects",
+     "lt",
+     "lte",
+     "ltr",
+     "major",
+     "maxSatisfying",
+     "minSatisfying",
+     "minVersion",
+     "minor",
+     "neq",
+     "outside",
+     "parse",
+     "patch",
+     "prerelease",
+     "rcompare",
+     "rcompareIdentifiers",
+     "re",
+     "rsort",
+     "safeRe",
+     "satisfies",
+     "sort",
+     "src",
+     "toComparators",
+     "tokens",
+     "valid",
+     "validRange"
+    ]
+   },
+   "clean": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "cmp": {
+    "kind": "function",
+    "arity": 4,
+    "members": {},
+    "statics": []
+   },
+   "coerce": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "compare": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "compareBuild": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "compareIdentifiers": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "compareLoose": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "diff": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "eq": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gt": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gte": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gtr": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "inc": {
+    "kind": "function",
+    "arity": 4,
+    "members": {},
+    "statics": []
+   },
+   "intersects": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "lt": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "lte": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "ltr": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "major": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "maxSatisfying": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "minSatisfying": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "minVersion": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "minor": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "neq": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "outside": {
+    "kind": "function",
+    "arity": 4,
+    "members": {},
+    "statics": []
+   },
+   "parse": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "patch": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "prerelease": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "rcompare": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "rcompareIdentifiers": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "re": {
+    "kind": "value"
+   },
+   "rsort": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "safeRe": {
+    "kind": "value"
+   },
+   "satisfies": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "sort": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "src": {
+    "kind": "value"
+   },
+   "toComparators": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "tokens": {
+    "kind": "object",
+    "keys": [
+     "BUILD",
+     "BUILDIDENTIFIER",
+     "CARET",
+     "CARETLOOSE",
+     "CARETTRIM",
+     "COERCE",
+     "COERCERTL",
+     "COMPARATOR",
+     "COMPARATORLOOSE",
+     "COMPARATORTRIM",
+     "FULL",
+     "FULLPLAIN",
+     "GTLT",
+     "HYPHENRANGE",
+     "HYPHENRANGELOOSE",
+     "LONECARET",
+     "LONETILDE",
+     "LOOSE",
+     "LOOSEPLAIN",
+     "MAINVERSION",
+     "MAINVERSIONLOOSE",
+     "NONNUMERICIDENTIFIER",
+     "NUMERICIDENTIFIER",
+     "NUMERICIDENTIFIERLOOSE",
+     "PRERELEASE",
+     "PRERELEASEIDENTIFIER",
+     "PRERELEASEIDENTIFIERLOOSE",
+     "PRERELEASELOOSE",
+     "STAR",
+     "TILDE",
+     "TILDELOOSE",
+     "TILDETRIM",
+     "XRANGE",
+     "XRANGEIDENTIFIER",
+     "XRANGEIDENTIFIERLOOSE",
+     "XRANGELOOSE",
+     "XRANGEPLAIN",
+     "XRANGEPLAINLOOSE"
+    ]
+   },
+   "valid": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "validRange": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   }
+  },
+  "semver-6.3.1.bundle.cjs": {
+   "Comparator": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "intersects": "method/2",
+     "parse": "method/1",
+     "test": "method/1",
+     "toString": "method/0"
+    },
+    "statics": []
+   },
+   "Range": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "format": "method/0",
+     "intersects": "method/2",
+     "parseRange": "method/1",
+     "test": "method/1",
+     "toString": "method/0"
+    },
+    "statics": []
+   },
+   "SEMVER_SPEC_VERSION": {
+    "kind": "value",
+    "valueType": "string"
+   },
+   "SemVer": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "compare": "method/1",
+     "compareBuild": "method/1",
+     "compareMain": "method/1",
+     "comparePre": "method/1",
+     "format": "method/0",
+     "inc": "method/2",
+     "toString": "method/0"
+    },
+    "statics": [
+     "Comparator",
+     "Range",
+     "SEMVER_SPEC_VERSION",
+     "SemVer",
+     "clean",
+     "cmp",
+     "coerce",
+     "compare",
+     "compareBuild",
+     "compareIdentifiers",
+     "compareLoose",
+     "diff",
+     "eq",
+     "gt",
+     "gte",
+     "gtr",
+     "inc",
+     "intersects",
+     "lt",
+     "lte",
+     "ltr",
+     "major",
+     "maxSatisfying",
+     "minSatisfying",
+     "minVersion",
+     "minor",
+     "neq",
+     "outside",
+     "parse",
+     "patch",
+     "prerelease",
+     "rcompare",
+     "rcompareIdentifiers",
+     "re",
+     "rsort",
+     "safeRe",
+     "satisfies",
+     "sort",
+     "src",
+     "toComparators",
+     "tokens",
+     "valid",
+     "validRange"
+    ]
+   },
+   "clean": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "cmp": {
+    "kind": "function",
+    "arity": 4,
+    "members": {},
+    "statics": []
+   },
+   "coerce": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "compare": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "compareBuild": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "compareIdentifiers": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "compareLoose": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "diff": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "eq": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gt": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gte": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gtr": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "inc": {
+    "kind": "function",
+    "arity": 4,
+    "members": {},
+    "statics": []
+   },
+   "intersects": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "lt": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "lte": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "ltr": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "major": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "maxSatisfying": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "minSatisfying": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "minVersion": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "minor": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "neq": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "outside": {
+    "kind": "function",
+    "arity": 4,
+    "members": {},
+    "statics": []
+   },
+   "parse": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "patch": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "prerelease": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "rcompare": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "rcompareIdentifiers": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "re": {
+    "kind": "value"
+   },
+   "rsort": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "safeRe": {
+    "kind": "value"
+   },
+   "satisfies": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "sort": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "src": {
+    "kind": "value"
+   },
+   "toComparators": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "tokens": {
+    "kind": "object",
+    "keys": [
+     "BUILD",
+     "BUILDIDENTIFIER",
+     "CARET",
+     "CARETLOOSE",
+     "CARETTRIM",
+     "COERCE",
+     "COERCERTL",
+     "COMPARATOR",
+     "COMPARATORLOOSE",
+     "COMPARATORTRIM",
+     "FULL",
+     "FULLPLAIN",
+     "GTLT",
+     "HYPHENRANGE",
+     "HYPHENRANGELOOSE",
+     "LONECARET",
+     "LONETILDE",
+     "LOOSE",
+     "LOOSEPLAIN",
+     "MAINVERSION",
+     "MAINVERSIONLOOSE",
+     "NONNUMERICIDENTIFIER",
+     "NUMERICIDENTIFIER",
+     "NUMERICIDENTIFIERLOOSE",
+     "PRERELEASE",
+     "PRERELEASEIDENTIFIER",
+     "PRERELEASEIDENTIFIERLOOSE",
+     "PRERELEASELOOSE",
+     "STAR",
+     "TILDE",
+     "TILDELOOSE",
+     "TILDETRIM",
+     "XRANGE",
+     "XRANGEIDENTIFIER",
+     "XRANGEIDENTIFIERLOOSE",
+     "XRANGELOOSE",
+     "XRANGEPLAIN",
+     "XRANGEPLAINLOOSE"
+    ]
+   },
+   "valid": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "validRange": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   }
+  },
+  "semver-7.7.1": {
+   "Comparator": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "intersects": "method/2",
+     "parse": "method/1",
+     "test": "method/1",
+     "toString": "method/0"
+    },
+    "statics": [
+     "ANY"
+    ]
+   },
+   "RELEASE_TYPES": {
+    "kind": "value"
+   },
+   "Range": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "format": "method/0",
+     "intersects": "method/2",
+     "parseRange": "method/1",
+     "range": "accessor",
+     "test": "method/1",
+     "toString": "method/0"
+    },
+    "statics": []
+   },
+   "SEMVER_SPEC_VERSION": {
+    "kind": "value",
+    "valueType": "string"
+   },
+   "SemVer": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "compare": "method/1",
+     "compareBuild": "method/1",
+     "compareMain": "method/1",
+     "comparePre": "method/1",
+     "format": "method/0",
+     "inc": "method/3",
+     "toString": "method/0"
+    },
+    "statics": []
+   },
+   "clean": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "cmp": {
+    "kind": "function",
+    "arity": 4,
+    "members": {},
+    "statics": []
+   },
+   "coerce": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "compare": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "compareBuild": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "compareIdentifiers": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "compareLoose": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "diff": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "eq": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gt": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gte": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gtr": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "inc": {
+    "kind": "function",
+    "arity": 5,
+    "members": {},
+    "statics": []
+   },
+   "intersects": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "lt": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "lte": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "ltr": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "major": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "maxSatisfying": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "minSatisfying": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "minVersion": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "minor": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "neq": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "outside": {
+    "kind": "function",
+    "arity": 4,
+    "members": {},
+    "statics": []
+   },
+   "parse": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "patch": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "prerelease": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "rcompare": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "rcompareIdentifiers": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "re": {
+    "kind": "value"
+   },
+   "rsort": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "satisfies": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "simplifyRange": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "sort": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "src": {
+    "kind": "value"
+   },
+   "subset": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "toComparators": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "tokens": {
+    "kind": "object",
+    "keys": [
+     "BUILD",
+     "BUILDIDENTIFIER",
+     "CARET",
+     "CARETLOOSE",
+     "CARETTRIM",
+     "COERCE",
+     "COERCEFULL",
+     "COERCEPLAIN",
+     "COERCERTL",
+     "COERCERTLFULL",
+     "COMPARATOR",
+     "COMPARATORLOOSE",
+     "COMPARATORTRIM",
+     "FULL",
+     "FULLPLAIN",
+     "GTE0",
+     "GTE0PRE",
+     "GTLT",
+     "HYPHENRANGE",
+     "HYPHENRANGELOOSE",
+     "LONECARET",
+     "LONETILDE",
+     "LOOSE",
+     "LOOSEPLAIN",
+     "MAINVERSION",
+     "MAINVERSIONLOOSE",
+     "NONNUMERICIDENTIFIER",
+     "NUMERICIDENTIFIER",
+     "NUMERICIDENTIFIERLOOSE",
+     "PRERELEASE",
+     "PRERELEASEIDENTIFIER",
+     "PRERELEASEIDENTIFIERLOOSE",
+     "PRERELEASELOOSE",
+     "STAR",
+     "TILDE",
+     "TILDELOOSE",
+     "TILDETRIM",
+     "XRANGE",
+     "XRANGEIDENTIFIER",
+     "XRANGEIDENTIFIERLOOSE",
+     "XRANGELOOSE",
+     "XRANGEPLAIN",
+     "XRANGEPLAINLOOSE"
+    ]
+   },
+   "valid": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "validRange": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   }
+  },
+  "semver-7.7.1.bundle.cjs": {
+   "Comparator": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "intersects": "method/2",
+     "parse": "method/1",
+     "test": "method/1",
+     "toString": "method/0"
+    },
+    "statics": [
+     "ANY"
+    ]
+   },
+   "RELEASE_TYPES": {
+    "kind": "value"
+   },
+   "Range": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "format": "method/0",
+     "intersects": "method/2",
+     "parseRange": "method/1",
+     "range": "accessor",
+     "test": "method/1",
+     "toString": "method/0"
+    },
+    "statics": []
+   },
+   "SEMVER_SPEC_VERSION": {
+    "kind": "value",
+    "valueType": "string"
+   },
+   "SemVer": {
+    "kind": "class",
+    "arity": 2,
+    "members": {
+     "compare": "method/1",
+     "compareBuild": "method/1",
+     "compareMain": "method/1",
+     "comparePre": "method/1",
+     "format": "method/0",
+     "inc": "method/3",
+     "toString": "method/0"
+    },
+    "statics": []
+   },
+   "clean": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "cmp": {
+    "kind": "function",
+    "arity": 4,
+    "members": {},
+    "statics": []
+   },
+   "coerce": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "compare": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "compareBuild": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "compareIdentifiers": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "compareLoose": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "diff": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "eq": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gt": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gte": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "gtr": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "inc": {
+    "kind": "function",
+    "arity": 5,
+    "members": {},
+    "statics": []
+   },
+   "intersects": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "lt": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "lte": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "ltr": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "major": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "maxSatisfying": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "minSatisfying": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "minVersion": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "minor": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "neq": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "outside": {
+    "kind": "function",
+    "arity": 4,
+    "members": {},
+    "statics": []
+   },
+   "parse": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "patch": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "prerelease": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "rcompare": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "rcompareIdentifiers": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "re": {
+    "kind": "value"
+   },
+   "rsort": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "satisfies": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "simplifyRange": {
+    "kind": "function",
+    "arity": 3,
+    "members": {},
+    "statics": []
+   },
+   "sort": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "src": {
+    "kind": "value"
+   },
+   "subset": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "toComparators": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "tokens": {
+    "kind": "object",
+    "keys": [
+     "BUILD",
+     "BUILDIDENTIFIER",
+     "CARET",
+     "CARETLOOSE",
+     "CARETTRIM",
+     "COERCE",
+     "COERCEFULL",
+     "COERCEPLAIN",
+     "COERCERTL",
+     "COERCERTLFULL",
+     "COMPARATOR",
+     "COMPARATORLOOSE",
+     "COMPARATORTRIM",
+     "FULL",
+     "FULLPLAIN",
+     "GTE0",
+     "GTE0PRE",
+     "GTLT",
+     "HYPHENRANGE",
+     "HYPHENRANGELOOSE",
+     "LONECARET",
+     "LONETILDE",
+     "LOOSE",
+     "LOOSEPLAIN",
+     "MAINVERSION",
+     "MAINVERSIONLOOSE",
+     "NONNUMERICIDENTIFIER",
+     "NUMERICIDENTIFIER",
+     "NUMERICIDENTIFIERLOOSE",
+     "PRERELEASE",
+     "PRERELEASEIDENTIFIER",
+     "PRERELEASEIDENTIFIERLOOSE",
+     "PRERELEASELOOSE",
+     "STAR",
+     "TILDE",
+     "TILDELOOSE",
+     "TILDETRIM",
+     "XRANGE",
+     "XRANGEIDENTIFIER",
+     "XRANGEIDENTIFIERLOOSE",
+     "XRANGELOOSE",
+     "XRANGEPLAIN",
+     "XRANGEPLAINLOOSE"
+    ]
+   },
+   "valid": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "validRange": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   }
+  },
+  "marked-16.4.2": {
+   "Hooks": {
+    "kind": "class",
+    "arity": 1,
+    "members": {
+     "emStrongMask": "method/1",
+     "postprocess": "method/1",
+     "preprocess": "method/1",
+     "processAllTokens": "method/1",
+     "provideLexer": "method/0",
+     "provideParser": "method/0"
+    },
+    "statics": [
+     "passThroughHooks",
+     "passThroughHooksRespectAsync"
+    ]
+   },
+   "Lexer": {
+    "kind": "class",
+    "arity": 1,
+    "members": {
+     "blockTokens": "method/1",
+     "inline": "method/1",
+     "inlineTokens": "method/1",
+     "lex": "method/1"
+    },
+    "statics": [
+     "lex",
+     "lexInline",
+     "rules"
+    ]
+   },
+   "Marked": {
+    "kind": "class",
+    "arity": 0,
+    "members": {
+     "lexer": "method/2",
+     "onError": "method/2",
+     "parseMarkdown": "method/1",
+     "parser": "method/2",
+     "setOptions": "method/1",
+     "use": "method/0",
+     "walkTokens": "method/2"
+    },
+    "statics": []
+   },
+   "Parser": {
+    "kind": "class",
+    "arity": 1,
+    "members": {
+     "parse": "method/1",
+     "parseInline": "method/1"
+    },
+    "statics": [
+     "parse",
+     "parseInline"
+    ]
+   },
+   "Renderer": {
+    "kind": "class",
+    "arity": 1,
+    "members": {
+     "blockquote": "method/1",
+     "br": "method/1",
+     "checkbox": "method/1",
+     "code": "method/1",
+     "codespan": "method/1",
+     "def": "method/1",
+     "del": "method/1",
+     "em": "method/1",
+     "heading": "method/1",
+     "hr": "method/1",
+     "html": "method/1",
+     "image": "method/1",
+     "link": "method/1",
+     "list": "method/1",
+     "listitem": "method/1",
+     "paragraph": "method/1",
+     "space": "method/1",
+     "strong": "method/1",
+     "table": "method/1",
+     "tablecell": "method/1",
+     "tablerow": "method/1",
+     "text": "method/1"
+    },
+    "statics": []
+   },
+   "TextRenderer": {
+    "kind": "class",
+    "arity": 0,
+    "members": {
+     "br": "method/0",
+     "codespan": "method/1",
+     "del": "method/1",
+     "em": "method/1",
+     "html": "method/1",
+     "image": "method/1",
+     "link": "method/1",
+     "strong": "method/1",
+     "text": "method/1"
+    },
+    "statics": []
+   },
+   "Tokenizer": {
+    "kind": "class",
+    "arity": 1,
+    "members": {
+     "autolink": "method/1",
+     "blockquote": "method/1",
+     "br": "method/1",
+     "code": "method/1",
+     "codespan": "method/1",
+     "def": "method/1",
+     "del": "method/1",
+     "emStrong": "method/2",
+     "escape": "method/1",
+     "fences": "method/1",
+     "heading": "method/1",
+     "hr": "method/1",
+     "html": "method/1",
+     "inlineText": "method/1",
+     "lheading": "method/1",
+     "link": "method/1",
+     "list": "method/1",
+     "paragraph": "method/1",
+     "reflink": "method/2",
+     "space": "method/1",
+     "table": "method/1",
+     "tag": "method/1",
+     "text": "method/1",
+     "url": "method/1"
+    },
+    "statics": []
+   },
+   "defaults": {
+    "kind": "object",
+    "keys": [
+     "async",
+     "breaks",
+     "extensions",
+     "gfm",
+     "hooks",
+     "pedantic",
+     "renderer",
+     "silent",
+     "tokenizer",
+     "walkTokens"
+    ]
+   },
+   "getDefaults": {
+    "kind": "function",
+    "arity": 0,
+    "members": {},
+    "statics": []
+   },
+   "lexer": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "marked": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": [
+     "Hooks",
+     "Lexer",
+     "Parser",
+     "Renderer",
+     "TextRenderer",
+     "Tokenizer",
+     "defaults",
+     "getDefaults",
+     "lexer",
+     "options",
+     "parse",
+     "parseInline",
+     "parser",
+     "setOptions",
+     "use",
+     "walkTokens"
+    ]
+   },
+   "options": {
+    "kind": "function",
+    "arity": 1,
+    "members": {},
+    "statics": []
+   },
+   "parse": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": [
+     "Hooks",
+     "Lexer",
+     "Parser",
+     "Renderer",
+     "TextRenderer",
+     "Tokenizer",
+     "defaults",
+     "getDefaults",
+     "lexer",
+     "options",
+     "parse",
+     "parseInline",
+     "parser",
+     "setOptions",
+     "use",
+     "walkTokens"
+    ]
+   },
+   "parseInline": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "parser": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   },
+   "setOptions": {
+    "kind": "function",
+    "arity": 1,
+    "members": {},
+    "statics": []
+   },
+   "use": {
+    "kind": "function",
+    "arity": 0,
+    "members": {},
+    "statics": []
+   },
+   "walkTokens": {
+    "kind": "function",
+    "arity": 2,
+    "members": {},
+    "statics": []
+   }
+  }
+ }
+}

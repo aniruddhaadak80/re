@@ -1,0 +1,164 @@
+{
+ "tool": "esbuild 0.28.2 metafile",
+ "inputs": {
+  "src/c.js": [
+   {
+    "path": "src/a.js",
+    "kind": "import-statement",
+    "external": false,
+    "original": "./a.js"
+   }
+  ],
+  "src/b.js": [
+   {
+    "path": "src/c.js",
+    "kind": "import-statement",
+    "external": false,
+    "original": "./c.js"
+   }
+  ],
+  "src/a.js": [
+   {
+    "path": "src/b.js",
+    "kind": "import-statement",
+    "external": false,
+    "original": "./b.js"
+   }
+  ],
+  "src/util/strings.ts": [],
+  "src/helpers.cjs": [],
+  "src/legacy.cjs": [
+   {
+    "path": "src/helpers.cjs",
+    "kind": "require-call",
+    "external": false,
+    "original": "./helpers.cjs"
+   },
+   {
+    "path": "path",
+    "kind": "require-call",
+    "external": true
+   }
+  ],
+  "src/lazy.js": [
+   {
+    "path": "src/c.js",
+    "kind": "import-statement",
+    "external": false,
+    "original": "./c.js"
+   }
+  ],
+  "src/index.js": [
+   {
+    "path": "src/a.js",
+    "kind": "import-statement",
+    "external": false,
+    "original": "./a.js"
+   },
+   {
+    "path": "src/util/strings.ts",
+    "kind": "import-statement",
+    "external": false,
+    "original": "./util/strings.js"
+   },
+   {
+    "path": "lodash-es",
+    "kind": "import-statement",
+    "external": true
+   },
+   {
+    "path": "src/legacy.cjs",
+    "kind": "import-statement",
+    "external": false,
+    "original": "./legacy.cjs"
+   },
+   {
+    "path": "src/lazy.js",
+    "kind": "dynamic-import",
+    "external": false,
+    "original": "./lazy.js"
+   }
+  ],
+  "src/cli.cjs": [
+   {
+    "path": "src/helpers.cjs",
+    "kind": "require-call",
+    "external": false,
+    "original": "./helpers.cjs"
+   }
+  ]
+ },
+ "outputs": {
+  "../graph-dist/esm/index.js": {
+   "imports": [
+    {
+     "path": "../graph-dist/esm/chunk-5QXAPRUV.js",
+     "kind": "import-statement"
+    },
+    {
+     "path": "../graph-dist/esm/chunk-KSII6XAB.js",
+     "kind": "import-statement"
+    },
+    {
+     "path": "../graph-dist/esm/chunk-PIRHQTI4.js",
+     "kind": "import-statement"
+    },
+    {
+     "path": "path",
+     "kind": "require-call",
+     "external": true
+    },
+    {
+     "path": "lodash-es",
+     "kind": "import-statement",
+     "external": true
+    },
+    {
+     "path": "../graph-dist/esm/chunk-HS4K5ZBH.js",
+     "kind": "dynamic-import"
+    }
+   ],
+   "entryPoint": "src/index.js"
+  },
+  "../graph-dist/esm/cli.js": {
+   "imports": [
+    {
+     "path": "../graph-dist/esm/chunk-5QXAPRUV.js",
+     "kind": "import-statement"
+    },
+    {
+     "path": "../graph-dist/esm/chunk-PIRHQTI4.js",
+     "kind": "import-statement"
+    }
+   ],
+   "entryPoint": "src/cli.cjs"
+  },
+  "../graph-dist/esm/chunk-5QXAPRUV.js": {
+   "imports": [
+    {
+     "path": "../graph-dist/esm/chunk-PIRHQTI4.js",
+     "kind": "import-statement"
+    }
+   ]
+  },
+  "../graph-dist/esm/chunk-HS4K5ZBH.js": {
+   "imports": [
+    {
+     "path": "../graph-dist/esm/chunk-KSII6XAB.js",
+     "kind": "import-statement"
+    },
+    {
+     "path": "../graph-dist/esm/chunk-PIRHQTI4.js",
+     "kind": "import-statement"
+    }
+   ],
+   "entryPoint": "src/lazy.js"
+  },
+  "../graph-dist/esm/chunk-KSII6XAB.js": {
+   "imports": []
+  },
+  "../graph-dist/esm/chunk-PIRHQTI4.js": {
+   "imports": []
+  }
+ }
+}

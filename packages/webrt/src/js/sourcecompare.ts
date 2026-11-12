@@ -136,6 +136,8 @@ export interface SourceBundleComparison {
 const CODE_FILE = /\.(?:m?jsx?|cjs|tsx?|mts|cts|vue|svelte|css|scss|less)$/;
 const SKIP_FILE = /(?:^|\/)(?:node_modules|dist|build|coverage|\.git)\/|\.d\.ts$|(?:^|\/)(?:__tests__|test|tests)\/|\.(?:test|spec)\.[cm]?[jt]sx?$|(?:^|\/)[^/]*\.config\.[cm]?[jt]s$/;
 
+const BUNDLER_NAME = /^(?:__|init_|require_|import_|exports_|_interop|_export)|_exports$/;
+
 function lineDiff(a: string, b: string): { added: number; removed: number; first?: number } {
   const al = a.replace(/\r\n/g, '\n').split('\n'), bl = b.replace(/\r\n/g, '\n').split('\n');
   let first: number | undefined;
@@ -213,7 +215,9 @@ export function compareSourceToBundle(sourceMap: string | RawSourceMap, folder: 
           used.add(m.line);
           const text = lines[m.line - 1];
           if (text === undefined || m.col > text.length) { out++; continue; }
-          if (m.name && !text.startsWith(m.name, m.col) && !text.slice(m.col, m.col + m.name.length + 40).includes(m.name)) names++;
+          // bundler helpers (esbuild init_x, require_x, __export, webpack __webpack_require__) carry names that are not in the source
+          // esbuild maps export getters to 1:0, so a name only counts as missing when the whole file lacks it
+          if (m.name && !BUNDLER_NAME.test(m.name) && !text.includes(m.name) && !f.content.includes(m.name)) names++;
         }
         st.mappingsOutOfRange = out; st.namesNotFound = names; st.mappedLines = used.size;
         st.status = out || names ? 'changed' : 'no-content';

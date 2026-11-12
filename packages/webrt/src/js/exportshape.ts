@@ -93,6 +93,7 @@ class ShapeReader {
         r = { format: 'cjs', exports: { 'module.exports': { kind: v && typeof v === 'object' ? 'object' : 'value', keys, from: path } }, starReexports: [], warnings: [] };
       } else {
         const { ast } = parseJs(code);
+        this.outerBody.set(path, ast.program.body);
         r = this.fromStatements(ast.program.body, path, depth);
       }
     } finally { this.active.delete(path); }
@@ -147,11 +148,17 @@ class ShapeReader {
       if (st.type !== 'ExpressionStatement') continue;
       const e = st.expression;
       if (e.type === 'AssignmentExpression' && e.operator === '=' && e.left.type === 'MemberExpression') {
-        const target = memberName(e.left.object);
-        const prop = e.left.computed ? staticString(e.left.property) : e.left.property.type === 'Identifier' ? e.left.property.name : undefined;
-        if (!target || !prop) continue;
-        if (target.endsWith('.prototype')) { const owner = target.slice(0, -10); if (bindings.has(owner)) addMember(owner, memberFrom(prop, e.right, false)); }
-        else if (bindings.has(target) && !target.includes('.')) addMember(target, memberFrom(prop, e.right, true));
+        // a.b = a.c = value: every left side gets the final value
+        const lefts: t.MemberExpression[] = [];
+        let right: t.Node = e;
+        while (right.type === 'AssignmentExpression' && right.operator === '=' && right.left.type === 'MemberExpression' && lefts.length < 20) { lefts.push(right.left); right = right.right; }
+        for (const left of lefts) {
+          const target = memberName(left.object);
+          const prop = left.computed ? staticString(left.property) : left.property.type === 'Identifier' ? left.property.name : undefined;
+          if (!target || !prop) continue;
+          if (target.endsWith('.prototype')) { const owner = target.slice(0, -10); if (bindings.has(owner)) addMember(owner, memberFrom(prop, right, false)); }
+          else if (bindings.has(target) && !target.includes('.')) addMember(target, memberFrom(prop, right, true));
+        }
       }
     }
     const describe = (b: Binding | undefined, d: number, seen = new Set<Binding>()): ExportShape => {
@@ -166,7 +173,67 @@ class ShapeReader {
         const s = m.exports[name];
         return s ? { ...s, via: b.spec } : { kind: 'unknown', via: b.spec, from: target };
       }
-      return { ...this.shapeOfNode(b.node, (n) => describe(n.type === 'Identifier' ? bindings.get(n.name) : { k: 'node', node: n, line: n.loc?.start.line ?? 0 }, d + 1, seen), path), line: b.line, from: path };
+      const local = localValue(b.node, d, seen);
+      if (local) return { ...local, line: b.line, from: path };
+      const viaModule = valueThroughModule(b.node, d);
+      if (viaModule) return { ...viaModule, line: b.line };
+      return { ...this.shapeOfNode(b.node, (n) => (n.type === 'Identifier' ? withStatics(n.name, describe(bindings.get(n.name), d + 1, seen)) : valueThroughModule(n, d + 1) ?? describe({ k: 'node', node: n, line: n.loc?.start.line ?? 0 }, d + 1, seen)), path), line: b.line, from: path };
+    };
+    // X.member where X is a local function or class (statics and later assignments), an instance of a
+    // local class (new C), or f() where f is a local function that returns an object literal.
+    const localValue = (n: t.Node, d: number, seen: Set<Binding>): ExportShape | undefined => {
+      if (d > MAX_DEPTH) return undefined;
+      if (n.type === 'MemberExpression' && !n.computed && n.property.type === 'Identifier' && n.object.type === 'Identifier') {
+        const owner = n.object.name, prop = n.property.name;
+        const ob = bindings.get(owner);
+        if (!ob || ob.k !== 'node') return undefined;
+        const assigned = statics.get(owner)?.find((m) => m.static && m.name === prop);
+        if (assigned) return assigned.kind === 'method' ? { kind: 'function', arity: assigned.arity, async: assigned.async, generator: assigned.generator } : { kind: 'unknown' };
+        const os = ob.node.type === 'NewExpression' && ob.node.callee.type === 'Identifier' ? withStatics(ob.node.callee.name, describe(bindings.get(ob.node.callee.name), d + 1, seen)) : withStatics(owner, describe(ob, d + 1, seen));
+        const wantStatic = ob.node.type !== 'NewExpression';
+        const m = os.members?.find((x) => x.name === prop && x.static === wantStatic);
+        if (m) return m.kind === 'method' ? { kind: 'function', arity: m.arity, async: m.async, generator: m.generator } : { kind: 'unknown' };
+        return undefined;
+      }
+      if (n.type === 'CallExpression' && n.callee.type === 'Identifier' && n.arguments.length <= 8) {
+        const fb = bindings.get(n.callee.name);
+        const fn = fb?.k === 'node' ? fb.node : undefined;
+        if (fn && (fn.type === 'FunctionDeclaration' || fn.type === 'FunctionExpression' || fn.type === 'ArrowFunctionExpression')) {
+          const ret = fn.body.type === 'BlockStatement' ? (fn.body.body.find((x) => x.type === 'ReturnStatement') as t.ReturnStatement | undefined)?.argument : fn.body;
+          if (ret?.type === 'ObjectExpression') return this.shapeOfNode(ret, () => ({ kind: 'unknown' }), path);
+        }
+      }
+      return undefined;
+    };
+    // A module an expression evaluates to: a required or imported file, or an esbuild __commonJS factory call.
+    const moduleOf = (n: t.Node, d: number): { m: ModuleShapes; spec?: string } | undefined => {
+      if (d > MAX_DEPTH) return undefined;
+      if (n.type === 'CallExpression' && n.callee.type === 'Identifier' && /^__to(?:ESM|CommonJS)$/.test(n.callee.name) && n.arguments[0]) return moduleOf(n.arguments[0] as t.Node, d + 1);
+      const spec = requireSpec(n);
+      if (spec !== undefined) { const tg = this.resolve(path, spec); return tg ? { m: this.module(tg, depth + 1), spec } : undefined; }
+      if (n.type === 'CallExpression' && n.callee.type === 'Identifier' && n.arguments.length === 0) {
+        const fb = bindings.get(n.callee.name);
+        if (fb?.k === 'node' && fb.node.type === 'CallExpression' && fb.node.callee.type === 'Identifier' && fb.node.callee.name === '__commonJS') return this.esbuildFactory(fb.node, path, depth);
+      }
+      if (n.type === 'Identifier') {
+        const b = bindings.get(n.name);
+        if (b?.k === 'node') return moduleOf(b.node, d + 1);
+        if (b && (b.k === 'require' || (b.k === 'import' && (b.imported === '*' || b.imported === 'default'))) && !(b.k === 'require' && b.prop)) { const tg = this.resolve(path, b.spec); return tg ? { m: this.module(tg, depth + 1), spec: b.spec } : undefined; }
+      }
+      return undefined;
+    };
+    // The export shape a module-valued expression or a member of one has.
+    const valueThroughModule = (n: t.Node, d: number): ExportShape | undefined => {
+      if (n.type === 'MemberExpression' && !n.computed && n.property.type === 'Identifier') {
+        const mo = moduleOf(n.object, d + 1);
+        if (mo) { const s = mo.m.exports[n.property.name] ?? (mo.m.exports['module.exports']?.keys?.includes(n.property.name) ? { kind: 'unknown' as const } : undefined); return s ? { ...s, via: mo.spec ?? s.via } : { kind: 'unknown' }; }
+        return undefined;
+      }
+      if (n.type === 'CallExpression') {
+        const mo = moduleOf(n, d + 1);
+        if (mo) { const s = mo.m.exports['module.exports'] ?? { kind: 'object' as const, keys: Object.keys(mo.m.exports).filter((k) => k !== 'default').sort() }; return { ...s, via: mo.spec ?? s.via }; }
+      }
+      return undefined;
     };
     const withStatics = (name: string | undefined, s: ExportShape): ExportShape => {
       const extraM = name ? statics.get(name) : undefined;
@@ -174,7 +241,8 @@ class ShapeReader {
       if (s.kind === 'class' || s.kind === 'function') {
         const members = [...(s.members ?? [])];
         for (const m of extraM) if (!members.some((x) => x.name === m.name && x.static === m.static)) members.push(m);
-        return { ...s, members: sortMembers(members) };
+        // an ES5 constructor with prototype methods is a class in all but syntax
+        return { ...s, kind: s.kind === 'function' && members.some((m) => !m.static) ? 'class' : s.kind, members: sortMembers(members) };
       }
       if (s.kind === 'object') return { ...s, keys: [...new Set([...(s.keys ?? []), ...extraM.filter((m) => m.static).map((m) => m.name)])].sort() };
       return s;
@@ -204,6 +272,8 @@ class ShapeReader {
           }
           return;
         }
+        // exports = module.exports = X
+        if (e.left.type === 'Identifier' && e.left.name === exportsName && e.right.type === 'AssignmentExpression') { scanCjs(e.right); return; }
         if (e.left.type === 'MemberExpression' && isExportsObj(e.left.object)) {
           const k = e.left.computed ? staticString(e.left.property) : e.left.property.type === 'Identifier' ? e.left.property.name : undefined;
           if (k && k !== '__esModule') { cjs = true; cjsProps[k] = ofExpr(e.right); }
@@ -236,6 +306,7 @@ class ShapeReader {
       }
     };
     for (const st of body) {
+      if (st.type === 'VariableDeclaration') for (const dcl of st.declarations) if (dcl.init?.type === 'AssignmentExpression') scanCjs(dcl.init);
       if (st.type === 'ExpressionStatement') {
         let e: t.Node = st.expression;
         if (e.type === 'SequenceExpression') { for (const x of e.expressions) scanCjs(x); continue; }
@@ -295,6 +366,27 @@ class ShapeReader {
     }
     return { format: Object.keys(exports).length ? 'esm' : 'none', exports, starReexports, warnings };
   }
+
+  private factories = new Map<t.Node, ModuleShapes>();
+  /** Shapes of an esbuild __commonJS({ "path"(exports, module) { ... } }) factory. */
+  esbuildFactory(call: t.CallExpression, path: string, depth: number): { m: ModuleShapes; spec?: string } | undefined {
+    const hit = this.factories.get(call);
+    if (hit) return { m: hit };
+    const obj = call.arguments[0];
+    if (obj?.type !== 'ObjectExpression' || depth > MAX_DEPTH) return undefined;
+    const p = obj.properties[0];
+    const fn = p?.type === 'ObjectMethod' ? p : p?.type === 'ObjectProperty' && (p.value.type === 'FunctionExpression' || p.value.type === 'ArrowFunctionExpression') ? p.value : undefined;
+    if (!fn || fn.body.type !== 'BlockStatement') return undefined;
+    const params = fn.params.map((x) => (x.type === 'Identifier' ? x.name : ''));
+    const name = p && p.type !== 'SpreadElement' ? propKey(p) : undefined;
+    this.factories.set(call, { format: 'none', exports: {}, starReexports: [], warnings: ['factory cycle'] });
+    // the factory body sees the bundle's top level, so its statements are read with the outer ones in scope
+    const outer = this.outerBody.get(path) ?? [];
+    const m = this.fromStatements([...outer.filter((s) => s.type === 'VariableDeclaration' || s.type === 'FunctionDeclaration'), ...fn.body.body], name ?? path, depth + 1, { exportsName: params[0] || 'exports', moduleName: params[1] || 'module', requireName: '__require_unused' });
+    this.factories.set(call, m);
+    return { m, spec: name };
+  }
+  outerBody = new Map<string, t.Statement[]>();
 
   /** m.x where m is a required module, as used by tsc and babel re-export getters. */
   private followMember(n: t.Node, bindings: Map<string, Binding>, describe: (b: Binding | undefined, d: number) => ExportShape, _path: string): ExportShape {
@@ -419,6 +511,7 @@ export function bundleExportShapes(code: string): { bundler: string; top: Module
   const b = unpackBundle(code);
   const { ast } = parseJs(code);
   const reader = new ShapeReader(new Map([['bundle.js', code]]));
+  reader.outerBody.set('bundle.js', ast.program.body);
   const top = reader.fromStatements(ast.program.body, 'bundle.js', 0);
   const modules: { id: string; path?: string; shapes: ModuleShapes }[] = [];
   const byRange = b.modules.map((m) => ({ m, fn: undefined as t.Node | undefined }));

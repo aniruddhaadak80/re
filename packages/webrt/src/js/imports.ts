@@ -5,7 +5,7 @@
 // Mermaid. Browser safe: callers hand in file contents, nothing is read or run here.
 import { parseJs, walk, staticString, templateShape, memberName, t } from './ast.js';
 import { unpackBundle, type BundleResult } from './bundle.js';
-import { parseSourceMap, type RawSourceMap } from '../sourcemap.js';
+import { parseSourceMap, SourceMapIndex, type RawSourceMap } from '../sourcemap.js';
 import { InputError } from '../util.js';
 
 export type ImportKind = 'import' | 'import-type' | 'export-from' | 'dynamic-import' | 'require' | 'require-resolve' | 'import-scripts' | 'worker' | 'bundle-dep' | 'preload';
@@ -111,7 +111,7 @@ export function scanModuleImports(code: string, path = 'input.js'): ModuleScan {
         }
         const name = callee.type === 'Identifier' ? callee.name : memberName(callee);
         if (!name || !a0) return undefined;
-        if (node.type === 'CallExpression' && (name === 'require' || name === 'module.require')) { cjs = true; const s = staticString(a0); if (s !== undefined) add(s, 'require', node); else { const tpl = templateShape(a0); if (tpl) add(tpl, 'require', node, undefined, true); } }
+        if (node.type === 'CallExpression' && (name === 'require' || name === 'module.require' || name === '__require')) { cjs = true; const s = staticString(a0); if (s !== undefined) add(s, 'require', node); else { const tpl = templateShape(a0); if (tpl) add(tpl, 'require', node, undefined, true); } }
         else if (node.type === 'CallExpression' && name === 'require.resolve') { const s = staticString(a0); if (s !== undefined) add(s, 'require-resolve', node); }
         else if (node.type === 'CallExpression' && (name === 'importScripts' || name === 'self.importScripts')) { for (const a of node.arguments) { const s = staticString(a as t.Node); if (s !== undefined) add(s, 'import-scripts', node); } }
         else if (node.type === 'NewExpression' && /^(?:(?:window|self|globalThis)\.)?(?:Worker|SharedWorker)$/.test(name)) {
@@ -334,6 +334,7 @@ export function buildImportGraph(files: { path: string; code: string }[], opts: 
       if (spec.startsWith('.') || spec.startsWith('/')) target = resolveRel(p, spec);
       else target = resolveAlias(spec);
       if (!target && (spec.startsWith('.') || spec.startsWith('/'))) {
+        if (im.kind === 'import-type') { unresolved.push({ from: p, specifier: spec, kind: im.kind, line: im.line }); continue; }
         if (/\.(?:css|scss|sass|less|svg|png|jpe?g|gif|webp|woff2?|html)$/.test(spec.split(/[?#]/)[0]!)) continue; // assets
         const missingId = `missing:${normPath(`${dirOf(p)}/${spec}`)}`;
         if (!nodes.has(missingId)) nodes.set(missingId, { id: missingId, kind: 'missing', inDegree: 0, outDegree: 0 });
@@ -376,6 +377,7 @@ export function buildImportGraph(files: { path: string; code: string }[], opts: 
 /** Module graph inside one bundle (webpack 4/5, jsonp chunks, browserify, esbuild registries). */
 export function bundleImportGraph(code: string, opts: { sourceMap?: string | RawSourceMap; bundle?: BundleResult } = {}): ImportGraph {
   const b = opts.bundle ?? unpackBundle(code, { sourceMap: opts.sourceMap });
+  let entryOverride: string | undefined;
   const nodes = new Map<string, GraphNode>();
   const edges: GraphEdge[] = [];
   const unresolved: ImportGraph['unresolved'] = [];
@@ -431,6 +433,91 @@ export function bundleImportGraph(code: string, opts: { sourceMap?: string | Raw
       });
     } catch (e) { warnings.push(`chunk loads: ${(e as Error).message.slice(0, 160)}`); }
   }
+  // Calls into the registry from outside every module body: webpack 5 inlines its entry module in an
+  // IIFE, esbuild scope-hoists ES modules and calls require_x() / init_x() factories from the top level.
+  // Those calls become edges from one synthetic entry node, named from a webpack banner when present.
+  if (b.modules.length) {
+    try {
+      const { ast } = parseJs(code);
+      const ids = new Set(b.modules.map((m) => m.id));
+      const factoryNames = new Map<string, string>(); // esbuild: require_x -> module id
+      walk(ast, ({ node }) => {
+        if (node.type === 'VariableDeclarator' && node.id.type === 'Identifier' && node.init?.type === 'CallExpression' && node.init.callee.type === 'Identifier' && /^__(?:commonJS|esm)$/.test(node.init.callee.name)) {
+          const obj = node.init.arguments[0];
+          const p0 = obj?.type === 'ObjectExpression' ? obj.properties[0] : undefined;
+          const key = p0 && p0.type !== 'SpreadElement' ? (p0.key.type === 'StringLiteral' ? p0.key.value : p0.key.type === 'Identifier' ? p0.key.name : undefined) : undefined;
+          if (key && ids.has(key)) factoryNames.set(node.id.name, key);
+        }
+        return undefined;
+      });
+      const owner = (n: t.Node) => b.modules.find((m) => (n.start ?? 0) >= m.start && (n.end ?? 0) <= m.end);
+      let entryId: string | undefined;
+      const entryLocs: { line: number; column: number }[] = [];
+      const entryNode = () => {
+        if (entryId) return entryId;
+        const banner = b.bundler.startsWith('webpack') ? /!\*{3}\s+(\.\/[^\s*]{1,300})\s+\*{3}!/.exec(code.slice(Math.max(0, code.lastIndexOf('__webpack_exports__') - 2000))) : null;
+        entryId = banner?.[1] ? normPath(banner[1]) : '<entry>';
+        if (nodes.has(entryId)) entryId = `<entry>${entryId}`;
+        nodes.set(entryId, { id: entryId, kind: 'module', path: banner?.[1] ? normPath(banner[1]) : undefined, inDegree: 0, outDegree: 0 });
+        return entryId;
+      };
+      const seenEdge = new Set(edges.map((e) => `${e.from}>${e.to}>${e.kind}`));
+      const push = (from: string, to: string, spec: string, kind: ImportKind, line?: number) => { const k = `${from}>${to}>${kind}`; if (seenEdge.has(k) || from === to) return; seenEdge.add(k); edges.push({ from, to, specifier: spec, kind, line }); };
+      walk(ast, ({ node, ancestors }) => {
+        if (node.type !== 'CallExpression' || node.callee.type !== 'Identifier') return undefined;
+        const a0 = node.arguments[0];
+        let target: string | undefined;
+        if (factoryNames.has(node.callee.name) && node.arguments.length === 0) target = factoryNames.get(node.callee.name);
+        else if (a0 && (a0.type === 'StringLiteral' || a0.type === 'NumericLiteral') && ids.has(String(a0.value)) && b.bundler !== 'esbuild') target = String(a0.value);
+        if (target === undefined) return undefined;
+        const own = owner(node);
+        const to = byBundleId.get(target)!;
+        // inside a .then(() => require(x)) after a chunk load the edge is dynamic
+        const dynamic = ancestors.some((anc) => anc.type === 'CallExpression' && anc.callee.type === 'MemberExpression' && anc.callee.property.type === 'Identifier' && anc.callee.property.name === 'then');
+        if (own) { if (b.bundler === 'esbuild') push(byBundleId.get(own.id)!, to, factoryNames.has(node.callee.name) ? node.callee.name : target, 'bundle-dep', node.loc?.start.line); return undefined; }
+        if (node.loc && entryLocs.length < 50) entryLocs.push({ line: node.loc.start.line, column: node.loc.start.column });
+        push(entryNode(), to, target, dynamic ? 'dynamic-import' : 'bundle-dep', node.loc?.start.line);
+        return undefined;
+      });
+      // webpack: __webpack_require__.e("chunk").then(() => __webpack_require__("./x.js")) for a module that lives in another chunk
+      if (b.bundler.startsWith('webpack')) {
+        walk(ast, ({ node }) => {
+          if (node.type !== 'CallExpression' || node.callee.type !== 'MemberExpression' || node.callee.property.type !== 'Identifier' || node.callee.property.name !== 'then') return undefined;
+          const obj = node.callee.object;
+          if (obj.type !== 'CallExpression' || obj.callee.type !== 'MemberExpression' || obj.callee.property.type !== 'Identifier' || obj.callee.property.name !== 'e') return undefined;
+          const fn = node.arguments[0];
+          let lit: string | undefined;
+          if (fn && (fn.type === 'ArrowFunctionExpression' || fn.type === 'FunctionExpression')) walk(fn.body, ({ node: x }) => { if (lit === undefined && x.type === 'CallExpression' && x.callee.type === 'Identifier' && (x.arguments[0]?.type === 'StringLiteral' || x.arguments[0]?.type === 'NumericLiteral')) { lit = String((x.arguments[0] as t.StringLiteral).value); return 'stop'; } return undefined; });
+          if (lit === undefined || ids.has(lit)) return undefined;
+          const own = owner(node);
+          const from = own ? byBundleId.get(own.id)! : entryNode();
+          const to = `chunk-module:${normPath(lit)}`;
+          if (!nodes.has(to)) nodes.set(to, { id: to, kind: 'chunk', bundleId: lit, inDegree: 0, outDegree: 0 });
+          push(from, to, lit, 'dynamic-import', node.loc?.start.line);
+          return undefined;
+        });
+      }
+      // name an anonymous inlined entry through the source map
+      if (entryId === '<entry>' && entryLocs.length && opts.sourceMap) {
+        try {
+          const smi = new SourceMapIndex(opts.sourceMap);
+          let name: string | undefined;
+          for (const l of entryLocs) {
+            const src = smi.sourceInRange(l.line, l.column, l.line, l.column + 200);
+            if (src) name = sourceKey(src);
+            if (name) break;
+          }
+          if (name && !nodes.has(name)) {
+            const n = nodes.get('<entry>')!;
+            nodes.delete('<entry>'); n.id = name; n.path = name; nodes.set(name, n);
+            for (const e of edges) if (e.from === '<entry>') e.from = name;
+            entryId = name;
+          }
+        } catch { /* map not usable */ }
+      }
+      if (entryId) { b.entryIds = []; entryOverride = entryId; }
+    } catch (e) { warnings.push(`registry calls: ${(e as Error).message.slice(0, 160)}`); }
+  }
   // chunk level imports of ESM output (rollup, vite, esbuild ESM) when there is no registry
   if (!b.modules.length) {
     nodes.set('<bundle>', { id: '<bundle>', kind: 'chunk', size: code.length, inDegree: 0, outDegree: 0 });
@@ -441,6 +528,7 @@ export function bundleImportGraph(code: string, opts: { sourceMap?: string | Raw
     }
   }
   const entries: EntryPoint[] = b.entryIds.map((e) => byBundleId.get(e)).filter((x): x is string => !!x).map((id) => ({ id, reason: 'bundle-entry' as const }));
+  if (entryOverride) entries.unshift({ id: entryOverride, reason: 'bundle-entry' });
   void idOf;
   return finish('bundle', nodes, edges, entries, unresolved, warnings, b.bundler);
 }
