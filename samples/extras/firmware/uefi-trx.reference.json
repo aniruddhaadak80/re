@@ -1,0 +1,122 @@
+{
+ "tool": "uefi_firmware 1.16 (EDK2 compressors and its own FV parser)",
+ "plain.bin": {
+  "size": 25040,
+  "sha256": "0e21a967ec35f10ed9fbf38cfe815d19806de2934c3a7031b195544b3107ed6e"
+ },
+ "efi": {
+  "size": 25040,
+  "sha256": "0e21a967ec35f10ed9fbf38cfe815d19806de2934c3a7031b195544b3107ed6e"
+ },
+ "tiano": {
+  "size": 25040,
+  "sha256": "0e21a967ec35f10ed9fbf38cfe815d19806de2934c3a7031b195544b3107ed6e"
+ },
+ "fv": {
+  "offset": 4096,
+  "length": 16384,
+  "files": 4,
+  "leafSections": [
+   {
+    "file": "11111111-2222-4333-8444-555555555555",
+    "type": 21,
+    "size": 22,
+    "sha256": "ce1e86865266181369975da6c6791a75ae69961627ade49d6e49184665f78f65"
+   },
+   {
+    "file": "11111111-2222-4333-8444-555555555555",
+    "type": 20,
+    "size": 10,
+    "sha256": "d312ad52943a4e1e67de5720a6fa81b405c73dcc295af2aa05956544c978d690"
+   },
+   {
+    "file": "11111111-2222-4333-8444-555555555555",
+    "type": 16,
+    "size": 328,
+    "sha256": "ddd8774600ed19ea0c848ac0a5710696e1f6b1309156ea0ee8c4ed8db93e471e"
+   },
+   {
+    "file": "11111111-2222-4333-8444-555555555555",
+    "type": 19,
+    "size": 1,
+    "sha256": "beead77994cf573341ec17b58bbf7eb34d2711c993c1d976b128b3188dc1829a"
+   },
+   {
+    "file": "22222222-3333-4444-8555-666666666666",
+    "type": 25,
+    "size": 4000,
+    "sha256": "44ca75aed1424768eb10dc5dca06d8f31da49f11e3dcdf8f9ac60ded9169a4dc"
+   },
+   {
+    "file": "22222222-3333-4444-8555-666666666666",
+    "type": 21,
+    "size": 28,
+    "sha256": "92223fefb69330f2987ea62fe71f6fbd1fa337fdd9761d7d8ee1fb9d3103e745"
+   },
+   {
+    "file": "33333333-4444-4555-8666-777777777777",
+    "type": 16,
+    "size": 328,
+    "sha256": "2e2e39043445e1b7781376b60ffc1e2b2d6cea8d53538adf51e122b4628022fb"
+   },
+   {
+    "file": "33333333-4444-4555-8666-777777777777",
+    "type": 21,
+    "size": 22,
+    "sha256": "c1800e63428ce7d1a44205094c558bc7526c6de08b64bcc727c8729a73f3332e"
+   },
+   {
+    "file": "5C60F367-A505-419A-859E-2A4FF6CA6FE5",
+    "type": "raw-file",
+    "size": 512,
+    "sha256": "71e620339993b4d58a90071185e7727b60bd30cde54bc183538de32b5df25be2"
+   }
+  ],
+  "expect": {
+   "pe1": "ddd8774600ed19ea0c848ac0a5710696e1f6b1309156ea0ee8c4ed8db93e471e",
+   "pe2": "2e2e39043445e1b7781376b60ffc1e2b2d6cea8d53538adf51e122b4628022fb",
+   "raw1": "44ca75aed1424768eb10dc5dca06d8f31da49f11e3dcdf8f9ac60ded9169a4dc",
+   "nestedRaw": "71e620339993b4d58a90071185e7727b60bd30cde54bc183538de32b5df25be2"
+  }
+ },
+ "trx": {
+  "kernelOffset": 28,
+  "kernelSha256": "0921e93bb32e7f544288b939b48069e234de0d0e979a5789aeb72c19471f55ff",
+  "rootfsOffset": 4096,
+  "length": 77824,
+  "crc32": 4264263966,
+  "binwalk": [
+   {
+    "offset": 0,
+    "description": "TRX firmware header"
+   },
+   {
+    "offset": 28,
+    "description": "LZMA compressed data"
+   },
+   {
+    "offset": 4096,
+    "description": "Squashfs filesystem"
+   }
+  ]
+ },
+ "router": {
+  "uimageOffset": 64,
+  "squashfsOffset": 65536,
+  "kernelSha256": "0921e93bb32e7f544288b939b48069e234de0d0e979a5789aeb72c19471f55ff",
+  "binwalk": [
+   {
+    "offset": 64,
+    "description": "uImage header"
+   },
+   {
+    "offset": 128,
+    "description": "LZMA compressed data"
+   },
+   {
+    "offset": 65536,
+    "description": "Squashfs filesystem"
+   }
+  ]
+ }
+}

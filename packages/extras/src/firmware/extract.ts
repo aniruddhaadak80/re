@@ -1,6 +1,6 @@
 // Firmware extraction (binwalk/unblob style, pure TypeScript): carve known formats out of a blob,
-// unpack them (gzip, xz, lzma, zstd, lz4, zip, cpio, tar, squashfs, uImage, FIT, TRX, Android boot
-// and vendor_boot images v0 to v4, UEFI firmware volumes with FFS files and LZMA sections) and
+// unpack them (gzip, xz, lzma, bzip2, zstd, lz4, zip, cpio, tar, squashfs, uImage, FIT, TRX, Android boot
+// and vendor_boot images v0 to v4, UEFI firmware volumes with FFS files and LZMA, EFI and Tiano compressed sections) and
 // recurse into what comes out, with depth, count, size and time limits. Member names are
 // sanitized so nothing can escape the output root. Browser safe: results stay in memory; the
 // Node entry writes them to disk (writeExtraction in ../node.ts).
@@ -11,6 +11,8 @@ import { gunzipMember, inflateRaw } from '../compress/inflate.js';
 import { lzmaAloneDecode, looksLikeLzmaAlone, xzDecode } from '../compress/lzma.js';
 import { lzo1xDecompress, lzopDecode, LZOP_MAGIC } from '../compress/lzo.js';
 import { zstdDecodeFrame } from '../compress/zstd.js';
+import { bzip2Decode } from '../compress/bzip2.js';
+import { efiDecompress } from '../compress/efi.js';
 import { zipEntries, zipRead } from '../compress/zip.js';
 import { lz4Block } from '../containers/lz4.js';
 import { tarEntries } from '../signals/recording.js';
@@ -43,7 +45,7 @@ export interface ExtractResult {
 interface Member { name: string; kind: ExtractedFile['kind']; data?: Uint8Array; target?: string; mode?: string; offset?: number }
 interface Unpacked { end: number; description: string; members: Member[]; /** When true the members are parts of the same blob and are not re-carved as one */ leaf?: boolean }
 type Handler = (b: Uint8Array, off: number, ctx: Ctx) => Unpacked | undefined;
-interface Ctx { opts: Required<Omit<ExtractOptions, 'skip'>> & { skip: Set<string> }; warn: (m: string) => void; budget: () => boolean; maxOut: () => number }
+interface Ctx { opts: Required<Omit<ExtractOptions, 'skip'>> & { skip: Set<string> }; warn: (m: string) => void; budget: () => boolean; maxOut: () => number; truncate: (why: string) => void }
 
 const u32le = (b: Uint8Array, o: number) => ((b[o] as number) | ((b[o + 1] as number) << 8) | ((b[o + 2] as number) << 16) | ((b[o + 3] as number) << 24)) >>> 0;
 const u32be = (b: Uint8Array, o: number) => (((b[o] as number) << 24) | ((b[o + 1] as number) << 16) | ((b[o + 2] as number) << 8) | (b[o + 3] as number)) >>> 0;
@@ -134,6 +136,8 @@ function concat(parts: Uint8Array[], total: number): Uint8Array {
 // ---------------- payload decompression by name (uImage, FIT, TRX loader) ----------------
 function decompressNamed(kind: string, d: Uint8Array, max: number): Uint8Array | undefined {
   switch (kind) {
+    case 'none': return d;
+    case 'bzip2': return bzip2Decode(d, { maxOut: max }).data;
     case 'gzip': return gunzipMember(d, { maxOut: max }).data;
     case 'lzma': return lzmaAloneDecode(d, { maxOut: max }).data;
     case 'xz': return xzDecode(d, { maxOut: max }).data;
@@ -171,6 +175,10 @@ const H: Record<string, Handler> = {
   'lz4-legacy'(b, off, ctx) {
     const r = lz4LegacyDecode(b, off, ctx.maxOut());
     return { end: r.end, description: `LZ4 legacy frame, ${r.data.length} bytes`, members: [{ name: 'lz4.uncompressed', kind: 'file', data: r.data }] };
+  },
+  bzip2(b, off, ctx) {
+    const r = bzip2Decode(b, { start: off, maxOut: ctx.maxOut(), concatenated: false });
+    return { end: r.end, description: `bzip2, block size ${r.blockSize}, ${r.blocks} blocks, CRC ${r.crcValid ? 'ok' : 'bad'}, ${r.data.length} bytes`, members: [{ name: 'bzip2.uncompressed', kind: 'file', data: r.data }] };
   },
   lzop(b, off, ctx) {
     const r = lzopDecode(b, { start: off, maxOut: ctx.maxOut() });
@@ -220,6 +228,8 @@ const H: Record<string, Handler> = {
   squashfs(b, off, ctx) {
     const r = extractSquashfs(b, off, { withData: true, maxEntries: ctx.opts.maxFiles, maxFileSize: ctx.opts.maxFileSize, maxTotal: ctx.maxOut(), deadline: Date.now() + ctx.opts.timeBudgetMs });
     for (const e of r.errors.slice(0, 20)) ctx.warn(`squashfs: ${e}`);
+    const missing = r.entries.filter((e) => e.type === 'file' && (e.size ?? 0) > 0 && !e.data).length;
+    if (r.truncated || missing) ctx.truncate(`squashfs at ${off}: ${missing} file(s) not unpacked because of the size, count or time limits`);
     const end = off + (r.super.bytesUsed > 0 ? r.super.bytesUsed : b.length - off);
     return {
       end: Math.min(b.length, end), description: `squashfs ${r.super.version}, ${r.super.compression}, block ${r.super.blockSize}, ${r.entries.length} entries, ${r.super.bytesUsed} bytes`,
@@ -235,7 +245,7 @@ const H: Record<string, Handler> = {
     const add = (name: string, d: Uint8Array) => {
       let out: Uint8Array | undefined;
       try { out = decompressNamed(u.compression, d, ctx.maxOut()); } catch (e) { ctx.warn(`uImage ${u.name}: ${u.compression} payload did not decode: ${(e as Error).message}`); }
-      members.push({ name: out ? name : `${name}.${u.compression === 'none' ? 'bin' : u.compression}`, kind: 'file', data: out ?? d });
+      members.push({ name: out ? name : `${name}.${u.compression}`, kind: 'file', data: out ?? d });
     };
     if (u.multi?.length) {
       let p = 4 * (u.multi.length + 1);
@@ -349,6 +359,7 @@ const H: Record<string, Handler> = {
 
 // ---------------- UEFI volumes, FFS files and sections ----------------
 const LZMA_GUID = 'EE4E5898-3914-4259-9D6E-DC7BD79403CF';
+const TIANO_GUID = 'A31280AD-481E-41B6-95E8-127F4C984779';
 const CRC32_GUID = 'FC1BCDB0-7D31-49AA-936A-A4600D9DD083';
 const FFS_TYPES: Record<number, string> = { 1: 'raw', 2: 'freeform', 3: 'sec_core', 4: 'pei_core', 5: 'dxe_core', 6: 'peim', 7: 'driver', 8: 'combined_peim_driver', 9: 'application', 0xa: 'mm', 0xb: 'fv_image', 0xc: 'combined_mm_dxe', 0xd: 'mm_core', 0xe: 'mm_standalone', 0xf: 'mm_core_standalone', 0xf0: 'pad' };
 const SEC_EXT: Record<number, string> = { 0x10: 'pe32.efi', 0x11: 'pic', 0x12: 'te', 0x13: 'dxe.depex', 0x14: 'version', 0x15: 'ui', 0x16: 'compat16', 0x17: 'fv', 0x18: 'freeform', 0x19: 'raw', 0x1b: 'pei.depex', 0x1c: 'mm.depex' };
@@ -416,13 +427,19 @@ function uefiSections(body: Uint8Array, ctx: Ctx, depth: number, absBase: number
         // EFI_COMPRESSION_SECTION: uncompressed length u32, type u8 (0 none, 1 standard EFI/Tiano)
         const ctype = data[4];
         if (ctype === 0) out.push(...uefiSections(data.subarray(5), ctx, depth, absBase + s + hdr + 5, `${tag}.`));
-        else out.push({ name: `${tag}.compressed-efi.bin`, kind: 'file', data: data.subarray(5), offset: absBase + s + hdr + 5 });
+        else {
+          const r = efiDecompress(data, { start: 5, variant: 'auto', maxOut: ctx.maxOut() });
+          out.push(...uefiSections(r.data, ctx, depth, absBase + s + hdr + 5, `${tag}.`));
+        }
       } else if (type === 0x02) {
         const g = guid(data, 0);
         const dataOff = v.u16(s + hdr + 16);
         const inner = body.subarray(s + dataOff, s + size);
         if (g === LZMA_GUID) {
           const r = lzmaAloneDecode(inner, { maxOut: ctx.maxOut() });
+          out.push(...uefiSections(r.data, ctx, depth, absBase + s + dataOff, `${tag}.`));
+        } else if (g === TIANO_GUID) {
+          const r = efiDecompress(inner, { variant: 'tiano', maxOut: ctx.maxOut() });
           out.push(...uefiSections(r.data, ctx, depth, absBase + s + dataOff, `${tag}.`));
         } else if (g === CRC32_GUID) out.push(...uefiSections(inner, ctx, depth, absBase + s + dataOff, `${tag}.`));
         else out.push({ name: `${tag}.guided-${g}.bin`, kind: 'file', data: inner, offset: absBase + s + dataOff });
@@ -459,6 +476,7 @@ function candidates(b: Uint8Array, from: number, to: number, skip: Set<string>):
       case 0x04: if (startsAt(b, i, [0x04, 0x22, 0x4d, 0x18])) add(i, 'lz4'); break;
       case 0x02: if (startsAt(b, i, [0x02, 0x21, 0x4c, 0x18])) add(i, 'lz4-legacy'); break;
       case 0x89: if (startsAt(b, i, LZOP_MAGIC)) add(i, 'lzop'); break;
+      case 0x42: if (b[i + 1] === 0x5a && b[i + 2] === 0x68 && (b[i + 3] as number) >= 0x31 && (b[i + 3] as number) <= 0x39 && (startsAt(b, i + 4, [0x31, 0x41, 0x59, 0x26, 0x53, 0x59]) || startsAt(b, i + 4, [0x17, 0x72, 0x45, 0x38, 0x50, 0x90]))) add(i, 'bzip2'); break;
       case 0x50: if (b[i + 1] === 0x4b && b[i + 2] === 3 && b[i + 3] === 4) add(i, 'zip'); break;
       case 0x30: if (startsAt(b, i, [0x30, 0x37, 0x30, 0x37, 0x30]) && (b[i + 5] === 0x31 || b[i + 5] === 0x32 || b[i + 5] === 0x37)) add(i, 'cpio'); break;
       case 0x68: if (startsAt(b, i, [0x68, 0x73, 0x71, 0x73])) add(i, 'squashfs'); break;
@@ -491,7 +509,7 @@ export function extractFirmware(bytes: Uint8Array, options: ExtractOptions = {})
     if (res.files.length >= opts.maxFiles || res.stats.bytes >= opts.maxTotalBytes || Date.now() - t0 > opts.timeBudgetMs) { res.truncated = true; return false; }
     return true;
   };
-  const ctx: Ctx = { opts, warn, budget, maxOut: () => Math.max(0, Math.min(opts.maxFileSize, opts.maxTotalBytes - res.stats.bytes)) };
+  const ctx: Ctx = { opts, warn, budget, maxOut: () => Math.max(0, Math.min(opts.maxFileSize, opts.maxTotalBytes - res.stats.bytes)), truncate: (why) => { res.truncated = true; warn(why); } };
   const uniq = (p: string) => { let q = p, k = 1; while (used.has(q)) q = `${p}~${k++}`; used.add(q); return q; };
   const emit = (path: string, m: Member, depth: number, via: string[]): ExtractedFile => {
     const f: ExtractedFile = { path: uniq(path), kind: m.kind, size: m.data?.length ?? 0, depth, via, ...(m.mode ? { mode: m.mode } : {}), ...(m.target !== undefined ? { target: m.target } : {}), ...(m.offset !== undefined ? { offset: m.offset } : {}) };
@@ -523,6 +541,7 @@ export function extractFirmware(bytes: Uint8Array, options: ExtractOptions = {})
       res.stats.chunks++;
       for (const m of u.members) {
         if (!budget()) break;
+        if (m.kind === 'dir' && sanitizeMemberPath(m.name) === 'unnamed' && /^[./]*$/.test(m.name)) continue; // archive root entry
         const name = sanitizeMemberPath(m.name, warn);
         const f = emit(`${dir}/${name}`, m, depth + 1, [...via, c.type]);
         if (m.kind === 'file' && m.data && m.data.length >= 16 && depth + 1 <= opts.maxDepth) {
