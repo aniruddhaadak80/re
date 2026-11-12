@@ -22,6 +22,8 @@ import { NamesError } from './names.js';
 import { detect } from './detect.js';
 import { installFor } from './catalog.js';
 import { UnsafeArgumentError } from './exec.js';
+import { listCutterSessions, cutterCommand } from './cutter.js';
+import { detectJeb, jebDecompile, jebInfo, jebUnits, JEB_INSTALL, jebScriptPath } from './jeb.js';
 import { HookParamError } from './hooks.js';
 import type { BridgeTool, ToolId, ToolInputField } from './types.js';
 
@@ -518,6 +520,44 @@ const RAW: BridgeTool[] = [
         note: 'RevLens does not drive the Cutter GUI. Use rizin directly (bridge_r2_* with engine: rizin, or bridge_r2_session_open) and write names into a rizin project with bridge_r2_apply_names, then open that project in Cutter.',
       };
     },
+  },
+  {
+    name: 'bridge_cutter_sessions',
+    description: 'Running Cutter windows with their pid, the binaries and rizin project they have open (command line plus open file handles), and whether the RevLens Cutter plugin is live in them for in-window commands. Also called list_cutter_sessions.',
+    inputSchema: {},
+    run: () => listCutterSessions(),
+  },
+  {
+    name: 'bridge_cutter_command',
+    description: 'Run one rizin command for a Cutter window: inside Cutter through the RevLens plugin when it is loaded (sees your renames), else in a separate rizin (Cutter\'s bundled rizin first) on the same file and project. Shell, write, open and script commands are refused. Needs allowExecution: true. Also called cutter_command.',
+    inputSchema: {
+      session: f('string', 'Cutter pid from bridge_cutter_sessions'), file: f('string', 'file to use when there is no session, or which of the session files'),
+      project: f('string', 'rizin project (.rzdb) to load'), command: f('string', 'rizin command, for example afl, pdf @ main, axt @ sym.imp.strcpy', false),
+      mode: f('string', 'auto (default), live (plugin only) or rizin (separate process)'), analysis: f('string', 'none, aa (default without a project) or aaa'),
+      maxChars: f('number', 'cap on returned characters'), allowExecution: ALLOW, timeoutMs: TIMEOUT,
+    },
+    run: (i) => cutterCommand(i),
+  },
+  {
+    name: 'bridge_jeb_info',
+    description: 'Find JEB and, given a path, open the file in JEB headless with the RevLens script: project name, artifacts and unit count. Without a path it only reports the install and the script path.',
+    inputSchema: { path: f('string', 'file to open in JEB'), timeoutMs: TIMEOUT },
+    run: async (i) => {
+      if (!i.path) { const d = await detectJeb(); return d.available ? { ...d, script: jebScriptPath() } : { ...d, install: JEB_INSTALL }; }
+      return jebInfo(i);
+    },
+  },
+  {
+    name: 'bridge_jeb_units',
+    description: 'List the units JEB builds for a file (APK, DEX, resources, native code, certificates) with type, format and child count, using JEB headless.',
+    inputSchema: { path: PATH, timeoutMs: TIMEOUT },
+    run: (i) => jebUnits(i),
+  },
+  {
+    name: 'bridge_jeb_decompile',
+    description: 'Decompile one item with JEB headless: a class (Lcom/a/B;), a method (Lcom/a/B;->m()V) or a native address. Returns the source text from the unit decompiler that handles it.',
+    inputSchema: { path: PATH, item: f('string', 'class or method signature, or an address', false), maxChars: f('number', 'cap on returned characters'), timeoutMs: TIMEOUT },
+    run: (i) => jebDecompile(i),
   },
   {
     name: 'bridge_ida_run',

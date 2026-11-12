@@ -28,5 +28,7 @@ export {
 export { ghidraApplyNames, ghidraExportNames, idaApplyNames, idaExportNames, r2ApplyNames, r2ExportNames, namesToR2Script, r2Name, loadNames } from './writeback/providers.js';
 export { ghidraCachedProject } from './providers/ghidra.js';
 export { TOOLS } from './tools.js';
+export { listCutterSessions, cutterCommand, pluginCommand, pluginScriptPath, pluginDir, readAnnouncements, isCutterProcess, parseCmdline, filesFromArgs, openFilesFromProc, cutterFromProc, parsePs, parseLsof, parseWindowsProcesses, splitWindowsCommandLine, type CutterSession, type CutterCommandInput } from './cutter.js';
+export { detectJeb, detectJebSync, jebInfo, jebUnits, jebDecompile, jebArgs, parseJebOutput, jebScriptPath, jebVersionFromName, JEB_INSTALL, type JebDetection, type JebInput } from './jeb.js';
 export { CLI_COMMANDS, parseArgv, toolInput, renderResult } from './cli.js';
 export { ANALYZERS, r2Analyzer, jadxAnalyzer, inventoryAnalyzer } from './analyzer.js';

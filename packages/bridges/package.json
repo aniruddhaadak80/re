@@ -23,6 +23,8 @@
   "files": [
     "dist",
     "ci",
+    "scripts/cutter",
+    "scripts/jeb",
     "README.md"
   ],
   "scripts": {
