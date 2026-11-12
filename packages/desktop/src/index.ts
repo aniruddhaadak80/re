@@ -16,6 +16,10 @@ export { encodeMessage, decodeMessage, messageLength, splitSignature, Variant, M
 export { parseStrace, splitArgs, unquote, compareCaptures, type StraceSummary, type ProcessCapture } from './strace.js';
 export { readLevelLog, readLevelTable, readLevelDb, decodeLocalStorage, type LevelRecord, type LevelTableRecord, type LevelTableResult, type LevelDbFile, type LevelDbEntry } from './leveldb.js';
 export { snappyDecompress, snappyLength, crc32c, unmaskCrc } from './snappy.js';
+export { parseGType, decodeGVariant, printGVariant, formatG17, type GType, type GVar } from './gvariantbin.js';
+export { readGvdb, isGvdb, readDconfDb, dconfDump, type GvdbFile, type GvdbItem, type GvdbTable, type DconfKey } from './gvdb.js';
+export { detectEngines, findBytes, parseUnityFsHeader, parseUnitySerializedHeader, parseIl2cppMetadata, parseGodotPck, godotEmbeddedStart, parseGameMakerHeader, parseUnrealPakFooter, parseUnrealUtoc, parseRenpyHeader, parseRpgMakerHeader, parsePeHeader, peRvaToOffset, parseDotnetBundle, DOTNET_BUNDLE_SIGNATURE, type EngineId, type EngineEvidence, type EngineFinding, type EngineFileInfo, type RangeReader, type DotnetBundle, type PeInfo } from './engines.js';
+export { settleChangeTime, changeTimeLimits, CHANGE_TIME_SETTINGS, type ChangeTimeLimits, type SettleSeams } from './changetime.js';
 export { parseXml, wholeText, parseKeyFile, detectFormat, viewOf, isSecretFile, isSecretKey, redactValue, redactLines, validateTask, resolvePointer, pointerSegments, parseSelectorSegment, runCheck, runTask, toEvalTasks, scoreTaskAnswers, type DesktopTask, type TaskCheck, type CheckResult, type TaskRun, type ViewHelpers, type FileSource } from './views.js';
 export { writeZip, listZip, readZipEntry, type ZipEntry } from './zip.js';
 export { decodeXwd, encodePng, pngInfo, crop, diffImages, crc32, type Rgba } from './image.js';

@@ -13,6 +13,7 @@ import { parseRegQuery } from './apps.js';
 import { writeZip } from './zip.js';
 import { readLevelDb, decodeLocalStorage } from './leveldb.js';
 import { dconfDump, isGvdb } from './gvdb.js';
+import { settleChangeTime, changeTimeLimits } from './changetime.js';
 import { viewOf, detectFormat, isSecretFile, redactValue, redactLines, runTask, validateTask, type ViewHelpers, type DesktopTask, type FileSource } from './views.js';
 import { parsePlist } from './plist.js';
 import type { UiNode } from './gvariant.js';
@@ -97,7 +98,7 @@ export function stateCandidates(app: AppIdentity, platform: string = process.pla
   return out;
 }
 
-export interface StateFile { root: string; path: string; rel: string; size: number; mtime: string; format: string; sha256?: string; secret: boolean; summary?: unknown }
+export interface StateFile { root: string; path: string; rel: string; size: number; mtime: string; /** ChangeTime; on Windows read after it settles (see changetime.ts) */ ctime?: string; ctimeReads?: number; format: string; sha256?: string; secret: boolean; summary?: unknown }
 export interface AppStateResult {
   app: AppIdentity; platform: string; roots: StateRoot[]; files: StateFile[]; totalBytes: number; truncated: boolean;
   electron?: { userData: string; localStorage?: { origin?: string; key: string; value?: string }[]; markers: string[] }[];
@@ -178,6 +179,7 @@ export async function appState(o: AppStateOptions): Promise<AppStateResult> {
   const seenReal = new Set<string>();
   const dconfUser = join(o.home === undefined ? (process.env.XDG_CONFIG_HOME || join(home, '.config')) : join(home, '.config'), 'dconf', 'user');
   let userDb: Uint8Array | null | undefined;
+  const ctLimits = changeTimeLimits(process.env); // refuses bad settings before any work
   for (const r of roots) {
     if (r.kind === 'registry') {
       if (process.platform !== 'win32') continue;
@@ -209,7 +211,9 @@ export async function appState(o: AppStateOptions): Promise<AppStateResult> {
     r.exists = true;
     const truncated = await walk(r.path, maxFiles - res.files.length, maxDepth, async (abs, fst) => {
       const rel = relative(r.kind === 'file' ? join(r.path, '..') : r.path, abs).split(sep).join('/');
-      const f: StateFile = { root: r.path, path: abs, rel, size: Number(fst.size), mtime: new Date(Number(fst.mtimeMs)).toISOString(), format: 'unknown', secret: isSecretFile(abs) };
+      let first = true;
+      const ct = await settleChangeTime(async () => { if (first) { first = false; return { ctimeMs: Number(fst.ctimeMs) }; } return { ctimeMs: Number((await lstat(abs)).ctimeMs) }; }, { platform: process.platform, limits: ctLimits }).catch(() => undefined);
+      const f: StateFile = { root: r.path, path: abs, rel, size: Number(fst.size), mtime: new Date(Number(fst.mtimeMs)).toISOString(), ctime: ct && Number.isFinite(Number(ct.stats.ctimeMs)) ? new Date(Number(ct.stats.ctimeMs)).toISOString() : undefined, ctimeReads: ct && ct.reads > 1 ? ct.reads : undefined, format: 'unknown', secret: isSecretFile(abs) };
       res.totalBytes += f.size;
       if (f.size <= 16 * 1024 * 1024) {
         try {
@@ -267,7 +271,7 @@ export async function appExport(o: AppStateOptions & { out: string; redact?: boo
   for (const e of st.electron ?? []) if (e.localStorage?.some((x) => x.value === '[redacted]')) lsSecret.add(e.userData);
   for (const f of st.files) {
     const zipName = `state/${rootLabel.get(f.root)}/${f.rel}`;
-    const rec: Record<string, unknown> = { path: zipName, source: f.path, size: f.size, sha256: f.sha256, format: f.format, mtime: f.mtime };
+    const rec: Record<string, unknown> = { path: zipName, source: f.path, size: f.size, sha256: f.sha256, format: f.format, mtime: f.mtime, ctime: f.ctime };
     if (redact && f.secret) { rec.redacted = 'withheld'; withheld++; manifestFiles.push(rec); continue; }
     if (redact && lsSecret.has(f.root) && /^(Default\/)?(Local|Session) Storage\/leveldb\/[^/]+\.(log|ldb)$/.test(f.rel)) { rec.redacted = 'withheld: Local Storage holds secret-looking keys (non-secret keys are in the manifest)'; withheld++; manifestFiles.push(rec); continue; }
     if (f.size > 64 * 1024 * 1024 || total + f.size > maxBytes) { rec.redacted = 'skipped-size'; manifestFiles.push(rec); continue; }

@@ -17,6 +17,7 @@ import { verifyAuditLog } from './audit.js';
 import { traceUi, runUiScenario } from './uiscenario.js';
 import { captureProcess, compareCaptureFiles } from './capture.js';
 import { appState, appExport, checkTaskFile } from './appstate.js';
+import { detectAppFolder } from './enginescan.js';
 
 export * from './index.js';
 export { run, executionAllowed, psQuote } from './exec.js';
@@ -24,6 +25,8 @@ export { startComputer, actOnComputer, checkpointComputer, closeComputer, listCo
 export { verifyAuditLog, canonicalJson } from './audit.js';
 export { traceUi, runUiScenario, diffToEvents, type TraceOptions, type ScenarioOptions, type ScenarioStep } from './uiscenario.js';
 export { captureProcess, compareCaptureFiles, type CaptureOptions } from './capture.js';
+export { waitExit, release } from './children.js';
+export { detectAppFolder, type EngineScanOptions } from './enginescan.js';
 export { appState, appExport, checkTaskFile, stateCandidates, homeSource, nodeViewHelpers, type AppStateOptions } from './appstate.js';
 export { Atspi, resolveA11yAddress } from './atspi.js';
 export { DBusClient, parseAddress } from './dbus.js';
@@ -204,8 +207,14 @@ export function defaultAppDirs(platform: string = PLATFORM): string[] {
 }
 
 /** Read one .desktop file, .app bundle or Info.plist into an AppRecord with runtime hints (Electron, resolved executable). */
-export async function inspectApp(path: string): Promise<AppRecord & { resolvedExecutable?: string; electron?: boolean; asar?: string }> {
+export async function inspectApp(path: string, o: { engines?: boolean } = {}): Promise<AppRecord & { resolvedExecutable?: string; electron?: boolean; asar?: string; engines?: Awaited<ReturnType<typeof detectAppFolder>> }> {
   const st = await stat(path);
+  if (st.isDirectory() && !/\.app\/?$/.test(path)) {
+    // a plain app folder (a game or a portable app): identify what it is built with
+    const eng = await detectAppFolder(path);
+    const top = eng.engines[0];
+    return { platform: process.platform === 'darwin' ? 'macos' : process.platform === 'win32' ? 'windows' : 'linux', source: path, name: basename(path.replace(/[\\/]+$/, '')), installLocation: path, packaging: 'other', extra: top ? { engine: top.engine } : undefined, engines: eng };
+  }
   let app: AppRecord | undefined;
   if (st.isDirectory() && /\.app\/?$/.test(path)) {
     const bundle = path.replace(/\/$/, '');
@@ -213,7 +222,8 @@ export async function inspectApp(path: string): Promise<AppRecord & { resolvedEx
     app = infoPlistToApp(parsePlist(new Uint8Array(await readFile(plistPath))), bundle);
     const electron = await exists(join(bundle, 'Contents', 'Frameworks', 'Electron Framework.framework'));
     const asar = join(bundle, 'Contents', 'Resources', 'app.asar');
-    return { ...app, resolvedExecutable: app.executable, electron, asar: (await exists(asar)) ? asar : undefined };
+    const engines = o.engines === false ? undefined : await detectAppFolder(bundle, { maxFiles: 20_000 }).catch(() => undefined);
+    return { ...app, resolvedExecutable: app.executable, electron, asar: (await exists(asar)) ? asar : undefined, engines };
   }
   const bytes = await readRegularFile(path, 16 * 1024 * 1024, `${path} is not a file or .app bundle`);
   if (/\.desktop$/.test(path)) {
@@ -231,7 +241,10 @@ export async function inspectApp(path: string): Promise<AppRecord & { resolvedEx
     const dir = real.replace(/[\\/][^\\/]+$/, '');
     for (const c of [join(dir, 'resources', 'app.asar'), join(dir, '..', 'Resources', 'app.asar')]) if (await exists(c)) { electron = true; asar = c; break; }
   }
-  return { ...app, resolvedExecutable: real, electron, asar };
+  // engines next to the executable, but never by walking a shared system folder such as /usr/bin
+  const exeDir = real?.replace(/[\\/][^\\/]+$/, '');
+  const engines = o.engines === false || !exeDir || /^(\/usr)?\/s?bin$|^\/usr\/local\/s?bin$|^\/usr\/games$|^\/snap\/bin$/.test(exeDir) ? undefined : await detectAppFolder(exeDir, { maxFiles: 20_000 }).catch(() => undefined);
+  return { ...app, resolvedExecutable: real, electron, asar, engines };
 }
 
 export interface AppListOptions { dirs?: string[]; filter?: string; includeHidden?: boolean; limit?: number; offset?: number; resolve?: boolean }
@@ -422,9 +435,15 @@ const NODE_TOOLS: ToolDef[] = [
   },
   {
     name: 'desktop_app_inspect',
-    description: 'Read one installed app: a .desktop file, an .app bundle or an Info.plist. Resolves the executable on PATH and flags Electron apps with the app.asar path, ready for web_electron_audit.',
-    inputSchema: { path: { type: 'string', description: '.desktop file, .app folder or Info.plist.' } },
-    run: async (i) => inspectApp(String(i.path)),
+    description: 'Read one installed app: a .desktop file, an .app bundle, an Info.plist or a plain app folder. Resolves the executable on PATH, flags Electron apps with the app.asar path (ready for web_electron_audit), and identifies game engines and .NET in the app folder (as desktop_app_engines does).',
+    inputSchema: { path: { type: 'string', description: '.desktop file, .app folder, Info.plist or app folder.' }, engines: { type: 'boolean', description: 'Scan the app folder for engines and .NET (default true).', optional: true } },
+    run: async (i) => inspectApp(String(i.path), { engines: i.engines }),
+  },
+  {
+    name: 'desktop_app_engines',
+    description: 'Identify what an app folder is built with: Unity (Mono or IL2CPP, version from UnityFS or serialized file headers, IL2CPP metadata version), Unreal (pak footer version, IoStore TOC, shipping executables), Godot (standalone or embedded PCK with engine version, C# assemblies), GameMaker (data.win FORM/GEN8 with game name and IDE version), Ren\'Py (RPA archives, compiled scripts, version file), RPG Maker (MV and MZ core scripts with version, encrypted assets, XP/VX/VX Ace RGSS archives) and .NET (runtimeconfig frameworks, managed assemblies with metadata version, apphosts and single-file bundles with their file list). Every result lists its evidence with path and offset.',
+    inputSchema: { path: { type: 'string', description: 'App folder (or a file inside it).' }, maxFiles: { type: 'number', description: 'Max files to list (default 50000).', optional: true }, maxDepth: { type: 'number', description: 'Max folder depth (default 10).', optional: true }, maxScanBytes: { type: 'number', description: 'Max bytes read per executable when looking for a .NET bundle (default 256 MiB).', optional: true } },
+    run: async (i) => detectAppFolder(String(i.path), i),
   },
   {
     name: 'desktop_ui_tree',

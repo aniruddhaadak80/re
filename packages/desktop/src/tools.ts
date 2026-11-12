@@ -7,7 +7,8 @@ import { parseGVariant } from './gvariant.js';
 import { compareSnapshots } from './compare.js';
 import { compareUiTrees } from './uimodel.js';
 import { parseStrace, compareCaptures } from './strace.js';
-import { readLevelLog, decodeLocalStorage } from './leveldb.js';
+import { readLevelLog, readLevelTable, readLevelDb, decodeLocalStorage } from './leveldb.js';
+import { readDconfDb, dconfDump } from './gvdb.js';
 import { validateTask, toEvalTasks, scoreTaskAnswers, type DesktopTask } from './views.js';
 import { decodeXwd, pngInfo } from './image.js';
 
@@ -38,7 +39,8 @@ async function jsonOf(path: unknown, text: unknown, read?: Reader, max = 256 * 1
 const textOf = async (i: { path?: string; base64?: string; text?: string }, read?: Reader) => (typeof i.text === 'string' ? i.text : new TextDecoder().decode(await bytesOf(i, read)));
 
 /** Parse-only tools. Pass a file reader to accept paths (Node). */
-export function BROWSER_TOOLS(read?: Reader): ToolDef[] {
+export function BROWSER_TOOLS(read?: Reader, readDir?: (dir: string) => Promise<{ name: string; bytes: Uint8Array }[]>): ToolDef[] {
+  const kv = (k: Uint8Array, v?: Uint8Array) => { const hex = (b: Uint8Array) => Array.from(b.subarray(0, 256), (x) => x.toString(16).padStart(2, '0')).join(''); const txt = (b: Uint8Array) => new TextDecoder('utf-8', { fatal: false }).decode(b.subarray(0, 2000)); return { key: txt(k), keyHex: hex(k), value: v ? txt(v) : undefined, valueBytes: v?.length }; };
   return [
     {
       name: 'desktop_plist_parse',
@@ -114,6 +116,35 @@ export function BROWSER_TOOLS(read?: Reader): ToolDef[] {
         const txt = (b: Uint8Array) => new TextDecoder('utf-8', { fatal: false }).decode(b.subarray(0, 2000));
         return { batches: r.batches, corrupt: r.corrupt, truncated: r.truncated, records: r.records.map((x) => i.localStorage ? { seq: x.seq, op: x.op, ...decodeLocalStorage(x.key, x.value) } : { seq: x.seq, op: x.op, key: txt(x.key), keyHex: hex(x.key), value: x.value ? txt(x.value) : undefined, valueBytes: x.value?.length }) };
       },
+    },
+    {
+      name: 'desktop_leveldb_table',
+      description: 'Read a LevelDB table file (.ldb or .sst; Chromium and Electron Local Storage, IndexedDB): footer, index, then every data block, decompressing Snappy blocks with a built-in pure TS decoder and checking block CRC-32C. Gives each put and delete with its sequence number. With localStorage=true, entries are decoded as Chromium Local Storage.',
+      inputSchema: { ...SRC, localStorage: { type: 'boolean', description: 'Decode Chromium Local Storage records.', optional: true }, limit: { type: 'number', description: 'Max records (default 2000).', optional: true } },
+      run: async (i) => {
+        const r = readLevelTable(await bytesOf(i, read, 512 * 1024 * 1024), { maxRecords: Math.max(1, Math.min(Number(i.limit ?? 2000), 100_000)) });
+        return { blocks: r.blocks, compressedBlocks: r.compressedBlocks, badChecksums: r.badChecksums, corrupt: r.corrupt, truncated: r.truncated, warnings: r.warnings, records: r.records.map((x) => i.localStorage ? { seq: x.seq, op: x.op, block: x.block, ...decodeLocalStorage(x.key, x.value) } : { seq: x.seq, op: x.op, block: x.block, ...kv(x.key, x.value) }) };
+      },
+    },
+    {
+      name: 'desktop_leveldb_read',
+      description: 'Merge the files of one LevelDB folder (every .log and .ldb/.sst given as {name, base64}, or a folder path in Node) into its live key set: highest sequence number wins and deletes remove keys, as LevelDB itself reads it. With localStorage=true, entries are decoded as Chromium Local Storage.',
+      inputSchema: { files: { type: 'array', description: 'List of {name, base64} for the folder\'s .log and .ldb files.', optional: true }, path: { type: 'string', description: 'LevelDB folder (Node only).', optional: true }, localStorage: { type: 'boolean', description: 'Decode Chromium Local Storage records.', optional: true }, limit: { type: 'number', description: 'Max entries returned (default 2000).', optional: true }, offset: { type: 'number', description: 'Skip this many entries.', optional: true } },
+      run: async (i) => {
+        let files: { name: string; bytes: Uint8Array }[];
+        if (Array.isArray(i.files)) files = i.files.slice(0, 10_000).map((f: { name?: unknown; base64?: unknown }) => ({ name: String(f.name ?? ''), bytes: b64(String(f.base64 ?? '')) }));
+        else if (typeof i.path === 'string') { if (!readDir) throw new InputError('folder paths are only supported in Node; pass files'); files = await readDir(i.path); }
+        else throw new InputError('give files or path');
+        const r = readLevelDb(files);
+        const off = Math.max(0, Number(i.offset ?? 0)), lim = Math.max(1, Math.min(Number(i.limit ?? 2000), 100_000));
+        return { live: r.entries.length, deleted: r.deleted, files: r.files, truncated: r.truncated, warnings: r.warnings.slice(0, 50), entries: r.entries.slice(off, off + lim).map((x) => (i.localStorage ? { seq: x.seq, source: x.source, ...decodeLocalStorage(x.key, x.value) } : { seq: x.seq, source: x.source, ...kv(x.key, x.value) })) };
+      },
+    },
+    {
+      name: 'desktop_dconf_read',
+      description: 'Read a binary dconf database (GVDB file such as ~/.config/dconf/user or /etc/dconf/db/local) without dconf: every key with its GVariant type, value and text, locks, and the same text `dconf dump` prints for a folder.',
+      inputSchema: { ...SRC, dir: { type: 'string', description: 'Folder for the dump text, like /org/gnome/ (default /).', optional: true }, limit: { type: 'number', description: 'Max keys returned (default 5000).', optional: true } },
+      run: async (i) => { const b = await bytesOf(i, read, 256 * 1024 * 1024); const r = readDconfDb(b); const lim = Math.max(1, Math.min(Number(i.limit ?? 5000), 200_000)); return { keys: r.keys.slice(0, lim), totalKeys: r.keys.length, locks: r.locks, dirs: r.dirs.slice(0, lim), warnings: r.warnings.slice(0, 50), dump: dconfDump(b, typeof i.dir === 'string' ? i.dir : '/').slice(0, 2_000_000) }; },
     },
     {
       name: 'desktop_task_validate',
