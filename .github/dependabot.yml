@@ -54,6 +54,18 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: zod
         update-types: ["version-update:semver-major"]
+      # Babel 8 and GraphQL 17 are transitive majors: the workspace's parsers
+      # are pinned to the 7.x / 16.x APIs and the 8.x PRs fail the test lane.
+      - dependency-name: "@babel/parser"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@babel/generator"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@babel/types"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@babel/traverse"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: graphql
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
