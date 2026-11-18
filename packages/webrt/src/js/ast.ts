@@ -14,7 +14,9 @@ export interface ParseResult {
   sourceType: 'module' | 'script';
 }
 
-const BASE_PLUGINS: ParserPlugin[] = ['jsx', 'classProperties', 'classPrivateProperties', 'classPrivateMethods', 'dynamicImport', 'importMeta', 'topLevelAwait', 'optionalChaining', 'nullishCoalescingOperator', 'objectRestSpread', 'bigInt', 'numericSeparator', 'logicalAssignment', 'optionalCatchBinding', 'exportDefaultFrom', 'importAttributes'];
+// Babel 8 parses the ES2015+ syntax below unconditionally, so the proposal
+// plugins that used to be listed here are gone from `ParserPlugin`.
+const BASE_PLUGINS: ParserPlugin[] = ['jsx', 'exportDefaultFrom'];
 
 /** Parse JavaScript (or JSX) leniently. Throws InputError only when nothing could be parsed. */
 export function parseJs(code: string, opts: { typescript?: boolean } = {}): ParseResult {

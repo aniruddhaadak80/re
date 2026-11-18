@@ -511,7 +511,9 @@ function cleanupPass(ast: t.File, res: DeobfuscateResult): boolean {
     const n = v.node;
     // obj['name'] -> obj.name
     if ((n.type === 'MemberExpression' || n.type === 'OptionalMemberExpression') && n.computed && n.property.type === 'StringLiteral' && IDENT_RE.test(n.property.value) && !RESERVED.has(n.property.value)) {
-      n.property = t.identifier(n.property.value); n.computed = false; res.stats.membersSimplified++; changed = true;
+      // In Babel 8 `MemberExpression` is a discriminated union: a string
+      // property implies `computed: true`, so widening is needed to flip it.
+      n.property = t.identifier(n.property.value); (n as { computed: boolean }).computed = false; res.stats.membersSimplified++; changed = true;
     }
     if ((n.type === 'ObjectProperty' || n.type === 'ObjectMethod' || n.type === 'ClassMethod') && !n.computed && n.key.type === 'StringLiteral' && IDENT_RE.test(n.key.value) && !RESERVED.has(n.key.value)) {
       n.key = t.identifier(n.key.value); res.stats.membersSimplified++; changed = true;
