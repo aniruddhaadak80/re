@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="The imphash of a Go binary, no Python">
+<defs>
+<pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#1C1C20" stroke-width="1"/></pattern>
+<radialGradient id="glow" cx="78%" cy="35%" r="55%"><stop offset="0%" stop-color="#F5B301" stop-opacity="0.22"/><stop offset="100%" stop-color="#F5B301" stop-opacity="0"/></radialGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD166"/><stop offset="100%" stop-color="#F5B301"/></linearGradient>
+</defs>
+<style>text{font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif}.m{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}</style>
+<rect width="1200" height="630" fill="#0A0A0B"/><rect width="1200" height="630" fill="url(#g)"/><rect width="1200" height="630" fill="url(#glow)"/>
+<g transform="translate(80 80)"><circle cx="18" cy="18" r="14" fill="none" stroke="url(#gold)" stroke-width="5"/><line x1="29" y1="29" x2="40" y2="40" stroke="#F5B301" stroke-width="6" stroke-linecap="round"/>
+<text x="56" y="28" font-size="26" font-weight="800" fill="#F5B301">RevLens</text><text x="196" y="28" font-size="20" fill="#A8A29E">blog</text></g>
+<text x="80" y="290" font-size="22" font-weight="700" fill="#14B8A6" letter-spacing="2" class="m">PE INTERNALS</text>
+<text x="80" y="360" font-size="52" font-weight="800" fill="#FFD166">The imphash of a</text><text x="80" y="422" font-size="52" font-weight="800" fill="#FFD166">Go binary, without</text><text x="80" y="484" font-size="52" font-weight="800" fill="#FFD166">Python</text>
+<g transform="translate(750 120)"><rect width="380" height="340" rx="22" fill="#141416" stroke="#2A2A30"/><text x="28" y="56" font-size="17" fill="#14B8A6" class="m">kernel32.writefile,</text><text x="28" y="90" font-size="17" fill="#14B8A6" class="m">kernel32.writeconsolew,</text><text x="28" y="124" font-size="17" fill="#14B8A6" class="m">kernel32.virtualalloc,</text><text x="28" y="158" font-size="17" fill="#14B8A6" class="m">kernel32.loadlibraryw,</text><text x="28" y="192" font-size="17" fill="#14B8A6" class="m">kernel32.getprocaddress,</text><text x="28" y="226" font-size="17" fill="#14B8A6" class="m">kernel32.createthread,</text><line x1="28" y1="270" x2="352" y2="270" stroke="#2A2A30"/><text x="28" y="300" font-size="15" fill="#A8A29E" class="m">md5 =</text><text x="28" y="326" font-size="15" font-weight="700" fill="#FFD166" class="m">b196866f0bf37f1f128fa153413b744f</text></g>
+<rect x="80" y="560" width="120" height="6" rx="3" fill="#F5B301"/><rect x="210" y="560" width="40" height="6" rx="3" fill="#14B8A6"/>
+<text x="1120" y="570" text-anchor="end" font-size="18" fill="#A8A29E" class="m">aniruddhaadak80.github.io/re</text>
+</svg>

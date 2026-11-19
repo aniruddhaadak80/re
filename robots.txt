@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aniruddhaadak80.github.io/re/sitemap.xml
